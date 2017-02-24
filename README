@@ -1,5 +1,7 @@
 Please make note of the COPYING file for the copyright and licensing information. 
 
+If you attempt to recompile this, particularly when using QT creator, take note that most platforms do not have the old SSL implementations, for many very good reasons, but QT expects some of them and will complain. Do NOT compile old and dangerous SSL versions. Rather, supress this error message using build environment variables. QT_LOGGING_RULES should be set to: qt.network.ssl.warning=false
+
 This engine is designed to allow access to resources using an Agave interface. See: https://agaveapi.co for more information.
 
 There are two main extensible parts of the interface.
