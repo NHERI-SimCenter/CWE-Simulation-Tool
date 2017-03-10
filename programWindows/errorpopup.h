@@ -33,6 +33,13 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
+// The ErrorPopup is used to halt execution with a useful error message.
+// It has 2 constructors:
+// 1) Uses a VWTerrorType which is an error code. This is meant for fatal errors which might happen from time to time,
+// even if the code is correct.
+// 2) Uses a QString text message. This is meant for fatal errors that should not be possible, except in the case of a logic
+// error elsewhere in the code.
+
 #ifndef ERRORPOPUP_H
 #define ERRORPOPUP_H
 
@@ -63,6 +70,7 @@ private slots:
     void closeByError();
 
 private:
+    void setErrorLabel(QString errorText);
     QString getErrorText(VWTerrorType errNum);
 
     Ui::ErrorPopup *ui;

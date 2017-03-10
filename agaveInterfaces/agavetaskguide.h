@@ -43,6 +43,7 @@
 enum class AgaveRequestType;
 enum class AgaveState;
 
+//TODO: This whole class, needs more documentation in particular
 enum class AuthHeaderType {NONE, PASSWD, CLIENT, TOKEN, REFRESH};
 
 class AgaveTaskGuide
@@ -51,54 +52,37 @@ public:
     explicit AgaveTaskGuide();
     explicit AgaveTaskGuide(QString newID, AgaveRequestType reqType);
 
-    void addValidStartState(AgaveState newState);
-    void addValidReplyState(AgaveState newState);
-
     void setURLsuffix(QString newValue);
     void setHeaderType(AuthHeaderType newValue);
-    void setPostParams(QString format, int numSubs);
-    void setOutputSigGood(QString outID, QStringList parseFindList);
-    void setOutputSigFail(QString outID, QStringList parseFindList);
+
     void setTokenFormat(bool newSetting);
     void setDynamicURLParams(QString format, int numSubs);
-    void setAsPrivlidged();
+    void setPostParams(QString format, int numSubs);
+    void setAsInternal();
 
     QString getTaskID();
-    bool verifyValidStartState(AgaveState checkState);
-    bool verifyValidReplyState(AgaveState checkState);
     QString getURLsuffix();
     AgaveRequestType getRequestType();
     AuthHeaderType getHeaderType();
-    QByteArray fillPostArgList(QStringList *argList);
-    QByteArray fillPostArgList();
-    QMap<QString, QList<QString>> getOutputSignatureGood();
-    QMap<QString, QList<QString>> getOutputSignatureFail();
-    QByteArray fillURLArgList(QStringList * argList);
-    QByteArray fillURLArgList();
+    QByteArray fillPostArgList(QStringList *argList = NULL);
+    QByteArray fillURLArgList(QStringList * argList = NULL);
     bool isTokenFormat();
-    bool isPrivlidged();
+    bool isInternal();
 
-    bool needsNoParams();
-    bool needsBothParams();
-    bool needsOnlyPostParms();
-    bool needsOnlyURLParams();
+    bool needsPostParms();
+    bool needsURLParams();
 
 private:
     QString taskId;
-    QList<AgaveState> validStartStates;
-    QList<AgaveState> validReplyStates;
 
     QString URLsuffix = "";
     AgaveRequestType requestType;
     AuthHeaderType headerType = AuthHeaderType::NONE;
-    QMap<QString, QList<QString>> outputsOfInterestGood;
-    QMap<QString, QList<QString>> outputsOfInterestFail;
 
     QByteArray fillAnyArgList(QStringList *argList, int numVals, QString strFormat);
 
+    bool internalTask = false;
     bool usesTokenFormat = false;
-    bool privlidgedTask = false;
-    bool usesDefaultValidStates;
     bool needsPostParams = false;
     bool needsURLParams = false;
 
@@ -107,7 +91,6 @@ private:
 
     QString dynURLFormat = "";
     int numDynURLVals = 0;
-    bool verifiyValidState(AgaveState checkState, QList<AgaveState> * stateList);
 };
 
 #endif // AGAVETASKGUIDE_H

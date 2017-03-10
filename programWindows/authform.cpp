@@ -39,22 +39,27 @@
 #include <QNetworkAccessManager>
 #include <QSslConfiguration>
 
-#include "../vwtinterfacedriver.h"
-#include "../agaveInterfaces/agavehandler.h"
+#include "../agaveInterfaces/remotedatainterface.h"
 #include "errorpopup.h"
+#include "copyrightdialog.h"
+#include "vwtinterfacedriver.h"
 
-AuthForm::AuthForm(VWTinterfaceDriver * mainDriver, QWidget *parent) :
+AuthForm::AuthForm(RemoteDataInterface * newRemoteHandle, VWTinterfaceDriver * theDriver, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AuthForm)
 {
     ui->setupUi(this);
 
-    windowHandler = mainDriver;
-    agaveConnection = windowHandler->getAgaveConnection();
+    theConnection = newRemoteHandle;
+    myDriver = theDriver;
 
     this->setTabOrder(this->findChild<QWidget *>("unameInput"), this->findChild<QWidget *>("passwordInput"));
     this->setTabOrder(this->findChild<QWidget *>("passwordInput"), this->findChild<QWidget *>("loginButton"));
     this->setTabOrder(this->findChild<QWidget *>("loginButton"), this->findChild<QWidget *>("quitButton"));
+
+    errorTextElement = this->findChild<QLabel *>("errorLabel");
+    unameInput = this->findChild<QLineEdit *>("unameInput")->text();
+    passwordInput = this->findChild<QLineEdit *>("passwordInput")->text();
 }
 
 AuthForm::~AuthForm()
@@ -64,7 +69,8 @@ AuthForm::~AuthForm()
 
 void AuthForm::getCopyingInfo()
 {
-    windowHandler->displayCopyInfo();
+    CopyrightDialog copyrightPopup;
+    copyrightPopup.exec();
 }
 
 void AuthForm::exitAuth()
@@ -74,20 +80,19 @@ void AuthForm::exitAuth()
 
 void AuthForm::performAuth()
 {
-    if (agaveConnection->getState() != AgaveState::NO_AUTH)
-    {
-        return;
-    }
-    QString unameText = this->findChild<QLineEdit *>("unameInput")->text();
-    QString passText = this->findChild<QLineEdit *>("passwordInput")->text();
+    QString unameText = unameInput->text();
+    QString passText = passwordInput->text();
 
-    agaveConnection->performAuth(unameText, passText);
+    RemoteDataReply * authReply = theConnection->performAuth(unameText, passText);
+    if (authReply->isValidReply())
+    {
+        QObject::connect(authReply,SIGNAL(haveAuthReply(RequestState)),this,SLOT(getAuthReply(RequestState)));
+        QObject::connect(authReply,SIGNAL(haveAuthReply(RequestState)),myDriver, SLOT(getAuthReply(RequestState)));
+    }
 }
 
 void AuthForm::getAuthReply(RequestState authReply)
 {
-    QLabel * errorTextElement = this->findChild<QLabel *>("errorLabel");
-
     if (authReply == RequestState::GOOD)
     {
         errorTextElement->setText("Loading . . .");
@@ -104,5 +109,4 @@ void AuthForm::getAuthReply(RequestState authReply)
     {
         ErrorPopup("Authentication Problems Detected");
     }
-
 }

@@ -33,43 +33,84 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef AUTHFORM_H
-#define AUTHFORM_H
+#include "remotedatainterface.h"
 
-#include <QWidget>
-#include <QLabel>
-#include <QLineEdit>
-
-enum class RequestState;
-class VWTinterfaceDriver;
-class RemoteDataInterface;
-
-namespace Ui {
-class AuthForm;
+FileMetaData::FileMetaData()
+{
+    //Note: defaults are handled in the class header
 }
 
-class AuthForm : public QWidget
+FileMetaData::FileMetaData(FileMetaData * copyFrom)
 {
-    Q_OBJECT
+    this->fullContainingPath = copyFrom->fullContainingPath;
+    this->fileName = copyFrom->fileName;
+    this->fileSize = copyFrom->fileSize;
+    this->myType = copyFrom->myType;
+}
 
-public:
-    explicit AuthForm(RemoteDataInterface * newRemoteHandle, VWTinterfaceDriver * theDriver, QWidget *parent = 0);
-    ~AuthForm();
+FileMetaData FileMetaData::operator=(const FileMetaData & toCopy)
+{
+    FileMetaData ret(&toCopy);
+    return ret;
+}
 
-private slots:
-    void performAuth();
-    void exitAuth();
-    void getCopyingInfo();
-    void getAuthReply(RequestState authReply);
+void FileMetaData::setFullFilePath(QString fullPath)
+{
+    QStringList pathParts;
+    char divChar;
+    if (fullPath.contains('/'))
+    {
+        pathParts = fullPath.split('/');
+        divChar = '/';
+    }
+    else
+    {
+        pathParts = fullPath.split('\\');
+        divChar = '\\';
+    }
+    fileName = pathParts.at(pathParts.size() - 1);
+    pathParts.removeLast();
+    fullContainingPath = divChar;
+    for (auto itr = pathParts.cbegin(); itr != pathParts.cend(); itr++)
+    {
+        fullContainingPath.append(*itr);
+        fullContainingPath.append(divChar);
+    }
+}
 
-private:
-    Ui::AuthForm *ui;
-    RemoteDataInterface * theConnection;
-    VWTinterfaceDriver * myDriver;
+void FileMetaData::setSize(int newSize)
+{
+    fileSize = newSize;
+}
 
-    QLabel * errorTextElement;
-    QLineEdit * unameInput;
-    QLineEdit * passwordInput;
-};
+void FileMetaData::setType(FileType newType)
+{
+    myType = newType;
+}
 
-#endif // AUTHFORM_H
+QString FileMetaData::getFullPath()
+{
+    QString ret = fullContainingPath;
+    ret.append(fileName);
+    return ret;
+}
+
+QString FileMetaData::getFileName()
+{
+    return fileName;
+}
+
+QString FileMetaData::getContainingPath()
+{
+    return fullContainingPath;
+}
+
+int FileMetaData::getSize()
+{
+    return fileSize;
+}
+
+FileType FileMetaData::getFileType()
+{
+    return myType;
+}

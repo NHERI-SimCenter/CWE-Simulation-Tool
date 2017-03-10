@@ -40,13 +40,12 @@
 #include "../agaveInterfaces/agavehandler.h"
 #include "../agaveInterfaces/agavetaskreply.h"
 
-FileMainipPanel::FileMainipPanel(VWTinterfaceDriver * controller, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
+FileMainipPanel::FileMainipPanel(AgaveHandler * newAgaveHandle, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
 {
     this->setFrameNameList({"Remote File Management", "Browse Remote Files"});
 
-    interfaceControl = controller;
     myTreeReader = newReader;
-    agaveConnection = interfaceControl->getAgaveConnection();
+    agaveConnection = newAgaveHandle;
     this->setFileTreeVisibleSetting(true);
 }
 

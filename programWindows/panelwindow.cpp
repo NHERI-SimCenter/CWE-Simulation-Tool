@@ -40,16 +40,16 @@
 #include "taskPanels/taskpanelentry.h"
 #include "taskPanels/filemainippanel.h"
 #include "taskPanels/placeholderpanel.h"
-#include "../vwtinterfacedriver.h"
+#include "../agaveInterfaces/agavehandler.h"
+#include "copyrightdialog.h"
 
-PanelWindow::PanelWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
+PanelWindow::PanelWindow(AgaveHandler * newAgaveLink, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PanelWindow)
 {
     ui->setupUi(this);
 
-    interfaceDriver = newDriver;
-
+    agaveLink = newAgaveLink;
     taskTreeView = this->findChild<QTreeView *>("taskTreeView");
     sharedWidget = this->findChild<QStackedWidget *>("stackedView");
     QTreeView * fileTreeView = this->findChild<QTreeView *>("fileTreeView");
@@ -59,7 +59,7 @@ PanelWindow::PanelWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     taskListModel.setHorizontalHeaderLabels(taskHeaderList);
     taskTreeView->hideColumn(1);
 
-    fileTreeModel = new FileTreeModelReader(interfaceDriver, fileTreeView, fileLabel);
+    fileTreeModel = new FileTreeModelReader(agaveLink, fileTreeView, fileLabel);
 }
 
 PanelWindow::~PanelWindow()
@@ -74,7 +74,7 @@ void PanelWindow::setupTaskList()
     fileTreeModel->resetFileData();
 
     //Populate panel list:
-    FileMainipPanel * filePanel = new FileMainipPanel(interfaceDriver, fileTreeModel);
+    FileMainipPanel * filePanel = new FileMainipPanel(agaveLink, fileTreeModel);
     registerTaskPanel(filePanel);
 
     PlaceholderPanel * placeHolderEntry = new PlaceholderPanel();
@@ -211,12 +211,13 @@ void PanelWindow::takePanelOwnership(TaskPanelEntry * newOwner)
 
 void PanelWindow::menuCopyInfo()
 {
-    interfaceDriver->displayCopyInfo();
+    CopyrightDialog copyrightPopup;
+    copyrightPopup.exec();
 }
 
 void PanelWindow::taskEntryClicked(QModelIndex clickedItem)
 {
-    //TODO: Figure out proper behavior if click down and release up arre on two different items
+    //TODO: Figure out proper behavior if click down and release up are on two different items
     QStandardItem * clickedTextEntry = taskListModel.itemFromIndex(clickedItem);
     int entryRow = clickedTextEntry->row();
     int taskIndex = -1;

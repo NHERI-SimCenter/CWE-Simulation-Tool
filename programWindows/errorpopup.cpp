@@ -43,15 +43,7 @@ ErrorPopup::ErrorPopup(VWTerrorType errNum) :
     ui->setupUi(this);
 
     errorVal = errNum;
-    QLabel * errorTextElement = this->findChild<QLabel *>("errorText");
-
-    QString errorText = getErrorText(errNum);
-    errorText.prepend(" :");
-    errorText.prepend(QString::number((unsigned int)errNum));
-    errorText.prepend("ERROR ");
-
-    errorTextElement->setText(errorText);
-    qDebug("%s",errorText.toStdString().c_str());
+    setErrorLabel(getErrorText(errNum));
 
     //TODO: not sure if calling exec during constructor is a good idea
     this->exec();
@@ -64,18 +56,23 @@ ErrorPopup::ErrorPopup(QString errorText) :
     ui->setupUi(this);
 
     errorVal = VWTerrorType::CUSTOM_ERROR;
-    QLabel * errorTextElement = this->findChild<QLabel *>("errorText");
-
-    QString fullErrorText = errorText;
-    fullErrorText.prepend(" :");
-    fullErrorText.prepend(QString::number((unsigned int)errorVal));
-    fullErrorText.prepend("ERROR ");
-
-    errorTextElement->setText(fullErrorText);
-    qDebug("%s",fullErrorText.toStdString().c_str());
+    setErrorLabel(errorText);
 
     //TODO: not sure if calling exec during constructor is a good idea
     this->exec();
+}
+
+void ErrorPopup::setErrorLabel(QString errorText)
+{
+    QLabel * errorTextElement = this->findChild<QLabel *>("errorText");
+
+    QString realErrorText = errorText;
+    realErrorText.prepend(": ");
+    realErrorText.prepend(QString::number((unsigned int)errNum));
+    realErrorText.prepend("ERROR ");
+
+    errorTextElement->setText(realErrorText);
+    qDebug("%s",realErrorText.toStdString().c_str());
 }
 
 void ErrorPopup::closeByError()

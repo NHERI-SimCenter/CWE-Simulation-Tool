@@ -56,45 +56,63 @@ enum class FileColumn : int {FILENAME = 0,
                              MIME_TYPE = 5,
                              PERMISSIONS = 6};
 
-class VWTinterfaceDriver;
-class AgaveHandler;
 class SingleLineDialog;
-enum class RequestState;
-
-//TODO: This class is a total mess from beginning to end. PRS
-//TODO: Many inefficient nested function calls. Mostly because I was writing it blind to how it should work. PRS
-//TODO: Next task will be rewrite of this and corresponging .h interface. PRS
+class AgaveHandler;
 
 class FileTreeModelReader : public QObject
 {
     Q_OBJECT
 public:
-    FileTreeModelReader(VWTinterfaceDriver * theDriver, QTreeView * newLinkedFileView, QLabel * fileHeaderLabel);
+    FileTreeModelReader(AgaveHandler * newAgaveLink, QTreeView * newLinkedFileView, QLabel * fileHeaderLabel);
+
     QString getFilePathForNode(QModelIndex dataIndex);
     QMap<QString,QString> getDataForEntry(QModelIndex dataIndex);
     QModelIndex getCurrentSelectedFile();
+
     void setTreeViewVisibility(bool isVisible);
-    void resetFileData();
-    void refreshFolderFromPath(QString pathToRefresh);
     void setRightClickMenuEnabled(bool newSetting);
+
+    void resetFileData();
+    void refreshFolderAtPath(QString pathToRefresh);
 
 signals:
     void newFileSelected(QModelIndex dataIndex);
 
 private slots:
-    void refreshFileInfo(QJsonValue fileList);
+    void refreshFileInfo(QJsonArray fileList);
+
     void folderExpanded(QModelIndex itemOpened);
     void fileEntryTouched(QModelIndex fileIndex);
     void needRightClickMenu(QPoint pos);
-    void getAgaveResult();
+
+    //Slots for the file operations in the right-click menu
+    void sendCopyReq();
+    void getCopyResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+
+    void sendMoveReq();
+    void getMoveResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+
+    void sendRenameReq();
+    void getRenameResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+
+    void sendDeleteReq();
+    void getDeleteResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+
+    void sendUploadReq();
+    void getUploadResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+
+    void sendCreateFolderReq();
+    void getCreateFolderResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+
+    void sendDownloadReq();
+    void getDownloadResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
 
 private:
     bool insertFileData(QJsonArray fileList);
-    QList<QStandardItem*> getLoadingPlaceholderRow();
     bool needDataRefresh(QModelIndex dataIndex);
     void refreshFolderFromNode(QStandardItem * modelNode);
 
-    bool runRemoteFileTask(QString taskName, QDialog * approvalDialog = NULL, SingleLineDialog * inputDialog = NULL);
+    QList<QStandardItem*> getLoadingPlaceholderRow();
 
     const int tableNumCols = 7;
     const QStringList shownHeaderLabelList = {"File Name","Type","Size","Last Changed",
@@ -105,11 +123,9 @@ private:
     QStandardItemModel dataStore;
     QTreeView * linkedFileView;
     QModelIndex selectedItem;
-    VWTinterfaceDriver * myDriver;
     QLabel * filesLabel;
     bool rightClickEnabled = false;
     bool fileOperationPending = false;
-    QString pendingOperationRefresh;
 
     AgaveHandler * agaveLink;
 };
