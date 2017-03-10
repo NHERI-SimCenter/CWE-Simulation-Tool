@@ -44,7 +44,6 @@
 #include <QJsonValue>
 
 class FileTreeModelReader;
-class VWTinterfaceDriver;
 class AgaveHandler;
 enum class RequestState;
 
@@ -52,7 +51,7 @@ class FileMainipPanel : public TaskPanelEntry
 {
     Q_OBJECT
 public:
-    FileMainipPanel(VWTinterfaceDriver * controller, FileTreeModelReader * newReader, QObject *parent = 0);
+    FileMainipPanel(AgaveHandler * newAgaveHandle, FileTreeModelReader * newReader, QObject *parent = 0);
 
     virtual void setupOwnFrame();
     virtual void frameNowVisible();
@@ -66,7 +65,6 @@ private:
     FileTreeModelReader * myTreeReader;
 
     AgaveHandler * agaveConnection;
-    VWTinterfaceDriver * interfaceControl;
 
     QLabel * contentLabel = NULL;
 };

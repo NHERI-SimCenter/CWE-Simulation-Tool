@@ -58,9 +58,6 @@ public:
 private:
     Ui::SingleLineDialog *ui;
     QLineEdit * inputLine;
-    QPushButton * doButton;
-    QPushButton * cancelButton;
-    QLabel * inputLabel;
 };
 
 #endif // SINGLELINEDIALOG_H

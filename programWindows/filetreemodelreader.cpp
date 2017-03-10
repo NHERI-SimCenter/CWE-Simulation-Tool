@@ -47,11 +47,10 @@
 //TODO: Many inefficient nested function calls. Mostly because I was writing it blind to how it should work. PRS
 //TODO: Next task will be rewrite of this and corresponging .h interface. PRS
 
-FileTreeModelReader::FileTreeModelReader(VWTinterfaceDriver *theDriver, QTreeView * newLinkedFileView, QLabel * fileHeaderLabel)
+FileTreeModelReader::FileTreeModelReader(AgaveHandler * newAgaveLink, QTreeView * newLinkedFileView, QLabel * fileHeaderLabel)
 {
-    myDriver = theDriver;
     linkedFileView = newLinkedFileView;
-    agaveLink = theDriver->getAgaveConnection();
+    agaveLink = newAgaveLink;
     filesLabel = fileHeaderLabel;
     QObject::connect(agaveLink, SIGNAL(sendFileData(QJsonValue)), this, SLOT(refreshFileInfo(QJsonValue)));
     QObject::connect(linkedFileView, SIGNAL(expanded(QModelIndex)), this, SLOT(folderExpanded(QModelIndex)));
@@ -119,6 +118,27 @@ void FileTreeModelReader::setTreeViewVisibility(bool isVisible)
     filesLabel->setVisible(isVisible);
 }
 
+void FileTreeModelReader::setRightClickMenuEnabled(bool newSetting)
+{
+    rightClickEnabled = newSetting;
+}
+
+void FileTreeModelReader::resetFileData()
+{
+    dataStore.clear();
+    dataStore.setColumnCount(tableNumCols);
+    dataStore.setHorizontalHeaderLabels(shownHeaderLabelList);
+    linkedFileView->hideColumn((int)FileColumn::MIME_TYPE);
+    linkedFileView->hideColumn((int)FileColumn::PERMISSIONS);
+    linkedFileView->hideColumn((int)FileColumn::FORMAT);
+    linkedFileView->hideColumn((int)FileColumn::LAST_CHANGED);
+    //TODO: Adjust column size defaults;
+
+    QStandardItem * rootNode = dataStore.invisibleRootItem();
+    rootNode->appendRow(this->getLoadingPlaceholderRow());
+    agaveLink->retriveDirListing("/");
+}
+
 void FileTreeModelReader::refreshFolderFromPath(QString pathToRefresh)
 {
     //We traverse from root to the file specified, stoping when we either
@@ -163,11 +183,6 @@ void FileTreeModelReader::refreshFolderFromPath(QString pathToRefresh)
     refreshFolderFromNode(searchItem);
 }
 
-void FileTreeModelReader::setRightClickMenuEnabled(bool newSetting)
-{
-    rightClickEnabled = newSetting;
-}
-
 void FileTreeModelReader::refreshFolderFromNode(QStandardItem * modelNode)
 {
     if (modelNode != dataStore.invisibleRootItem())
@@ -180,17 +195,12 @@ void FileTreeModelReader::refreshFolderFromNode(QStandardItem * modelNode)
     }
 }
 
-void FileTreeModelReader::refreshFileInfo(QJsonValue fileList)
+void FileTreeModelReader::refreshFileInfo(QJsonArray fileList)
 {
-    if (!fileList.isArray())
-    {
-        ErrorPopup("Agave Link produces incorrect file data.");
-        return;
-    }
-
     if (!insertFileData(fileList.toArray()))
     {
         //if we have a data mismatch we reset everything
+        //TODO: this should be more graceful
         resetFileData();
     }
 }
@@ -243,9 +253,7 @@ void FileTreeModelReader::needRightClickMenu(QPoint pos)
     if (touchedItem == NULL) return;
 
     fileEntryTouched(targetIndex);
-
-    targetIndex = getCurrentSelectedFile();
-    QMap<QString,QString> rawFileData = getDataForEntry(targetIndex);
+    QMap<QString,QString> rawFileData = getDataForEntry(getCurrentSelectedFile());
 
     if (rawFileData.value("format") == "Fetching Data") return;
     if (rawFileData.value("type") == "Empty Folder") return;
@@ -259,114 +267,178 @@ void FileTreeModelReader::needRightClickMenu(QPoint pos)
         return;
     }
 
-    fileMenu.addAction("Copy To . . .");
-    fileMenu.addAction("Move To . . .");
-    fileMenu.addAction("Rename");
+    fileMenu.addAction("Copy To . . .",SLOT(sendCopyReq()));
+    fileMenu.addAction("Move To . . .",SLOT(sendMoveReq()));
+    fileMenu.addAction("Rename",SLOT(sendRenameReq()));
     //We don't let the user delete the username folder
     if (dataStore.itemFromIndex(targetIndex)->parent() != NULL)
     {
         fileMenu.addSeparator();
-        fileMenu.addAction("Delete");
+        fileMenu.addAction("Delete",SLOT(sendDeleteReq()));
         fileMenu.addSeparator();
     }
     if (rawFileData.value("type") == "dir")
     {
-        fileMenu.addAction("Upload File Here");
-        fileMenu.addAction("Create New Folder");
+        fileMenu.addAction("Upload File Here",SLOT(sendUploadReq()));
+        fileMenu.addAction("Create New Folder",SLOT(sendCreateFolderReq()));
     }
     else
     {
-        fileMenu.addAction("Download File");
+        fileMenu.addAction("Download File",SLOT(sendDownloadReq()));
     }
 
-    QAction * triggeredAction = fileMenu.exec(QCursor::pos());
-    if (triggeredAction == NULL) return;
-
-    QString selectedMenuItem = triggeredAction->text();
-
-    qDebug("%s", selectedMenuItem.toStdString().c_str());
-
-    //TODO: Double check file has not changed
-
-    pendingOperationRefresh = getFilePathForNode(targetIndex);
-
-    //TODO: Double check valid for operation
-    //TODO: Some of these operations have unwield interfaces (exp. copy and move)
-
-    if (selectedMenuItem == "Delete")
-    {
-        DeleteConfirm deletePopup(pendingOperationRefresh);
-        if (runRemoteFileTask("fileDelete", &deletePopup))
-        {
-            pendingOperationRefresh = getFilePathForNode(dataStore.itemFromIndex(targetIndex)->parent()->index());
-        }
-    }
-    else if (selectedMenuItem == "Create New Folder")
-    {
-        SingleLineDialog newFolderNamePopup("Please input a name for the new folder:", "newFolder1");
-        runRemoteFileTask("newFolder", &newFolderNamePopup, &newFolderNamePopup);
-    }
-    else if (selectedMenuItem == "Upload File Here")
-    {
-        SingleLineDialog uploadNamePopup("Please input full path of file to upload:", "");
-        runRemoteFileTask("fileUpload", &uploadNamePopup, &uploadNamePopup);
-    }
-    else if (selectedMenuItem == "Copy To . . .")
-    {
-
-    }
-    else if (selectedMenuItem == "Move To . . .")
-    {
-
-    }
-    else if (selectedMenuItem == "Rename")
-    {
-        SingleLineDialog newNamePopup("Please type a new file name:", "newname");
-        if (runRemoteFileTask("renameFile", &newNamePopup, &newNamePopup))
-        {
-            pendingOperationRefresh = getFilePathForNode(dataStore.itemFromIndex(targetIndex)->parent()->index());
-        }
-    }
-    else if (selectedMenuItem == "Download File")
-    {
-
-    }
+    fileMenu.exec(QCursor::pos());
 }
 
-bool FileTreeModelReader::runRemoteFileTask(QString taskName, QDialog * approvalDialog, SingleLineDialog * inputDialog)
+void FileTreeModelReader::sendCopyReq()
 {
-    if (approvalDialog != NULL)
+    //TODO
+}
+
+void FileTreeModelReader::getCopyResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData)
+{
+    //TODO
+}
+
+void FileTreeModelReader::sendMoveReq()
+{
+    //TODO
+}
+
+void FileTreeModelReader::getMoveResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData)
+{
+    //TODO
+}
+
+void FileTreeModelReader::sendRenameReq()
+{
+    QString reqPath = getFilePathForNode(getCurrentSelectedFile());
+    SingleLineDialog newNamePopup("Please type a new file name:", "newname");
+    //TODO: NEED lots of verification here
+    //First, that file can be renamed
+    //Second, that new file name is valid
+    if (newNamePopup->exec() != QDialog::Accepted)
     {
-        int result = approvalDialog->exec();
-        if (result != QDialog::Accepted)
-        {
-            return false;
-        }
+        return;
     }
 
-    AgaveTaskReply * replyHandle;
-    if (inputDialog != NULL)
-    {
-        replyHandle = agaveLink->performAgaveQuery(taskName,{pendingOperationRefresh},{inputDialog->getInputText()});
-    }
-    else
-    {
-        replyHandle = agaveLink->performAgaveQuery(taskName,{pendingOperationRefresh});
-    }
+    QStringList URLparams = {reqPath};
+    QStringList POSTparams = {newNamePopup->getInputText()};
+
+    AgaveTaskReply * replyHandle = agaveLink->performAgaveQuery("renameFile",&URLparams,&POSTparams);
     if (replyHandle == NULL)
     {
-        return false;
+        return;
     }
     QObject::connect(replyHandle, SIGNAL(sendAgaveResultData(QString,RequestState,QMap<QString,QJsonValue>)),
-                        this, SLOT(getAgaveResult()));
+                        this, SLOT(getRenameResult(QString,RequestState,QMap<QString,QJsonValue>)));
     fileOperationPending = true;
-    return true;
 }
 
-void FileTreeModelReader::getAgaveResult()
+void FileTreeModelReader::getRenameResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData)
 {
-    refreshFolderFromPath(pendingOperationRefresh);
     fileOperationPending = false;
+    //TODO: data refresh
+}
+
+void FileTreeModelReader::sendDeleteReq()
+{
+    QString reqPath = getFilePathForNode(getCurrentSelectedFile());
+    //TODO: verify file valid for delete
+    DeleteConfirm deletePopup(reqPath);
+    if (deletePopup->exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    QStringList URLparams = {reqPath};
+
+    AgaveTaskReply * replyHandle = agaveLink->performAgaveQuery("fileDelete",&URLparams);
+    if (replyHandle == NULL)
+    {
+        return;
+    }
+    QObject::connect(replyHandle, SIGNAL(sendAgaveResultData(QString,RequestState,QMap<QString,QJsonValue>)),
+                        this, SLOT(getDeleteResult(QString,RequestState,QMap<QString,QJsonValue>)));
+    fileOperationPending = true;
+}
+
+void FileTreeModelReader::getDeleteResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData)
+{
+    fileOperationPending = false;
+    //TODO: data refresh
+}
+
+void FileTreeModelReader::sendUploadReq()
+{
+    SingleLineDialog uploadNamePopup("Please input full path of file to upload:", "");
+    QString reqPath = getFilePathForNode(getCurrentSelectedFile());
+    //TODO: NEED lots of verification here
+    //First, valid folder to upload to
+    //Second, that uploaded file exists and is valid
+    if (uploadNamePopup->exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    QStringList URLparams = {reqPath};
+    QStringList POSTparams = {uploadNamePopup->getInputText()};
+
+    AgaveTaskReply * replyHandle = agaveLink->performAgaveQuery("fileUpload",&URLparams,&POSTparams);
+    if (replyHandle == NULL)
+    {
+        return;
+    }
+    QObject::connect(replyHandle, SIGNAL(sendAgaveResultData(QString,RequestState,QMap<QString,QJsonValue>)),
+                        this, SLOT(getUploadResult(QString,RequestState,QMap<QString,QJsonValue>)));
+    fileOperationPending = true;
+}
+
+void FileTreeModelReader::getUploadResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData)
+{
+    fileOperationPending = false;
+    //TODO: data refresh
+}
+
+void FileTreeModelReader::sendCreateFolderReq()
+{
+    SingleLineDialog newFolderNamePopup("Please input a name for the new folder:", "newFolder1");
+    QString reqPath = getFilePathForNode(getCurrentSelectedFile());
+    //TODO: verification here
+    //First, valid folder to create in
+    //Second, that new name is valid
+    if (newFolderNamePopup->exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    QStringList URLparams = {reqPath};
+    QStringList POSTparams = {uploadNamePopup->getInputText()};
+
+    AgaveTaskReply * replyHandle = agaveLink->performAgaveQuery("newFolder",&URLparams,&POSTparams);
+    if (replyHandle == NULL)
+    {
+        return;
+    }
+    QObject::connect(replyHandle, SIGNAL(sendAgaveResultData(QString,RequestState,QMap<QString,QJsonValue>)),
+                        this, SLOT(getCreateFolderResult(QString,RequestState,QMap<QString,QJsonValue>)));
+    fileOperationPending = true;
+}
+
+void FileTreeModelReader::getCreateFolderResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData)
+{
+    fileOperationPending = false;
+    //TODO: data refresh
+}
+
+void FileTreeModelReader::sendDownloadReq()
+{
+    //TODO
+}
+
+void FileTreeModelReader::getDownloadResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData)
+{
+    //TODO
 }
 
 bool FileTreeModelReader::insertFileData(QJsonArray fileList)
@@ -573,21 +645,4 @@ bool FileTreeModelReader::needDataRefresh(QModelIndex dataIndex)
         return true;
     }
     return false;
-}
-
-void FileTreeModelReader::resetFileData()
-{
-    dataStore.clear();
-    dataStore.setColumnCount(tableNumCols);
-    dataStore.setHorizontalHeaderLabels(shownHeaderLabelList);
-    linkedFileView->hideColumn((int)FileColumn::MIME_TYPE);
-    linkedFileView->hideColumn((int)FileColumn::PERMISSIONS);
-    linkedFileView->hideColumn((int)FileColumn::FORMAT);
-    linkedFileView->hideColumn((int)FileColumn::LAST_CHANGED);
-    //TODO: Adjust column size defaults;
-
-    QStandardItem * rootNode = dataStore.invisibleRootItem();
-    QList<QStandardItem*> emptyItem = this->getLoadingPlaceholderRow();
-    rootNode->appendRow(emptyItem);
-    agaveLink->retriveDirListing("/");
 }

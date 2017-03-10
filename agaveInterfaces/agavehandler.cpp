@@ -40,319 +40,57 @@
 #include "../vwtinterfacedriver.h"
 #include "../programWindows/errorpopup.h"
 
-AgaveHandler::AgaveHandler(VWTinterfaceDriver *theDriver) :
+//TODO: there are some holes in the exchange of error information.
+//TODO: need to tighten this
+
+//TODO: need to do more double checking of valid file paths
+
+AgaveHandler::AgaveHandler() :
         QObject(0), networkHandle(0), SSLoptions()
 {
     SSLoptions.setProtocol(QSsl::SecureProtocols);
-
     clearAllAuthTokens();
-
-    currentState = AgaveState::NO_AUTH;
-
-    mainDriver = theDriver;
 
     setupTaskGuideList();
 }
 
-void AgaveHandler::setupTaskGuideList()
-{
-    AgaveTaskGuide authStep1("authStep1", AgaveRequestType::AGAVE_GET);
-    authStep1.addValidStartState(AgaveState::GETTING_AUTH);
-    authStep1.addValidReplyState(AgaveState::GETTING_AUTH);
-    authStep1.setURLsuffix(QString("/clients/v2/%1").arg(clientName));
-    authStep1.setHeaderType(AuthHeaderType::PASSWD);
-    authStep1.setOutputSigFail("message", {"message"});
-    authStep1.setAsPrivlidged();
-    insertAgaveTaskGuide(authStep1);
-
-    AgaveTaskGuide authStep1a("authStep1a", AgaveRequestType::AGAVE_DELETE);
-    authStep1a.addValidStartState(AgaveState::GETTING_AUTH);
-    authStep1a.addValidReplyState(AgaveState::GETTING_AUTH);
-    authStep1a.setURLsuffix(QString("/clients/v2/%1").arg(clientName));
-    authStep1a.setHeaderType(AuthHeaderType::PASSWD);
-    authStep1a.setAsPrivlidged();
-    insertAgaveTaskGuide(authStep1a);
-
-    AgaveTaskGuide authStep2("authStep2", AgaveRequestType::AGAVE_POST);
-    authStep2.addValidStartState(AgaveState::GETTING_AUTH);
-    authStep2.addValidReplyState(AgaveState::GETTING_AUTH);
-    authStep2.setURLsuffix(QString("/clients/v2/"));
-    authStep2.setHeaderType(AuthHeaderType::PASSWD);
-    authStep2.setPostParams(QString("clientName=%1&description=Client ID for SimCenter Wind GUI App").arg(clientName),0);
-    authStep2.setOutputSigGood("consumerKey", {"result", "consumerKey"});
-    authStep2.setOutputSigGood("consumerSecret", {"result", "consumerSecret"});
-    authStep2.setAsPrivlidged();
-    insertAgaveTaskGuide(authStep2);
-
-    AgaveTaskGuide authStep3("authStep3", AgaveRequestType::AGAVE_POST);
-    authStep3.addValidStartState(AgaveState::GETTING_AUTH);
-    authStep3.addValidReplyState(AgaveState::GETTING_AUTH);
-    authStep3.setURLsuffix(QString("/token"));
-    authStep3.setHeaderType(AuthHeaderType::CLIENT);
-    authStep3.setPostParams("username=%1&password=%2&grant_type=password&scope=PRODUCTION",2);
-    authStep3.setTokenFormat(true);
-    authStep3.setOutputSigGood("access_token", {"access_token"});
-    authStep3.setOutputSigGood("refresh_token", {"refresh_token"});
-    authStep3.setAsPrivlidged();
-    insertAgaveTaskGuide(authStep3);
-
-    AgaveTaskGuide authRefresh("authRefresh", AgaveRequestType::AGAVE_POST);
-    authRefresh.setURLsuffix(QString("/token"));
-    authRefresh.setHeaderType(AuthHeaderType::CLIENT);
-    authRefresh.setPostParams("grant_type=refresh_token&scope=PRODUCTION&refresh_token=%1",1);
-    authRefresh.setTokenFormat(true);
-    authRefresh.setOutputSigGood("access_token", {"access_token"});
-    authRefresh.setOutputSigGood("refresh_token", {"refresh_token"});
-    authRefresh.setAsPrivlidged();
-    insertAgaveTaskGuide(authRefresh);
-
-    AgaveTaskGuide authRevoke("authRevoke", AgaveRequestType::AGAVE_POST);
-    authRevoke.addValidStartState(AgaveState::SHUTDOWN);
-    authRevoke.addValidReplyState(AgaveState::SHUTDOWN);
-    authRevoke.setURLsuffix(QString("/revoke"));
-    authRevoke.setHeaderType(AuthHeaderType::CLIENT);
-    authRevoke.setPostParams("token=%1",1);
-    authRevoke.setAsPrivlidged();
-    insertAgaveTaskGuide(authRevoke);
-
-    AgaveTaskGuide dirListing("dirListing", AgaveRequestType::AGAVE_GET);
-    dirListing.setURLsuffix((QString("/files/v2/listings/system/%1/")).arg(storageNode));
-    dirListing.setDynamicURLParams("%1",1);
-    dirListing.setHeaderType(AuthHeaderType::TOKEN);
-    dirListing.setOutputSigGood("fileList", {"result"});
-    dirListing.setAsPrivlidged();
-    insertAgaveTaskGuide(dirListing);
-
-    AgaveTaskGuide fileUpload("fileUpload", AgaveRequestType::AGAVE_UPLOAD);
-    fileUpload.setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
-    fileUpload.setDynamicURLParams("%1",1);
-    fileUpload.setPostParams("%1",1); //AGAVE_UPLOAD always uses a single parameter for the full file name
-    fileUpload.setHeaderType(AuthHeaderType::TOKEN);
-    fileUpload.setOutputSigGood("result", {"result"});
-    insertAgaveTaskGuide(fileUpload);
-
-    AgaveTaskGuide fileDelete("fileDelete", AgaveRequestType::AGAVE_DELETE);
-    fileDelete.setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
-    fileDelete.setDynamicURLParams("%1",1);
-    fileDelete.setHeaderType(AuthHeaderType::TOKEN);
-    fileDelete.setOutputSigGood("result", {"result"});
-    insertAgaveTaskGuide(fileDelete);
-
-    AgaveTaskGuide newFolder("newFolder", AgaveRequestType::AGAVE_PUT);
-    newFolder.setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
-    newFolder.setDynamicURLParams("%1",1);
-    newFolder.setPostParams("action=mkdir&path=%1",1);
-    newFolder.setHeaderType(AuthHeaderType::TOKEN);
-    newFolder.setOutputSigGood("result", {"result"});
-    insertAgaveTaskGuide(newFolder);
-
-    AgaveTaskGuide renameFile("renameFile", AgaveRequestType::AGAVE_PUT);
-    renameFile.setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
-    renameFile.setDynamicURLParams("%1",1);
-    renameFile.setPostParams("action=rename&path=%1",1);
-    renameFile.setHeaderType(AuthHeaderType::TOKEN);
-    renameFile.setOutputSigGood("result", {"result"});
-    insertAgaveTaskGuide(renameFile);
-}
-
-void AgaveHandler::insertAgaveTaskGuide(AgaveTaskGuide newGuide)
-{
-    QString taskName = newGuide.getTaskID();
-    if (validTaskList.contains(taskName))
-    {
-        ErrorPopup("Invalid Task Guide List: Duplicate Name");
-        return;
-    }
-    validTaskList.insert(taskName,newGuide);
-}
-
 AgaveHandler::~AgaveHandler()
 {
+    //TODO: need a better way to insure that all tokens are revoked
     closeAllConnections();
 }
 
-void AgaveHandler::closeAllConnections()
+RemoteDataReply * AgaveHandler::setCurrentRemoteWorkingDirectory(QString cd)
 {
-    AgaveState prevState = currentState;
-    qDebug("Shutdown sequence begins");
-    changeState(AgaveState::SHUTDOWN);
-    if ((prevState == AgaveState::LOGGED_IN) && (clientEncoded != "") && (token != ""))
-    {
-        runSimpleTask(QString("authRevoke"), QList<QString>{token});
-    }
-    //Remove client entry?
-}
+    QString tmp = getPathReletiveToCWD(cd);
 
-AgaveState AgaveHandler::getState()
-{
-    return currentState;
-}
+    AgaveTaskReply * passThru = new AgaveTaskReply(retriveTaskGuide("changeDir"),NULL,(QObject *)this);
 
-void AgaveHandler::processPrivlidgedTask(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData)
-{
-    if (resultState == RequestState::NO_CONNECT)
+    if (tmp.isEmpty())
     {
-        if (currentState == AgaveState::GETTING_AUTH)
-        {
-            changeState(AgaveState::NO_AUTH);
-            clearAllAuthTokens();
-            emit sendAuthResult(RequestState::NO_CONNECT);
-        }
-        else
-        {
-            //TODO: This should probably have its own error number
-            ErrorPopup("Unable to connect to agave server. Check network connection and try again");
-        }
-        return;
-    }
-
-    if (taskID == "authStep1")
-    {
-        if (resultState == RequestState::GOOD)
-        {
-            runSimpleTask("authStep1a");
-        }
-        else
-        {
-            if (rawData.value("message").toString() == "Application not found")
-            {
-                runSimpleTask("authStep2");
-            }
-            else if (rawData.value("message").toString() == "Login failed.Please recheck the username and password and try again.")
-            {
-                changeState(AgaveState::NO_AUTH);
-                clearAllAuthTokens();
-                emit sendAuthResult(RequestState::FAIL);
-            }
-            else
-            {
-                changeState(AgaveState::NO_AUTH);
-                clearAllAuthTokens();
-                emit sendAuthResult(RequestState::NO_CONNECT);
-            }
-        }
-    }
-    else if (taskID == "authStep1a")
-    {
-        if (resultState == RequestState::GOOD)
-        {
-            runSimpleTask("authStep2");
-        }
-        else
-        {
-            changeState(AgaveState::NO_AUTH);
-            clearAllAuthTokens();
-            emit sendAuthResult(RequestState::FAIL);
-        }
-    }
-    else if (taskID == "authStep2")
-    {
-        if (resultState == RequestState::GOOD)
-        {
-            if (rawData.value("consumerKey").toString().isEmpty() ||
-                rawData.value("consumerSecret").toString().isEmpty())
-            {
-                ErrorPopup("Client success fails.");
-                return;
-            }
-            clientKey = rawData.value("consumerKey").toString();
-            clientSecret = rawData.value("consumerSecret").toString();
-
-            clientEncoded = "Basic ";
-            QByteArray rawAuth(clientKey.toLatin1());
-            rawAuth.append(":");
-            rawAuth.append(clientSecret);
-            clientEncoded.append(rawAuth.toBase64());
-
-            runSimpleTask("authStep3", QList<QString>({authUname, authPass}));
-        }
-        else
-        {
-            changeState(AgaveState::NO_AUTH);
-            clearAllAuthTokens();
-            emit sendAuthResult(RequestState::FAIL);
-        }
-    }
-    else if (taskID == "authStep3")
-    {
-        if (resultState == RequestState::GOOD)
-        {
-            if (rawData.value("access_token").toString().isEmpty() ||
-                rawData.value("refresh_token").toString().isEmpty())
-            {
-                changeState(AgaveState::NO_AUTH);
-                clearAllAuthTokens();
-                emit sendAuthResult(RequestState::FAIL);
-            }
-            else
-            {
-                token = rawData.value("access_token").toString().toLatin1();
-                tokenHeader = (QString("Bearer ").append(token)).toLatin1();
-                refreshToken = rawData.value("refresh_token").toString().toLatin1();
-
-                changeState(AgaveState::LOGGED_IN);
-                emit sendAuthResult(RequestState::GOOD);
-                qDebug("Login success.");
-            }
-        }
-        else
-        {
-            changeState(AgaveState::NO_AUTH);
-            clearAllAuthTokens();
-            emit sendAuthResult(RequestState::FAIL);
-        }
-    }
-    else if (taskID == "authRefresh")
-    {
-        if (resultState == RequestState::GOOD)
-        {
-            if (rawData.value("access_token").toString().isEmpty() ||
-                rawData.value("refresh_token").toString().isEmpty())
-            {
-                ErrorPopup("Token refresh failure.");
-                return;
-            }
-            token = rawData.value("access_token").toString().toLatin1();
-            refreshToken = rawData.value("refresh_token").toString().toLatin1();
-        }
-    }
-    else if (taskID == "authRevoke")
-    {
-        qDebug("Token Revoke sucess?");
-    }
-    else if (taskID == "dirListing")
-    {
-        if ((resultState == RequestState::GOOD) && !rawData.isEmpty() && rawData.contains("fileList"))
-        {
-            emit sendFileData(rawData.value("fileList"));
-        }
-        else
-        {
-            qDebug("Listing Failed");
-            //TODO: Probably should have some more meaningful error handleing here
-        }
+        passThru->delayedPassThruReply(RequestState::FAIL, &pwd);
     }
     else
     {
-        ErrorPopup("Non-existant privlidged request requested.");
+        pwd = tmp;
+        passThru->delayedPassThruReply(RequestState::GOOD, &pwd);
     }
+
+    return (RemoteDataReply *) passThru;
 }
 
-void AgaveHandler::changeState(AgaveState newState)
+QString AgaveHandler::getPathReletiveToCWD(QString inputPath)
 {
-    AgaveState oldState = currentState;
-    currentState = newState;
-    emit stateChanged(oldState, newState);
+    //returning an empty string is an invalid path
+    //TODO: check validity of input path
+    //TODO: calculate path as reletive to CWD
+    //TODO: or return input, if it is a full path
+
+    return inputPath;
 }
 
-void AgaveHandler::performAuth(QString uname, QString passwd)
+RemoteDataReply * AgaveHandler::performAuth(QString uname, QString passwd)
 {
-    if (currentState != AgaveState::NO_AUTH)
-    {
-        return;
-    }
-    changeState(AgaveState::GETTING_AUTH);
-
     authUname = uname;
     authPass = passwd;
 
@@ -362,207 +100,516 @@ void AgaveHandler::performAuth(QString uname, QString passwd)
     rawAuth.append(passwd);
     authEncloded.append(rawAuth.toBase64());
 
-    runSimpleTask("authStep1");
-}
+    AgaveTaskReply * parentReply = new AgaveTaskReply(retriveTaskGuide("fullAuth"),NULL,(QObject *)this);
 
-void AgaveHandler::retriveDirListing(QString dirPath)
-{
-    if (dirPath == "/")
+    AgaveTaskReply * tmp = performAgaveQuery("authStep1",(QObject *)parentReply);
+
+    if (!tmp->isValidReply())
     {
-        dirPath.append(authUname);
-    }
-    runSimpleTask("dirListing", QList<QString>({dirPath}));
-}
-
-void AgaveHandler::runSimpleTask(QString queryName)
-{
-    QStringList emptyList;
-    runSimpleTask(queryName, emptyList, emptyList);
-}
-
-void AgaveHandler::runSimpleTask(QString queryName, QStringList queryParams)
-{
-    QStringList emptyList;
-    AgaveTaskGuide taskGuide = retriveTaskGuide(queryName);
-    if (taskGuide.needsOnlyPostParms())
-    {
-        runSimpleTask(queryName,emptyList,queryParams);
+        ErrorPopup("Invalid request for authentication step 1");
+        //TODO: need to rethink the passing of error info here
     }
 
-    if (taskGuide.needsOnlyURLParams())
-    {
-        runSimpleTask(queryName,queryParams,emptyList);
-    }
-    //TODO: This should be an error
+    return (RemoteDataReply *) parentReply;
 }
 
-void AgaveHandler::runSimpleTask(QString queryName, QStringList URLParams, QStringList postParams)
+RemoteDataReply * AgaveHandler::remoteLS(QString dirPath)
 {
-    //TODO: should plroabaly check if the task is privlidged here
-    AgaveTaskReply * replyToLink = performAgaveQuery(queryName, URLParams, postParams);
-    if (replyToLink == NULL)
+    QString tmp = getPathReletiveToCWD(dirPath);
+    if ((tmp.isEmpty()) || (tmp == "/") || (tmp == ""))
     {
-        qDebug("Prividged Task Failed");
-        return;
+        tmp = "/";
+        tmp.append(authUname);
     }
-    QObject::connect(replyToLink, SIGNAL(sendAgaveResultData(QString,RequestState,QMap<QString,QJsonValue>)),
-                     this, SLOT(processPrivlidgedTask(QString,RequestState,QMap<QString,QJsonValue>)));
+    return (RemoteDataReply *) performAgaveQuery("dirListing", tmp);
 }
 
-AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName)
+RemoteDataReply * deleteFile(QString toDelete)
 {
-    QStringList emptyList;
-    return performAgaveQuery(queryName, emptyList, emptyList);
+    QString toCheck = getPathReletiveToCWD(toDelete);
+    //TODO: check that path is valid
+    return (RemoteDataReply *) performAgaveQuery("fileDelete", toCheck);
 }
 
-AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QStringList queryParams)
+RemoteDataReply * moveFile(QString from, QString to)
 {
-    QStringList emptyList;
-    AgaveTaskGuide taskGuide = retriveTaskGuide(queryName);
-    if (taskGuide.needsOnlyPostParms())
-    {
-        return performAgaveQuery(queryName,emptyList,queryParams);
-    }
-
-    if (taskGuide.needsOnlyURLParams())
-    {
-        return performAgaveQuery(queryName,queryParams,emptyList);
-    }
-    //TODO: This should be an error
+    //TODO: not implemented yet
     return NULL;
 }
 
-AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QStringList URLParams, QStringList postParams)
+RemoteDataReply * copyFile(QString from, QString to)
 {
-    AgaveTaskGuide taskGuide = retriveTaskGuide(queryName);
+    //TODO: not implemented yet
+    return NULL;
+}
 
-    if (!taskGuide.verifyValidStartState(currentState))
+RemoteDataReply * renameFile(QString fullName, QString newName)
+{
+    QString toCheck = getPathReletiveToCWD(fullName);
+    //TODO: check that path and new name is valid
+    return (RemoteDataReply *) performAgaveQuery("renameFile", toCheck, newName);
+}
+
+RemoteDataReply * mkRemoteDir(QString loc, QString newName)
+{
+    QString toCheck = getPathReletiveToCWD(loc);
+    //TODO: check that path and new name is valid
+    return (RemoteDataReply *) performAgaveQuery("newFolder", toCheck, newName);
+}
+
+RemoteDataReply * uploadFile(QString location, QString localFileName)
+{
+    QString toCheck = getPathReletiveToCWD(location);
+    //TODO: check that path and local file exists
+    return (RemoteDataReply *) performAgaveQuery("fileUpload", toCheck, localFileName);
+}
+
+RemoteDataReply * downloadFile(QString localDest, QString remoteName)
+{
+    //TODO: not implemented yet
+    return NULL;
+}
+
+RemoteDataReply * runRemoteJob(QString jobName, QString jobParameters, QString remoteWorkingDir)
+{
+    //TODO: not implemented yet
+    return NULL;
+}
+
+void AgaveHandler::closeAllConnections()
+{
+    qDebug("Shutdown sequence begins");
+    if ((clientEncoded != "") && (token != ""))
     {
+        performAgaveQuery("authRevoke", token);
+    }
+    //maybe TODO: Remove client entry?
+}
+
+void AgaveHandler::clearAllAuthTokens()
+{
+    attemptingAuth = false;
+    authGained = false;
+
+    authEncloded = "";
+    clientEncoded = "";
+    token = "";
+    refreshToken = "";
+
+    authUname = "";
+    authPass = "";
+    clientKey = "";
+    clientSecret = "";
+}
+
+void AgaveHandler::setupTaskGuideList()
+{
+    AgaveTaskGuide * toInsert = NULL;
+
+    toInsert = new AgaveTaskGuide("changeDir", AgaveRequestType::AGAVE_NONE);
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("fullAuth", AgaveRequestType::AGAVE_NONE);
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("authStep1", AgaveRequestType::AGAVE_GET);
+    toInsert->setURLsuffix(QString("/clients/v2/%1").arg(clientName));
+    toInsert->setHeaderType(AuthHeaderType::PASSWD);
+    toInsert->setAsInternal();
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("authStep1a", AgaveRequestType::AGAVE_DELETE);
+    toInsert->setURLsuffix(QString("/clients/v2/%1").arg(clientName));
+    toInsert->setHeaderType(AuthHeaderType::PASSWD);
+    toInsert->setAsInternal();
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("authStep2", AgaveRequestType::AGAVE_POST);
+    toInsert->setURLsuffix(QString("/clients/v2/"));
+    toInsert->setHeaderType(AuthHeaderType::PASSWD);
+    toInsert->setPostParams(QString("clientName=%1&description=Client ID for SimCenter Wind GUI App").arg(clientName),0);
+    toInsert->setAsInternal();
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("authStep3", AgaveRequestType::AGAVE_POST);
+    toInsert->setURLsuffix(QString("/token"));
+    toInsert->setHeaderType(AuthHeaderType::CLIENT);
+    toInsert->setPostParams("username=%1&password=%2&grant_type=password&scope=PRODUCTION",2);
+    toInsert->setTokenFormat(true);
+    toInsert->setAsInternal();
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("authRefresh", AgaveRequestType::AGAVE_POST);
+    toInsert->setURLsuffix(QString("/token"));
+    toInsert->setHeaderType(AuthHeaderType::CLIENT);
+    toInsert->setPostParams("grant_type=refresh_token&scope=PRODUCTION&refresh_token=%1",1);
+    toInsert->setTokenFormat(true);
+    toInsert->setAsInternal();
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("authRevoke", AgaveRequestType::AGAVE_POST);
+    toInsert->setURLsuffix(QString("/revoke"));
+    toInsert->setHeaderType(AuthHeaderType::CLIENT);
+    toInsert->setPostParams("token=%1",1);
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("dirListing", AgaveRequestType::AGAVE_GET);
+    toInsert->setURLsuffix((QString("/files/v2/listings/system/%1/")).arg(storageNode));
+    toInsert->setDynamicURLParams("%1",1);
+    toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    toInsert->setAsInternal();
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("fileUpload", AgaveRequestType::AGAVE_UPLOAD);
+    toInsert->setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
+    toInsert->setDynamicURLParams("%1",1);
+    toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("fileDelete", AgaveRequestType::AGAVE_DELETE);
+    toInsert->setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
+    toInsert->setDynamicURLParams("%1",1);
+    toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("newFolder", AgaveRequestType::AGAVE_PUT);
+    toInsert->setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
+    toInsert->setDynamicURLParams("%1",1);
+    toInsert->setPostParams("action=mkdir&path=%1",1);
+    toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("renameFile", AgaveRequestType::AGAVE_PUT);
+    toInsert->setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
+    toInsert->setDynamicURLParams("%1",1);
+    toInsert->setPostParams("action=rename&path=%1",1);
+    toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    insertAgaveTaskGuide(toInsert);
+}
+
+void AgaveHandler::insertAgaveTaskGuide(AgaveTaskGuide * newGuide)
+{
+    QString taskName = newGuide->getTaskID();
+    if (validTaskList.contains(taskName))
+    {
+        ErrorPopup("Invalid Task Guide List: Duplicate Name");
+        return;
+    }
+    validTaskList.insert(taskName,newGuide);
+}
+
+AgaveTaskGuide * AgaveHandler::retriveTaskGuide(QString taskID)
+{
+    AgaveTaskGuide * ret;
+    if (!validTaskList.contains(taskID))
+    {
+        ErrorPopup("Non-existant request requested.1");
+        return NULL;
+    }
+    ret = validTaskList.value(taskID);
+    if (taskID != ret->getTaskID())
+    {
+        ErrorPopup("Task Guide format error.");
+    }
+    return ret;
+}
+
+void AgaveHandler::forwardReplyToParent(AgaveTaskReply * agaveReply, RequestState replyState, QString * param1 = NULL)
+{
+    AgaveTaskReply * parentReply = (AgaveTaskReply*)agaveReply->parent();
+    if (parentReply == NULL)
+    {
+        return;
+    }
+    parentReply->invokePassThruReply(replyState, param1);
+}
+
+void AgaveHandler::handleInternalTask(AgaveTaskReply * agaveReply, QNetworkReply * rawReply)
+{
+    const QByteArray replyText = rawReply->readAll();
+
+    QJsonParseError parseError;
+    QJsonDocument parseHandler = QJsonDocument::fromJson(replyText, &parseError);
+
+    if (parseHandler.isNull())
+    {
+        forwardReplyToParent(agaveReply, RequestState::NO_CONNECT);
+        return;
+    }
+
+    qDebug(parseHandler.toJson());
+
+    RequestState prelimResult = standardSuccessFailCheck(agaveReply->getTaskGuide(), parseHandler);
+
+    if (prelimResult == RequestState::NO_CONNECT)
+    {
+        forwardReplyToParent(agaveReply, RequestState::NO_CONNECT);
+    }
+
+    QString taskID = agaveReply->getTaskGuide()->getTaskID();
+
+    if (taskID == "authStep1")
+    {
+        if (prelimResult == RequestState::GOOD)
+        {
+            performAgaveQuery("authStep1a", agaveReply->parent());
+        }
+        else
+        {
+            QString messageData = AgaveTaskReply::retriveMainAgaveJSON(parseHandler, "message").toString();
+            if (messageData == "Application not found")
+            {
+                performAgaveQuery("authStep2", agaveReply->parent());
+            }
+            else if (messageData == "Login failed.Please recheck the username and password and try again.")
+            {
+                clearAllAuthTokens();
+                forwardReplyToParent(agaveReply, RequestState::FAIL);
+            }
+            else
+            {
+                clearAllAuthTokens();
+                forwardReplyToParent(agaveReply, RequestState::NO_CONNECT);
+            }
+        }
+    }
+    else if (taskID == "authStep1a")
+    {
+        if (prelimResult == RequestState::GOOD)
+        {
+            performAgaveQuery("authStep2", agaveReply->parent());
+        }
+        else
+        {
+            clearAllAuthTokens();
+            forwardReplyToParent(agaveReply, RequestState::FAIL);
+        }
+    }
+    else if (taskID == "authStep2")
+    {
+        if (prelimResult == RequestState::GOOD)
+        {
+            clientKey = AgaveTaskReply::retriveMainAgaveJSON(parseHandler, "consumerKey").toString();
+            clientSecret = AgaveTaskReply::retriveMainAgaveJSON(parseHandler, "consumerSecret").toString();
+
+            if (clientKey.isEmpty() || clientSecret.isEmpty())
+            {
+                ErrorPopup("Client success does not yeild client auth data.");
+                return;
+            }
+
+            clientEncoded = "Basic ";
+            QByteArray rawAuth(clientKey.toLatin1());
+            rawAuth.append(":");
+            rawAuth.append(clientSecret);
+            clientEncoded.append(rawAuth.toBase64());
+
+            QStringList authList = {authUname, authPass};
+            performAgaveQuery("authStep3", &authList, NULL, agaveReply->parent());
+        }
+        else
+        {
+            clearAllAuthTokens();
+            forwardReplyToParent(agaveReply, RequestState::FAIL);
+        }
+    }
+    else if (taskID == "authStep3")
+    {
+        if (prelimResult == RequestState::GOOD)
+        {
+            token = AgaveTaskReply::retriveMainAgaveJSON(parseHandler, "access_token").toString();
+            refreshToken = AgaveTaskReply::retriveMainAgaveJSON(parseHandler, "refresh_token").toString();
+
+            if (token.isEmpty() || refreshToken.isEmpty())
+            {
+                clearAllAuthTokens();
+                forwardReplyToParent(agaveReply, RequestState::FAIL);
+            }
+            else
+            {
+                tokenHeader = (QString("Bearer ").append(token)).toLatin1();
+
+                authGained = true;
+                attemptingAuth = false;
+
+                forwardReplyToParent(agaveReply, RequestState::GOOD);
+                qDebug("Login success.");
+            }
+        }
+        else
+        {
+            clearAllAuthTokens();
+            forwardReplyToParent(agaveReply, RequestState::FAIL);
+        }
+    }
+    else if (taskID == "authRefresh")
+    {
+        if (prelimResult == RequestState::GOOD)
+        {
+            token = AgaveTaskReply::retriveMainAgaveJSON(parseHandler, "access_token").toString();
+            refreshToken = AgaveTaskReply::retriveMainAgaveJSON(parseHandler, "refresh_token").toString();
+
+            if (token.isEmpty() || refreshToken.isEmpty())
+            {
+                ErrorPopup("Token refresh failure.");
+                return;
+            }
+            //TODO: Will need more info here based on when, how and where refreshes are requested
+        }
+    }
+    else
+    {
+        ErrorPopup("Non-existant internal request requested.");
+    }
+}
+
+AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QObject * parentReq = NULL)
+{
+    return performAgaveQuery(queryName, NULL, NULL, parentReq);
+}
+
+AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QString param1, QObject * parentReq = NULL)
+{
+    QStringList paramList1 = {param1};
+    return performAgaveQuery(queryName, &paramList1, NULL, parentReq);
+}
+
+AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QString param1, QString param2, QObject * parentReq = NULL)
+{
+    QStringList paramList1 = {param1};
+    QStringList paramList2 = {param2};
+    return performAgaveQuery(queryName, &paramList1, &paramList2, parentReq);
+}
+
+AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QStringList * paramList1 = NULL, QStringList * paramList2 = NULL, QObject * parentReq = NULL)
+{
+    AgaveTaskGuide * taskGuide = retriveTaskGuide(queryName);
+
+    QNetworkReply * qReply = internalQueryMethod(taskGuide, paramList1, paramList2);
+
+    if (networkHandle.networkAccessible() != QNetworkAccessManager::Accessible)
+    {
+        //TODO: This should probably be a numbered error
+        ErrorPopup("Network not available");
         return NULL;
     }
 
+    QObject * parentObj = (QObject *) this;
+    if (parentReq != NULL)
+    {
+        parentObj = parentReq;
+    }
+
+    AgaveTaskReply * ret = new AgaveTaskReply(taskGuide,qReply,parentObj);
+
+    if (taskGuide->isInternal())
+    {
+        if (ret->isValidReply())
+        {
+            QObject::connect(ret, SIGNAL(haveInternalTaskReply(AgaveTaskGuide*,QNetworkReply*)), this, SLOT(handleInternalTask(AgaveTaskReply*,QNetworkReply*)));
+        }
+        else
+        {
+            ErrorPopup("Unable to construct authentication procedure requests");
+        }
+    }
+    return ret;
+}
+
+QNetworkReply * AgaveHandler::internalQueryMethod(AgaveTaskGuide * taskGuide, QStringList * paramList1 = NULL, QStringList * paramList2 = NULL)
+{
+    QStringList * URLParams = NULL;
+    QStringList * postParams = NULL;
+
+    if (taskGuide->needsURLParams())
+    {
+        URLParams = paramList1;
+        if (taskGuide->needsPostParms())
+        {
+            postParams = paramList2;
+        }
+    }
+    else
+    {
+        if (taskGuide->needsPostParms())
+        {
+            postParams = paramList1;
+        }
+    }
+
+    QStringList emptyList;
+    if (URLParams == NULL)
+    {
+        URLParams = &emptyList;
+    }
+
+    if (postParams == NULL)
+    {
+        postParams = &emptyList;
+    }
+
+    QByteArray realURLsuffix = taskGuide->getURLsuffix().toLatin1();
+    realURLsuffix.append(taskGuide->fillURLArgList(URLParams));
+    QByteArray clientPostData = taskGuide->fillPostArgList(postParams);
+
     QByteArray * authHeader = NULL;
-    if (taskGuide.getHeaderType() == AuthHeaderType::CLIENT)
+    if (taskGuide->getHeaderType() == AuthHeaderType::CLIENT)
     {
         authHeader = &clientEncoded;
     }
-    else if (taskGuide.getHeaderType() == AuthHeaderType::PASSWD)
+    else if (taskGuide->getHeaderType() == AuthHeaderType::PASSWD)
     {
         authHeader = &authEncloded;
     }
-    else if (taskGuide.getHeaderType() == AuthHeaderType::REFRESH)
+    else if (taskGuide->getHeaderType() == AuthHeaderType::REFRESH)
     {
         //TODO
     }
-    else if (taskGuide.getHeaderType() == AuthHeaderType::TOKEN)
+    else if (taskGuide->getHeaderType() == AuthHeaderType::TOKEN)
     {
         authHeader = &tokenHeader;
     }
 
-    if (taskGuide.getRequestType() == AgaveRequestType::AGAVE_POST)
+    if ((taskGuide->getRequestType() == AgaveRequestType::AGAVE_POST) || (taskGuide->getRequestType() == AgaveRequestType::AGAVE_PUT))
     {
-        QByteArray clientPostData;
-        if (postParams.isEmpty())
-        {
-            clientPostData = taskGuide.fillPostArgList();
-        }
-        else
-        {
-            clientPostData = taskGuide.fillPostArgList(&postParams);
-        }
+        //Note: For a put, the post data for this function is used as the put data for the HTTP request
         qDebug("Post data: %s", clientPostData.toStdString().c_str());
-
-        return makeAgaveRequest(taskGuide.getURLsuffix(),
-                         taskGuide.getRequestType(),
-                         queryName,
+        return finalizeAgaveRequest(taskGuide, realURLsuffix,
                          authHeader, clientPostData);
     }
-    else if ((taskGuide.getRequestType() == AgaveRequestType::AGAVE_GET) || (taskGuide.getRequestType() == AgaveRequestType::AGAVE_DELETE))
+    else if ((taskGuide->getRequestType() == AgaveRequestType::AGAVE_GET) || (taskGuide->getRequestType() == AgaveRequestType::AGAVE_DELETE))
     {
-        QByteArray realURLsuffix = taskGuide.getURLsuffix().toLatin1();
-        if (URLParams.isEmpty())
-        {
-            realURLsuffix.append(taskGuide.fillURLArgList());
-        }
-        else
-        {
-            realURLsuffix.append(taskGuide.fillURLArgList(&URLParams));
-        }
-        qDebug("URL Req: %s", realURLsuffix.toStdString().c_str());
 
-        return makeAgaveRequest(realURLsuffix,
-                         taskGuide.getRequestType(),
-                         queryName,
+        qDebug("URL Req: %s", realURLsuffix.toStdString().c_str());
+        return finalizeAgaveRequest(taskGuide, realURLsuffix,
                          authHeader);
     }
-    else if (taskGuide.getRequestType() == AgaveRequestType::AGAVE_UPLOAD)
+    else if (taskGuide->getRequestType() == AgaveRequestType::AGAVE_UPLOAD)
     {
-        //Upload is a single post parameter
-        if (postParams.length() != 1) return NULL;
-        QString fullFileName = postParams.at(0);
+        //For agave upload, instead of post params, we have the full local file name
+        QString fullFileName = clientPostData;
         QFile * fileHandle = new QFile(fullFileName);
         if (!fileHandle->open(QIODevice::ReadOnly))
         {
             fileHandle->deleteLater();
             return NULL;
         }
-
-        QByteArray realURLsuffix = taskGuide.getURLsuffix().toLatin1();
-        if (URLParams.isEmpty())
-        {
-            realURLsuffix.append(taskGuide.fillURLArgList());
-        }
-        else
-        {
-            realURLsuffix.append(taskGuide.fillURLArgList(&URLParams));
-        }
         qDebug("URL Req: %s", realURLsuffix.toStdString().c_str());
-
         QByteArray emptyPostData;
 
-        return makeAgaveRequest(realURLsuffix,
-                         taskGuide.getRequestType(),
-                         queryName,
+        return finalizeAgaveRequest(taskGuide, realURLsuffix,
                          authHeader, emptyPostData, fileHandle);
-    }
-    else if (taskGuide.getRequestType() == AgaveRequestType::AGAVE_PUT)
-    {
-        QByteArray clientPutData;
-        if (postParams.isEmpty())
-        {
-            clientPutData = taskGuide.fillPostArgList();
-        }
-        else
-        {
-            clientPutData = taskGuide.fillPostArgList(&postParams);
-        }
-
-        QByteArray realURLsuffix = taskGuide.getURLsuffix().toLatin1();
-        if (URLParams.isEmpty())
-        {
-            realURLsuffix.append(taskGuide.fillURLArgList());
-        }
-        else
-        {
-            realURLsuffix.append(taskGuide.fillURLArgList(&URLParams));
-        }
-        qDebug("URL Req: %s", realURLsuffix.toStdString().c_str());
-
-        return makeAgaveRequest(realURLsuffix,
-                         taskGuide.getRequestType(),
-                         queryName,
-                         authHeader, clientPutData);
     }
     else
     {
-        //TODO: Probably should have fatal error here
+        ErrorPopup("Non-existant Agave request type requested.");
         return NULL;
     }
 
     return NULL;
 }
 
-AgaveTaskReply *AgaveHandler::makeAgaveRequest(QString urlAppend, AgaveRequestType type, QString taskName, QByteArray * authHeader, QByteArray postData, QFile * fileHandle)
+QNetworkReply * AgaveHandler::finalizeAgaveRequest(AgaveTaskGuide * theGuide, QString urlAppend, QByteArray * authHeader = NULL, QByteArray postData = "", QFile * fileHandle = NULL)
 {
     QNetworkReply * clientReply = NULL;
     AgaveTaskReply * ret = NULL;
@@ -574,16 +621,11 @@ AgaveTaskReply *AgaveHandler::makeAgaveRequest(QString urlAppend, AgaveRequestTy
     clientRequest->setUrl(QUrl(activeURL));
 
     //clientRequest->setRawHeader("User-Agent", "SimCenterWindGUI");
-    if (type == AgaveRequestType::AGAVE_POST)
+    if (theGuide->getRequestType() == AgaveRequestType::AGAVE_POST)
     {
-        //TODO: this gave us problems before, defults are needed for multiparts, but POST should be set manually
-        //Should look into this to make sure it is fully correct
+        //TODO: this gave us problems before, related to multiparts
         clientRequest->setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     }
-    //else if (type == AgaveRequestType::AGAVE_JSON_POST)
-    //{
-    //    clientRequest->setHeader(QNetworkRequest::ContentTypeHeader, "Content-Type: application/json");
-    //}
 
     if (authHeader != NULL)
     {
@@ -602,23 +644,23 @@ AgaveTaskReply *AgaveHandler::makeAgaveRequest(QString urlAppend, AgaveRequestTy
 
     qDebug("%s", clientRequest->url().url().toStdString().c_str());
 
-    if (type == AgaveRequestType::AGAVE_GET)
+    if (theGuide->getRequestType() == AgaveRequestType::AGAVE_GET)
     {
         clientReply = networkHandle.get(*clientRequest);
     }
-    else if (type == AgaveRequestType::AGAVE_POST)
+    else if (theGuide->getRequestType() == AgaveRequestType::AGAVE_POST)
     {
         clientReply = networkHandle.post(*clientRequest, postData);
     }
-    else if (type == AgaveRequestType::AGAVE_PUT)
+    else if (theGuide->getRequestType() == AgaveRequestType::AGAVE_PUT)
     {
         clientReply = networkHandle.put(*clientRequest, postData);
     }
-    else if (type == AgaveRequestType::AGAVE_DELETE)
+    else if (theGuide->getRequestType() == AgaveRequestType::AGAVE_DELETE)
     {
         clientReply = networkHandle.deleteResource(*clientRequest);
     }
-    else if (type == AgaveRequestType::AGAVE_UPLOAD)
+    else if (theGuide->getRequestType() == AgaveRequestType::AGAVE_UPLOAD)
     {
         QHttpMultiPart * fileUpload = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
@@ -630,63 +672,21 @@ AgaveTaskReply *AgaveHandler::makeAgaveRequest(QString urlAppend, AgaveRequestTy
         filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant(tempString));
 
         filePart.setBodyDevice(fileHandle);
+        //Following line is to insure deletion of the file handle later, when the parent is deleted
         fileHandle->setParent(fileUpload);
 
         fileUpload->append(filePart);
 
         clientReply = networkHandle.post(*clientRequest, fileUpload);
+
+        //Following line insures Mulipart object deleted when the network reply is
         fileUpload->setParent(clientReply);
     }
 
     if (clientReply == NULL)
     {
         ErrorPopup("Non-existant request requested.2");
-        return ret;
-    }
-
-    ret = new AgaveTaskReply(this,retriveTaskGuide(taskName),clientReply);
-
-    if (!ret->isValidRequest())
-    {
-        ErrorPopup("Request Results in NULL");
-        ret->deleteLater();
         return NULL;
     }
-
-    if (networkHandle.networkAccessible() != QNetworkAccessManager::Accessible)
-    {
-        ErrorPopup("Network not available");
-        ret->deleteLater();
-        return NULL;
-    }
-    return ret;
-}
-
-void AgaveHandler::clearAllAuthTokens()
-{
-    authEncloded = "";
-    clientEncoded = "";
-    token = "";
-    refreshToken = "";
-
-    authUname = "";
-    authPass = "";
-    clientKey = "";
-    clientSecret = "";
-}
-
-AgaveTaskGuide AgaveHandler::retriveTaskGuide(QString taskID)
-{
-    AgaveTaskGuide ret;
-    if (!validTaskList.contains(taskID))
-    {
-        ErrorPopup("Non-existant request requested.1");
-        return ret;
-    }
-    ret = validTaskList.value(taskID);
-    if (taskID != ret.getTaskID())
-    {
-        ErrorPopup("Task Guide format error.");
-    }
-    return ret;
+    return clientReply;
 }

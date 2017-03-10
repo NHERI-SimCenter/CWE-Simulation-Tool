@@ -46,12 +46,11 @@
 #include <QStackedWidget>
 
 enum class VWTerrorType: unsigned int;
-enum class AgaveState;
 
-class AgaveHandler;
+class RemoteDataInterface;
 class AuthForm;
 class PanelWindow;
-class ErrorPopup;
+class RequestState;
 
 class VWTinterfaceDriver : public QObject
 {
@@ -62,24 +61,17 @@ public:
     ~VWTinterfaceDriver();
     void startup();
 
-    void displayCopyInfo();
-
     void closeAuthScreen();
 
-    AgaveHandler * getAgaveConnection();
+    RemoteDataInterface * getDataConnection();
 
 public slots:
-    void stateMonitor(AgaveState oldState, AgaveState newState);
+    void getAuthReply(RequestState authReply);
 
 private:
-    AgaveHandler * agaveConnector;
+    RemoteDataInterface * theConnector;
     AuthForm * authWindow;
     PanelWindow * mainWindow;
-    ErrorPopup * errorWindow;
-
-    void hideWindowsForError();
-
-    QString copyrightInfoText;
 };
 
 #endif // VWTINTERFACEDRIVER_H
