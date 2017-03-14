@@ -43,15 +43,10 @@ SingleLineDialog::SingleLineDialog(QString textLine, QString defaultInput, QWidg
     ui->setupUi(this);
 
     inputLine = this->findChild<QLineEdit *>("InputLine");
-    doButton = this->findChild<QPushButton *>("doButton");
-    cancelButton = this->findChild<QPushButton *>("cancelButton");
-    inputLabel = this->findChild<QLabel *>("QueryText");
+    QLabel * inputLabel = this->findChild<QLabel *>("QueryText");
 
     inputLabel->setText(textLine);
     inputLine->setText(defaultInput);
-
-    QObject::connect(doButton, SIGNAL(clicked(bool)), this, SLOT(accept()));
-    QObject::connect(cancelButton, SIGNAL(clicked(bool)), this, SLOT(reject()));
 }
 
 SingleLineDialog::~SingleLineDialog()

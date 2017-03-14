@@ -120,5 +120,38 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SingleLineDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>114</x>
+     <y>93</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>59</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SingleLineDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>384</x>
+     <y>93</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>59</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
