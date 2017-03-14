@@ -33,73 +33,25 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef AGAVETASKGUIDE_H
-#define AGAVETASKGUIDE_H
+#ifndef QUICKINFOPOPUP_H
+#define QUICKINFOPOPUP_H
 
-#include <QMap>
-#include <QString>
-#include <QStringList>
+#include <QDialog>
 
-enum class AgaveRequestType;
-enum class AgaveState;
+namespace Ui {
+class QuickInfoPopup;
+}
 
-//TODO: This whole class, needs more documentation in particular
-enum class AuthHeaderType {NONE, PASSWD, CLIENT, TOKEN, REFRESH};
-
-class AgaveTaskGuide
+class QuickInfoPopup : public QDialog
 {
+    Q_OBJECT
+
 public:
-    explicit AgaveTaskGuide();
-    explicit AgaveTaskGuide(QString newID, AgaveRequestType reqType);
-
-    void setURLsuffix(QString newValue);
-    void setHeaderType(AuthHeaderType newValue);
-
-    void setTokenFormat(bool newSetting);
-    void setDynamicURLParams(QString format, int numSubs);
-    void setPostParams(QString format, int numSubs);
-    void setAsInternal();
-    void setStoreParam(int paramList, int elementToStore);
-
-    QString getTaskID();
-    QString getURLsuffix();
-    AgaveRequestType getRequestType();
-    AuthHeaderType getHeaderType();
-    QByteArray fillPostArgList(QStringList *argList = NULL);
-    QByteArray fillURLArgList(QStringList * argList = NULL);
-    bool isTokenFormat();
-    bool isInternal();
-
-    bool hasStoredParam();
-    int getStoredParamList();
-    int getStoredParamElement();
-
-    bool usesPostParms();
-    bool usesURLParams();
+    explicit QuickInfoPopup(QString * message, QWidget *parent = 0);
+    ~QuickInfoPopup();
 
 private:
-    QString taskId;
-
-    QString URLsuffix = "";
-    AgaveRequestType requestType;
-    AuthHeaderType headerType = AuthHeaderType::NONE;
-
-    QByteArray fillAnyArgList(QStringList *argList, int numVals, QString strFormat);
-
-    bool internalTask = false;
-    bool usesTokenFormat = false;
-    bool needsPostParams = false;
-    bool needsURLParams = false;
-
-    bool storeParamInReply = false;
-    int storeParamList = 0;
-    int storeParamElement = 0;
-
-    QString postFormat = "";
-    int numPostVals = 0;
-
-    QString dynURLFormat = "";
-    int numDynURLVals = 0;
+    Ui::QuickInfoPopup *ui;
 };
 
-#endif // AGAVETASKGUIDE_H
+#endif // QUICKINFOPOPUP_H

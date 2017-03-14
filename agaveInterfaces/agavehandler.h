@@ -52,7 +52,7 @@
 #include <QFileInfo>
 #include <QStringList>
 
-enum class AgaveRequestType {AGAVE_GET, AGAVE_POST, AGAVE_DELETE, AGAVE_UPLOAD, AGAVE_PUT, AGAVE_NONE};
+enum class AgaveRequestType {AGAVE_GET, AGAVE_POST, AGAVE_DELETE, AGAVE_UPLOAD, AGAVE_DOWNLOAD, AGAVE_PUT, AGAVE_NONE};
 
 class QNetworkReply;
 class AgaveTaskGuide;
@@ -91,6 +91,8 @@ public:
 
     virtual RemoteDataReply * runRemoteJob(QString jobName, QString jobParameters, QString remoteWorkingDir);
 
+    QString getTenantURL();
+
 private slots:
     void handleInternalTask(AgaveTaskReply *agaveReply, QNetworkReply * rawReply);
 
@@ -98,7 +100,7 @@ private:
     AgaveTaskReply * performAgaveQuery(QString queryName, QObject * parentReq = NULL);
     AgaveTaskReply * performAgaveQuery(QString queryName, QString param1, QObject * parentReq = NULL);
     AgaveTaskReply * performAgaveQuery(QString queryName, QString param1, QString param2, QObject * parentReq = NULL);
-    AgaveTaskReply * performAgaveQuery(QString queryName, QStringList * paramList1 = NULL, QStringList * paramList2 = NULL, QObject * parentReq = NULL);
+    AgaveTaskReply * performAgaveQuery(QString queryName, QStringList * paramList0 = NULL, QStringList * paramList1 = NULL, QObject * parentReq = NULL);
     QNetworkReply * internalQueryMethod(AgaveTaskGuide * theGuide, QStringList * paramList1 = NULL, QStringList * paramList2 = NULL);
     QNetworkReply * finalizeAgaveRequest(AgaveTaskGuide * theGuide, QString urlAppend, QByteArray * authHeader = NULL, QByteArray postData = "", QFile * fileHandle = NULL);
 

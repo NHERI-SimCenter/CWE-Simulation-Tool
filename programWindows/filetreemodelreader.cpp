@@ -41,6 +41,7 @@
 #include "../programWindows/deleteconfirm.h"
 #include "../programWindows/singlelinedialog.h"
 #include "../programWindows/errorpopup.h"
+#include "../programWindows/quickinfopopup.h"
 
 FileTreeModelReader::FileTreeModelReader(RemoteDataInterface * newDataLink, QTreeView * newLinkedFileView, QLabel * fileHeaderLabel)
 {
@@ -488,13 +489,47 @@ void FileTreeModelReader::getUploadReply(RequestState replyState, FileMetaData *
 
 void FileTreeModelReader::sendDownloadReq()
 {
-    //TODO
+    FileMetaData targetFile = selectedItem->getFileData();
+    SingleLineDialog downloadNamePopup("Please input full path download destination:", "");
+    //TODO: NEED lots of verification here
+    //First, valid folder to upload to
+    //Second, that download destination is valid
+    if (downloadNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    qDebug("Starting download procedure: %s to %s", qPrintable(targetFile.getFullPath()),
+           qPrintable(downloadNamePopup.getInputText()));
+    RemoteDataReply * theReply = dataLink->downloadFile(downloadNamePopup.getInputText(), targetFile.getFullPath());
+    if (theReply == NULL)
+    {
+        QString replyMessage = "Unable to download file. Check that destination file does not already exist";
+        QuickInfoPopup downloadPopup(&replyMessage);
+        downloadPopup.exec();
+        return;
+    }
+    QObject::connect(theReply, SIGNAL(haveDownloadReply(RequestState,QString*)),
+                     this, SLOT(getDownloadReply(RequestState,QString*)));
+
+    fileOperationPending = true;
 }
 
 void FileTreeModelReader::getDownloadReply(RequestState replyState, QString * localDest)
 {
     fileOperationPending = false;
-    //TODO
+    QString downloadMessage;
+    if (replyState != RequestState::GOOD)
+    {
+        downloadMessage = "Error: Unable to download requested file.";
+    }
+    else
+    {
+        downloadMessage = "Download complete to: ";
+        downloadMessage.append(localDest);
+    }
+    QuickInfoPopup downloadPopup(&downloadMessage);
+    downloadPopup.exec();
 }
 
 void FileTreeModelReader::sendManualRefresh()

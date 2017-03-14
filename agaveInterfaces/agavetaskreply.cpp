@@ -159,6 +159,10 @@ void AgaveTaskReply::processBadReply(RequestState replyState, QString errorText)
     {
         emit haveRenameReply(replyState, NULL, NULL);
     }
+    else if (myGuide->getTaskID() == "fileDownload")
+    {
+        emit haveDownloadReply(replyState, NULL);
+    }
     else
     {
         emit haveJobReply(replyState, NULL);
@@ -205,6 +209,25 @@ void AgaveTaskReply::rawTaskComplete()
     }
 
     const QByteArray replyText = myReplyObject->readAll();
+
+    if (myGuide->getRequestType() == AgaveRequestType::AGAVE_DOWNLOAD)
+    {
+        QFile * fileHandle = new QFile(dataStore);
+        if (!fileHandle->open(QIODevice::WriteOnly))
+        {
+            processFailureReply("Could not open local file for writing");
+            fileHandle->deleteLater();
+            return;
+        }
+        fileHandle->write(replyText.toStdString().c_str());
+        //TODO: There may be errors here we need to catch
+
+        fileHandle->close();
+        fileHandle->deleteLater();
+
+        emit haveDownloadReply(RequestState::GOOD, &dataStore);
+        return;
+    }
 
     QJsonParseError parseError;
     QJsonDocument parseHandler = QJsonDocument::fromJson(replyText, &parseError);
