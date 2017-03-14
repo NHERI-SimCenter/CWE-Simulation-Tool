@@ -36,20 +36,20 @@
 #include "panelwindow.h"
 #include "ui_panelwindow.h"
 
-#include "agaveInterfaces/filetreemodelreader.h"
 #include "taskPanels/taskpanelentry.h"
 #include "taskPanels/filemainippanel.h"
 #include "taskPanels/placeholderpanel.h"
-#include "../agaveInterfaces/agavehandler.h"
 #include "copyrightdialog.h"
+#include "filetreemodelreader.h"
+#include "../remotedatainterface.h"
 
-PanelWindow::PanelWindow(AgaveHandler * newAgaveLink, QWidget *parent) :
+PanelWindow::PanelWindow(RemoteDataInterface * newDataLink, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PanelWindow)
 {
     ui->setupUi(this);
 
-    agaveLink = newAgaveLink;
+    dataLink = newDataLink;
     taskTreeView = this->findChild<QTreeView *>("taskTreeView");
     sharedWidget = this->findChild<QStackedWidget *>("stackedView");
     QTreeView * fileTreeView = this->findChild<QTreeView *>("fileTreeView");
@@ -59,7 +59,7 @@ PanelWindow::PanelWindow(AgaveHandler * newAgaveLink, QWidget *parent) :
     taskListModel.setHorizontalHeaderLabels(taskHeaderList);
     taskTreeView->hideColumn(1);
 
-    fileTreeModel = new FileTreeModelReader(agaveLink, fileTreeView, fileLabel);
+    fileTreeModel = new FileTreeModelReader(dataLink, fileTreeView, fileLabel);
 }
 
 PanelWindow::~PanelWindow()
@@ -74,7 +74,7 @@ void PanelWindow::setupTaskList()
     fileTreeModel->resetFileData();
 
     //Populate panel list:
-    FileMainipPanel * filePanel = new FileMainipPanel(agaveLink, fileTreeModel);
+    FileMainipPanel * filePanel = new FileMainipPanel(dataLink, fileTreeModel);
     registerTaskPanel(filePanel);
 
     PlaceholderPanel * placeHolderEntry = new PlaceholderPanel();

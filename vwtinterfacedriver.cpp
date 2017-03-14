@@ -37,41 +37,42 @@ using namespace std;
 
 #include "vwtinterfacedriver.h"
 
-#include "agaveInterfaces/remotedatainterface.h"
+#include "remotedatainterface.h"
+#include "agaveInterfaces/agavehandler.h"
 #include "programWindows/authform.h"
 #include "programWindows/panelwindow.h"
 #include "programWindows/errorpopup.h"
 
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
-    agaveConnector = new AgaveHandler(this);
+    theConnector = (RemoteDataInterface *) (new AgaveHandler(this));
     authWindow = NULL;
     mainWindow = NULL;
 }
 
 VWTinterfaceDriver::~VWTinterfaceDriver()
 {
-    if (agaveConnector != NULL) delete agaveConnector;
+    if (theConnector != NULL) delete theConnector;
     if (authWindow != NULL) delete authWindow;
     if (mainWindow != NULL) delete mainWindow;
 }
 
 void VWTinterfaceDriver::startup()
 {
-    authWindow = new AuthForm(agaveConnector);
-    mainWindow = new PanelWindow(agaveConnector);
+    authWindow = new AuthForm(theConnector, this);
+    mainWindow = new PanelWindow(theConnector);
 
     authWindow->show();
 }
 
-AgaveHandler * VWTinterfaceDriver::getAgaveConnection()
+RemoteDataInterface * VWTinterfaceDriver::getDataConnection()
 {
-    return agaveConnector;
+    return theConnector;
 }
 
 void VWTinterfaceDriver::getAuthReply(RequestState authReply)
 {
-    if ((authReply = RequestState::GOOD) && (authWindow != NULL) && (authWindow->isVisible()))
+    if ((authReply == RequestState::GOOD) && (authWindow != NULL) && (authWindow->isVisible()))
     {
         closeAuthScreen();
     }

@@ -59,7 +59,7 @@ SOURCES += main.cpp \
     programWindows/singlelinedialog.cpp \
     programWindows/copyrightdialog.cpp \
     programWindows/filetreemodelreader.cpp \
-    agaveInterfaces/remotedatainterface.cpp
+    remotedatainterface.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -75,8 +75,8 @@ HEADERS  += \
     programWindows/deleteconfirm.h \
     programWindows/singlelinedialog.h \
     programWindows/copyrightdialog.h \
-    agaveInterfaces/remotedatainterface.h \
-    programWindows/filetreemodelreader.h
+    programWindows/filetreemodelreader.h \
+    remotedatainterface.h
 
 FORMS    += \
     programWindows/authform.ui \

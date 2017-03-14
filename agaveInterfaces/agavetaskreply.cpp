@@ -39,18 +39,18 @@
 #include "agavehandler.h"
 #include "../programWindows/errorpopup.h"
 
-AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * newReply, QObject *parent) : QObject(parent)
+AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * newReply, QObject *parent) : RemoteDataReply(parent)
 {
     myGuide = theGuide;
     if (myGuide == NULL)
     {
         ErrorPopup("Task Reply has no task guide.");
+        return;
     }
     myReplyObject = newReply;
     if ((myReplyObject == NULL) && (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE))
     {
-        validRequest = false;
-        this->deleteLater();
+        ErrorPopup("Task Reply has no network reply.");
         return;
     }
 
@@ -68,7 +68,7 @@ AgaveTaskReply::~AgaveTaskReply()
     }
 }
 
-void AgaveTaskReply::delayedPassThruReply(RequestState replyState, QString * param1 = NULL)
+void AgaveTaskReply::delayedPassThruReply(RequestState replyState, QString * param1)
 {
     if (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE)
     {
@@ -107,19 +107,14 @@ void AgaveTaskReply::invokePassThruReply(RequestState replyState, QString * para
     return;
 }
 
-bool AgaveTaskReply::isValidReply()
-{
-    return validRequest;
-}
-
-QString AgaveTaskReply::getErrorMessage()
-{
-    return currentError;
-}
-
 AgaveTaskGuide * AgaveTaskReply::getTaskGuide()
 {
     return myGuide;
+}
+
+void AgaveTaskReply::setDataStore(QString newSetting)
+{
+    dataStore = newSetting;
 }
 
 void AgaveTaskReply::processNoContactReply(QString errorText)
@@ -134,8 +129,7 @@ void AgaveTaskReply::processFailureReply(QString errorText)
 
 void AgaveTaskReply::processBadReply(RequestState replyState, QString errorText)
 {
-    currentError = errorText;
-    qDebug(errorText);
+    qDebug("%s", qPrintable(errorText));
 
     if (myGuide->getTaskID() == "changeDir")
     {
@@ -150,7 +144,7 @@ void AgaveTaskReply::processBadReply(RequestState replyState, QString errorText)
         emit haveLSReply(replyState, NULL);
     }
     else if (myGuide->getTaskID() == "fileUpload")
-    {(
+    {
         emit haveUploadReply(replyState, NULL);
     }
     else if (myGuide->getTaskID() == "fileDelete")
@@ -229,9 +223,9 @@ void AgaveTaskReply::rawTaskComplete()
         return;
     }
 
-    qDebug(parseHandler.toJson());
+    qDebug("%s", qPrintable(parseHandler.toJson()));
 
-    RequestState prelimResult = standardSuccessFailCheck(myGuide, parseHandler);
+    RequestState prelimResult = standardSuccessFailCheck(myGuide, &parseHandler);
 
     if (prelimResult == RequestState::NO_CONNECT)
     {
@@ -248,7 +242,7 @@ void AgaveTaskReply::rawTaskComplete()
     }
     else if (myGuide->getTaskID() == "dirListing")
     {
-        QJsonValue expectedArray = retriveMainAgaveJSON(parseHandler,"result");
+        QJsonValue expectedArray = retriveMainAgaveJSON(&parseHandler,"result");
         if (!expectedArray.isArray())
         {
             processFailureReply("Parse gives no array for file list.");
@@ -270,7 +264,7 @@ void AgaveTaskReply::rawTaskComplete()
     }
     else if (myGuide->getTaskID() == "fileUpload")
     {
-        QJsonValue expectedObject = retriveMainAgaveJSON(parseHandler,"result");
+        QJsonValue expectedObject = retriveMainAgaveJSON(&parseHandler,"result");
         FileMetaData aFile = parseJSONfileMetaData(expectedObject.toObject());
         if (aFile.getFileType() == FileType::INVALID)
         {
@@ -281,39 +275,37 @@ void AgaveTaskReply::rawTaskComplete()
     }
     else if (myGuide->getTaskID() == "fileDelete")
     {
-        //TODO: find the path of deleted file, somewhere
-        emit haveDeleteReply(RequestState::GOOD, NULL);
+        emit haveDeleteReply(RequestState::GOOD, &dataStore);
     }
     else if (myGuide->getTaskID() == "newFolder")
     {
-        QJsonValue expectedObject = retriveMainAgaveJSON(parseHandler,"result");
+        QJsonValue expectedObject = retriveMainAgaveJSON(&parseHandler,"result");
         FileMetaData aFile = parseJSONfileMetaData(expectedObject.toObject());
         if (aFile.getFileType() == FileType::INVALID)
         {
             processFailureReply("Invalid file data");
             return;
         }
-        emit haveMkdirReply(RequestState::GOOD, aFile);
+        emit haveMkdirReply(RequestState::GOOD, &aFile);
     }
     else if (myGuide->getTaskID() == "renameFile")
     {
-        QJsonValue expectedObject = retriveMainAgaveJSON(parseHandler,"result");
+        QJsonValue expectedObject = retriveMainAgaveJSON(&parseHandler,"result");
         FileMetaData aFile = parseJSONfileMetaData(expectedObject.toObject());
         if (aFile.getFileType() == FileType::INVALID)
         {
             processFailureReply("Invalid file data");
             return;
         }
-        //TODO: find the path of old file name, somehow
-        emit haveRenameReply(RequestState::GOOD, NULL, aFile);
+        emit haveRenameReply(RequestState::GOOD, &dataStore, &aFile);
     }
     else
     {
-        emit haveJobReply(RequestState::GOOD, parseHandler);
+        emit haveJobReply(RequestState::GOOD, &parseHandler);
     }
 }
 
-static RequestState AgaveTaskReply::standardSuccessFailCheck(AgaveTaskGuide * taskGuide, QJsonDocument * parsedDoc)
+RequestState AgaveTaskReply::standardSuccessFailCheck(AgaveTaskGuide * taskGuide, QJsonDocument * parsedDoc)
 {
     //In Agave TOKEN uses a different output form
     if (taskGuide->isTokenFormat())
@@ -327,7 +319,7 @@ static RequestState AgaveTaskReply::standardSuccessFailCheck(AgaveTaskGuide * ta
     {
         QString statusString = retriveMainAgaveJSON(parsedDoc,"status").toString();
 
-        else if (statusString == "error")
+        if (statusString == "error")
         {
             return RequestState::FAIL;
         }
@@ -336,21 +328,36 @@ static RequestState AgaveTaskReply::standardSuccessFailCheck(AgaveTaskGuide * ta
             return RequestState::NO_CONNECT;
         }
     }
+    return RequestState::GOOD;
 }
 
-static FileMetaData AgaveTaskReply::parseJSONfileMetaData(QJsonObject fileNameValuePairs)
+FileMetaData AgaveTaskReply::parseJSONfileMetaData(QJsonObject fileNameValuePairs)
 {
     FileMetaData ret;
-    if (!fileNameValuePairs.contains("format") || !fileNameValuePairs.contains("name")
+    if (!(fileNameValuePairs.contains("format") || fileNameValuePairs.contains("nativeFormat"))
+            || !fileNameValuePairs.contains("name")
             || !fileNameValuePairs.contains("path")
             || !fileNameValuePairs.value("path").isString())
     {
         return ret;
     }
 
-    ret.setFullFilePath(fileNameValuePairs.value("path").toString());
+    if (fileNameValuePairs.value("name").toString() == ".")
+    {
+        QString tmp = fileNameValuePairs.value("path").toString();
+        tmp.append("/.");
+        ret.setFullFilePath(tmp);
+    }
+    else
+    {
+        ret.setFullFilePath(fileNameValuePairs.value("path").toString());
+    }
 
     QString typeString = fileNameValuePairs.value("type").toString();
+    if (typeString.isEmpty())
+    {
+        typeString = fileNameValuePairs.value("nativeFormat").toString();
+    }
     if (typeString == "dir")
     {
         ret.setType(FileType::DIR);
@@ -359,34 +366,44 @@ static FileMetaData AgaveTaskReply::parseJSONfileMetaData(QJsonObject fileNameVa
     {
         ret.setType(FileType::FILE);
     }
+    else if (typeString == "raw")
+    {
+        ret.setType(FileType::FILE);
+    }
     //TODO: consider more validity checks here
-    int fileLength = fileNameValuePairs.value("length").toString().toInt();
+    int fileLength = fileNameValuePairs.value("length").toInt();
     ret.setSize(fileLength);
 
     return ret;
 }
 
-static QJsonValue AgaveTaskReply::retriveMainAgaveJSON(QJsonDocument * parsedDoc, QString oneKey)
+QJsonValue AgaveTaskReply::retriveMainAgaveJSON(QJsonDocument * parsedDoc, const char * oneKey)
 {
     QList<QString> smallList = { oneKey };
     return retriveMainAgaveJSON(parsedDoc, smallList);
 }
 
-static QJsonValue AgaveTaskReply::retriveMainAgaveJSON(QJsonDocument * parsedDoc, QList<QString> keyList)
+QJsonValue AgaveTaskReply::retriveMainAgaveJSON(QJsonDocument * parsedDoc, QString oneKey)
+{
+    QList<QString> smallList = { oneKey };
+    return retriveMainAgaveJSON(parsedDoc, smallList);
+}
+
+QJsonValue AgaveTaskReply::retriveMainAgaveJSON(QJsonDocument * parsedDoc, QList<QString> keyList)
 {
     QJsonValue nullVal;
     if (keyList.size() < 1) return nullVal;
-    if (parsedDoc.isNull()) return nullVal;
-    if (parsedDoc.isEmpty()) return nullVal;
-    if (!parsedDoc.isObject()) return nullVal;
+    if (parsedDoc->isNull()) return nullVal;
+    if (parsedDoc->isEmpty()) return nullVal;
+    if (!parsedDoc->isObject()) return nullVal;
 
-    QJsonValue resultVal = recursiveJSONdig(QJsonValue(parsedDoc.object()) , &keyList, 0);
+    QJsonValue resultVal = recursiveJSONdig(QJsonValue(parsedDoc->object()) , &keyList, 0);
     if (resultVal.isUndefined()) return nullVal;
     if (resultVal.isNull()) return nullVal;
     return resultVal;
 }
 
-static QJsonValue AgaveTaskReply::recursiveJSONdig(QJsonValue currVal, QList<QString> * keyList, int i)
+QJsonValue AgaveTaskReply::recursiveJSONdig(QJsonValue currVal, QList<QString> * keyList, int i)
 {
     QJsonValue nullValue;
     if (i >= keyList->size())

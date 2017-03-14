@@ -50,6 +50,7 @@
 #include <QHttpMultiPart>
 #include <QHttpPart>
 #include <QFileInfo>
+#include <QStringList>
 
 enum class AgaveRequestType {AGAVE_GET, AGAVE_POST, AGAVE_DELETE, AGAVE_UPLOAD, AGAVE_PUT, AGAVE_NONE};
 
@@ -62,7 +63,7 @@ class AgaveHandler : public RemoteDataInterface
     Q_OBJECT
 
 public:
-    explicit AgaveHandler();
+    explicit AgaveHandler(QObject *parent);
     ~AgaveHandler();
 
     virtual RemoteDataReply * closeAllConnections();
@@ -132,7 +133,6 @@ private:
 
     QString pwd = "";
 
-    //TODO: implement use of these variables
     bool authGained = false;
     bool attemptingAuth = false;
 };

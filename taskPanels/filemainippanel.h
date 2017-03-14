@@ -43,28 +43,29 @@
 #include <QPushButton>
 #include <QJsonValue>
 
+class FileMetaData;
 class FileTreeModelReader;
-class AgaveHandler;
+class RemoteDataInterface;
 enum class RequestState;
 
 class FileMainipPanel : public TaskPanelEntry
 {
     Q_OBJECT
 public:
-    FileMainipPanel(AgaveHandler * newAgaveHandle, FileTreeModelReader * newReader, QObject *parent = 0);
+    FileMainipPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
 
     virtual void setupOwnFrame();
     virtual void frameNowVisible();
     virtual void frameNowInvisible();
 
 private slots:
-    void selectedFileChanged(QModelIndex newSelection);
+    void selectedFileChanged(FileMetaData * newSelection);
 
 private:    
     QModelIndex currentFileSelected;
     FileTreeModelReader * myTreeReader;
 
-    AgaveHandler * agaveConnection;
+    RemoteDataInterface * dataConnection;
 
     QLabel * contentLabel = NULL;
 };

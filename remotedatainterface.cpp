@@ -40,18 +40,12 @@ FileMetaData::FileMetaData()
     //Note: defaults are handled in the class header
 }
 
-FileMetaData::FileMetaData(FileMetaData * copyFrom)
+bool FileMetaData::operator==(const FileMetaData & toCompare)
 {
-    this->fullContainingPath = copyFrom->fullContainingPath;
-    this->fileName = copyFrom->fileName;
-    this->fileSize = copyFrom->fileSize;
-    this->myType = copyFrom->myType;
-}
-
-FileMetaData FileMetaData::operator=(const FileMetaData & toCopy)
-{
-    FileMetaData ret(&toCopy);
-    return ret;
+    if (this->getFileName() != toCompare.getFileName()) return false;
+    if (this->getFileType() != toCompare.getFileType()) return false;
+    if (this->getSize() != toCompare.getSize()) return false;
+    return true;
 }
 
 void FileMetaData::setFullFilePath(QString fullPath)
@@ -88,29 +82,84 @@ void FileMetaData::setType(FileType newType)
     myType = newType;
 }
 
-QString FileMetaData::getFullPath()
+QString FileMetaData::getFullPath() const
 {
     QString ret = fullContainingPath;
     ret.append(fileName);
     return ret;
 }
 
-QString FileMetaData::getFileName()
+QString FileMetaData::getFileName() const
 {
     return fileName;
 }
 
-QString FileMetaData::getContainingPath()
+QString FileMetaData::getContainingPath() const
 {
     return fullContainingPath;
 }
 
-int FileMetaData::getSize()
+int FileMetaData::getSize() const
 {
     return fileSize;
 }
 
-FileType FileMetaData::getFileType()
+FileType FileMetaData::getFileType() const
 {
     return myType;
 }
+
+QString FileMetaData::getFileTypeString() const
+{
+    switch (myType)
+    {
+    case FileType::DIR : return "Folder";
+    case FileType::EMPTY_FOLDER : return "Empty";
+    case FileType::FILE : return "File";
+    case FileType::INVALID : return "Error";
+    case FileType::SIM_LINK : return "Link";
+    case FileType::UNLOADED : return "Fetching";
+    }
+    return "ERROR";
+}
+
+QStringList FileMetaData::getPathNameList(QString fullPath)
+{
+    QStringList fileNames = fullPath.split('/');
+
+    QStringList ret;
+    for (auto itr = fileNames.cbegin(); itr != fileNames.cend(); itr++)
+    {
+        if (!(*itr).isEmpty())
+        {
+            ret.append(*itr);
+        }
+    }
+    return ret;
+}
+
+QString FileMetaData::cleanPathSlashes(QString fullPath)
+{
+    //TODO: maybe this should work for both types of slashes
+
+    bool isFolder = false;
+    if ((fullPath.at(fullPath.size() - 1)) == '/')
+    {
+        isFolder = true;
+    }
+    QStringList fileNameList = FileMetaData::getPathNameList(fullPath);
+    QString ret;
+    if (fileNameList.isEmpty()) return "/";
+
+    for (auto itr = fileNameList.cbegin(); itr != fileNameList.cend(); itr++)
+    {
+        ret.append("/");
+        ret.append(*itr);
+    }
+
+    if (isFolder){ret.append('/');}
+    return ret;
+}
+
+RemoteDataReply::RemoteDataReply(QObject * parent):QObject(parent) {}
+RemoteDataInterface::RemoteDataInterface(QObject * parent):QObject(parent) {}
