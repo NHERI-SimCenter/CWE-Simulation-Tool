@@ -68,11 +68,11 @@ void ErrorPopup::setErrorLabel(QString errorText)
 
     QString realErrorText = errorText;
     realErrorText.prepend(": ");
-    realErrorText.prepend(QString::number((unsigned int)errNum));
+    realErrorText.prepend(QString::number((unsigned int)errorVal));
     realErrorText.prepend("ERROR ");
 
     errorTextElement->setText(realErrorText);
-    qDebug("%s",realErrorText.toStdString().c_str());
+    qDebug("%s",qPrintable(realErrorText));
 }
 
 void ErrorPopup::closeByError()

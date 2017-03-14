@@ -36,16 +36,15 @@
 #include "filemainippanel.h"
 
 #include "../vwtinterfacedriver.h"
-#include "../agaveInterfaces/filetreemodelreader.h"
-#include "../agaveInterfaces/agavehandler.h"
-#include "../agaveInterfaces/agavetaskreply.h"
+#include "../remotedatainterface.h"
+#include "../programWindows/filetreemodelreader.h"
 
-FileMainipPanel::FileMainipPanel(AgaveHandler * newAgaveHandle, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
+FileMainipPanel::FileMainipPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
 {
     this->setFrameNameList({"Remote File Management", "Browse Remote Files"});
 
     myTreeReader = newReader;
-    agaveConnection = newAgaveHandle;
+    dataConnection = newDataHandle;
     this->setFileTreeVisibleSetting(true);
 }
 
@@ -64,33 +63,31 @@ void FileMainipPanel::setupOwnFrame()
 void FileMainipPanel::frameNowVisible()
 {
     myTreeReader->setRightClickMenuEnabled(true);
-    selectedFileChanged(myTreeReader->getCurrentSelectedFile());
-    QObject::connect(myTreeReader, SIGNAL(newFileSelected(QModelIndex)), this, SLOT(selectedFileChanged(QModelIndex)));
+    QObject::connect(myTreeReader, SIGNAL(newFileSelected(FileMetaData *)), this, SLOT(selectedFileChanged(FileMetaData *)));
+    myTreeReader->resendSelectedFile();
 }
 
 void FileMainipPanel::frameNowInvisible()
 {
     myTreeReader->setRightClickMenuEnabled(false);
-    QObject::disconnect(myTreeReader, SIGNAL(newFileSelected(QModelIndex)), this, SLOT(selectedFileChanged(QModelIndex)));
+    QObject::disconnect(myTreeReader, SIGNAL(newFileSelected(FileMetaData *)), this, SLOT(selectedFileChanged(FileMetaData *)));
 }
 
-void FileMainipPanel::selectedFileChanged(QModelIndex newSelection)
+void FileMainipPanel::selectedFileChanged(FileMetaData * newSelection)
 {
-    QMap<QString, QString> fileDataList = myTreeReader->getDataForEntry(newSelection);
-    if (fileDataList.isEmpty())
+    if ((newSelection->getFileType() == FileType::EMPTY_FOLDER) ||
+        (newSelection->getFileType() == FileType::INVALID) ||
+        (newSelection->getFileType() == FileType::UNLOADED))
     {
         contentLabel->setText("No File Selected.");
         return;
     }
-    //TODO: Need to make a more user friendly view
+    //TODO: Need to make a more user friendly view and add the rest of the info
     QString blindDump;
-    QList<QString> keyList = fileDataList.keys();
-    for (auto itr = keyList.cbegin(); itr != keyList.cend(); ++itr)
-    {
-        blindDump.append(*itr);
-        blindDump.append(": ");
-        blindDump.append(fileDataList.value(*itr));
-        blindDump.append("\n");
-    }
+
+    blindDump.append("Name: ");
+    blindDump.append(newSelection->getFileName().toLatin1());
+    blindDump.append("\n");
+
     contentLabel->setText(blindDump);
 }

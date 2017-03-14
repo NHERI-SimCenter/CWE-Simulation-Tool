@@ -69,8 +69,8 @@ public:
     bool isTokenFormat();
     bool isInternal();
 
-    bool needsPostParms();
-    bool needsURLParams();
+    bool usesPostParms();
+    bool usesURLParams();
 
 private:
     QString taskId;

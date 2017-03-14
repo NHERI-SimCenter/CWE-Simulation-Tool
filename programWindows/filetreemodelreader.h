@@ -48,6 +48,8 @@
 #include <QMenu>
 #include <QCursor>
 
+//NOTE: FILENAME MUST == 0 for these functions to work.
+//The other columns can be changed
 enum class FileColumn : int {FILENAME = 0,
                              TYPE = 1,
                              SIZE = 2,
@@ -57,62 +59,105 @@ enum class FileColumn : int {FILENAME = 0,
                              PERMISSIONS = 6};
 
 class SingleLineDialog;
-class AgaveHandler;
+class RemoteDataInterface;
+class FileMetaData;
+enum class RequestState;
+
+class FileTreeNode : public QObject
+{
+    Q_OBJECT
+public:
+    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
+    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
+                                                //depending if the parent is NULL
+    ~FileTreeNode();
+
+    QList<FileTreeNode *>::iterator fileListStart();
+    QList<FileTreeNode *>::iterator fileListEnd();
+
+    void setFileData(FileMetaData newData);
+    void setMark(bool newSetting);
+    bool isMarked();
+
+    bool isRootNode();
+    FileTreeNode * getParentNode();
+    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
+    void clearAllChildren();
+    FileMetaData getFileData();
+
+    bool childIsUnloaded();
+
+private:
+    FileMetaData * fileData = NULL;
+    QList<FileTreeNode *> * childList = NULL;
+    bool rootNode;
+    bool marked = false;
+};
 
 class FileTreeModelReader : public QObject
 {
     Q_OBJECT
 public:
-    FileTreeModelReader(AgaveHandler * newAgaveLink, QTreeView * newLinkedFileView, QLabel * fileHeaderLabel);
-
-    QString getFilePathForNode(QModelIndex dataIndex);
-    QMap<QString,QString> getDataForEntry(QModelIndex dataIndex);
-    QModelIndex getCurrentSelectedFile();
+    FileTreeModelReader(RemoteDataInterface * newDataLink, QTreeView * newLinkedFileView, QLabel * fileHeaderLabel);
 
     void setTreeViewVisibility(bool isVisible);
     void setRightClickMenuEnabled(bool newSetting);
 
+    void resendSelectedFile();
+    FileMetaData getCurrentSelectedFile();
     void resetFileData();
-    void refreshFolderAtPath(QString pathToRefresh);
 
 signals:
-    void newFileSelected(QModelIndex dataIndex);
+    void newFileSelected(FileMetaData * newFileData);
 
 private slots:
-    void refreshFileInfo(QJsonArray fileList);
-
     void folderExpanded(QModelIndex itemOpened);
     void fileEntryTouched(QModelIndex fileIndex);
     void needRightClickMenu(QPoint pos);
 
-    //Slots for the file operations in the right-click menu
-    void sendCopyReq();
-    void getCopyResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+    void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
 
-    void sendMoveReq();
-    void getMoveResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
-
-    void sendRenameReq();
-    void getRenameResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
-
+    //Slots for file operations in the right-click menu
     void sendDeleteReq();
-    void getDeleteResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
-
-    void sendUploadReq();
-    void getUploadResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+    void getDeleteReply(RequestState replyState, QString * oldFilePath);
+    void sendMoveReq();
+    void getMoveReply(RequestState replyState, QString * oldFilePath, FileMetaData * revisedFileData);
+    void sendCopyReq();
+    void getCopyReply(RequestState replyState, FileMetaData * newFileData);
+    void sendRenameReq();
+    void getRenameReply(RequestState replyState, QString * oldFilePath, FileMetaData * newFileData);
 
     void sendCreateFolderReq();
-    void getCreateFolderResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+    void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
 
+    void sendUploadReq();
+    void getUploadReply(RequestState replyState, FileMetaData * newFileData);
     void sendDownloadReq();
-    void getDownloadResult(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+    void getDownloadReply(RequestState replyState, QString * localDest);
+
+    void sendManualRefresh();
 
 private:
-    bool insertFileData(QJsonArray fileList);
-    bool needDataRefresh(QModelIndex dataIndex);
-    void refreshFolderFromNode(QStandardItem * modelNode);
+    QString getFilePathForNode(QModelIndex dataIndex);
+    FileTreeNode * getFileNodeFromPath(QString filePath);
+    FileTreeNode * getFileNearestFromPath(QString filePath);
 
-    QList<QStandardItem*> getLoadingPlaceholderRow();
+    //Note: if not found, will return NULL and call translateFileDataToModel(), to resync
+    //If input is NULL, return NULL, but don't resync
+    FileTreeNode * getNodeFromModel(QStandardItem * toFind);
+    QStandardItem * getModelEntryFromNode(FileTreeNode * toFind);
+
+    void totalResetErrorProcedure();
+    void translateFileDataToModel();
+    void translateFileDataRecurseHelper(FileTreeNode * currentFile, QStandardItem * currentModelEntry);
+    void enactFolderRefresh(FileTreeNode * folderToRemoteLS);
+
+    bool fileInModel(FileTreeNode * toFind, QStandardItem * compareTo);
+    void changeModelFromFile(QStandardItem * targetRow, FileTreeNode * dataSource);
+    void newModelRowFromFile(QStandardItem * parentItem, FileTreeNode * dataSource);
+
+    bool columnInUse(int i);
+    QString getRawColumnData(int i, FileMetaData * rawFileData);
 
     const int tableNumCols = 7;
     const QStringList shownHeaderLabelList = {"File Name","Type","Size","Last Changed",
@@ -120,14 +165,17 @@ private:
     const QStringList hiddenHeaderLabelList = {"name","type","length","lastModified",
                                    "format","mimeType","permissions"};
 
+    QLabel * filesLabel = NULL;
+    QTreeView * linkedFileView = NULL;
+
+    FileTreeNode * rootFileNode = NULL;
     QStandardItemModel dataStore;
-    QTreeView * linkedFileView;
-    QModelIndex selectedItem;
-    QLabel * filesLabel;
+    FileTreeNode * selectedItem = NULL;
+
     bool rightClickEnabled = false;
     bool fileOperationPending = false;
 
-    AgaveHandler * agaveLink;
+    RemoteDataInterface * dataLink = NULL;
 };
 
 #endif // FILETREEMODELREADER_H

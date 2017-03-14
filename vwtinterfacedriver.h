@@ -46,11 +46,11 @@
 #include <QStackedWidget>
 
 enum class VWTerrorType: unsigned int;
+enum class RequestState;
 
 class RemoteDataInterface;
 class AuthForm;
 class PanelWindow;
-class RequestState;
 
 class VWTinterfaceDriver : public QObject
 {

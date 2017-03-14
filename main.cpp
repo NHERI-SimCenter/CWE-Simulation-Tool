@@ -35,15 +35,33 @@
 
 #include <QApplication>
 #include <QtGlobal>
+#include <string.h>
 #include "vwtinterfacedriver.h"
+
+void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
 
 int main(int argc, char *argv[])
 {
     QApplication mainRunLoop(argc, argv);
     VWTinterfaceDriver programDriver;
 
-    //TODO: Enable debug output only with a command line argument
-    qDebug("NOTE: Debugging text output is enabled.");
+    bool debugLoggingEnabled = false;
+    for (int i = 0; i < argc; i++)
+    {
+        if (strcmp(argv[i],"enableDebugLogging") == 0)
+        {
+            debugLoggingEnabled = true;
+        }
+    }
+
+    if (debugLoggingEnabled)
+    {
+        qDebug("NOTE: Debugging text output is enabled.");
+    }
+    else
+    {
+        qInstallMessageHandler(emptyMessageHandler);
+    }
 
     programDriver.startup();
     return mainRunLoop.exec();

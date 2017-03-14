@@ -61,37 +61,38 @@ public:
     void invokePassThruReply(RequestState replyState, QString * param1 = NULL);
     void delayedPassThruReply(RequestState replyState, QString * param1 = NULL);
 
-    virtual bool isValidReply();
-    virtual QString getErrorMessage();
     AgaveTaskGuide * getTaskGuide();
+
+    void setDataStore(QString newSetting);
 
     static RequestState standardSuccessFailCheck(AgaveTaskGuide * taskGuide, QJsonDocument * parsedDoc);
     static FileMetaData parseJSONfileMetaData(QJsonObject fileNameValuePairs);
 
+    static QJsonValue retriveMainAgaveJSON(QJsonDocument * parsedDoc, const char * oneKey);
     static QJsonValue retriveMainAgaveJSON(QJsonDocument * parsedDoc, QString oneKey);
     static QJsonValue retriveMainAgaveJSON(QJsonDocument * parsedDoc, QList<QString> keyList);
     static QJsonValue recursiveJSONdig(QJsonValue currObj, QList<QString> * keyList, int i);
 
 signals:
-    virtual void haveCurrentRemoteDir(RequestState cmdReply, QString * pwd);
-    virtual void connectionsClosed(RequestState cmdReply);
+    void haveCurrentRemoteDir(RequestState cmdReply, QString * pwd);
+    void connectionsClosed(RequestState cmdReply);
 
-    virtual void haveAuthReply(RequestState authReply);
-    virtual void haveLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
+    void haveAuthReply(RequestState authReply);
+    void haveLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
 
-    virtual void haveDeleteReply(RequestState replyState, QString * oldFilePath);
-    virtual void haveMoveReply(RequestState replyState, QString * oldFilePath, FileMetaData * revisedFileData);
-    virtual void haveCopyReply(RequestState replyState, FileMetaData * newFileData);
-    virtual void haveRenameReply(RequestState replyState, QString * oldFilePath, FileMetaData * newFileData);
+    void haveDeleteReply(RequestState replyState, QString * oldFilePath);
+    void haveMoveReply(RequestState replyState, QString * oldFilePath, FileMetaData * revisedFileData);
+    void haveCopyReply(RequestState replyState, FileMetaData * newFileData);
+    void haveRenameReply(RequestState replyState, QString * oldFilePath, FileMetaData * newFileData);
 
-    virtual void haveMkdirReply(RequestState replyState, FileMetaData * newFolderData);
+    void haveMkdirReply(RequestState replyState, FileMetaData * newFolderData);
 
-    virtual void haveUploadReply(RequestState replyState, FileMetaData * newFileData);
-    virtual void haveDownloadReply(RequestState replyState, QString * localDest);
+    void haveUploadReply(RequestState replyState, FileMetaData * newFileData);
+    void haveDownloadReply(RequestState replyState, QString * localDest);
 
-    virtual void haveJobReply(RequestState replyState, QJsonDocument * rawJobReply);
+    void haveJobReply(RequestState replyState, QJsonDocument * rawJobReply);
 
-    void haveInternalTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * rawReply);
+    void haveInternalTaskReply(AgaveTaskReply * theGuide, QNetworkReply * rawReply);
 
 private slots:
     void rawTaskComplete();
@@ -105,13 +106,12 @@ private:
     AgaveTaskReply * passThruRef = NULL;
     AgaveTaskGuide * myGuide = NULL;
     QNetworkReply * myReplyObject = NULL;
-    bool validRequest = true;
-    QString currentError = "Operation Pending";
 
     //PassThru reply store:
     bool haveReplyStore = false;
     RequestState pendingReply;
     QString pendingParam;
+    QString dataStore;
 };
 
 #endif // AGAVETASKREPLY_H

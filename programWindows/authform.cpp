@@ -36,10 +36,7 @@
 #include "authform.h"
 #include "ui_authform.h"
 
-#include <QNetworkAccessManager>
-#include <QSslConfiguration>
-
-#include "../agaveInterfaces/remotedatainterface.h"
+#include "remotedatainterface.h"
 #include "errorpopup.h"
 #include "copyrightdialog.h"
 #include "vwtinterfacedriver.h"
@@ -58,8 +55,8 @@ AuthForm::AuthForm(RemoteDataInterface * newRemoteHandle, VWTinterfaceDriver * t
     this->setTabOrder(this->findChild<QWidget *>("loginButton"), this->findChild<QWidget *>("quitButton"));
 
     errorTextElement = this->findChild<QLabel *>("errorLabel");
-    unameInput = this->findChild<QLineEdit *>("unameInput")->text();
-    passwordInput = this->findChild<QLineEdit *>("passwordInput")->text();
+    unameInput = this->findChild<QLineEdit *>("unameInput");
+    passwordInput = this->findChild<QLineEdit *>("passwordInput");
 }
 
 AuthForm::~AuthForm()
@@ -84,7 +81,7 @@ void AuthForm::performAuth()
     QString passText = passwordInput->text();
 
     RemoteDataReply * authReply = theConnection->performAuth(unameText, passText);
-    if (authReply->isValidReply())
+    if (authReply != NULL)
     {
         QObject::connect(authReply,SIGNAL(haveAuthReply(RequestState)),this,SLOT(getAuthReply(RequestState)));
         QObject::connect(authReply,SIGNAL(haveAuthReply(RequestState)),myDriver, SLOT(getAuthReply(RequestState)));

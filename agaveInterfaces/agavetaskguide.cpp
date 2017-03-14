@@ -46,7 +46,7 @@ AgaveTaskGuide::AgaveTaskGuide(QString newID, AgaveRequestType reqType)
     taskId = newID;
     requestType = reqType;
 
-    if (AgaveRequestType::AGAVE_UPLOAD)
+    if (requestType == AgaveRequestType::AGAVE_UPLOAD)
     {
         //Agave Upload takes one param: the full file name
         setPostParams("%1", 1);
@@ -88,12 +88,12 @@ bool AgaveTaskGuide::isInternal()
     return internalTask;
 }
 
-QByteArray AgaveTaskGuide::fillPostArgList(QStringList * argList = NULL)
+QByteArray AgaveTaskGuide::fillPostArgList(QStringList * argList)
 {
     return fillAnyArgList(argList, numPostVals, postFormat);
 }
 
-QByteArray AgaveTaskGuide::fillURLArgList(QStringList * argList = NULL)
+QByteArray AgaveTaskGuide::fillURLArgList(QStringList * argList)
 {
     return fillAnyArgList(argList, numDynURLVals, dynURLFormat);
 }
@@ -143,12 +143,12 @@ void AgaveTaskGuide::setPostParams(QString format, int numSubs)
     numPostVals = numSubs;
 }
 
-bool AgaveTaskGuide::needsPostParms()
+bool AgaveTaskGuide::usesPostParms()
 {
     return needsPostParams;
 }
 
-bool AgaveTaskGuide::needsURLParams()
+bool AgaveTaskGuide::usesURLParams()
 {
     return needsURLParams;
 }

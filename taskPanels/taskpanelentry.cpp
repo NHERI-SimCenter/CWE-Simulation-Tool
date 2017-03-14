@@ -49,7 +49,6 @@ TaskPanelEntry::TaskPanelEntry(QObject *parent) : QObject(parent)
 
 TaskPanelEntry::~TaskPanelEntry()
 {
-    //TODO: Double check all the needed cleanup is done
     if (ownWidget != NULL)
     {
         ownWidget->deleteLater();
