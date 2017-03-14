@@ -54,10 +54,12 @@ SOURCES += main.cpp \
     programWindows/panelwindow.cpp \
     agaveInterfaces/agavehandler.cpp \
     agaveInterfaces/agavetaskguide.cpp \
-    agaveInterfaces/filetreemodelreader.cpp \
     agaveInterfaces/agavetaskreply.cpp \
     programWindows/deleteconfirm.cpp \
-    programWindows/singlelinedialog.cpp
+    programWindows/singlelinedialog.cpp \
+    programWindows/copyrightdialog.cpp \
+    programWindows/filetreemodelreader.cpp \
+    remotedatainterface.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -69,14 +71,17 @@ HEADERS  += \
     programWindows/panelwindow.h \
     agaveInterfaces/agavehandler.h \
     agaveInterfaces/agavetaskguide.h \
-    agaveInterfaces/filetreemodelreader.h \
     agaveInterfaces/agavetaskreply.h \
     programWindows/deleteconfirm.h \
-    programWindows/singlelinedialog.h
+    programWindows/singlelinedialog.h \
+    programWindows/copyrightdialog.h \
+    programWindows/filetreemodelreader.h \
+    remotedatainterface.h
 
 FORMS    += \
     programWindows/authform.ui \
     programWindows/errorpopup.ui \
     programWindows/panelwindow.ui \
     programWindows/deleteconfirm.ui \
-    programWindows/singlelinedialog.ui
+    programWindows/singlelinedialog.ui \
+    programWindows/copyrightdialog.ui

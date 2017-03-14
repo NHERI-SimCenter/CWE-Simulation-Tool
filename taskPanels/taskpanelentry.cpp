@@ -49,8 +49,10 @@ TaskPanelEntry::TaskPanelEntry(QObject *parent) : QObject(parent)
 
 TaskPanelEntry::~TaskPanelEntry()
 {
-    //TODO: Double check all the needed cleanup
-    ownWidget->deleteLater();
+    if (ownWidget != NULL)
+    {
+        ownWidget->deleteLater();
+    }
 }
 
 void TaskPanelEntry::setFrameNameList(QStringList nameList)
@@ -120,7 +122,7 @@ int TaskPanelEntry::getNewFrameId()
     return ret;
 }
 
-//These virtual functions should be overwritten
+//These virtual functions should be overwritten in subclasses
 void TaskPanelEntry::setupOwnFrame()
 {
     QLabel * warningLabel = new QLabel("Error, this message should never appear.");

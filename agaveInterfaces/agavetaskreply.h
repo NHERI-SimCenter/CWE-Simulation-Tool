@@ -36,48 +36,82 @@
 #ifndef AGAVETASKREPLY_H
 #define AGAVETASKREPLY_H
 
-//TODO: Double check this that this include is needed
-#include "agavetaskguide.h"
+#include "remotedatainterface.h"
 
 #include <QtGlobal>
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonArray>
 #include <QJsonObject>
+#include <QTimer>
 
 enum class RequestState;
 class AgaveHandler;
 class AgaveTaskGuide;
 
-class AgaveTaskReply : public QObject
+class AgaveTaskReply : public RemoteDataReply
 {
     Q_OBJECT
 public:
-    explicit AgaveTaskReply(AgaveHandler * theManager, AgaveTaskGuide theGuide, QNetworkReply *newReply, QObject *parent = 0);
+    explicit AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply *newReply, QObject *parent = 0);
     ~AgaveTaskReply();
 
-    bool isValidRequest();
+    void invokePassThruReply(RequestState replyState, QString * param1 = NULL);
+    void delayedPassThruReply(RequestState replyState, QString * param1 = NULL);
+
+    AgaveTaskGuide * getTaskGuide();
+
+    void setDataStore(QString newSetting);
+
+    static RequestState standardSuccessFailCheck(AgaveTaskGuide * taskGuide, QJsonDocument * parsedDoc);
+    static FileMetaData parseJSONfileMetaData(QJsonObject fileNameValuePairs);
+
+    static QJsonValue retriveMainAgaveJSON(QJsonDocument * parsedDoc, const char * oneKey);
+    static QJsonValue retriveMainAgaveJSON(QJsonDocument * parsedDoc, QString oneKey);
+    static QJsonValue retriveMainAgaveJSON(QJsonDocument * parsedDoc, QList<QString> keyList);
+    static QJsonValue recursiveJSONdig(QJsonValue currObj, QList<QString> * keyList, int i);
 
 signals:
-    void sendAgaveResultData(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+    void haveCurrentRemoteDir(RequestState cmdReply, QString * pwd);
+    void connectionsClosed(RequestState cmdReply);
+
+    void haveAuthReply(RequestState authReply);
+    void haveLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
+
+    void haveDeleteReply(RequestState replyState, QString * oldFilePath);
+    void haveMoveReply(RequestState replyState, QString * oldFilePath, FileMetaData * revisedFileData);
+    void haveCopyReply(RequestState replyState, FileMetaData * newFileData);
+    void haveRenameReply(RequestState replyState, QString * oldFilePath, FileMetaData * newFileData);
+
+    void haveMkdirReply(RequestState replyState, FileMetaData * newFolderData);
+
+    void haveUploadReply(RequestState replyState, FileMetaData * newFileData);
+    void haveDownloadReply(RequestState replyState, QString * localDest);
+
+    void haveJobReply(RequestState replyState, QJsonDocument * rawJobReply);
+
+    void haveInternalTaskReply(AgaveTaskReply * theGuide, QNetworkReply * rawReply);
 
 private slots:
     void rawTaskComplete();
 
 private:
-    void processReqResult();
-    void processReqResult(RequestState resultState, QMap<QString, QJsonValue> rawData);
+    void processNoContactReply(QString errorText);
+    void processFailureReply(QString errorText);
 
-    QJsonValue retriveMainAgaveJSON(QJsonDocument parsedDoc, QString oneKey);
-    QJsonValue retriveMainAgaveJSON(QJsonDocument parsedDoc, QList<QString> keyList);
-    QJsonValue recursiveJSONdig(QJsonValue currObj, QList<QString> * keyList, int i);
+    void processBadReply(RequestState replyState, QString errorText);
 
-    AgaveHandler * myManager;
-    AgaveTaskGuide myGuide;
+    AgaveTaskReply * passThruRef = NULL;
+    AgaveTaskGuide * myGuide = NULL;
+    QNetworkReply * myReplyObject = NULL;
 
-    QNetworkAccessManager * myNetworkManager;
-    QNetworkReply * myReplyObject;
-    bool validRequest = true;
+    //PassThru reply store:
+    bool haveReplyStore = false;
+    RequestState pendingReply;
+    QString pendingParam;
+    QString dataStore;
 };
 
 #endif // AGAVETASKREPLY_H

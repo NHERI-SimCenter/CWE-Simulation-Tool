@@ -33,43 +33,25 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef AUTHFORM_H
-#define AUTHFORM_H
+#ifndef COPYRIGHTDIALOG_H
+#define COPYRIGHTDIALOG_H
 
-#include <QWidget>
-#include <QLabel>
-#include <QLineEdit>
-
-enum class RequestState;
-class VWTinterfaceDriver;
-class RemoteDataInterface;
+#include <QDialog>
 
 namespace Ui {
-class AuthForm;
+class CopyrightDialog;
 }
 
-class AuthForm : public QWidget
+class CopyrightDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit AuthForm(RemoteDataInterface * newRemoteHandle, VWTinterfaceDriver * theDriver, QWidget *parent = 0);
-    ~AuthForm();
-
-private slots:
-    void performAuth();
-    void exitAuth();
-    void getCopyingInfo();
-    void getAuthReply(RequestState authReply);
+    explicit CopyrightDialog(QWidget *parent = 0);
+    ~CopyrightDialog();
 
 private:
-    Ui::AuthForm *ui;
-    RemoteDataInterface * theConnection;
-    VWTinterfaceDriver * myDriver;
-
-    QLabel * errorTextElement;
-    QLineEdit * unameInput;
-    QLineEdit * passwordInput;
+    Ui::CopyrightDialog *ui;
 };
 
-#endif // AUTHFORM_H
+#endif // COPYRIGHTDIALOG_H

@@ -36,11 +36,10 @@
 #ifndef AGAVEHANDLER_H
 #define AGAVEHANDLER_H
 
-//Note: this interface is a work in progress. As the project develops, we should gain some insight into
-//the various operations should fit together. (Particularly, what tasks should be "privlidged" and how.)
+//Note: In order to insure that this work continues to function, even without Agave,
+//This is a subclass of a more generic abstract class
 
-//TODO: Probably should rethink pass-by-val vs. pass-by-pointer, if it would save memory
-//But many QT containers return copies by val, so think this thru carefully
+#include "remotedatainterface.h"
 
 #include <QtGlobal>
 #include <QObject>
@@ -51,63 +50,67 @@
 #include <QHttpMultiPart>
 #include <QHttpPart>
 #include <QFileInfo>
+#include <QStringList>
 
-enum class AgaveState {NO_AUTH, GETTING_AUTH, LOGGED_IN, SHUTDOWN};
-enum class RequestState {FAIL, GOOD, NO_CONNECT};
-enum class AgaveRequestType {AGAVE_GET, AGAVE_POST, AGAVE_DELETE, AGAVE_UPLOAD, AGAVE_PUT};
+enum class AgaveRequestType {AGAVE_GET, AGAVE_POST, AGAVE_DELETE, AGAVE_UPLOAD, AGAVE_PUT, AGAVE_NONE};
 
 class QNetworkReply;
 class AgaveTaskGuide;
-class VWTinterfaceDriver;
 class AgaveTaskReply;
 
-class AgaveHandler : public QObject
+class AgaveHandler : public RemoteDataInterface
 {
     Q_OBJECT
 
 public:
-    explicit AgaveHandler(VWTinterfaceDriver * theDriver);
+    explicit AgaveHandler(QObject *parent);
     ~AgaveHandler();
 
-    //Note: Authorization and directory listing are privlidged operations
-    //    : and should have their signal connections created directly
-    //Reason: File reading and authentication require auth data, which this object has
-    void performAuth(QString uname, QString passwd);
-    void retriveDirListing(QString dirPath);
+    virtual RemoteDataReply * closeAllConnections();
 
-    //Other requests must use an AgaveTaskReply object, and are only valid if
-    //Authentication is already complete
-    AgaveTaskReply * performAgaveQuery(QString queryName);
-    AgaveTaskReply * performAgaveQuery(QString queryName, QStringList queryParams);
-    AgaveTaskReply * performAgaveQuery(QString queryName, QStringList URLParams, QStringList postParams);
+    //Defaults to directory root,
+    //Subsequent commands with remote folder names are either absolute paths
+    //or reletive to the current working directory
+    virtual RemoteDataReply * setCurrentRemoteWorkingDirectory(QString cd);
 
-    void closeAllConnections();
+    //Remote tasks to be implemented in subclasses:
+    //Returns a RemoteDataReply, which should have the correct signal attached to an appropriate slot
+    virtual RemoteDataReply * performAuth(QString uname, QString passwd);
 
-    AgaveState getState();
+    virtual RemoteDataReply * remoteLS(QString dirPath);
 
-signals:
-    void stateChanged(AgaveState oldState, AgaveState newState);
+    virtual RemoteDataReply * deleteFile(QString toDelete);
+    virtual RemoteDataReply * moveFile(QString from, QString to);
+    virtual RemoteDataReply * copyFile(QString from, QString to);
+    virtual RemoteDataReply * renameFile(QString fullName, QString newName);
 
-    void sendAuthResult(RequestState resultState);
-    void sendFileData(QJsonValue fileList);
+    virtual RemoteDataReply * mkRemoteDir(QString loc, QString newName);
+
+    virtual RemoteDataReply * uploadFile(QString loc, QString localFileName);
+    virtual RemoteDataReply * downloadFile(QString localDest, QString remoteName);
+
+    virtual RemoteDataReply * runRemoteJob(QString jobName, QString jobParameters, QString remoteWorkingDir);
 
 private slots:
-    void processPrivlidgedTask(QString taskID, RequestState resultState, QMap<QString,QJsonValue> rawData);
+    void handleInternalTask(AgaveTaskReply *agaveReply, QNetworkReply * rawReply);
 
 private:
-    void setupTaskGuideList();
-    void insertAgaveTaskGuide(AgaveTaskGuide newGuide);
+    AgaveTaskReply * performAgaveQuery(QString queryName, QObject * parentReq = NULL);
+    AgaveTaskReply * performAgaveQuery(QString queryName, QString param1, QObject * parentReq = NULL);
+    AgaveTaskReply * performAgaveQuery(QString queryName, QString param1, QString param2, QObject * parentReq = NULL);
+    AgaveTaskReply * performAgaveQuery(QString queryName, QStringList * paramList1 = NULL, QStringList * paramList2 = NULL, QObject * parentReq = NULL);
+    QNetworkReply * internalQueryMethod(AgaveTaskGuide * theGuide, QStringList * paramList1 = NULL, QStringList * paramList2 = NULL);
+    QNetworkReply * finalizeAgaveRequest(AgaveTaskGuide * theGuide, QString urlAppend, QByteArray * authHeader = NULL, QByteArray postData = "", QFile * fileHandle = NULL);
 
-    AgaveTaskReply * makeAgaveRequest(QString urlAppend, AgaveRequestType type, QString taskName, QByteArray * authHeader = NULL, QByteArray postData = "", QFile * fileHandle = NULL);
-    void changeState(AgaveState newState);
-
-    void runSimpleTask(QString queryName);
-    void runSimpleTask(QString queryName, QStringList queryParams);
-    void runSimpleTask(QString queryName, QStringList URLParams, QStringList postParams);
+    void forwardReplyToParent(AgaveTaskReply * agaveReply, RequestState replyState, QString * param1 = NULL);
 
     void clearAllAuthTokens();
 
-    AgaveTaskGuide retriveTaskGuide(QString taskID);
+    void setupTaskGuideList();
+    void insertAgaveTaskGuide(AgaveTaskGuide * newGuide);
+    AgaveTaskGuide * retriveTaskGuide(QString taskID);
+
+    QString getPathReletiveToCWD(QString inputPath);
 
     QNetworkAccessManager networkHandle;
     QSslConfiguration SSLoptions;
@@ -126,10 +129,12 @@ private:
     QString clientKey;
     QString clientSecret;
 
-    QMap<QString, AgaveTaskGuide> validTaskList;
+    QMap<QString, AgaveTaskGuide*> validTaskList;
 
-    AgaveState currentState;
-    VWTinterfaceDriver * mainDriver;
+    QString pwd = "";
+
+    bool authGained = false;
+    bool attemptingAuth = false;
 };
 
 #endif // AGAVEHANDLER_H

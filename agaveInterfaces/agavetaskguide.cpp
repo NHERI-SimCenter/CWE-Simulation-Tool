@@ -34,7 +34,6 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 #include "agavetaskguide.h"
-
 #include "agavehandler.h"
 
 AgaveTaskGuide::AgaveTaskGuide()
@@ -42,37 +41,21 @@ AgaveTaskGuide::AgaveTaskGuide()
     taskId = "INVALID";
 }
 
-//TODO: Strightforward copy constructor?
-//TODO: should probably overload asssignment operator too? Maybe not needed
-
 AgaveTaskGuide::AgaveTaskGuide(QString newID, AgaveRequestType reqType)
 {
     taskId = newID;
     requestType = reqType;
 
-    validStartStates.append(AgaveState::LOGGED_IN);
-    validReplyStates.append(AgaveState::LOGGED_IN);
-    usesDefaultValidStates = true;
+    if (requestType == AgaveRequestType::AGAVE_UPLOAD)
+    {
+        //Agave Upload takes one param: the full file name
+        setPostParams("%1", 1);
+    }
 }
 
 QString AgaveTaskGuide::getTaskID()
 {
     return taskId;
-}
-
-bool AgaveTaskGuide::verifyValidStartState(AgaveState checkState)
-{
-    return verifiyValidState(checkState, &validStartStates);
-}
-
-bool AgaveTaskGuide::verifyValidReplyState(AgaveState checkState)
-{
-    return verifiyValidState(checkState, &validReplyStates);
-}
-
-bool AgaveTaskGuide::verifiyValidState(AgaveState checkState, QList<AgaveState> * stateList)
-{
-    return stateList->contains(checkState);
 }
 
 QString AgaveTaskGuide::getURLsuffix()
@@ -90,34 +73,24 @@ AuthHeaderType AgaveTaskGuide::getHeaderType()
     return headerType;
 }
 
-QMap<QString, QList<QString>> AgaveTaskGuide::getOutputSignatureGood()
-{
-    return outputsOfInterestGood;
-}
-
-QMap<QString, QList<QString>> AgaveTaskGuide::getOutputSignatureFail()
-{
-    return outputsOfInterestFail;
-}
-
 bool AgaveTaskGuide::isTokenFormat()
 {
     return usesTokenFormat;
 }
 
-QByteArray AgaveTaskGuide::fillPostArgList()
+void AgaveTaskGuide::setAsInternal()
 {
-    return fillAnyArgList(NULL, numPostVals, postFormat);
+    internalTask = true;
+}
+
+bool AgaveTaskGuide::isInternal()
+{
+    return internalTask;
 }
 
 QByteArray AgaveTaskGuide::fillPostArgList(QStringList * argList)
 {
     return fillAnyArgList(argList, numPostVals, postFormat);
-}
-
-QByteArray AgaveTaskGuide::fillURLArgList()
-{
-    return fillAnyArgList(NULL, numDynURLVals, dynURLFormat);
 }
 
 QByteArray AgaveTaskGuide::fillURLArgList(QStringList * argList)
@@ -127,17 +100,9 @@ QByteArray AgaveTaskGuide::fillURLArgList(QStringList * argList)
 
 QByteArray AgaveTaskGuide::fillAnyArgList(QStringList * argList, int numVals, QString strFormat)
 {
-    if ((argList == NULL) || (argList->size() == 0))
+    if ((argList == NULL) || (numVals != argList->size()) || (numVals == 0))
     {
-        if (numVals != 0)
-        {
-            return "";
-        }
         return strFormat.toLatin1();
-    }
-    if (numVals != argList->size())
-    {
-        return "";
     }
 
     QString ret = strFormat;
@@ -149,35 +114,6 @@ QByteArray AgaveTaskGuide::fillAnyArgList(QStringList * argList, int numVals, QS
     return ret.toLatin1();
 }
 
-bool AgaveTaskGuide::isPrivlidged()
-{
-    return privlidgedTask;
-}
-
-void AgaveTaskGuide::addValidStartState(AgaveState newState)
-{
-    if (usesDefaultValidStates == true)
-    {
-        usesDefaultValidStates = false;
-        validStartStates.clear();
-        validReplyStates.clear();
-    }
-
-    validStartStates.append(newState);
-}
-
-void AgaveTaskGuide::addValidReplyState(AgaveState newState)
-{
-    if (usesDefaultValidStates == true)
-    {
-        usesDefaultValidStates = false;
-        validStartStates.clear();
-        validReplyStates.clear();
-    }
-
-    validReplyStates.append(newState);
-}
-
 void AgaveTaskGuide::setURLsuffix(QString newValue)
 {
     URLsuffix = newValue;
@@ -186,23 +122,6 @@ void AgaveTaskGuide::setURLsuffix(QString newValue)
 void AgaveTaskGuide::setHeaderType(AuthHeaderType newValue)
 {
     headerType = newValue;
-}
-
-void AgaveTaskGuide::setPostParams(QString format, int numSubs)
-{
-    needsPostParams = true;
-    postFormat = format;
-    numPostVals = numSubs;
-}
-
-void AgaveTaskGuide::setOutputSigGood(QString outID, QStringList parseFindList)
-{
-    outputsOfInterestGood.insert(outID,parseFindList);
-}
-
-void AgaveTaskGuide::setOutputSigFail(QString outID, QStringList parseFindList)
-{
-    outputsOfInterestFail.insert(outID,parseFindList);
 }
 
 void AgaveTaskGuide::setTokenFormat(bool newSetting)
@@ -217,27 +136,19 @@ void AgaveTaskGuide::setDynamicURLParams(QString format, int numSubs)
     numDynURLVals = numSubs;
 }
 
-void AgaveTaskGuide::setAsPrivlidged()
+void AgaveTaskGuide::setPostParams(QString format, int numSubs)
 {
-    privlidgedTask = true;
+    needsPostParams = true;
+    postFormat = format;
+    numPostVals = numSubs;
 }
 
-bool AgaveTaskGuide::needsNoParams()
+bool AgaveTaskGuide::usesPostParms()
 {
-    return ((needsPostParams == false) && (needsURLParams == false));
+    return needsPostParams;
 }
 
-bool AgaveTaskGuide::needsBothParams()
+bool AgaveTaskGuide::usesURLParams()
 {
-    return ((needsPostParams == true) && (needsURLParams == true));
-}
-
-bool AgaveTaskGuide::needsOnlyPostParms()
-{
-    return ((needsPostParams == true) && (needsURLParams == false));
-}
-
-bool AgaveTaskGuide::needsOnlyURLParams()
-{
-    return ((needsPostParams == false) && (needsURLParams == true));
+    return needsURLParams;
 }

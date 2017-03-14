@@ -66,7 +66,7 @@ public:
     static int getActiveFrameId();
     static int getNewFrameId();
 
-//These virtual functions should be over-written:
+//These virtual functions should be over-written in subclasses:
     virtual void setupOwnFrame();
     virtual void frameNowVisible();
     virtual void frameNowInvisible();
