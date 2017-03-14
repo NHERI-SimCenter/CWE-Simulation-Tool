@@ -46,9 +46,10 @@ AgaveTaskGuide::AgaveTaskGuide(QString newID, AgaveRequestType reqType)
     taskId = newID;
     requestType = reqType;
 
-    if (requestType == AgaveRequestType::AGAVE_UPLOAD)
+    if ((requestType == AgaveRequestType::AGAVE_UPLOAD) || (requestType == AgaveRequestType::AGAVE_DOWNLOAD))
     {
         //Agave Upload takes one param: the full file name
+        //Agave Download takes one param: the local destination name
         setPostParams("%1", 1);
     }
 }
@@ -141,6 +142,28 @@ void AgaveTaskGuide::setPostParams(QString format, int numSubs)
     needsPostParams = true;
     postFormat = format;
     numPostVals = numSubs;
+}
+
+void AgaveTaskGuide::setStoreParam(int paramList, int elementToStore)
+{
+    storeParamInReply = true;
+    storeParamList = paramList;
+    storeParamElement = elementToStore;
+}
+
+bool AgaveTaskGuide::hasStoredParam()
+{
+    return storeParamInReply;
+}
+
+int AgaveTaskGuide::getStoredParamList()
+{
+    return storeParamList;
+}
+
+int AgaveTaskGuide::getStoredParamElement()
+{
+    return storeParamElement;
 }
 
 bool AgaveTaskGuide::usesPostParms()

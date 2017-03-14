@@ -33,73 +33,28 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef AGAVETASKGUIDE_H
-#define AGAVETASKGUIDE_H
+#include "quickinfopopup.h"
+#include "ui_quickinfopopup.h"
 
-#include <QMap>
-#include <QString>
-#include <QStringList>
-
-enum class AgaveRequestType;
-enum class AgaveState;
-
-//TODO: This whole class, needs more documentation in particular
-enum class AuthHeaderType {NONE, PASSWD, CLIENT, TOKEN, REFRESH};
-
-class AgaveTaskGuide
+QuickInfoPopup::QuickInfoPopup(QString * message, QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::QuickInfoPopup)
 {
-public:
-    explicit AgaveTaskGuide();
-    explicit AgaveTaskGuide(QString newID, AgaveRequestType reqType);
+    ui->setupUi(this);
 
-    void setURLsuffix(QString newValue);
-    void setHeaderType(AuthHeaderType newValue);
+    QLabel * textLabel = this->findChild<QLabel *>("shownText");
 
-    void setTokenFormat(bool newSetting);
-    void setDynamicURLParams(QString format, int numSubs);
-    void setPostParams(QString format, int numSubs);
-    void setAsInternal();
-    void setStoreParam(int paramList, int elementToStore);
+    if (message != NULL)
+    {
+        textLabel->setText(*message);
+    }
+    else
+    {
+        textLabel->setText("Error: blank message created.");
+    }
+}
 
-    QString getTaskID();
-    QString getURLsuffix();
-    AgaveRequestType getRequestType();
-    AuthHeaderType getHeaderType();
-    QByteArray fillPostArgList(QStringList *argList = NULL);
-    QByteArray fillURLArgList(QStringList * argList = NULL);
-    bool isTokenFormat();
-    bool isInternal();
-
-    bool hasStoredParam();
-    int getStoredParamList();
-    int getStoredParamElement();
-
-    bool usesPostParms();
-    bool usesURLParams();
-
-private:
-    QString taskId;
-
-    QString URLsuffix = "";
-    AgaveRequestType requestType;
-    AuthHeaderType headerType = AuthHeaderType::NONE;
-
-    QByteArray fillAnyArgList(QStringList *argList, int numVals, QString strFormat);
-
-    bool internalTask = false;
-    bool usesTokenFormat = false;
-    bool needsPostParams = false;
-    bool needsURLParams = false;
-
-    bool storeParamInReply = false;
-    int storeParamList = 0;
-    int storeParamElement = 0;
-
-    QString postFormat = "";
-    int numPostVals = 0;
-
-    QString dynURLFormat = "";
-    int numDynURLVals = 0;
-};
-
-#endif // AGAVETASKGUIDE_H
+QuickInfoPopup::~QuickInfoPopup()
+{
+    delete ui;
+}
