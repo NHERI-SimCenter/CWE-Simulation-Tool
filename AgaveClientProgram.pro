@@ -59,7 +59,8 @@ SOURCES += main.cpp \
     programWindows/singlelinedialog.cpp \
     programWindows/copyrightdialog.cpp \
     programWindows/filetreemodelreader.cpp \
-    remotedatainterface.cpp
+    remotedatainterface.cpp \
+    programWindows/quickinfopopup.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -76,7 +77,8 @@ HEADERS  += \
     programWindows/singlelinedialog.h \
     programWindows/copyrightdialog.h \
     programWindows/filetreemodelreader.h \
-    remotedatainterface.h
+    remotedatainterface.h \
+    programWindows/quickinfopopup.h
 
 FORMS    += \
     programWindows/authform.ui \
@@ -84,4 +86,5 @@ FORMS    += \
     programWindows/panelwindow.ui \
     programWindows/deleteconfirm.ui \
     programWindows/singlelinedialog.ui \
-    programWindows/copyrightdialog.ui
+    programWindows/copyrightdialog.ui \
+    programWindows/quickinfopopup.ui

@@ -132,9 +132,7 @@ RemoteDataReply * AgaveHandler::remoteLS(QString dirPath)
 RemoteDataReply * AgaveHandler::deleteFile(QString toDelete)
 {
     QString toCheck = getPathReletiveToCWD(toDelete);
-    AgaveTaskReply * ret = performAgaveQuery("fileDelete", toCheck);
-    ret->setDataStore(toDelete);
-    return (RemoteDataReply *) ret;
+    return (RemoteDataReply *) performAgaveQuery("fileDelete", toCheck);
 }
 
 RemoteDataReply * AgaveHandler::moveFile(QString from, QString to)
@@ -153,12 +151,7 @@ RemoteDataReply * AgaveHandler::renameFile(QString fullName, QString newName)
 {
     QString toCheck = getPathReletiveToCWD(fullName);
     //TODO: check that path and new name is valid
-    AgaveTaskReply * ret = performAgaveQuery("renameFile", toCheck, newName);
-    if (ret != NULL)
-    {
-        ret->setDataStore(fullName);
-    }
-    return (RemoteDataReply *) ret;
+    return (RemoteDataReply *) performAgaveQuery("renameFile", toCheck, newName);
 }
 
 RemoteDataReply * AgaveHandler::mkRemoteDir(QString loc, QString newName)
@@ -177,8 +170,9 @@ RemoteDataReply * AgaveHandler::uploadFile(QString location, QString localFileNa
 
 RemoteDataReply * AgaveHandler::downloadFile(QString localDest, QString remoteName)
 {
-    //TODO: not implemented yet
-    return NULL;
+    //TODO: check path and local path
+    QString toCheck = getPathReletiveToCWD(remoteName);
+    return (RemoteDataReply *) performAgaveQuery("fileDownload", toCheck, localDest);
 }
 
 RemoteDataReply * AgaveHandler::runRemoteJob(QString jobName, QString jobParameters, QString remoteWorkingDir)
@@ -278,10 +272,18 @@ void AgaveHandler::setupTaskGuideList()
     toInsert->setHeaderType(AuthHeaderType::TOKEN);
     insertAgaveTaskGuide(toInsert);
 
+    toInsert = new AgaveTaskGuide("fileDownload", AgaveRequestType::AGAVE_DOWNLOAD);
+    toInsert->setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
+    toInsert->setDynamicURLParams("%1",1);
+    toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    toInsert->setStoreParam(1,0);
+    insertAgaveTaskGuide(toInsert);
+
     toInsert = new AgaveTaskGuide("fileDelete", AgaveRequestType::AGAVE_DELETE);
     toInsert->setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
     toInsert->setDynamicURLParams("%1",1);
     toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    toInsert->setStoreParam(0,0);
     insertAgaveTaskGuide(toInsert);
 
     toInsert = new AgaveTaskGuide("newFolder", AgaveRequestType::AGAVE_PUT);
@@ -296,6 +298,7 @@ void AgaveHandler::setupTaskGuideList()
     toInsert->setDynamicURLParams("%1",1);
     toInsert->setPostParams("action=rename&path=%1",1);
     toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    toInsert->setStoreParam(0,0);
     insertAgaveTaskGuide(toInsert);
 }
 
@@ -513,7 +516,7 @@ AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QString para
     return performAgaveQuery(queryName, &paramList1, &paramList2, parentReq);
 }
 
-AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QStringList * paramList1, QStringList * paramList2, QObject * parentReq)
+AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QStringList * paramList0, QStringList * paramList1, QObject * parentReq)
 {
     if (networkHandle.networkAccessible() != QNetworkAccessManager::Accessible)
     {
@@ -524,7 +527,7 @@ AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QStringList 
 
     AgaveTaskGuide * taskGuide = retriveTaskGuide(queryName);
 
-    QNetworkReply * qReply = internalQueryMethod(taskGuide, paramList1, paramList2);
+    QNetworkReply * qReply = internalQueryMethod(taskGuide, paramList0, paramList1);
 
     if (qReply == NULL)
     {
@@ -542,6 +545,26 @@ AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QStringList 
     if (taskGuide->isInternal())
     {
         QObject::connect(ret, SIGNAL(haveInternalTaskReply(AgaveTaskReply*,QNetworkReply*)), this, SLOT(handleInternalTask(AgaveTaskReply*,QNetworkReply*)));
+    }
+    if (taskGuide->hasStoredParam())
+    {
+        QStringList * listToStore = NULL;
+        if (taskGuide->getStoredParamList() == 0)
+        {
+            listToStore = paramList0;
+        }
+        else if (taskGuide->getStoredParamList() == 1)
+        {
+            listToStore = paramList1;
+        }
+        if (listToStore != NULL)
+        {
+            if (listToStore->size() > taskGuide->getStoredParamElement())
+            {
+                ret->setDataStore(listToStore->at(taskGuide->getStoredParamElement()));
+            }
+        }
+
     }
     return ret;
 }
@@ -630,6 +653,25 @@ QNetworkReply * AgaveHandler::internalQueryMethod(AgaveTaskGuide * taskGuide, QS
         return finalizeAgaveRequest(taskGuide, realURLsuffix,
                          authHeader, emptyPostData, fileHandle);
     }
+    else if (taskGuide->getRequestType() == AgaveRequestType::AGAVE_DOWNLOAD)
+    {
+        //For agave download, instead of post params, we have the full local file name
+        QString fullFileName = clientPostData;
+        QFile * fileHandle = new QFile(fullFileName);
+        if (fileHandle->open(QIODevice::ReadOnly))
+        {
+            //If the file already exists, we do not overwrite
+            //This should be checked by calling client, but we check it here too
+            fileHandle->deleteLater();
+            return NULL;
+        }
+        fileHandle->deleteLater();
+        qDebug("URL Req: %s", qPrintable(realURLsuffix));
+        QByteArray emptyPostData;
+
+        return finalizeAgaveRequest(taskGuide, realURLsuffix,
+                         authHeader, emptyPostData);
+    }
     else
     {
         ErrorPopup("Non-existant Agave request type requested.");
@@ -673,7 +715,7 @@ QNetworkReply * AgaveHandler::finalizeAgaveRequest(AgaveTaskGuide * theGuide, QS
 
     qDebug("%s", qPrintable(clientRequest->url().url()));
 
-    if (theGuide->getRequestType() == AgaveRequestType::AGAVE_GET)
+    if ((theGuide->getRequestType() == AgaveRequestType::AGAVE_GET) || (theGuide->getRequestType() == AgaveRequestType::AGAVE_DOWNLOAD))
     {
         clientReply = networkHandle.get(*clientRequest);
     }
@@ -718,4 +760,9 @@ QNetworkReply * AgaveHandler::finalizeAgaveRequest(AgaveTaskGuide * theGuide, QS
         return NULL;
     }
     return clientReply;
+}
+
+QString AgaveHandler::getTenantURL()
+{
+    return tenantURL;
 }
