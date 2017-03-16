@@ -138,9 +138,12 @@ private slots:
     void sendManualRefresh();
 
 private:
+    void lsClosestNode(QString fullPath);
+    void lsClosestNodeToParent(QString fullPath);
+
     QString getFilePathForNode(QModelIndex dataIndex);
     FileTreeNode * getFileNodeFromPath(QString filePath);
-    FileTreeNode * getFileNearestFromPath(QString filePath);
+    FileTreeNode * getDirNearestFromPath(QString filePath);
 
     //Note: if not found, will return NULL and call translateFileDataToModel(), to resync
     //If input is NULL, return NULL, but don't resync
