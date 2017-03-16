@@ -88,7 +88,35 @@ QString AgaveHandler::getPathReletiveToCWD(QString inputPath)
 
     QString cleanedInput = FileMetaData::cleanPathSlashes(inputPath);
 
-    return cleanedInput;
+    if (inputPath.at(0) == '/')
+    {
+        return cleanedInput;
+    }
+
+    //TODO: implement .. later
+    QStringList oldList = pwd.split('/');
+    QStringList newList = cleanedInput.split('/');
+    QString ret;
+
+    for (auto itr = oldList.cbegin(); itr != oldList.cend(); itr++)
+    {
+        if (!(*itr).isEmpty())
+        {
+            ret.append('/');
+            ret.append(*itr);
+        }
+    }
+
+    for (auto itr = newList.cbegin(); itr != newList.cend(); itr++)
+    {
+        if (!(*itr).isEmpty())
+        {
+            ret.append('/');
+            ret.append(*itr);
+        }
+    }
+
+    return ret;
 }
 
 RemoteDataReply * AgaveHandler::performAuth(QString uname, QString passwd)
@@ -137,14 +165,18 @@ RemoteDataReply * AgaveHandler::deleteFile(QString toDelete)
 
 RemoteDataReply * AgaveHandler::moveFile(QString from, QString to)
 {
-    //TODO: not implemented yet
-    return NULL;
+    QString fromCheck = getPathReletiveToCWD(from);
+    QString toCheck = getPathReletiveToCWD(to);
+    //TODO: check stuff is valid
+    return (RemoteDataReply *) performAgaveQuery("fileMove", fromCheck, toCheck);
 }
 
 RemoteDataReply * AgaveHandler::copyFile(QString from, QString to)
 {
-    //TODO: not implemented yet
-    return NULL;
+    QString fromCheck = getPathReletiveToCWD(from);
+    QString toCheck = getPathReletiveToCWD(to);
+    //TODO: check stuff is valid
+    return (RemoteDataReply *) performAgaveQuery("fileCopy", fromCheck, toCheck);
 }
 
 RemoteDataReply * AgaveHandler::renameFile(QString fullName, QString newName)
@@ -177,8 +209,19 @@ RemoteDataReply * AgaveHandler::downloadFile(QString localDest, QString remoteNa
 
 RemoteDataReply * AgaveHandler::runRemoteJob(QString jobName, QString jobParameters, QString remoteWorkingDir)
 {
-    //TODO: not implemented yet
-    return NULL;
+    QString pwd = getPathReletiveToCWD(remoteWorkingDir);
+    QStringList dirList = {pwd};
+    QStringList paramListTmp = jobParameters.split(' ');
+    QStringList paramList;
+
+    for (auto itr = paramListTmp.cbegin(); itr != paramListTmp.cend(); itr++)
+    {
+        if (!(*itr).isEmpty())
+        {
+            paramList.append(*itr);
+        }
+    }
+    return (RemoteDataReply *) performAgaveQuery(jobName,&dirList,&paramList);
 }
 
 RemoteDataReply * AgaveHandler::closeAllConnections()
@@ -297,6 +340,21 @@ void AgaveHandler::setupTaskGuideList()
     toInsert->setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
     toInsert->setDynamicURLParams("%1",1);
     toInsert->setPostParams("action=rename&path=%1",1);
+    toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    toInsert->setStoreParam(0,0);
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("fileCopy", AgaveRequestType::AGAVE_PUT);
+    toInsert->setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
+    toInsert->setDynamicURLParams("%1",1);
+    toInsert->setPostParams("action=copy&path=%1",1);
+    toInsert->setHeaderType(AuthHeaderType::TOKEN);
+    insertAgaveTaskGuide(toInsert);
+
+    toInsert = new AgaveTaskGuide("fileMove", AgaveRequestType::AGAVE_PUT);
+    toInsert->setURLsuffix((QString("/files/v2/media/system/%1/")).arg(storageNode));
+    toInsert->setDynamicURLParams("%1",1);
+    toInsert->setPostParams("action=move&path=%1",1);
     toInsert->setHeaderType(AuthHeaderType::TOKEN);
     toInsert->setStoreParam(0,0);
     insertAgaveTaskGuide(toInsert);

@@ -36,7 +36,7 @@
 #include "quickinfopopup.h"
 #include "ui_quickinfopopup.h"
 
-QuickInfoPopup::QuickInfoPopup(QString * message, QWidget *parent) :
+QuickInfoPopup::QuickInfoPopup(QString message, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QuickInfoPopup)
 {
@@ -46,7 +46,7 @@ QuickInfoPopup::QuickInfoPopup(QString * message, QWidget *parent) :
 
     if (message != NULL)
     {
-        textLabel->setText(*message);
+        textLabel->setText(message);
     }
     else
     {
