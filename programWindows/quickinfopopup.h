@@ -47,7 +47,7 @@ class QuickInfoPopup : public QDialog
     Q_OBJECT
 
 public:
-    explicit QuickInfoPopup(QString * message, QWidget *parent = 0);
+    explicit QuickInfoPopup(QString message, QWidget *parent = 0);
     ~QuickInfoPopup();
 
 private:

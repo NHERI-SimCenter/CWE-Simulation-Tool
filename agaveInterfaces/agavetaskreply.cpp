@@ -322,6 +322,28 @@ void AgaveTaskReply::rawTaskComplete()
         }
         emit haveRenameReply(RequestState::GOOD, &dataStore, &aFile);
     }
+    else if (myGuide->getTaskID() == "fileCopy")
+    {
+        QJsonValue expectedObject = retriveMainAgaveJSON(&parseHandler,"result");
+        FileMetaData aFile = parseJSONfileMetaData(expectedObject.toObject());
+        if (aFile.getFileType() == FileType::INVALID)
+        {
+            processFailureReply("Invalid file data");
+            return;
+        }
+        emit haveCopyReply(RequestState::GOOD, &aFile);
+    }
+    else if (myGuide->getTaskID() == "fileMove")
+    {
+        QJsonValue expectedObject = retriveMainAgaveJSON(&parseHandler,"result");
+        FileMetaData aFile = parseJSONfileMetaData(expectedObject.toObject());
+        if (aFile.getFileType() == FileType::INVALID)
+        {
+            processFailureReply("Invalid file data");
+            return;
+        }
+        emit haveMoveReply(RequestState::GOOD, &dataStore, &aFile);
+    }
     else
     {
         emit haveJobReply(RequestState::GOOD, &parseHandler);
