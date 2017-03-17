@@ -34,11 +34,8 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 #include "agavehandler.h"
-
 #include "agavetaskguide.h"
 #include "agavetaskreply.h"
-#include "../vwtinterfacedriver.h"
-#include "../programWindows/errorpopup.h"
 
 //TODO: there are some holes in the exchange of error information.
 //TODO: need to tighten this
@@ -64,7 +61,7 @@ RemoteDataReply * AgaveHandler::setCurrentRemoteWorkingDirectory(QString cd)
 {
     QString tmp = getPathReletiveToCWD(cd);
 
-    AgaveTaskReply * passThru = new AgaveTaskReply(retriveTaskGuide("changeDir"),NULL,(QObject *)this);
+    AgaveTaskReply * passThru = new AgaveTaskReply(retriveTaskGuide("changeDir"),NULL,this, (QObject *)this);
 
     if (tmp.isEmpty())
     {
@@ -134,7 +131,7 @@ RemoteDataReply * AgaveHandler::performAuth(QString uname, QString passwd)
     rawAuth.append(passwd);
     authEncloded.append(rawAuth.toBase64());
 
-    AgaveTaskReply * parentReply = new AgaveTaskReply(retriveTaskGuide("fullAuth"),NULL,(QObject *)this);
+    AgaveTaskReply * parentReply = new AgaveTaskReply(retriveTaskGuide("fullAuth"),NULL,this,(QObject *)this);
     AgaveTaskReply * tmp = performAgaveQuery("authStep1",(QObject *)parentReply);
 
     if (tmp == NULL)
@@ -365,7 +362,7 @@ void AgaveHandler::insertAgaveTaskGuide(AgaveTaskGuide * newGuide)
     QString taskName = newGuide->getTaskID();
     if (validTaskList.contains(taskName))
     {
-        ErrorPopup("Invalid Task Guide List: Duplicate Name");
+        emit sendFatalErrorMessage("Invalid Task Guide List: Duplicate Name");
         return;
     }
     validTaskList.insert(taskName,newGuide);
@@ -376,13 +373,13 @@ AgaveTaskGuide * AgaveHandler::retriveTaskGuide(QString taskID)
     AgaveTaskGuide * ret;
     if (!validTaskList.contains(taskID))
     {
-        ErrorPopup("Non-existant request requested.1");
+        emit sendFatalErrorMessage("Non-existant request requested.1");
         return NULL;
     }
     ret = validTaskList.value(taskID);
     if (taskID != ret->getTaskID())
     {
-        ErrorPopup("Task Guide format error.");
+        emit sendFatalErrorMessage("Task Guide format error.");
     }
     return ret;
 }
@@ -483,7 +480,7 @@ void AgaveHandler::handleInternalTask(AgaveTaskReply * agaveReply, QNetworkReply
 
             if (clientKey.isEmpty() || clientSecret.isEmpty())
             {
-                ErrorPopup("Client success does not yeild client auth data.");
+                emit sendFatalErrorMessage("Client success does not yeild client auth data.");
                 return;
             }
 
@@ -544,7 +541,7 @@ void AgaveHandler::handleInternalTask(AgaveTaskReply * agaveReply, QNetworkReply
 
             if (token.isEmpty() || refreshToken.isEmpty())
             {
-                ErrorPopup("Token refresh failure.");
+                emit sendFatalErrorMessage("Token refresh failure.");
                 return;
             }
             //TODO: Will need more info here based on when, how and where refreshes are requested
@@ -552,7 +549,7 @@ void AgaveHandler::handleInternalTask(AgaveTaskReply * agaveReply, QNetworkReply
     }
     else
     {
-        ErrorPopup("Non-existant internal request requested.");
+        emit sendFatalErrorMessage("Non-existant internal request requested.");
     }
 }
 
@@ -578,8 +575,7 @@ AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QStringList 
 {
     if (networkHandle.networkAccessible() != QNetworkAccessManager::Accessible)
     {
-        //TODO: This should probably be a numbered error
-        ErrorPopup("Network not available");
+        emit sendFatalErrorMessage("Network not available");
         return NULL;
     }
 
@@ -598,7 +594,7 @@ AgaveTaskReply * AgaveHandler::performAgaveQuery(QString queryName, QStringList 
         parentObj = parentReq;
     }
 
-    AgaveTaskReply * ret = new AgaveTaskReply(taskGuide,qReply,parentObj);
+    AgaveTaskReply * ret = new AgaveTaskReply(taskGuide,qReply,this, parentObj);
 
     if (taskGuide->isInternal())
     {
@@ -732,7 +728,7 @@ QNetworkReply * AgaveHandler::internalQueryMethod(AgaveTaskGuide * taskGuide, QS
     }
     else
     {
-        ErrorPopup("Non-existant Agave request type requested.");
+        emit sendFatalErrorMessage("Non-existant Agave request type requested.");
         return NULL;
     }
 
@@ -760,7 +756,7 @@ QNetworkReply * AgaveHandler::finalizeAgaveRequest(AgaveTaskGuide * theGuide, QS
     {
         if (authHeader->isEmpty())
         {
-            ErrorPopup(VWTerrorType::ERR_AUTH_BLANK);
+            emit sendFatalErrorMessage("Authorization request reply has no data in it");
             return NULL;
         }
         clientRequest->setRawHeader(QByteArray("Authorization"), *authHeader);
@@ -814,7 +810,7 @@ QNetworkReply * AgaveHandler::finalizeAgaveRequest(AgaveTaskGuide * theGuide, QS
 
     if (clientReply == NULL)
     {
-        ErrorPopup("Non-existant request requested.2");
+        emit sendFatalErrorMessage("Non-existant request requested.2");
         return NULL;
     }
     return clientReply;
@@ -823,4 +819,9 @@ QNetworkReply * AgaveHandler::finalizeAgaveRequest(AgaveTaskGuide * theGuide, QS
 QString AgaveHandler::getTenantURL()
 {
     return tenantURL;
+}
+
+void AgaveHandler::forwardAgaveError(QString errorText)
+{
+    emit sendFatalErrorMessage(errorText);
 }
