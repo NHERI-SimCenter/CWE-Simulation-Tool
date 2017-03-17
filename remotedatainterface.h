@@ -134,6 +134,9 @@ public:
     virtual RemoteDataReply * downloadFile(QString localDest, QString remoteName) = 0;
 
     virtual RemoteDataReply * runRemoteJob(QString jobName, QString jobParameters, QString remoteWorkingDir) = 0;
+
+signals:
+    void sendFatalErrorMessage(QString errorText);
 };
 
 #endif // REMOTEDATAINTERFACE_H
