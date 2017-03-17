@@ -1,4 +1,4 @@
-The SimCenter Agave Client Program, in source and binary forms, is copyright "The University of Notre Dame" and "The Regents of the University of California" and is licensed under the following copyright and license:
+The SimCenter CFD Client Program and Agave Interfaces, in source and binary forms, is copyright "The University of Notre Dame" and "The Regents of the University of California" and is licensed under the following copyright and license:
 
 BSD 3-Clause License
 
@@ -34,9 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ------------------------------------------------------------------------------------
 
-The SimCenter Agave Client Program makes use of the QT packages (unmodified): core, gui and network
+The SimCenter Agave Client Program and Agave Interfaces make use of the Qt packages (unmodified): core, gui and network
 
-QT is copyright "The Qt Company Ltd" and licensed under the GNU Lesser General Public License (version 3) which references the GNU General Public License (version 3)
+Qt is copyright "The Qt Company Ltd" and licensed under the GNU Lesser General Public License (version 3) which references the GNU General Public License (version 3)
 
 For reference, these licenses are reproduced below:
 

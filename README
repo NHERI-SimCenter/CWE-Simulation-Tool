@@ -1,28 +1,6 @@
 Please make note of the COPYING file for the copyright and licensing information. 
 
-If you attempt to recompile this, particularly when using QT creator, take note that most platforms do not have the old SSL implementations, for many very good reasons, but QT expects some of them and will complain. Do NOT compile old and dangerous SSL versions. Rather, supress this error message using build environment variables. QT_LOGGING_RULES should be set to: qt.network.ssl.warning=false
+If you attempt to recompile this, particularly when using QT creator, take note that most platforms do not have the old SSL implementations, for many very good reasons, but QT may expect some of them and complain. Do NOT compile old and dangerous SSL versions. Rather, supress this error message using build environment variables. QT_LOGGING_RULES should be set to: qt.network.ssl.warning=false
 
 This engine is designed to allow access to resources using an Agave interface. See: https://agaveapi.co for more information.
 
-There are two main extensible parts of the interface.
-
-First, there is the agave handler, consisting of the classes:
-AgaveHander: This wraps around the QNetworkManager
-AgaveTaskReply: This wraps around the QNetworkReply, and also does some JSON parsing.
-AgaveTaskGuide: This simple info class can store information about the HTTP format of various Agave interface requests.
-
-The FileTreeModelReader is a utility class to handle requests to read remote files through agave. It is a mess at the moment. Will fix.
-
-Upon initialization, the AgaveHandler will create a list of AgaveTaskGuides, using the setupTaskGuideList function. Each guide is inserted into the list using the insertAgaveTaskGuide function. Each guide has a unique name, which allows calls to that Agave task using performAgaveQuery and other functions. The task guide stores such information such as whether that Agave interaction is a GET,POST or PUT, the format of the POST parameters and the expected JSON members in successful replies.
-
-As such, expanding the Agave Handler to add support for more Agave queries should not involve adding more methods to the Agave Handler. Rather, one need merely create new entries in the Agave Task Guide List.
-
-Second, the program windows.
-
-These are more straightforward. The PanelWindow is the main QT window for this program, after login. This has a list of tasks on the left and a main window on the right, with an optional file traversing utility.
-
-The TaskPanelEntry can be subclassed to create a new panel. It has 3 virtual classes. setupOwnFrame() is called once, upon creation. frameNowVisible() is called when that frame is sleeted. frameNowInvisible() is called when the frame is unselected.
-
-By clicking on names of different panels in the list of tasks, the main window can be switched between various task panels. 
-
-setupTaskList() is called upon initialization. RegisterTaskPanel is called once for each panel in the list. So, to add a new user interface panel, subclass the TaskPanelEntry and construct and register it in the setupTaskList() function.
