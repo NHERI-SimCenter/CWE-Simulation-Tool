@@ -36,7 +36,7 @@
 #ifndef AGAVETASKREPLY_H
 #define AGAVETASKREPLY_H
 
-#include "remotedatainterface.h"
+#include "../remotedatainterface.h"
 
 #include <QtGlobal>
 #include <QObject>
@@ -55,7 +55,7 @@ class AgaveTaskReply : public RemoteDataReply
 {
     Q_OBJECT
 public:
-    explicit AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply *newReply, QObject *parent = 0);
+    explicit AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply *newReply, AgaveHandler * theManager, QObject *parent = 0);
     ~AgaveTaskReply();
 
     void invokePassThruReply(RequestState replyState, QString * param1 = NULL);
@@ -103,6 +103,7 @@ private:
 
     void processBadReply(RequestState replyState, QString errorText);
 
+    AgaveHandler * myManager = NULL;
     AgaveTaskReply * passThruRef = NULL;
     AgaveTaskGuide * myGuide = NULL;
     QNetworkReply * myReplyObject = NULL;

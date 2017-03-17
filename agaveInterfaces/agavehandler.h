@@ -39,7 +39,7 @@
 //Note: In order to insure that this work continues to function, even without Agave,
 //This is a subclass of a more generic abstract class
 
-#include "remotedatainterface.h"
+#include "../remotedatainterface.h"
 
 #include <QtGlobal>
 #include <QObject>
@@ -92,6 +92,7 @@ public:
     virtual RemoteDataReply * runRemoteJob(QString jobName, QString jobParameters, QString remoteWorkingDir);
 
     QString getTenantURL();
+    void forwardAgaveError(QString errorText);
 
 private slots:
     void handleInternalTask(AgaveTaskReply *agaveReply, QNetworkReply * rawReply);
