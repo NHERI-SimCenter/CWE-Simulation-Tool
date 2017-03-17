@@ -34,9 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ------------------------------------------------------------------------------------
 
-The SimCenter Agave Interface, and related programs, makes use of the QT packages (unmodified): core, gui and network
+Programs which use the SimCenter Agave Client Interface, unmodified and as intended, will make use of at least the following Qt packages (unmodified): core and network. Persons considering use of the SimCenter Agave Client Interface should note the licensing conditions of Qt, described below.
 
-QT is copyright "The Qt Company Ltd" and licensed under the GNU Lesser General Public License (version 3) which references the GNU General Public License (version 3)
+Qt is copyright "The Qt Company Ltd" and licensed under the GNU Lesser General Public License (version 3) which references the GNU General Public License (version 3)
 
 For reference, these licenses are reproduced below:
 
