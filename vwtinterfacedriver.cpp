@@ -37,8 +37,8 @@ using namespace std;
 
 #include "vwtinterfacedriver.h"
 
-#include "remotedatainterface.h"
-#include "agaveInterfaces/agavehandler.h"
+#include "AgaveClientInterface/remotedatainterface.h"
+#include "AgaveClientInterface/agaveInterfaces/agavehandler.h"
 #include "programWindows/authform.h"
 #include "programWindows/panelwindow.h"
 #include "programWindows/errorpopup.h"
@@ -48,6 +48,8 @@ VWTinterfaceDriver::VWTinterfaceDriver()
     theConnector = (RemoteDataInterface *) (new AgaveHandler(this));
     authWindow = NULL;
     mainWindow = NULL;
+
+    QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(getFatalInterfaceError(QString)));
 }
 
 VWTinterfaceDriver::~VWTinterfaceDriver()
@@ -76,6 +78,11 @@ void VWTinterfaceDriver::getAuthReply(RequestState authReply)
     {
         closeAuthScreen();
     }
+}
+
+void VWTinterfaceDriver::getFatalInterfaceError(QString errText)
+{
+    ErrorPopup((QString)errText);
 }
 
 void VWTinterfaceDriver::closeAuthScreen()

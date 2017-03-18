@@ -36,7 +36,7 @@
 #include "filetreemodelreader.h"
 
 #include "../vwtinterfacedriver.h"
-#include "../remotedatainterface.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
 
 #include "../programWindows/deleteconfirm.h"
 #include "../programWindows/singlelinedialog.h"

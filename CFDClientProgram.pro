@@ -52,9 +52,6 @@ SOURCES += main.cpp \
     programWindows/authform.cpp \
     programWindows/errorpopup.cpp \
     programWindows/panelwindow.cpp \
-    agaveInterfaces/agavehandler.cpp \
-    agaveInterfaces/agavetaskguide.cpp \
-    agaveInterfaces/agavetaskreply.cpp \
     programWindows/deleteconfirm.cpp \
     programWindows/singlelinedialog.cpp \
     programWindows/copyrightdialog.cpp \
@@ -73,9 +70,6 @@ HEADERS  += \
     programWindows/authform.h \
     programWindows/errorpopup.h \
     programWindows/panelwindow.h \
-    agaveInterfaces/agavehandler.h \
-    agaveInterfaces/agavetaskguide.h \
-    agaveInterfaces/agavetaskreply.h \
     programWindows/deleteconfirm.h \
     programWindows/singlelinedialog.h \
     programWindows/copyrightdialog.h \
