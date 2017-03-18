@@ -37,20 +37,23 @@
 
 #include "agavetaskguide.h"
 #include "agavehandler.h"
-#include "../programWindows/errorpopup.h"
 
-AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * newReply, QObject *parent) : RemoteDataReply(parent)
+AgaveTaskReply::AgaveTaskReply(AgaveTaskGuide * theGuide, QNetworkReply * newReply, AgaveHandler *theManager, QObject *parent) : RemoteDataReply(parent)
 {
+    myManager = theManager;
     myGuide = theGuide;
+
     if (myGuide == NULL)
     {
-        ErrorPopup("Task Reply has no task guide.");
+        //Note: this also checks that the myManager is specified.
+        //Note: There should probably be a more graceful way of checking for this.
+        myManager->forwardAgaveError("Task Reply has no task guide.");
         return;
     }
     myReplyObject = newReply;
     if ((myReplyObject == NULL) && (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE))
     {
-        ErrorPopup("Task Reply has no network reply.");
+        myManager->forwardAgaveError("Task Reply has no network reply.");
         return;
     }
 
@@ -72,7 +75,7 @@ void AgaveTaskReply::delayedPassThruReply(RequestState replyState, QString * par
 {
     if (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE)
     {
-        ErrorPopup("Passthru reply invoked on invalid task");
+        myManager->forwardAgaveError("Passthru reply invoked on invalid task");
         return;
     }
 
@@ -90,7 +93,7 @@ void AgaveTaskReply::invokePassThruReply(RequestState replyState, QString * para
     this->deleteLater();
     if (myGuide->getRequestType() != AgaveRequestType::AGAVE_NONE)
     {
-        ErrorPopup("Passthru reply invoked on invalid task");
+        myManager->forwardAgaveError("Passthru reply invoked on invalid task");
         return;
     }
     if (myGuide->getTaskID() == "changeDir")
@@ -103,7 +106,7 @@ void AgaveTaskReply::invokePassThruReply(RequestState replyState, QString * para
         emit haveAuthReply(replyState);
         return;
     }
-    ErrorPopup("Passthru reply not implemented");
+    myManager->forwardAgaveError("Passthru reply not implemented");
     return;
 }
 
@@ -133,11 +136,11 @@ void AgaveTaskReply::processBadReply(RequestState replyState, QString errorText)
 
     if (myGuide->getTaskID() == "changeDir")
     {
-        ErrorPopup("Change Dir failed.");
+        myManager->forwardAgaveError("Change Dir failed.");
     }
     else if (myGuide->getTaskID() == "authRefresh")
     {
-        ErrorPopup("Auth refresh not implemented");
+        myManager->forwardAgaveError("Auth refresh not implemented");
     }
     else if (myGuide->getTaskID() == "dirListing")
     {
@@ -189,7 +192,7 @@ void AgaveTaskReply::rawTaskComplete()
     QNetworkReply * testReply = (QNetworkReply*)QObject::sender();
     if (testReply != myReplyObject)
     {
-        ErrorPopup("Network reply does not match agave reply");
+        myManager->forwardAgaveError("Network reply does not match agave reply");
         return;
     }
 
@@ -261,7 +264,7 @@ void AgaveTaskReply::rawTaskComplete()
 
     if (myGuide->getTaskID() == "authRefresh")
     {
-        ErrorPopup("Auth refresh not implemented yet");
+        myManager->forwardAgaveError("Auth refresh not implemented yet");
     }
     else if (myGuide->getTaskID() == "dirListing")
     {
@@ -453,8 +456,6 @@ QJsonValue AgaveTaskReply::recursiveJSONdig(QJsonValue currVal, QList<QString> *
     QJsonValue nullValue;
     if (i >= keyList->size())
     {
-        //Should never happen
-        ErrorPopup("Invalid JSON parser state");
         return nullValue;
     }
 
