@@ -41,7 +41,7 @@
 #include "taskPanels/placeholderpanel.h"
 #include "copyrightdialog.h"
 #include "filetreemodelreader.h"
-#include "../remotedatainterface.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
 
 PanelWindow::PanelWindow(RemoteDataInterface * newDataLink, QWidget *parent) :
     QMainWindow(parent),
@@ -246,5 +246,6 @@ void PanelWindow::taskEntryClicked(QModelIndex clickedItem)
 
 void PanelWindow::menuExit()
 {
+    //TODO: Replace this with a graceful shutdown sequence
     qApp->exit(0);
 }

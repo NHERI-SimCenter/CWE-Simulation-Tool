@@ -36,7 +36,7 @@
 #include "filemainippanel.h"
 
 #include "../vwtinterfacedriver.h"
-#include "../remotedatainterface.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
 #include "../programWindows/filetreemodelreader.h"
 
 FileMainipPanel::FileMainipPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
