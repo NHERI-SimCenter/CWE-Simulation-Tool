@@ -36,7 +36,7 @@
 #include "authform.h"
 #include "ui_authform.h"
 
-#include "remotedatainterface.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
 #include "errorpopup.h"
 #include "copyrightdialog.h"
 #include "vwtinterfacedriver.h"
