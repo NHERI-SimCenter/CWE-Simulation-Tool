@@ -67,6 +67,7 @@ public:
 
 public slots:
     void getAuthReply(RequestState authReply);
+    void getFatalInterfaceError(QString errText);
 
 private:
     RemoteDataInterface * theConnector;
