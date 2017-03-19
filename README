@@ -4,3 +4,8 @@ If you attempt to recompile this, particularly when using QT creator, take note 
 
 This engine is designed to allow access to resources using an Agave interface. See: https://agaveapi.co for more information.
 
+This program uses the AgaveClientInterface Library. To make this simple, submodules and subtrees are not used.
+
+Rather, the AgaveClientInterface repo, also from NHERI-SimCenter, should be cloned into a folder right next to this repo. 
+
+That is, CFDClientProgram and AgaveClientInterface should be subfolders of the same super-folder.
