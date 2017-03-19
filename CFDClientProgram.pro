@@ -57,10 +57,10 @@ SOURCES += main.cpp \
     programWindows/copyrightdialog.cpp \
     programWindows/filetreemodelreader.cpp \
     programWindows/quickinfopopup.cpp \
-    AgaveClientInterface/agaveInterfaces/agavehandler.cpp \
-    AgaveClientInterface/agaveInterfaces/agavetaskguide.cpp \
-    AgaveClientInterface/agaveInterfaces/agavetaskreply.cpp \
-    AgaveClientInterface/remotedatainterface.cpp
+    ../AgaveClientInterface/agaveInterfaces/agavehandler.cpp \
+    ../AgaveClientInterface/agaveInterfaces/agavetaskguide.cpp \
+    ../AgaveClientInterface/agaveInterfaces/agavetaskreply.cpp \
+    ../AgaveClientInterface/remotedatainterface.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -75,10 +75,10 @@ HEADERS  += \
     programWindows/copyrightdialog.h \
     programWindows/filetreemodelreader.h \
     programWindows/quickinfopopup.h \
-    AgaveClientInterface/agaveInterfaces/agavehandler.h \
-    AgaveClientInterface/agaveInterfaces/agavetaskguide.h \
-    AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
-    AgaveClientInterface/remotedatainterface.h
+    ../AgaveClientInterface/agaveInterfaces/agavehandler.h \
+    ../AgaveClientInterface/agaveInterfaces/agavetaskguide.h \
+    ../AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
+    ../AgaveClientInterface/remotedatainterface.h
 
 FORMS    += \
     programWindows/authform.ui \

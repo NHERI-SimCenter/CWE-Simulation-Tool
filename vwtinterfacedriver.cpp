@@ -37,8 +37,7 @@ using namespace std;
 
 #include "vwtinterfacedriver.h"
 
-#include "AgaveClientInterface/remotedatainterface.h"
-#include "AgaveClientInterface/agaveInterfaces/agavehandler.h"
+#include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
 #include "programWindows/authform.h"
 #include "programWindows/panelwindow.h"
 #include "programWindows/errorpopup.h"
