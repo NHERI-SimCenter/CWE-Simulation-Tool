@@ -41,15 +41,17 @@
 #include "taskPanels/placeholderpanel.h"
 #include "copyrightdialog.h"
 #include "filetreemodelreader.h"
+#include "../vwtinterfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
-PanelWindow::PanelWindow(RemoteDataInterface * newDataLink, QWidget *parent) :
+PanelWindow::PanelWindow(VWTinterfaceDriver * newDriver, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PanelWindow)
 {
     ui->setupUi(this);
 
-    dataLink = newDataLink;
+    myDriver = newDriver;
+    dataLink = myDriver->getDataConnection();
     taskTreeView = this->findChild<QTreeView *>("taskTreeView");
     sharedWidget = this->findChild<QStackedWidget *>("stackedView");
     QTreeView * fileTreeView = this->findChild<QTreeView *>("fileTreeView");
@@ -246,6 +248,5 @@ void PanelWindow::taskEntryClicked(QModelIndex clickedItem)
 
 void PanelWindow::menuExit()
 {
-    //TODO: Replace this with a graceful shutdown sequence
-    qApp->exit(0);
+    myDriver->shutdown();
 }

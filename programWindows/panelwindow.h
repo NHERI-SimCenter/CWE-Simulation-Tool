@@ -41,10 +41,10 @@
 #include <QStandardItemModel>
 #include <QStackedWidget>
 
-
 class FileTreeModelReader;
 class TaskPanelEntry;
 class RemoteDataInterface;
+class VWTinterfaceDriver;
 
 namespace Ui {
 class PanelWindow;
@@ -55,7 +55,7 @@ class PanelWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit PanelWindow(RemoteDataInterface * newDataLink, QWidget *parent = 0);
+    explicit PanelWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
     ~PanelWindow();
 
     void setupTaskList();
@@ -67,6 +67,7 @@ private slots:
 
 private:
     Ui::PanelWindow *ui;
+    VWTinterfaceDriver * myDriver;
     QTreeView * taskTreeView;
     QStackedWidget *sharedWidget;
     RemoteDataInterface * dataLink;

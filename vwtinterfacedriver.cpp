@@ -41,6 +41,7 @@ using namespace std;
 #include "programWindows/authform.h"
 #include "programWindows/panelwindow.h"
 #include "programWindows/errorpopup.h"
+#include "programWindows/quickinfopopup.h"
 
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
@@ -53,17 +54,55 @@ VWTinterfaceDriver::VWTinterfaceDriver()
 
 VWTinterfaceDriver::~VWTinterfaceDriver()
 {
-    if (theConnector != NULL) delete theConnector;
-    if (authWindow != NULL) delete authWindow;
-    if (mainWindow != NULL) delete mainWindow;
+    if (theConnector != NULL) theConnector->deleteLater();
+    if (authWindow != NULL) authWindow->deleteLater();
+    if (mainWindow != NULL) mainWindow->deleteLater();
 }
 
 void VWTinterfaceDriver::startup()
 {
     authWindow = new AuthForm(theConnector, this);
-    mainWindow = new PanelWindow(theConnector);
+    QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
+    mainWindow = new PanelWindow(this);
+    QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
     authWindow->show();
+}
+
+void VWTinterfaceDriver::shutdown()
+{
+    if (doingShutdown)
+    {
+        return;
+    }
+    doingShutdown = true;
+    qDebug("Beginning graceful shutdown.");
+    if (theConnector != NULL)
+    {
+        RemoteDataReply * revokeTask = theConnector->closeAllConnections();
+        if (revokeTask != NULL)
+        {
+            QObject::connect(revokeTask, SIGNAL(connectionsClosed(RequestState)), this, SLOT(shutdownCallback()));
+            qDebug("Waiting on outstanding tasks");
+            QuickInfoPopup * waitOnCloseMessage = new QuickInfoPopup("Waiting for network shutdown. Click OK to force quit.");
+            waitOnCloseMessage->show();
+            return;
+        }
+    }
+    shutdownCallback();
+}
+
+void VWTinterfaceDriver::shutdownCallback()
+{
+    QCoreApplication::instance()->exit(0);
+}
+
+void VWTinterfaceDriver::subWindowHidden(bool nowVisible)
+{
+    if (nowVisible == false)
+    {
+        shutdown();
+    }
 }
 
 RemoteDataInterface * VWTinterfaceDriver::getDataConnection()
@@ -98,6 +137,7 @@ void VWTinterfaceDriver::closeAuthScreen()
 
     if (authWindow != NULL)
     {
+        QObject::disconnect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
         authWindow->hide();
         authWindow->deleteLater();
         authWindow = NULL;
