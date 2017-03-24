@@ -36,6 +36,8 @@
 #ifndef VWTINTERFACEDRIVER_H
 #define VWTINTERFACEDRIVER_H
 
+#include <QCoreApplication>
+
 #include <QtGlobal>
 #include <QObject>
 #include <QDialog>
@@ -44,6 +46,8 @@
 #include <QPushButton>
 #include <QTreeView>
 #include <QStackedWidget>
+#include <QWindow>
+#include <QThread>
 
 enum class VWTerrorType: unsigned int;
 enum class RequestState;
@@ -60,6 +64,7 @@ public:
     explicit VWTinterfaceDriver();
     ~VWTinterfaceDriver();
     void startup();
+    void shutdown();
 
     void closeAuthScreen();
 
@@ -69,10 +74,16 @@ public slots:
     void getAuthReply(RequestState authReply);
     void getFatalInterfaceError(QString errText);
 
+private slots:
+    void subWindowHidden(bool nowVisible);
+    void shutdownCallback();
+
 private:
     RemoteDataInterface * theConnector;
     AuthForm * authWindow;
     PanelWindow * mainWindow;
+
+    bool doingShutdown = false;
 };
 
 #endif // VWTINTERFACEDRIVER_H
