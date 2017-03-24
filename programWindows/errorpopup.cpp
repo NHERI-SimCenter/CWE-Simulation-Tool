@@ -77,6 +77,7 @@ void ErrorPopup::setErrorLabel(QString errorText)
 
 void ErrorPopup::closeByError()
 {
+    qDebug("Graceless shutdown by error.");
     qApp->exit((unsigned int)errorVal);
 }
 

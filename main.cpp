@@ -34,6 +34,7 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 #include <QApplication>
+#include <QObject>
 #include <QtGlobal>
 #include <string.h>
 #include "vwtinterfacedriver.h"
@@ -62,6 +63,10 @@ int main(int argc, char *argv[])
     {
         qInstallMessageHandler(emptyMessageHandler);
     }
+
+    mainRunLoop.setQuitOnLastWindowClosed(false);
+    //Note: Window closeing should link somehow to the shutdown sequence, otherwise the app will not close
+    //Note: Might consider a better way of implementing this.
 
     programDriver.startup();
     return mainRunLoop.exec();
