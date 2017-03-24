@@ -36,9 +36,10 @@
 #ifndef AUTHFORM_H
 #define AUTHFORM_H
 
-#include <QWidget>
+#include <QMainWindow>
 #include <QLabel>
 #include <QLineEdit>
+#include <QStatusBar>
 
 enum class RequestState;
 class VWTinterfaceDriver;
@@ -48,7 +49,7 @@ namespace Ui {
 class AuthForm;
 }
 
-class AuthForm : public QWidget
+class AuthForm : public QMainWindow
 {
     Q_OBJECT
 

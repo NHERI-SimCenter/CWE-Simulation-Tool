@@ -81,10 +81,10 @@ HEADERS  += \
     ../AgaveClientInterface/remotedatainterface.h
 
 FORMS    += \
-    programWindows/authform.ui \
     programWindows/errorpopup.ui \
     programWindows/panelwindow.ui \
     programWindows/deleteconfirm.ui \
     programWindows/singlelinedialog.ui \
     programWindows/copyrightdialog.ui \
-    programWindows/quickinfopopup.ui
+    programWindows/quickinfopopup.ui \
+    programWindows/authform.ui

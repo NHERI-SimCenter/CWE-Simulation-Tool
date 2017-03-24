@@ -42,7 +42,7 @@
 #include "vwtinterfacedriver.h"
 
 AuthForm::AuthForm(RemoteDataInterface * newRemoteHandle, VWTinterfaceDriver * theDriver, QWidget *parent) :
-    QWidget(parent),
+    QMainWindow(parent),
     ui(new Ui::AuthForm)
 {
     ui->setupUi(this);
@@ -54,9 +54,11 @@ AuthForm::AuthForm(RemoteDataInterface * newRemoteHandle, VWTinterfaceDriver * t
     this->setTabOrder(this->findChild<QWidget *>("passwordInput"), this->findChild<QWidget *>("loginButton"));
     this->setTabOrder(this->findChild<QWidget *>("loginButton"), this->findChild<QWidget *>("quitButton"));
 
-    errorTextElement = this->findChild<QLabel *>("errorLabel");
     unameInput = this->findChild<QLineEdit *>("unameInput");
     passwordInput = this->findChild<QLineEdit *>("passwordInput");
+
+    errorTextElement = new QLabel("Waiting for Login");
+    this->statusBar()->addWidget(errorTextElement);
 }
 
 AuthForm::~AuthForm()
@@ -72,7 +74,7 @@ void AuthForm::getCopyingInfo()
 
 void AuthForm::exitAuth()
 {
-    qApp->exit(0);
+    myDriver->shutdown();
 }
 
 void AuthForm::performAuth()
