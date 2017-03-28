@@ -38,6 +38,7 @@
 
 #include "taskPanels/taskpanelentry.h"
 #include "taskPanels/filemainippanel.h"
+#include "taskPanels/filecompresspanel.h"
 #include "taskPanels/placeholderpanel.h"
 #include "copyrightdialog.h"
 #include "filetreemodelreader.h"
@@ -78,6 +79,8 @@ void PanelWindow::setupTaskList()
     //Populate panel list:
     FileMainipPanel * filePanel = new FileMainipPanel(dataLink, fileTreeModel);
     registerTaskPanel(filePanel);
+    FileCompressPanel * filePanel2 = new FileCompressPanel(dataLink, fileTreeModel);
+    registerTaskPanel(filePanel2);
 
     PlaceholderPanel * placeHolderEntry = new PlaceholderPanel();
     placeHolderEntry->setPlaceHolderText({"Create Simulation", ". . . Empty Channel Flow"});
