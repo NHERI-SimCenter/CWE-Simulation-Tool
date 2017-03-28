@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     }
 
     mainRunLoop.setQuitOnLastWindowClosed(false);
-    //Note: Window closeing should link somehow to the shutdown sequence, otherwise the app will not close
+    //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
     //Note: Might consider a better way of implementing this.
 
     programDriver.startup();

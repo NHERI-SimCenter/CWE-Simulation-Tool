@@ -46,7 +46,7 @@ using namespace std;
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
-    tmpHandle->registerAgaveAppInfo("compress",{"directory"},{},"directory");
+    tmpHandle->registerAgaveAppInfo("compress-0.1u1",{"directory", "compression_type"},{},"directory");
     theConnector = (RemoteDataInterface *) tmpHandle;
     authWindow = NULL;
     mainWindow = NULL;
@@ -145,4 +145,6 @@ void VWTinterfaceDriver::closeAuthScreen()
         authWindow->deleteLater();
         authWindow = NULL;
     }
+
+    //((AgaveHandler*)theConnector)->getAgaveAppList();
 }
