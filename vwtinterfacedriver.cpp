@@ -45,7 +45,9 @@ using namespace std;
 
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
-    theConnector = (RemoteDataInterface *) (new AgaveHandler(this));
+    AgaveHandler * tmpHandle = new AgaveHandler(this);
+    tmpHandle->registerAgaveAppInfo("compress",{"directory"},{},"directory");
+    theConnector = (RemoteDataInterface *) tmpHandle;
     authWindow = NULL;
     mainWindow = NULL;
 
@@ -85,6 +87,7 @@ void VWTinterfaceDriver::shutdown()
             QObject::connect(revokeTask, SIGNAL(connectionsClosed(RequestState)), this, SLOT(shutdownCallback()));
             qDebug("Waiting on outstanding tasks");
             QuickInfoPopup * waitOnCloseMessage = new QuickInfoPopup("Waiting for network shutdown. Click OK to force quit.");
+            QObject::connect(waitOnCloseMessage, SIGNAL(accepted()), this, SLOT(shutdownCallback()));
             waitOnCloseMessage->show();
             return;
         }

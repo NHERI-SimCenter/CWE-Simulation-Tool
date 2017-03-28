@@ -60,7 +60,8 @@ SOURCES += main.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.cpp \
-    ../AgaveClientInterface/remotedatainterface.cpp
+    ../AgaveClientInterface/remotedatainterface.cpp \
+    taskPanels/filecompresspanel.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -78,7 +79,8 @@ HEADERS  += \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
-    ../AgaveClientInterface/remotedatainterface.h
+    ../AgaveClientInterface/remotedatainterface.h \
+    taskPanels/filecompresspanel.h
 
 FORMS    += \
     programWindows/errorpopup.ui \
