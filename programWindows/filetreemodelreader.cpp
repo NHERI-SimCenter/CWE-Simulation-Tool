@@ -132,6 +132,7 @@ void FileTreeModelReader::needRightClickMenu(QPoint pos)
 {
     QModelIndex targetIndex = linkedFileView->indexAt(pos);
     fileEntryTouched(targetIndex);
+    if (!rightClickEnabled) return;
 
     //If we did not click anything, we should return
     if (selectedItem == NULL) return;
