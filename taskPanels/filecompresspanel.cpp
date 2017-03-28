@@ -57,6 +57,16 @@ void FileCompressPanel::setupOwnFrame()
     contentLabel = new QLabel("No File Selected.");
     vLayout->addWidget(contentLabel);
 
+    compressButton = new QPushButton("Compress");
+    QObject::connect(compressButton,SIGNAL(clicked(bool)),this,SLOT(compressSelected()));
+    vLayout->addWidget(compressButton);
+    compressButton->setVisible(false);
+
+    decompressButton = new QPushButton("De-Compress");
+    QObject::connect(decompressButton,SIGNAL(clicked(bool)),this,SLOT(compressSelected()));
+    vLayout->addWidget(decompressButton);
+    decompressButton->setVisible(false);
+
     getOwnedWidget()->setLayout(vLayout);
 }
 
@@ -73,6 +83,9 @@ void FileCompressPanel::frameNowInvisible()
 
 void FileCompressPanel::selectedFileChanged(FileMetaData * newSelection)
 {
+    compressButton->setVisible(false);
+    decompressButton->setVisible(false);
+
     if ((newSelection->getFileType() == FileType::EMPTY_FOLDER) ||
         (newSelection->getFileType() == FileType::INVALID) ||
         (newSelection->getFileType() == FileType::UNLOADED))
@@ -82,4 +95,56 @@ void FileCompressPanel::selectedFileChanged(FileMetaData * newSelection)
     }
 
     contentLabel->setText(newSelection->getFileName().toLatin1());
+
+    if (newSelection->getFileType() == FileType::DIR)
+    {
+        compressButton->setVisible(true);
+    }
+    else if (newSelection->getFileType() == FileType::FILE)
+    {
+        decompressButton->setVisible(true);
+    }
+}
+
+void FileCompressPanel::compressSelected()
+{
+    qDebug("Folder compress specified");
+    QMultiMap<QString, QString> oneInput;
+    oneInput.insert("compression_type","tgz");
+    FileMetaData fileData = myTreeReader->getCurrentSelectedFile();
+    if (fileData.getFileType() != FileType::DIR)
+    {
+        //TODO: give reasonable error
+        return;
+    }
+    RemoteDataReply * compressTask = dataConnection->runRemoteJob("compress-0.1u1",oneInput,fileData.getFullPath());
+    if (compressTask == NULL)
+    {
+        //TODO: give reasonable error
+        return;
+    }
+    QObject::connect(compressTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
+                     this, SLOT(finishedFileCompress(RequestState,QJsonDocument*)));
+}
+
+void FileCompressPanel::decompressSelected()
+{
+    //TODO: implement
+    qDebug("Folder de-compress specified");
+}
+
+void FileCompressPanel::finishedFileCompress(RequestState finalState, QJsonDocument * rawData)
+{
+    if (finalState != RequestState::GOOD)
+    {
+        //TODO: give reasonable error
+        return;
+    }
+
+    //TODO: ask for refresh of relevant containing folder
+}
+
+void FileCompressPanel::finishedFileExtract(RequestState, QJsonDocument *)
+{
+    //TODO: implement
 }

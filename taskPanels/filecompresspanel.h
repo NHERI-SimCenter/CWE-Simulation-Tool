@@ -25,6 +25,11 @@ public:
 
 private slots:
     void selectedFileChanged(FileMetaData * newSelection);
+    void compressSelected();
+    void decompressSelected();
+
+    void finishedFileCompress(RequestState finalState, QJsonDocument * rawData);
+    void finishedFileExtract(RequestState finalState, QJsonDocument * rawData);
 
 private:
     QModelIndex currentFileSelected;
@@ -33,6 +38,8 @@ private:
     RemoteDataInterface * dataConnection;
 
     QLabel * contentLabel = NULL;
+    QPushButton * compressButton;
+    QPushButton * decompressButton;
 };
 
 #endif // FILECOMPRESSPANEL_H
