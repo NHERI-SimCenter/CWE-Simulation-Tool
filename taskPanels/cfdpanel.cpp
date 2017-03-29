@@ -33,22 +33,22 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "filecompresspanel.h"
+#include "cfdpanel.h"
 
 #include "../vwtinterfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 #include "../programWindows/filetreemodelreader.h"
 
-FileCompressPanel::FileCompressPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
+CFDpanel::CFDpanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
 {
-    this->setFrameNameList({"Remote File Management", "Compress/Decompress"});
+    this->setFrameNameList({"Run/Setup Simulation", ". . . Using OpenFOAM"});
 
     myTreeReader = newReader;
     dataConnection = newDataHandle;
     this->setFileTreeVisibleSetting(true);
 }
 
-void FileCompressPanel::setupOwnFrame()
+void CFDpanel::setupOwnFrame()
 {
     QVBoxLayout * vLayout = new QVBoxLayout;
 
@@ -57,34 +57,28 @@ void FileCompressPanel::setupOwnFrame()
     contentLabel = new QLabel("No File Selected.");
     vLayout->addWidget(contentLabel);
 
-    compressButton = new QPushButton("Compress");
-    QObject::connect(compressButton,SIGNAL(clicked(bool)),this,SLOT(compressSelected()));
-    vLayout->addWidget(compressButton);
-    compressButton->setVisible(false);
-
-    decompressButton = new QPushButton("De-Compress");
-    QObject::connect(decompressButton,SIGNAL(clicked(bool)),this,SLOT(decompressSelected()));
-    vLayout->addWidget(decompressButton);
-    decompressButton->setVisible(false);
+    startButton = new QPushButton("Begin CFD");
+    QObject::connect(startButton,SIGNAL(clicked(bool)),this,SLOT(cfdSelected()));
+    vLayout->addWidget(startButton);
+    startButton->setVisible(false);
 
     getOwnedWidget()->setLayout(vLayout);
 }
 
-void FileCompressPanel::frameNowVisible()
+void CFDpanel::frameNowVisible()
 {
     QObject::connect(myTreeReader, SIGNAL(newFileSelected(FileMetaData *)), this, SLOT(selectedFileChanged(FileMetaData *)));
     myTreeReader->resendSelectedFile();
 }
 
-void FileCompressPanel::frameNowInvisible()
+void CFDpanel::frameNowInvisible()
 {
     QObject::disconnect(myTreeReader, SIGNAL(newFileSelected(FileMetaData *)), this, SLOT(selectedFileChanged(FileMetaData *)));
 }
 
-void FileCompressPanel::selectedFileChanged(FileMetaData * newSelection)
+void CFDpanel::selectedFileChanged(FileMetaData * newSelection)
 {
-    compressButton->setVisible(false);
-    decompressButton->setVisible(false);
+    startButton->setVisible(false);
 
     if ((newSelection->getFileType() == FileType::EMPTY_FOLDER) ||
         (newSelection->getFileType() == FileType::INVALID) ||
@@ -98,70 +92,32 @@ void FileCompressPanel::selectedFileChanged(FileMetaData * newSelection)
 
     if (newSelection->getFileType() == FileType::DIR)
     {
-        compressButton->setVisible(true);
-    }
-    else if (newSelection->getFileType() == FileType::FILE)
-    {
-        decompressButton->setVisible(true);
+        startButton->setVisible(true);
     }
 }
 
-void FileCompressPanel::compressSelected()
+void CFDpanel::cfdSelected()
 {
-    qDebug("Folder compress specified");
+    qDebug("Beginning CFD task");
     QMultiMap<QString, QString> oneInput;
-    oneInput.insert("compression_type","tgz");
+    oneInput.insert("solver","pisoFoam");
     FileMetaData fileData = myTreeReader->getCurrentSelectedFile();
     if (fileData.getFileType() != FileType::DIR)
     {
         //TODO: give reasonable error
         return;
     }
-    RemoteDataReply * compressTask = dataConnection->runRemoteJob("compress-0.1u1",oneInput,fileData.getFullPath());
+    RemoteDataReply * compressTask = dataConnection->runRemoteJob("openfoam-2.4.0u11",oneInput,fileData.getFullPath());
     if (compressTask == NULL)
     {
         //TODO: give reasonable error
         return;
     }
     QObject::connect(compressTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(finishedFileCompress(RequestState,QJsonDocument*)));
+                     this, SLOT(finishedCFDinvoke(RequestState,QJsonDocument*)));
 }
 
-void FileCompressPanel::decompressSelected()
-{
-    qDebug("Folder de-compress specified");
-    QMultiMap<QString, QString> oneInput;
-    FileMetaData fileData = myTreeReader->getCurrentSelectedFile();
-    if (fileData.getFileType() == FileType::DIR)
-    {
-        //TODO: give reasonable error
-        return;
-    }
-    oneInput.insert("inputFile",fileData.getFullPath());
-
-    RemoteDataReply * decompressTask = dataConnection->runRemoteJob("extract-0.1u1",oneInput,"");
-    if (decompressTask == NULL)
-    {
-        //TODO: give reasonable error
-        return;
-    }
-    QObject::connect(decompressTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(finishedFileExtract(RequestState,QJsonDocument*)));
-
-}
-
-void FileCompressPanel::finishedFileCompress(RequestState finalState, QJsonDocument *)
-{
-    if (finalState != RequestState::GOOD)
-    {
-        //TODO: give reasonable error
-        return;
-    }
-
-    //TODO: ask for refresh of relevant containing folder
-}
-
-void FileCompressPanel::finishedFileExtract(RequestState finalState, QJsonDocument *)
+void CFDpanel::finishedCFDinvoke(RequestState finalState, QJsonDocument *)
 {
     if (finalState != RequestState::GOOD)
     {

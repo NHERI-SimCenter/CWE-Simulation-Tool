@@ -40,6 +40,7 @@
 #include "taskPanels/filemainippanel.h"
 #include "taskPanels/filecompresspanel.h"
 #include "taskPanels/placeholderpanel.h"
+#include "taskPanels/cfdpanel.h"
 #include "copyrightdialog.h"
 #include "filetreemodelreader.h"
 #include "../vwtinterfacedriver.h"
@@ -77,60 +78,66 @@ void PanelWindow::setupTaskList()
     fileTreeModel->resetFileData();
 
     //Populate panel list:
-    FileMainipPanel * filePanel = new FileMainipPanel(dataLink, fileTreeModel);
-    registerTaskPanel(filePanel);
-    FileCompressPanel * filePanel2 = new FileCompressPanel(dataLink, fileTreeModel);
-    registerTaskPanel(filePanel2);
+    TaskPanelEntry * realPanel = new FileMainipPanel(dataLink, fileTreeModel);
+    registerTaskPanel(realPanel);
 
-    PlaceholderPanel * placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Create Simulation", ". . . Empty Channel Flow"});
-    registerTaskPanel(placeHolderEntry);
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Create Simulation", ". . . Standard Shapes"});
-    registerTaskPanel(placeHolderEntry);
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Create Simulation", ". . . From Geometry File (2D slice)"});
-    registerTaskPanel(placeHolderEntry);
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Create Simulation", ". . . From Geometry File (3D)"});
-    registerTaskPanel(placeHolderEntry);
+    realPanel = new FileCompressPanel(dataLink, fileTreeModel);
+    registerTaskPanel(realPanel);
 
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Mesh Generation", ". . . From Simple Geometry Format"});
-    registerTaskPanel(placeHolderEntry);
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Mesh Generation", ". . . For Empty Channel"});
-    registerTaskPanel(placeHolderEntry);
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Mesh Generation", ". . . Using Shape Template"});
-    registerTaskPanel(placeHolderEntry);
+    PlaceholderPanel * aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"Create Simulation", ". . . Empty Channel Flow"});
+    registerTaskPanel(aPanel);
 
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Run/Setup Simulation", ". . . Using OpenFOAM"});
-    registerTaskPanel(placeHolderEntry);
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Run/Setup Simulation", ". . . Modify Turbulence Parameters"});
-    registerTaskPanel(placeHolderEntry);
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Run/Setup Simulation", ". . . Modify Inflow Parameters"});
-    registerTaskPanel(placeHolderEntry);
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"Create Simulation", ". . . Standard Shapes"});
+    registerTaskPanel(aPanel);
 
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"Post-Process", "Extract Data"});
-    registerTaskPanel(placeHolderEntry);
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"Create Simulation", ". . . From Geometry File (2D slice)"});
+    registerTaskPanel(aPanel);
 
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"View Results", "Quick Simulation Stats"});
-    registerTaskPanel(placeHolderEntry);
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"View Results", "Visualize Mesh/Geometry"});
-    registerTaskPanel(placeHolderEntry);
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"View Results", "Visualize Velocity/Pressure Fields"});
-    registerTaskPanel(placeHolderEntry);
-    placeHolderEntry = new PlaceholderPanel();
-    placeHolderEntry->setPlaceHolderText({"View Results", "Create Data Graphs"});
-    registerTaskPanel(placeHolderEntry);
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"Create Simulation", ". . . From Geometry File (3D)"});
+    registerTaskPanel(aPanel);
+
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"Mesh Generation", ". . . From Simple Geometry Format"});
+    registerTaskPanel(aPanel);
+
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"Mesh Generation", ". . . For Empty Channel"});
+    registerTaskPanel(aPanel);
+
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"Mesh Generation", ". . . Using Shape Template"});
+    registerTaskPanel(aPanel);
+
+    realPanel = new CFDpanel(dataLink, fileTreeModel);
+    registerTaskPanel(realPanel);
+
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"Run/Setup Simulation", ". . . Modify Turbulence Parameters"});
+    registerTaskPanel(aPanel);
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"Run/Setup Simulation", ". . . Modify Inflow Parameters"});
+    registerTaskPanel(aPanel);
+
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"Post-Process", "Extract Data"});
+    registerTaskPanel(aPanel);
+
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"View Results", "Quick Simulation Stats"});
+    registerTaskPanel(aPanel);
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"View Results", "Visualize Mesh/Geometry"});
+    registerTaskPanel(aPanel);
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"View Results", "Visualize Velocity/Pressure Fields"});
+    registerTaskPanel(aPanel);
+    aPanel = new PlaceholderPanel();
+    aPanel->setPlaceHolderText({"View Results", "Create Data Graphs"});
+    registerTaskPanel(aPanel);
 
     //We then activate the first entry in the list
     taskEntryClicked(taskListModel.invisibleRootItem()->child(0,0)->index());

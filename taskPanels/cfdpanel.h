@@ -33,8 +33,8 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILECOMPRESSPANEL_H
-#define FILECOMPRESSPANEL_H
+#ifndef CFDPANEL_H
+#define CFDPANEL_H
 
 #include "taskpanelentry.h"
 
@@ -48,11 +48,11 @@ class FileTreeModelReader;
 class RemoteDataInterface;
 enum class RequestState;
 
-class FileCompressPanel : public TaskPanelEntry
+class CFDpanel : public TaskPanelEntry
 {
     Q_OBJECT
 public:
-    FileCompressPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
+    CFDpanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
 
     virtual void setupOwnFrame();
     virtual void frameNowVisible();
@@ -60,11 +60,9 @@ public:
 
 private slots:
     void selectedFileChanged(FileMetaData * newSelection);
-    void compressSelected();
-    void decompressSelected();
+    void cfdSelected();
 
-    void finishedFileCompress(RequestState finalState, QJsonDocument * rawData);
-    void finishedFileExtract(RequestState finalState, QJsonDocument * rawData);
+    void finishedCFDinvoke(RequestState finalState, QJsonDocument * rawData);
 
 private:
     QModelIndex currentFileSelected;
@@ -73,8 +71,7 @@ private:
     RemoteDataInterface * dataConnection;
 
     QLabel * contentLabel = NULL;
-    QPushButton * compressButton;
-    QPushButton * decompressButton;
+    QPushButton * startButton;
 };
 
-#endif // FILECOMPRESSPANEL_H
+#endif // CFDPANEL_H
