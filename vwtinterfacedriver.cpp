@@ -47,6 +47,8 @@ VWTinterfaceDriver::VWTinterfaceDriver()
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
     tmpHandle->registerAgaveAppInfo("compress-0.1u1",{"directory", "compression_type"},{},"directory");
+    tmpHandle->registerAgaveAppInfo("extract-0.1u1",{"inputFile"},{},"");
+    tmpHandle->registerAgaveAppInfo("openfoam-2.4.0u11",{"solver"},{"inputDirectory"},"inputDirectory");
     theConnector = (RemoteDataInterface *) tmpHandle;
     authWindow = NULL;
     mainWindow = NULL;
