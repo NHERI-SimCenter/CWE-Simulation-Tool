@@ -107,7 +107,7 @@ void CFDpanel::cfdSelected()
         //TODO: give reasonable error
         return;
     }
-    RemoteDataReply * compressTask = dataConnection->runRemoteJob("openfoam-2.4.0u11",oneInput,fileData.getFullPath());
+    RemoteDataReply * compressTask = dataConnection->runRemoteJob("openfoam",oneInput,fileData.getFullPath());
     if (compressTask == NULL)
     {
         //TODO: give reasonable error

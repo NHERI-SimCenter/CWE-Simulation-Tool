@@ -76,6 +76,11 @@ void FileTreeModelReader::resendSelectedFile()
 
 FileMetaData FileTreeModelReader::getCurrentSelectedFile()
 {
+    if (selectedItem == NULL)
+    {
+        FileMetaData empty;
+        return empty;
+    }
     return selectedItem->getFileData();
 }
 

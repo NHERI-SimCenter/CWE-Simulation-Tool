@@ -41,6 +41,8 @@
 #include "taskPanels/filecompresspanel.h"
 #include "taskPanels/placeholderpanel.h"
 #include "taskPanels/cfdpanel.h"
+#include "taskPanels/debugagaveapppanel.h"
+
 #include "copyrightdialog.h"
 #include "filetreemodelreader.h"
 #include "../vwtinterfacedriver.h"
@@ -138,6 +140,9 @@ void PanelWindow::setupTaskList()
     aPanel = new PlaceholderPanel();
     aPanel->setPlaceHolderText({"View Results", "Create Data Graphs"});
     registerTaskPanel(aPanel);
+
+    realPanel = new DebugAgaveAppPanel(dataLink, fileTreeModel);
+    registerTaskPanel(realPanel);
 
     //We then activate the first entry in the list
     taskEntryClicked(taskListModel.invisibleRootItem()->child(0,0)->index());

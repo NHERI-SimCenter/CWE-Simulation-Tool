@@ -46,9 +46,13 @@ using namespace std;
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
-    tmpHandle->registerAgaveAppInfo("compress-0.1u1",{"directory", "compression_type"},{},"directory");
-    tmpHandle->registerAgaveAppInfo("extract-0.1u1",{"inputFile"},{},"");
-    tmpHandle->registerAgaveAppInfo("openfoam-2.4.0u11",{"solver"},{"inputDirectory"},"inputDirectory");
+    tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
+    tmpHandle->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
+    tmpHandle->registerAgaveAppInfo("openfoam","openfoam-2.4.0u11",{"solver"},{"inputDirectory"},"inputDirectory");
+
+    //The following are bing debuged:
+    tmpHandle->registerAgaveAppInfo("FileEcho", "TODO",{"directory","NewFile", "EchoText"},{},"directory");
+
     theConnector = (RemoteDataInterface *) tmpHandle;
     authWindow = NULL;
     mainWindow = NULL;

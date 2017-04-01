@@ -117,7 +117,7 @@ void FileCompressPanel::compressSelected()
         //TODO: give reasonable error
         return;
     }
-    RemoteDataReply * compressTask = dataConnection->runRemoteJob("compress-0.1u1",oneInput,fileData.getFullPath());
+    RemoteDataReply * compressTask = dataConnection->runRemoteJob("compress",oneInput,fileData.getFullPath());
     if (compressTask == NULL)
     {
         //TODO: give reasonable error
@@ -139,7 +139,7 @@ void FileCompressPanel::decompressSelected()
     }
     oneInput.insert("inputFile",fileData.getFullPath());
 
-    RemoteDataReply * decompressTask = dataConnection->runRemoteJob("extract-0.1u1",oneInput,"");
+    RemoteDataReply * decompressTask = dataConnection->runRemoteJob("extract",oneInput,"");
     if (decompressTask == NULL)
     {
         //TODO: give reasonable error
