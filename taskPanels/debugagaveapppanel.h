@@ -33,41 +33,53 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include <QApplication>
-#include <QObject>
-#include <QtGlobal>
-#include <string.h>
-#include "vwtinterfacedriver.h"
+#ifndef DEBUGAGAVEAPPPANEL_H
+#define DEBUGAGAVEAPPPANEL_H
 
-void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
+#include "taskpanelentry.h"
 
-int main(int argc, char *argv[])
+#include <QModelIndex>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QJsonValue>
+
+#include <QListView>
+#include <QStandardItemModel>
+
+class FileMetaData;
+class FileTreeModelReader;
+class RemoteDataInterface;
+enum class RequestState;
+
+class DebugAgaveAppPanel : public TaskPanelEntry
 {
-    QApplication mainRunLoop(argc, argv);
-    VWTinterfaceDriver programDriver;
+    Q_OBJECT
+public:
+    DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
 
-    bool debugLoggingEnabled = false;
-    for (int i = 0; i < argc; i++)
-    {
-        if (strcmp(argv[i],"enableDebugLogging") == 0)
-        {
-            debugLoggingEnabled = true;
-        }
-    }
+    virtual void setupOwnFrame();
 
-    if (debugLoggingEnabled)
-    {
-        qDebug("NOTE: Debugging text output is enabled.");
-    }
-    else
-    {
-        qInstallMessageHandler(emptyMessageHandler);
-    }
+private slots:
+    void commandInvoked();
+    void commandReply(RequestState finalState, QJsonDocument * rawData);
+    void placeInputPairs(QModelIndex newSelected);
 
-    mainRunLoop.setQuitOnLastWindowClosed(false);
-    //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
-    //Note: Might consider a better way of implementing this.
+private:
+    QModelIndex currentFileSelected;
+    FileTreeModelReader * myTreeReader;
 
-    programDriver.startup();
-    return mainRunLoop.exec();
-}
+    RemoteDataInterface * dataConnection;
+
+    QPushButton * startButton;
+    QStandardItemModel agaveAppList;
+    QListView * agaveOptionList;
+
+    bool waitingOnCommand = false;
+    QString expectedCommand;
+
+    QVBoxLayout * vLayout;
+    QMap<QString, QStringList> inputLists;
+    QGridLayout * buttonArea = NULL;
+};
+
+#endif // DEBUGAGAVEAPPPANEL_H

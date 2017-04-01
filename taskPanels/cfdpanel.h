@@ -33,41 +33,45 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include <QApplication>
-#include <QObject>
-#include <QtGlobal>
-#include <string.h>
-#include "vwtinterfacedriver.h"
+#ifndef CFDPANEL_H
+#define CFDPANEL_H
 
-void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
+#include "taskpanelentry.h"
 
-int main(int argc, char *argv[])
+#include <QModelIndex>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QJsonValue>
+
+class FileMetaData;
+class FileTreeModelReader;
+class RemoteDataInterface;
+enum class RequestState;
+
+class CFDpanel : public TaskPanelEntry
 {
-    QApplication mainRunLoop(argc, argv);
-    VWTinterfaceDriver programDriver;
+    Q_OBJECT
+public:
+    CFDpanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
 
-    bool debugLoggingEnabled = false;
-    for (int i = 0; i < argc; i++)
-    {
-        if (strcmp(argv[i],"enableDebugLogging") == 0)
-        {
-            debugLoggingEnabled = true;
-        }
-    }
+    virtual void setupOwnFrame();
+    virtual void frameNowVisible();
+    virtual void frameNowInvisible();
 
-    if (debugLoggingEnabled)
-    {
-        qDebug("NOTE: Debugging text output is enabled.");
-    }
-    else
-    {
-        qInstallMessageHandler(emptyMessageHandler);
-    }
+private slots:
+    void selectedFileChanged(FileMetaData * newSelection);
+    void cfdSelected();
 
-    mainRunLoop.setQuitOnLastWindowClosed(false);
-    //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
-    //Note: Might consider a better way of implementing this.
+    void finishedCFDinvoke(RequestState finalState, QJsonDocument * rawData);
 
-    programDriver.startup();
-    return mainRunLoop.exec();
-}
+private:
+    QModelIndex currentFileSelected;
+    FileTreeModelReader * myTreeReader;
+
+    RemoteDataInterface * dataConnection;
+
+    QLabel * contentLabel = NULL;
+    QPushButton * startButton;
+};
+
+#endif // CFDPANEL_H
