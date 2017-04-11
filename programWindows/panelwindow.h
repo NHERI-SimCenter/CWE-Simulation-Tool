@@ -41,7 +41,7 @@
 #include <QStandardItemModel>
 #include <QStackedWidget>
 
-class FileTreeModelReader;
+class RemoteFileWindow;
 class TaskPanelEntry;
 class RemoteDataInterface;
 class VWTinterfaceDriver;
@@ -71,7 +71,7 @@ private:
     QTreeView * taskTreeView;
     QStackedWidget *sharedWidget;
     RemoteDataInterface * dataLink;
-    FileTreeModelReader * fileTreeModel;
+    RemoteFileWindow * fileTreeModel;
 
     QVector<TaskPanelEntry *> taskPanelList;
     QStandardItemModel taskListModel;

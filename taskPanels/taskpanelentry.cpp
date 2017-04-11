@@ -43,7 +43,6 @@ TaskPanelEntry::TaskPanelEntry(QObject *parent) : QObject(parent)
 {
     frameId = getNewFrameId();
     implemented = true;
-    fileTreeVisible = false;
     ownWidget = NULL;
 }
 
@@ -70,11 +69,6 @@ void TaskPanelEntry::setAsActive()
     activeFrameId = frameId;
 }
 
-void TaskPanelEntry::setFileTreeVisibleSetting(bool newSetting)
-{
-    fileTreeVisible = newSetting;
-}
-
 bool TaskPanelEntry::isImplemented()
 {
     return implemented;
@@ -83,11 +77,6 @@ bool TaskPanelEntry::isImplemented()
 bool TaskPanelEntry::isCurrentActiveFrame()
 {
     return (activeFrameId == frameId);
-}
-
-bool TaskPanelEntry::fileTreeIsVisible()
-{
-    return fileTreeVisible;
 }
 
 int TaskPanelEntry::getFrameId()

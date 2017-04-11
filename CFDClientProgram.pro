@@ -48,43 +48,41 @@ SOURCES += main.cpp \
     vwtinterfacedriver.cpp \
     taskPanels/placeholderpanel.cpp \
     taskPanels/taskpanelentry.cpp \
-    taskPanels/filemainippanel.cpp \
     programWindows/authform.cpp \
     programWindows/errorpopup.cpp \
     programWindows/panelwindow.cpp \
     programWindows/deleteconfirm.cpp \
     programWindows/singlelinedialog.cpp \
     programWindows/copyrightdialog.cpp \
-    programWindows/filetreemodelreader.cpp \
     programWindows/quickinfopopup.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.cpp \
     ../AgaveClientInterface/remotedatainterface.cpp \
-    taskPanels/filecompresspanel.cpp \
     taskPanels/cfdpanel.cpp \
-    taskPanels/debugagaveapppanel.cpp
+    taskPanels/debugagaveapppanel.cpp \
+    ../AgaveClientInterface/agaveInterfaces/agavelongrunning.cpp \
+    programWindows/remotefilewindow.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
     taskPanels/placeholderpanel.h \
     taskPanels/taskpanelentry.h \
-    taskPanels/filemainippanel.h \
     programWindows/authform.h \
     programWindows/errorpopup.h \
     programWindows/panelwindow.h \
     programWindows/deleteconfirm.h \
     programWindows/singlelinedialog.h \
     programWindows/copyrightdialog.h \
-    programWindows/filetreemodelreader.h \
     programWindows/quickinfopopup.h \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
     ../AgaveClientInterface/remotedatainterface.h \
-    taskPanels/filecompresspanel.h \
     taskPanels/cfdpanel.h \
-    taskPanels/debugagaveapppanel.h
+    taskPanels/debugagaveapppanel.h \
+    ../AgaveClientInterface/agaveInterfaces/agavelongrunning.h \
+    programWindows/remotefilewindow.h
 
 FORMS    += \
     programWindows/errorpopup.ui \
@@ -93,4 +91,5 @@ FORMS    += \
     programWindows/singlelinedialog.ui \
     programWindows/copyrightdialog.ui \
     programWindows/quickinfopopup.ui \
-    programWindows/authform.ui
+    programWindows/authform.ui \
+    programWindows/remotefilewindow.ui

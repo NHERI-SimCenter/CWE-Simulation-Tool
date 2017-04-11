@@ -33,21 +33,26 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "filetreemodelreader.h"
+#include "remotefilewindow.h"
+#include "ui_remotefilewindow.h"
+
+#include "../AgaveClientInterface/remotedatainterface.h"
+#include "deleteconfirm.h"
+#include "singlelinedialog.h"
+#include "quickinfopopup.h"
+#include "errorpopup.h"
 
 #include "../vwtinterfacedriver.h"
-#include "../AgaveClientInterface/remotedatainterface.h"
 
-#include "../programWindows/deleteconfirm.h"
-#include "../programWindows/singlelinedialog.h"
-#include "../programWindows/errorpopup.h"
-#include "../programWindows/quickinfopopup.h"
-
-FileTreeModelReader::FileTreeModelReader(RemoteDataInterface * newDataLink, QTreeView * newLinkedFileView, QLabel * fileHeaderLabel)
+RemoteFileWindow::RemoteFileWindow(VWTinterfaceDriver * newDriver, QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::RemoteFileWindow)
 {
-    linkedFileView = newLinkedFileView;
-    dataLink = newDataLink;
-    filesLabel = fileHeaderLabel;
+    ui->setupUi(this);
+
+    dataLink = newDriver->getDataConnection();
+    linkedFileView = this->findChild<QTreeView *>("remoteFileView");
+
     QObject::connect(linkedFileView, SIGNAL(expanded(QModelIndex)), this, SLOT(folderExpanded(QModelIndex)));
     QObject::connect(linkedFileView, SIGNAL(clicked(QModelIndex)), this, SLOT(fileEntryTouched(QModelIndex)));
     QObject::connect(linkedFileView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenu(QPoint)));
@@ -57,24 +62,20 @@ FileTreeModelReader::FileTreeModelReader(RemoteDataInterface * newDataLink, QTre
     selectedItem = NULL;
 }
 
-void FileTreeModelReader::setTreeViewVisibility(bool isVisible)
+RemoteFileWindow::~RemoteFileWindow()
 {
-    linkedFileView->setVisible(isVisible);
-    filesLabel->setVisible(isVisible);
+    delete ui;
+
+    //TODO: Delete entries in the file data tree
 }
 
-void FileTreeModelReader::setRightClickMenuEnabled(bool newSetting)
-{
-    rightClickEnabled = newSetting;
-}
-
-void FileTreeModelReader::resendSelectedFile()
+void RemoteFileWindow::resendSelectedFile()
 {
     if (linkedFileView->selectionModel()->selectedIndexes().size() <= 0) return;
     fileEntryTouched(linkedFileView->selectionModel()->selectedIndexes().at(0));
 }
 
-FileMetaData FileTreeModelReader::getCurrentSelectedFile()
+FileMetaData RemoteFileWindow::getCurrentSelectedFile()
 {
     if (selectedItem == NULL)
     {
@@ -84,7 +85,7 @@ FileMetaData FileTreeModelReader::getCurrentSelectedFile()
     return selectedItem->getFileData();
 }
 
-void FileTreeModelReader::resetFileData()
+void RemoteFileWindow::resetFileData()
 {
     //TODO: reconsider needed columns
     dataStore.clear();
@@ -109,9 +110,10 @@ void FileTreeModelReader::resetFileData()
     enactFolderRefresh(rootFileNode);
 }
 
-void FileTreeModelReader::folderExpanded(QModelIndex itemOpened)
+void RemoteFileWindow::folderExpanded(QModelIndex itemOpened)
 {
     FileTreeNode * theFileNode = getNodeFromModel(dataStore.itemFromIndex(itemOpened));
+    fileEntryTouched(itemOpened);
 
     if (theFileNode == NULL) return;
     if (!theFileNode->childIsUnloaded()) return;
@@ -119,7 +121,7 @@ void FileTreeModelReader::folderExpanded(QModelIndex itemOpened)
     enactFolderRefresh(theFileNode);
 }
 
-void FileTreeModelReader::fileEntryTouched(QModelIndex fileIndex)
+void RemoteFileWindow::fileEntryTouched(QModelIndex fileIndex)
 {
     QStandardItem * touchedItem = dataStore.itemFromIndex(fileIndex);
     selectedItem = getNodeFromModel(touchedItem);
@@ -133,11 +135,10 @@ void FileTreeModelReader::fileEntryTouched(QModelIndex fileIndex)
     emit newFileSelected(&newFileData);
 }
 
-void FileTreeModelReader::needRightClickMenu(QPoint pos)
+void RemoteFileWindow::needRightClickMenu(QPoint pos)
 {
     QModelIndex targetIndex = linkedFileView->indexAt(pos);
     fileEntryTouched(targetIndex);
-    if (!rightClickEnabled) return;
 
     //If we did not click anything, we should return
     if (selectedItem == NULL) return;
@@ -176,6 +177,15 @@ void FileTreeModelReader::needRightClickMenu(QPoint pos)
     {
         fileMenu.addAction("Download File",this, SLOT(sendDownloadReq()));
     }
+    if (theFileData.getFileType() == FileType::DIR)
+    {
+        fileMenu.addAction("Compress Folder",this, SLOT(sendCompressReq()));
+    }
+    else if (theFileData.getFileType() == FileType::FILE)
+    {
+        fileMenu.addAction("De-Compress File",this, SLOT(sendDecompressReq()));
+    }
+
     if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))
     {
         fileMenu.addSeparator();
@@ -186,7 +196,7 @@ void FileTreeModelReader::needRightClickMenu(QPoint pos)
     fileMenu.exec(QCursor::pos());
 }
 
-void FileTreeModelReader::getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList)
+void RemoteFileWindow::getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList)
 {
     if (cmdReply != RequestState::GOOD)
     {
@@ -237,7 +247,7 @@ void FileTreeModelReader::getLSReply(RequestState cmdReply, QList<FileMetaData> 
     }
 
     if (targetNode == NULL)
-    {   
+    {
         totalResetErrorProcedure();
         return;
     }
@@ -320,7 +330,7 @@ void FileTreeModelReader::getLSReply(RequestState cmdReply, QList<FileMetaData> 
     translateFileDataToModel();
 }
 
-void FileTreeModelReader::sendDeleteReq()
+void RemoteFileWindow::sendDeleteReq()
 {
     FileMetaData targetFile = selectedItem->getFileData();
     //TODO: verify file valid for delete
@@ -342,7 +352,7 @@ void FileTreeModelReader::sendDeleteReq()
     fileOperationPending = true;
 }
 
-void FileTreeModelReader::getDeleteReply(RequestState replyState, QString * oldFilePath)
+void RemoteFileWindow::getDeleteReply(RequestState replyState, QString * oldFilePath)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -353,7 +363,7 @@ void FileTreeModelReader::getDeleteReply(RequestState replyState, QString * oldF
     lsClosestNodeToParent(*oldFilePath);
 }
 
-void FileTreeModelReader::sendMoveReq()
+void RemoteFileWindow::sendMoveReq()
 {
     FileMetaData targetFile = selectedItem->getFileData();
     SingleLineDialog newNamePopup("Please type a file name to move to:", "newname");
@@ -378,7 +388,7 @@ void FileTreeModelReader::sendMoveReq()
     fileOperationPending = true;
 }
 
-void FileTreeModelReader::getMoveReply(RequestState replyState, QString * oldFilePath, FileMetaData * revisedFileData)
+void RemoteFileWindow::getMoveReply(RequestState replyState, QString * oldFilePath, FileMetaData * revisedFileData)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -390,7 +400,7 @@ void FileTreeModelReader::getMoveReply(RequestState replyState, QString * oldFil
     lsClosestNode(revisedFileData->getFullPath());
 }
 
-void FileTreeModelReader::sendCopyReq()
+void RemoteFileWindow::sendCopyReq()
 {
     FileMetaData targetFile = selectedItem->getFileData();
     SingleLineDialog newNamePopup("Please type a file name to copy to:", "newname");
@@ -415,7 +425,7 @@ void FileTreeModelReader::sendCopyReq()
     fileOperationPending = true;
 }
 
-void FileTreeModelReader::getCopyReply(RequestState replyState, FileMetaData * newFileData)
+void RemoteFileWindow::getCopyReply(RequestState replyState, FileMetaData * newFileData)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -426,7 +436,7 @@ void FileTreeModelReader::getCopyReply(RequestState replyState, FileMetaData * n
     lsClosestNode(newFileData->getFullPath());
 }
 
-void FileTreeModelReader::sendRenameReq()
+void RemoteFileWindow::sendRenameReq()
 {
     FileMetaData targetFile = selectedItem->getFileData();
     SingleLineDialog newNamePopup("Please type a new file name:", "newname");
@@ -449,7 +459,7 @@ void FileTreeModelReader::sendRenameReq()
     fileOperationPending = true;
 }
 
-void FileTreeModelReader::getRenameReply(RequestState replyState, QString * oldFilePath, FileMetaData * newFileData)
+void RemoteFileWindow::getRenameReply(RequestState replyState, QString * oldFilePath, FileMetaData * newFileData)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -461,7 +471,7 @@ void FileTreeModelReader::getRenameReply(RequestState replyState, QString * oldF
     lsClosestNodeToParent(newFileData->getFullPath());
 }
 
-void FileTreeModelReader::sendCreateFolderReq()
+void RemoteFileWindow::sendCreateFolderReq()
 {
     FileMetaData targetFile = selectedItem->getFileData();
     SingleLineDialog newFolderNamePopup("Please input a name for the new folder:", "newFolder1");
@@ -487,7 +497,7 @@ void FileTreeModelReader::sendCreateFolderReq()
     fileOperationPending = true;
 }
 
-void FileTreeModelReader::getMkdirReply(RequestState replyState, FileMetaData * newFolderData)
+void RemoteFileWindow::getMkdirReply(RequestState replyState, FileMetaData * newFolderData)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -498,7 +508,7 @@ void FileTreeModelReader::getMkdirReply(RequestState replyState, FileMetaData * 
     lsClosestNode(newFolderData->getContainingPath());
 }
 
-void FileTreeModelReader::sendUploadReq()
+void RemoteFileWindow::sendUploadReq()
 {
     FileMetaData targetFile = selectedItem->getFileData();
     SingleLineDialog uploadNamePopup("Please input full path of file to upload:", "");
@@ -525,7 +535,7 @@ void FileTreeModelReader::sendUploadReq()
     fileOperationPending = true;
 }
 
-void FileTreeModelReader::getUploadReply(RequestState replyState, FileMetaData * newFileData)
+void RemoteFileWindow::getUploadReply(RequestState replyState, FileMetaData * newFileData)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -536,7 +546,7 @@ void FileTreeModelReader::getUploadReply(RequestState replyState, FileMetaData *
     lsClosestNode(newFileData->getFullPath());
 }
 
-void FileTreeModelReader::sendDownloadReq()
+void RemoteFileWindow::sendDownloadReq()
 {
     FileMetaData targetFile = selectedItem->getFileData();
     SingleLineDialog downloadNamePopup("Please input full path download destination:", "");
@@ -563,7 +573,7 @@ void FileTreeModelReader::sendDownloadReq()
     fileOperationPending = true;
 }
 
-void FileTreeModelReader::getDownloadReply(RequestState replyState, QString * localDest)
+void RemoteFileWindow::getDownloadReply(RequestState replyState, QString * localDest)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -578,18 +588,83 @@ void FileTreeModelReader::getDownloadReply(RequestState replyState, QString * lo
     }
 }
 
-void FileTreeModelReader::sendManualRefresh()
+void RemoteFileWindow::sendCompressReq()
+{
+    qDebug("Folder compress specified");
+    QMultiMap<QString, QString> oneInput;
+    oneInput.insert("compression_type","tgz");
+    FileMetaData fileData = selectedItem->getFileData();
+    if (fileData.getFileType() != FileType::DIR)
+    {
+        //TODO: give reasonable error
+        return;
+    }
+    RemoteDataReply * compressTask = dataLink->runRemoteJob("compress",oneInput,fileData.getFullPath());
+    if (compressTask == NULL)
+    {
+        //TODO: give reasonable error
+        return;
+    }
+    QObject::connect(compressTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
+                     this, SLOT(getCompressReply(RequestState,QJsonDocument*)));
+}
+
+void RemoteFileWindow::getCompressReply(RequestState finalState, QJsonDocument *)
+{
+    if (finalState != RequestState::GOOD)
+    {
+        //TODO: give reasonable error
+        return;
+    }
+
+    //TODO: ask for refresh of relevant containing folder
+}
+
+void RemoteFileWindow::sendDecompressReq()
+{
+    qDebug("Folder de-compress specified");
+    QMultiMap<QString, QString> oneInput;
+    FileMetaData fileData = selectedItem->getFileData();
+    if (fileData.getFileType() == FileType::DIR)
+    {
+        //TODO: give reasonable error
+        return;
+    }
+    oneInput.insert("inputFile",fileData.getFullPath());
+
+    RemoteDataReply * decompressTask = dataLink->runRemoteJob("extract",oneInput,"");
+    if (decompressTask == NULL)
+    {
+        //TODO: give reasonable error
+        return;
+    }
+    QObject::connect(decompressTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
+                     this, SLOT(getDecompressReply(RequestState,QJsonDocument*)));
+}
+
+void RemoteFileWindow::getDecompressReply(RequestState finalState, QJsonDocument *)
+{
+    if (finalState != RequestState::GOOD)
+    {
+        //TODO: give reasonable error
+        return;
+    }
+
+    //TODO: ask for refresh of relevant containing folder
+}
+
+void RemoteFileWindow::sendManualRefresh()
 {
     enactFolderRefresh(selectedItem);
 }
 
-void FileTreeModelReader::lsClosestNode(QString fullPath)
+void RemoteFileWindow::lsClosestNode(QString fullPath)
 {
     FileTreeNode * nodeToRefresh = getDirNearestFromPath(fullPath);
     enactFolderRefresh(nodeToRefresh);
 }
 
-void FileTreeModelReader::lsClosestNodeToParent(QString fullPath)
+void RemoteFileWindow::lsClosestNodeToParent(QString fullPath)
 {
     FileTreeNode * nodeToRefresh = getFileNodeFromPath(fullPath);
     if (nodeToRefresh != NULL)
@@ -606,14 +681,14 @@ void FileTreeModelReader::lsClosestNodeToParent(QString fullPath)
     enactFolderRefresh(nodeToRefresh);
 }
 
-QString FileTreeModelReader::getFilePathForNode(QModelIndex dataIndex)
+QString RemoteFileWindow::getFilePathForNode(QModelIndex dataIndex)
 {
     FileTreeNode * nodeToCheck = getNodeFromModel(dataStore.itemFromIndex(dataIndex));
     if (nodeToCheck == NULL) return "";
     return nodeToCheck->getFileData().getFullPath();
 }
 
-FileTreeNode * FileTreeModelReader::getFileNodeFromPath(QString filePath)
+FileTreeNode * RemoteFileWindow::getFileNodeFromPath(QString filePath)
 {
     QStringList filePathParts = FileMetaData::getPathNameList(filePath);
     FileTreeNode * searchNode = rootFileNode;
@@ -630,7 +705,8 @@ FileTreeNode * FileTreeModelReader::getFileNodeFromPath(QString filePath)
 
     return searchNode;
 }
-FileTreeNode * FileTreeModelReader::getDirNearestFromPath(QString filePath)
+
+FileTreeNode * RemoteFileWindow::getDirNearestFromPath(QString filePath)
 {
     QStringList filePathParts = FileMetaData::getPathNameList(filePath);
     FileTreeNode * searchNode = rootFileNode;
@@ -648,7 +724,7 @@ FileTreeNode * FileTreeModelReader::getDirNearestFromPath(QString filePath)
     return searchNode;
 }
 
-FileTreeNode * FileTreeModelReader::getNodeFromModel(QStandardItem * toFind)
+FileTreeNode * RemoteFileWindow::getNodeFromModel(QStandardItem * toFind)
 {
     if (toFind->column() != (int)FileColumn::FILENAME)
     {
@@ -674,7 +750,7 @@ FileTreeNode * FileTreeModelReader::getNodeFromModel(QStandardItem * toFind)
     return getFileNodeFromPath(pathToFind);
 }
 
-QStandardItem * FileTreeModelReader::getModelEntryFromNode(FileTreeNode * toFind)
+QStandardItem * RemoteFileWindow::getModelEntryFromNode(FileTreeNode * toFind)
 {
     if (toFind == NULL) return NULL;
 
@@ -707,13 +783,13 @@ QStandardItem * FileTreeModelReader::getModelEntryFromNode(FileTreeNode * toFind
     return NULL;
 }
 
-void FileTreeModelReader::totalResetErrorProcedure()
+void RemoteFileWindow::totalResetErrorProcedure()
 {
     //TODO: Try to recover once by resetting all data on remote files
     ErrorPopup("Critical Remote file parseing error. Unable to Recover");
 }
 
-void FileTreeModelReader::translateFileDataToModel()
+void RemoteFileWindow::translateFileDataToModel()
 {
     FileTreeNode * currentFile = rootFileNode;
     QStandardItem * currentModelEntry = dataStore.invisibleRootItem();
@@ -721,7 +797,7 @@ void FileTreeModelReader::translateFileDataToModel()
     translateFileDataRecurseHelper(currentFile, currentModelEntry);
 }
 
-void FileTreeModelReader::translateFileDataRecurseHelper(FileTreeNode * currentFile, QStandardItem * currentModelEntry)
+void RemoteFileWindow::translateFileDataRecurseHelper(FileTreeNode * currentFile, QStandardItem * currentModelEntry)
 {
     //TODO: I am guessing this could be more efficient
     for (auto itr = currentFile->fileListStart(); itr != currentFile->fileListEnd(); itr++)
@@ -766,7 +842,7 @@ void FileTreeModelReader::translateFileDataRecurseHelper(FileTreeNode * currentF
     }
 }
 
-void FileTreeModelReader::enactFolderRefresh(FileTreeNode * folderToRemoteLS)
+void RemoteFileWindow::enactFolderRefresh(FileTreeNode * folderToRemoteLS)
 {
     QString fullFilePath = folderToRemoteLS->getFileData().getFullPath();
 
@@ -783,7 +859,7 @@ void FileTreeModelReader::enactFolderRefresh(FileTreeNode * folderToRemoteLS)
     }
 }
 
-bool FileTreeModelReader::fileInModel(FileTreeNode * toFind, QStandardItem * compareTo)
+bool RemoteFileWindow::fileInModel(FileTreeNode * toFind, QStandardItem * compareTo)
 {
     if ((toFind == NULL) || (compareTo == NULL))
     {
@@ -810,7 +886,7 @@ bool FileTreeModelReader::fileInModel(FileTreeNode * toFind, QStandardItem * com
     return true;
 }
 
-void FileTreeModelReader::changeModelFromFile(QStandardItem * targetRow, FileTreeNode * dataSource)
+void RemoteFileWindow::changeModelFromFile(QStandardItem * targetRow, FileTreeNode * dataSource)
 {
     if ((targetRow == NULL) || (dataSource == NULL))
     {
@@ -837,7 +913,7 @@ void FileTreeModelReader::changeModelFromFile(QStandardItem * targetRow, FileTre
     }
 }
 
-void FileTreeModelReader::newModelRowFromFile(QStandardItem * parentItem, FileTreeNode * dataSource)
+void RemoteFileWindow::newModelRowFromFile(QStandardItem * parentItem, FileTreeNode * dataSource)
 {
     if ((parentItem == NULL) || (dataSource == NULL))
     {
@@ -862,7 +938,7 @@ void FileTreeModelReader::newModelRowFromFile(QStandardItem * parentItem, FileTr
     parentItem->appendRow(newDataList);
 }
 
-bool FileTreeModelReader::columnInUse(int i)
+bool RemoteFileWindow::columnInUse(int i)
 {
     //TODO: This is a temporary function until the used/hidden columns are clarified
     if ((FileColumn)i == FileColumn::FILENAME)
@@ -880,7 +956,7 @@ bool FileTreeModelReader::columnInUse(int i)
     return false;
 }
 
-QString FileTreeModelReader::getRawColumnData(int i, FileMetaData * rawFileData)
+QString RemoteFileWindow::getRawColumnData(int i, FileMetaData * rawFileData)
 {
     if ((FileColumn)i == FileColumn::FILENAME)
     {

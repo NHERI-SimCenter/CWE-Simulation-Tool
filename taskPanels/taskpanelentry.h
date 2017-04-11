@@ -51,13 +51,9 @@ public:
     void setFrameNameList(QStringList nameList);
     void setAsNotImplemented();
     void setAsActive();
-    //Note: This will not change the file tree right away.
-    //Implement that in a subclass, if needed.
-    void setFileTreeVisibleSetting(bool newSetting);
 
     bool isImplemented();
     bool isCurrentActiveFrame();
-    bool fileTreeIsVisible();
 
     int getFrameId();
     QStringList getFrameNames();
@@ -78,7 +74,6 @@ private:
 
     QStringList frameNameList;
 
-    bool fileTreeVisible;
     bool implemented;
     int frameId;
 };
