@@ -44,7 +44,7 @@
 #include <QJsonValue>
 
 class FileMetaData;
-class FileTreeModelReader;
+class RemoteFileWindow;
 class RemoteDataInterface;
 enum class RequestState;
 
@@ -52,7 +52,7 @@ class CFDpanel : public TaskPanelEntry
 {
     Q_OBJECT
 public:
-    CFDpanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
+    CFDpanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent = 0);
 
     virtual void setupOwnFrame();
     virtual void frameNowVisible();
@@ -66,7 +66,7 @@ private slots:
 
 private:
     QModelIndex currentFileSelected;
-    FileTreeModelReader * myTreeReader;
+    RemoteFileWindow * myTreeReader;
 
     RemoteDataInterface * dataConnection;
 

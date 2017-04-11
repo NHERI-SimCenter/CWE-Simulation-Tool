@@ -33,9 +33,10 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILETREEMODELREADER_H
-#define FILETREEMODELREADER_H
+#ifndef REMOTEFILEWINDOW_H
+#define REMOTEFILEWINDOW_H
 
+#include <QMainWindow>
 #include <QtGlobal>
 #include <QStandardItemModel>
 #include <QStandardItem>
@@ -61,6 +62,7 @@ enum class FileColumn : int {FILENAME = 0,
 class SingleLineDialog;
 class RemoteDataInterface;
 class FileMetaData;
+class VWTinterfaceDriver;
 enum class RequestState;
 
 class FileTreeNode : public QObject
@@ -94,14 +96,17 @@ private:
     bool marked = false;
 };
 
-class FileTreeModelReader : public QObject
+namespace Ui {
+class RemoteFileWindow;
+}
+
+class RemoteFileWindow : public QMainWindow
 {
     Q_OBJECT
-public:
-    FileTreeModelReader(RemoteDataInterface * newDataLink, QTreeView * newLinkedFileView, QLabel * fileHeaderLabel);
 
-    void setTreeViewVisibility(bool isVisible);
-    void setRightClickMenuEnabled(bool newSetting);
+public:
+    explicit RemoteFileWindow(VWTinterfaceDriver * newDataLink, QWidget *parent = 0);
+    ~RemoteFileWindow();
 
     void resendSelectedFile();
     FileMetaData getCurrentSelectedFile();
@@ -135,9 +140,17 @@ private slots:
     void sendDownloadReq();
     void getDownloadReply(RequestState replyState, QString * localDest);
 
+    void sendCompressReq();
+    void getCompressReply(RequestState finalState, QJsonDocument * rawData);
+    void sendDecompressReq();
+    void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
+
+
     void sendManualRefresh();
 
 private:
+    Ui::RemoteFileWindow *ui;
+
     void lsClosestNode(QString fullPath);
     void lsClosestNodeToParent(QString fullPath);
 
@@ -168,17 +181,15 @@ private:
     const QStringList hiddenHeaderLabelList = {"name","type","length","lastModified",
                                    "format","mimeType","permissions"};
 
-    QLabel * filesLabel = NULL;
     QTreeView * linkedFileView = NULL;
 
     FileTreeNode * rootFileNode = NULL;
     QStandardItemModel dataStore;
     FileTreeNode * selectedItem = NULL;
 
-    bool rightClickEnabled = false;
     bool fileOperationPending = false;
 
     RemoteDataInterface * dataLink = NULL;
 };
 
-#endif // FILETREEMODELREADER_H
+#endif // REMOTEFILEWINDOW_H

@@ -47,7 +47,7 @@
 #include <QStandardItemModel>
 
 class FileMetaData;
-class FileTreeModelReader;
+class RemoteFileWindow;
 class RemoteDataInterface;
 enum class RequestState;
 
@@ -55,7 +55,7 @@ class DebugAgaveAppPanel : public TaskPanelEntry
 {
     Q_OBJECT
 public:
-    DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
+    DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent = 0);
 
     virtual void setupOwnFrame();
 
@@ -66,7 +66,7 @@ private slots:
 
 private:
     QModelIndex currentFileSelected;
-    FileTreeModelReader * myTreeReader;
+    RemoteFileWindow * myTreeReader;
 
     RemoteDataInterface * dataConnection;
 

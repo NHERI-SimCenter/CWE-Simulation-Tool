@@ -53,6 +53,7 @@ enum class VWTerrorType: unsigned int;
 enum class RequestState;
 
 class RemoteDataInterface;
+class RemoteFileWindow;
 class AuthForm;
 class PanelWindow;
 
@@ -69,6 +70,7 @@ public:
     void closeAuthScreen();
 
     RemoteDataInterface * getDataConnection();
+    RemoteFileWindow * getFileDisplay();
 
 public slots:
     void getAuthReply(RequestState authReply);
@@ -81,7 +83,9 @@ private slots:
 private:
     RemoteDataInterface * theConnector;
     AuthForm * authWindow;
+
     PanelWindow * mainWindow;
+    RemoteFileWindow * theFileDisplay;
 
     bool doingShutdown = false;
 };

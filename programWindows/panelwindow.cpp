@@ -37,14 +37,12 @@
 #include "ui_panelwindow.h"
 
 #include "taskPanels/taskpanelentry.h"
-#include "taskPanels/filemainippanel.h"
-#include "taskPanels/filecompresspanel.h"
 #include "taskPanels/placeholderpanel.h"
 #include "taskPanels/cfdpanel.h"
 #include "taskPanels/debugagaveapppanel.h"
 
 #include "copyrightdialog.h"
-#include "filetreemodelreader.h"
+#include "remotefilewindow.h"
 #include "../vwtinterfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
@@ -58,14 +56,12 @@ PanelWindow::PanelWindow(VWTinterfaceDriver * newDriver, QWidget *parent) :
     dataLink = myDriver->getDataConnection();
     taskTreeView = this->findChild<QTreeView *>("taskTreeView");
     sharedWidget = this->findChild<QStackedWidget *>("stackedView");
-    QTreeView * fileTreeView = this->findChild<QTreeView *>("fileTreeView");
-    QLabel * fileLabel = this->findChild<QLabel *>("filesLabel");
 
     taskTreeView->setModel(&taskListModel);
     taskListModel.setHorizontalHeaderLabels(taskHeaderList);
     taskTreeView->hideColumn(1);
 
-    fileTreeModel = new FileTreeModelReader(dataLink, fileTreeView, fileLabel);
+    fileTreeModel = myDriver->getFileDisplay();
 }
 
 PanelWindow::~PanelWindow()
@@ -76,17 +72,11 @@ PanelWindow::~PanelWindow()
 
 void PanelWindow::setupTaskList()
 {
-    //Start first query for files:
-    fileTreeModel->resetFileData();
-
     //Populate panel list:
-    TaskPanelEntry * realPanel = new FileMainipPanel(dataLink, fileTreeModel);
-    registerTaskPanel(realPanel);
+    TaskPanelEntry * realPanel;
+    PlaceholderPanel * aPanel;
 
-    realPanel = new FileCompressPanel(dataLink, fileTreeModel);
-    registerTaskPanel(realPanel);
-
-    PlaceholderPanel * aPanel = new PlaceholderPanel();
+    aPanel = new PlaceholderPanel();
     aPanel->setPlaceHolderText({"Create Simulation", ". . . Empty Channel Flow"});
     registerTaskPanel(aPanel);
 
@@ -221,7 +211,6 @@ void PanelWindow::takePanelOwnership(TaskPanelEntry * newOwner)
     }
 
     newOwner->setAsActive();
-    fileTreeModel->setTreeViewVisibility(newOwner->fileTreeIsVisible());
 
     newOwner->frameNowVisible();
 }

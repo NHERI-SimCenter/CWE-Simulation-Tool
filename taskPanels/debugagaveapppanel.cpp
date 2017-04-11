@@ -37,15 +37,14 @@
 
 #include "../vwtinterfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
-#include "../programWindows/filetreemodelreader.h"
+#include "../programWindows/remotefilewindow.h"
 
-DebugAgaveAppPanel::DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
+DebugAgaveAppPanel::DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent) : TaskPanelEntry(parent)
 {
     this->setFrameNameList({"Debug", "Test Agave App"});
 
     myTreeReader = newReader;
     dataConnection = newDataHandle;
-    this->setFileTreeVisibleSetting(true);
 
     agaveAppList.appendRow(new QStandardItem("FileEcho"));
     inputLists.insert("FileEcho", {"NewFile", "EchoText"});
@@ -144,7 +143,6 @@ void DebugAgaveAppPanel::commandInvoked()
         }
     }
 
-    /*
     RemoteDataReply * theTask = dataConnection->runRemoteJob(selectedApp,allInputs,workingDir);
     if (theTask == NULL)
     {
@@ -156,7 +154,6 @@ void DebugAgaveAppPanel::commandInvoked()
     expectedCommand = selectedApp;
     QObject::connect(theTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(commandReply(RequestState,QJsonDocument*)));
-                     */
 }
 
 void DebugAgaveAppPanel::commandReply(RequestState finalState, QJsonDocument *)
