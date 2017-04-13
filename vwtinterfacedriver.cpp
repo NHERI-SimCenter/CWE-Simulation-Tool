@@ -38,11 +38,11 @@ using namespace std;
 #include "vwtinterfacedriver.h"
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
-#include "programWindows/authform.h"
-#include "programWindows/panelwindow.h"
-#include "programWindows/errorpopup.h"
-#include "programWindows/quickinfopopup.h"
-#include "programWindows/remotefilewindow.h"
+#include "utilWindows/authform.h"
+#include "utilWindows/errorpopup.h"
+#include "utilWindows/quickinfopopup.h"
+#include "taskPanelWindow/panelwindow.h"
+#include "fileWindow/remotefilewindow.h"
 
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
