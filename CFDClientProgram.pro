@@ -43,53 +43,58 @@ TEMPLATE = app
 DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
 SOURCES += main.cpp \
     vwtinterfacedriver.cpp \
-    taskPanels/placeholderpanel.cpp \
-    taskPanels/taskpanelentry.cpp \
-    programWindows/authform.cpp \
-    programWindows/errorpopup.cpp \
-    programWindows/panelwindow.cpp \
-    programWindows/deleteconfirm.cpp \
-    programWindows/singlelinedialog.cpp \
-    programWindows/copyrightdialog.cpp \
-    programWindows/quickinfopopup.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.cpp \
     ../AgaveClientInterface/remotedatainterface.cpp \
-    taskPanels/cfdpanel.cpp \
-    taskPanels/debugagaveapppanel.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavelongrunning.cpp \
-    programWindows/remotefilewindow.cpp
+    fileWindow/fileoperator.cpp \
+    fileWindow/remotefilewindow.cpp \
+    taskPanelWindow/cfdpanel.cpp \
+    taskPanelWindow/debugagaveapppanel.cpp \
+    taskPanelWindow/panelwindow.cpp \
+    taskPanelWindow/placeholderpanel.cpp \
+    taskPanelWindow/taskpanelentry.cpp \
+    utilWindows/authform.cpp \
+    utilWindows/copyrightdialog.cpp \
+    utilWindows/deleteconfirm.cpp \
+    utilWindows/errorpopup.cpp \
+    utilWindows/quickinfopopup.cpp \
+    utilWindows/singlelinedialog.cpp \
+    fileWindow/filetreenode.cpp \
+    ../AgaveClientInterface/filemetadata.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
-    taskPanels/placeholderpanel.h \
-    taskPanels/taskpanelentry.h \
-    programWindows/authform.h \
-    programWindows/errorpopup.h \
-    programWindows/panelwindow.h \
-    programWindows/deleteconfirm.h \
-    programWindows/singlelinedialog.h \
-    programWindows/copyrightdialog.h \
-    programWindows/quickinfopopup.h \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
     ../AgaveClientInterface/remotedatainterface.h \
-    taskPanels/cfdpanel.h \
-    taskPanels/debugagaveapppanel.h \
     ../AgaveClientInterface/agaveInterfaces/agavelongrunning.h \
-    programWindows/remotefilewindow.h
+    fileWindow/fileoperator.h \
+    fileWindow/remotefilewindow.h \
+    taskPanelWindow/cfdpanel.h \
+    taskPanelWindow/debugagaveapppanel.h \
+    taskPanelWindow/panelwindow.h \
+    taskPanelWindow/placeholderpanel.h \
+    taskPanelWindow/taskpanelentry.h \
+    utilWindows/authform.h \
+    utilWindows/copyrightdialog.h \
+    utilWindows/deleteconfirm.h \
+    utilWindows/errorpopup.h \
+    utilWindows/quickinfopopup.h \
+    utilWindows/singlelinedialog.h \
+    fileWindow/filetreenode.h \
+    ../AgaveClientInterface/filemetadata.h
 
 FORMS    += \
-    programWindows/errorpopup.ui \
-    programWindows/panelwindow.ui \
-    programWindows/deleteconfirm.ui \
-    programWindows/singlelinedialog.ui \
-    programWindows/copyrightdialog.ui \
-    programWindows/quickinfopopup.ui \
-    programWindows/authform.ui \
-    programWindows/remotefilewindow.ui
+    fileWindow/remotefilewindow.ui \
+    taskPanelWindow/panelwindow.ui \
+    utilWindows/authform.ui \
+    utilWindows/copyrightdialog.ui \
+    utilWindows/deleteconfirm.ui \
+    utilWindows/errorpopup.ui \
+    utilWindows/quickinfopopup.ui \
+    utilWindows/singlelinedialog.ui
