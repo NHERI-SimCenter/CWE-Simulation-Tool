@@ -33,63 +33,32 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILEOPERATOR_H
-#define FILEOPERATOR_H
+#include "joboperator.h"
 
-#include <QObject>
-#include <QList>
+#include "remotefilewindow.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
 
-class RemoteFileWindow;
-class FileMetaData;
-class RemoteDataInterface;
-
-enum class RequestState;
-
-class FileOperator : public QObject
+JobOperator::JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, RemoteFileWindow * parent) : QObject((QObject *)parent)
 {
-    Q_OBJECT
+    myJobListView = newJobList;
+    myJobListView->setModel(&theJobList);
+    dataLink = newDataLink;
+    myFileWindow = parent;
+    QObject::connect(dataLink, SIGNAL(longRunningTasksUpdated()), this, SLOT(refreshRunningJobList()));
+}
 
-public:
-    FileOperator(RemoteDataInterface * newDataLink, RemoteFileWindow * parent);
+void JobOperator::refreshRunningJobList()
+{
+    theJobList.clear();
+    QList<LongRunningTask *> updatedTaskList = dataLink->getListOfLongTasks();
+    theJobList.setColumnCount(2);
+    theJobList.setHorizontalHeaderLabels({"Job ID", "Job Description"});
 
-    void totalResetErrorProcedure();
-    void enactFolderRefresh(FileMetaData folderToRemoteLS);
-    bool operationIsPending();
-
-private slots:
-    void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
-
-    void sendDeleteReq();
-    void getDeleteReply(RequestState replyState);
-    void sendMoveReq();
-    void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
-    void sendCopyReq();
-    void getCopyReply(RequestState replyState, FileMetaData * newFileData);
-    void sendRenameReq();
-    void getRenameReply(RequestState replyState, FileMetaData * newFileData);
-
-    void sendCreateFolderReq();
-    void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
-
-    void sendUploadReq();
-    void getUploadReply(RequestState replyState, FileMetaData * newFileData);
-    void sendDownloadReq();
-    void getDownloadReply(RequestState replyState);
-
-    void sendCompressReq();
-    void getCompressReply(RequestState finalState, QJsonDocument * rawData);
-    void sendDecompressReq();
-    void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
-
-    void sendManualRefresh();
-
-private:
-    QString getStringFromInitParams(QString stringKey);
-
-    RemoteFileWindow * myFileWindow;
-
-    RemoteDataInterface * dataLink;
-    bool fileOperationPending = false;
-};
-
-#endif // FILEOPERATOR_H
+    for (auto itr = updatedTaskList.cbegin(); itr != updatedTaskList.cend(); itr++)
+    {
+        QList<QStandardItem *> newRow;
+        newRow.append(new QStandardItem((*itr)->getIDstr()));
+        newRow.append(new QStandardItem((*itr)->getRawDataStr()));
+        theJobList.appendRow(newRow);
+    }
+}

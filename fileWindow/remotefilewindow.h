@@ -64,6 +64,7 @@ class FileMetaData;
 class FileTreeNode;
 class VWTinterfaceDriver;
 class FileOperator;
+class JobOperator;
 enum class RequestState;
 
 namespace Ui {
@@ -93,7 +94,7 @@ signals:
 private slots:
     void folderExpanded(QModelIndex itemOpened);
     void fileEntryTouched(QModelIndex fileIndex);
-    void needRightClickMenu(QPoint pos);
+    void needRightClickMenuFiles(QPoint pos);
 
 private:
     Ui::RemoteFileWindow *ui;
@@ -132,6 +133,8 @@ private:
     FileTreeNode * rootFileNode = NULL;
     QStandardItemModel dataStore;
     FileTreeNode * selectedItem = NULL;
+
+    JobOperator * myJobOperator = NULL;
 };
 
 #endif // REMOTEFILEWINDOW_H

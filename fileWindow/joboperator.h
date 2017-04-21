@@ -33,63 +33,34 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILEOPERATOR_H
-#define FILEOPERATOR_H
+#ifndef JOBOPERATOR_H
+#define JOBOPERATOR_H
 
 #include <QObject>
 #include <QList>
+#include <QListView>
+#include <QStandardItemModel>
 
 class RemoteFileWindow;
-class FileMetaData;
 class RemoteDataInterface;
 
-enum class RequestState;
-
-class FileOperator : public QObject
+class JobOperator : public QObject
 {
     Q_OBJECT
-
 public:
-    FileOperator(RemoteDataInterface * newDataLink, RemoteFileWindow * parent);
-
-    void totalResetErrorProcedure();
-    void enactFolderRefresh(FileMetaData folderToRemoteLS);
-    bool operationIsPending();
+    explicit JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, RemoteFileWindow * parent);
 
 private slots:
-    void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
-
-    void sendDeleteReq();
-    void getDeleteReply(RequestState replyState);
-    void sendMoveReq();
-    void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
-    void sendCopyReq();
-    void getCopyReply(RequestState replyState, FileMetaData * newFileData);
-    void sendRenameReq();
-    void getRenameReply(RequestState replyState, FileMetaData * newFileData);
-
-    void sendCreateFolderReq();
-    void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
-
-    void sendUploadReq();
-    void getUploadReply(RequestState replyState, FileMetaData * newFileData);
-    void sendDownloadReq();
-    void getDownloadReply(RequestState replyState);
-
-    void sendCompressReq();
-    void getCompressReply(RequestState finalState, QJsonDocument * rawData);
-    void sendDecompressReq();
-    void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
-
-    void sendManualRefresh();
+    void refreshRunningJobList();
 
 private:
-    QString getStringFromInitParams(QString stringKey);
-
     RemoteFileWindow * myFileWindow;
 
     RemoteDataInterface * dataLink;
-    bool fileOperationPending = false;
+    bool jobOperationPending = false;
+
+    QListView * myJobListView;
+    QStandardItemModel theJobList;
 };
 
-#endif // FILEOPERATOR_H
+#endif // JOBOPERATOR_H
