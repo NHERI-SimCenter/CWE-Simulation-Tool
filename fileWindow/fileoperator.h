@@ -25,13 +25,13 @@ private slots:
     void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
 
     void sendDeleteReq();
-    void getDeleteReply(RequestState replyState, QString * oldFilePath);
+    void getDeleteReply(RequestState replyState);
     void sendMoveReq();
-    void getMoveReply(RequestState replyState, QString * oldFilePath, FileMetaData * revisedFileData);
+    void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
     void sendCopyReq();
     void getCopyReply(RequestState replyState, FileMetaData * newFileData);
     void sendRenameReq();
-    void getRenameReply(RequestState replyState, QString * oldFilePath, FileMetaData * newFileData);
+    void getRenameReply(RequestState replyState, FileMetaData * newFileData);
 
     void sendCreateFolderReq();
     void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
@@ -39,7 +39,7 @@ private slots:
     void sendUploadReq();
     void getUploadReply(RequestState replyState, FileMetaData * newFileData);
     void sendDownloadReq();
-    void getDownloadReply(RequestState replyState, QString * localDest);
+    void getDownloadReply(RequestState replyState);
 
     void sendCompressReq();
     void getCompressReply(RequestState finalState, QJsonDocument * rawData);
@@ -49,6 +49,8 @@ private slots:
     void sendManualRefresh();
 
 private:
+    QString getStringFromInitParams(QString stringKey);
+
     RemoteFileWindow * myFileWindow;
 
     RemoteDataInterface * dataLink;

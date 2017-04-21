@@ -36,6 +36,7 @@
 #include "debugagaveapppanel.h"
 
 #include "vwtinterfacedriver.h"
+#include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 #include "fileWindow/remotefilewindow.h"
 

@@ -2,6 +2,7 @@
 
 #include "remotefilewindow.h"
 
+#include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
 #include "utilWindows/errorpopup.h"
@@ -19,6 +20,24 @@ void FileOperator::totalResetErrorProcedure()
 {
     //TODO: Try to recover once by resetting all data on remote files
     ErrorPopup("Critical Remote file parseing error. Unable to Recover");
+}
+
+QString FileOperator::getStringFromInitParams(QString stringKey)
+{
+    QString ret;
+    RemoteDataReply * theReply = qobject_cast<RemoteDataReply *> (QObject::sender());
+    if (theReply == NULL)
+    {
+        ErrorPopup("Unable to get sender object of reply signal");
+        return ret;
+    }
+    ret = theReply->getTaskParamList()->value(stringKey);
+    if (ret.isEmpty())
+    {
+        ErrorPopup("Missing init param");
+        return ret;
+    }
+    return ret;
 }
 
 void FileOperator::enactFolderRefresh(FileMetaData folderToRemoteLS)
@@ -70,12 +89,12 @@ void FileOperator::sendDeleteReq()
         //TODO, should have more meaningful error here
         return;
     }
-    QObject::connect(theReply, SIGNAL(haveDeleteReply(RequestState,QString*)),
-                     this, SLOT(getDeleteReply(RequestState,QString*)));
+    QObject::connect(theReply, SIGNAL(haveDeleteReply(RequestState)),
+                     this, SLOT(getDeleteReply(RequestState)));
     fileOperationPending = true;
 }
 
-void FileOperator::getDeleteReply(RequestState replyState, QString * oldFilePath)
+void FileOperator::getDeleteReply(RequestState replyState)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -83,7 +102,7 @@ void FileOperator::getDeleteReply(RequestState replyState, QString * oldFilePath
         return;
     }
 
-    myFileWindow->lsClosestNodeToParent(*oldFilePath);
+    myFileWindow->lsClosestNodeToParent(getStringFromInitParams("toDelete"));
 }
 
 void FileOperator::sendMoveReq()
@@ -107,11 +126,11 @@ void FileOperator::sendMoveReq()
         //TODO, should have more meaningful error here
         return;
     }
-    QObject::connect(theReply, SIGNAL(haveMoveReply(RequestState,QString*,FileMetaData*)), this, SLOT(getMoveReply(RequestState,QString*,FileMetaData*)));
+    QObject::connect(theReply, SIGNAL(haveMoveReply(RequestState,FileMetaData*)), this, SLOT(getMoveReply(RequestState,FileMetaData*)));
     fileOperationPending = true;
 }
 
-void FileOperator::getMoveReply(RequestState replyState, QString * oldFilePath, FileMetaData * revisedFileData)
+void FileOperator::getMoveReply(RequestState replyState, FileMetaData * revisedFileData)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -119,7 +138,7 @@ void FileOperator::getMoveReply(RequestState replyState, QString * oldFilePath, 
         return;
     }
 
-    myFileWindow->lsClosestNodeToParent(*oldFilePath);
+    myFileWindow->lsClosestNodeToParent(getStringFromInitParams("fullName"));
     myFileWindow->lsClosestNode(revisedFileData->getFullPath());
 }
 
@@ -178,11 +197,11 @@ void FileOperator::sendRenameReq()
         //TODO, should have more meaningful error here
         return;
     }
-    QObject::connect(theReply, SIGNAL(haveRenameReply(RequestState,QString*,FileMetaData*)), this, SLOT(getRenameReply(RequestState,QString*,FileMetaData*)));
+    QObject::connect(theReply, SIGNAL(haveRenameReply(RequestState,FileMetaData*)), this, SLOT(getRenameReply(RequestState,FileMetaData*)));
     fileOperationPending = true;
 }
 
-void FileOperator::getRenameReply(RequestState replyState, QString * oldFilePath, FileMetaData * newFileData)
+void FileOperator::getRenameReply(RequestState replyState, FileMetaData * newFileData)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -190,7 +209,7 @@ void FileOperator::getRenameReply(RequestState replyState, QString * oldFilePath
         return;
     }
 
-    myFileWindow->lsClosestNodeToParent(*oldFilePath);
+    myFileWindow->lsClosestNodeToParent(getStringFromInitParams("fullName"));
     myFileWindow->lsClosestNodeToParent(newFileData->getFullPath());
 }
 
@@ -290,13 +309,13 @@ void FileOperator::sendDownloadReq()
         downloadPopup.exec();
         return;
     }
-    QObject::connect(theReply, SIGNAL(haveDownloadReply(RequestState,QString*)),
-                     this, SLOT(getDownloadReply(RequestState,QString*)));
+    QObject::connect(theReply, SIGNAL(haveDownloadReply(RequestState)),
+                     this, SLOT(getDownloadReply(RequestState)));
 
     fileOperationPending = true;
 }
 
-void FileOperator::getDownloadReply(RequestState replyState, QString * localDest)
+void FileOperator::getDownloadReply(RequestState replyState)
 {
     fileOperationPending = false;
     if (replyState != RequestState::GOOD)
@@ -306,7 +325,7 @@ void FileOperator::getDownloadReply(RequestState replyState, QString * localDest
     }
     else
     {
-        QuickInfoPopup downloadPopup(QString("Download complete to: %1").arg(*localDest));
+        QuickInfoPopup downloadPopup(QString("Download complete to: %1").arg(getStringFromInitParams("localDest")));
         downloadPopup.exec();
     }
 }
