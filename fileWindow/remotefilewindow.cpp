@@ -40,6 +40,7 @@
 
 #include "fileoperator.h"
 #include "filetreenode.h"
+#include "joboperator.h"
 
 #include "vwtinterfacedriver.h"
 
@@ -53,16 +54,19 @@ RemoteFileWindow::RemoteFileWindow(VWTinterfaceDriver * newDriver, QWidget *pare
 
     linkedFileView = this->findChild<QTreeView *>("remoteFileView");
     selectedFileDisplay = this->findChild<QLabel *>("selectedFileInfo");
+    QListView * jobList = this->findChild<QListView *>("longTaskView");
 
     QObject::connect(linkedFileView, SIGNAL(expanded(QModelIndex)), this, SLOT(folderExpanded(QModelIndex)));
     QObject::connect(linkedFileView, SIGNAL(clicked(QModelIndex)), this, SLOT(fileEntryTouched(QModelIndex)));
-    QObject::connect(linkedFileView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenu(QPoint)));
+    QObject::connect(linkedFileView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenuFiles(QPoint)));
 
     linkedFileView->setModel(&dataStore);
 
     selectedItem = NULL;
+
     //Note: setting this as parent should deconstruct the fileOperator
     myFileOperator = new FileOperator(newDriver->getDataConnection(),this);
+    myJobOperator = new JobOperator(newDriver->getDataConnection(),jobList,this);
 }
 
 RemoteFileWindow::~RemoteFileWindow()
@@ -276,7 +280,7 @@ void RemoteFileWindow::fileEntryTouched(QModelIndex fileIndex)
     emit newFileSelected(&newFileData);
 }
 
-void RemoteFileWindow::needRightClickMenu(QPoint pos)
+void RemoteFileWindow::needRightClickMenuFiles(QPoint pos)
 {
     QModelIndex targetIndex = linkedFileView->indexAt(pos);
     fileEntryTouched(targetIndex);

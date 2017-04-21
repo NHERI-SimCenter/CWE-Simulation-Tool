@@ -64,7 +64,8 @@ SOURCES += main.cpp \
     utilWindows/quickinfopopup.cpp \
     utilWindows/singlelinedialog.cpp \
     fileWindow/filetreenode.cpp \
-    ../AgaveClientInterface/filemetadata.cpp
+    ../AgaveClientInterface/filemetadata.cpp \
+    fileWindow/joboperator.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -87,7 +88,8 @@ HEADERS  += \
     utilWindows/quickinfopopup.h \
     utilWindows/singlelinedialog.h \
     fileWindow/filetreenode.h \
-    ../AgaveClientInterface/filemetadata.h
+    ../AgaveClientInterface/filemetadata.h \
+    fileWindow/joboperator.h
 
 FORMS    += \
     fileWindow/remotefilewindow.ui \
