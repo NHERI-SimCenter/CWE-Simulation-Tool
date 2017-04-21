@@ -37,7 +37,9 @@
 
 #include "vwtinterfacedriver.h"
 
+#include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
+
 #include "fileWindow/remotefilewindow.h"
 
 CFDpanel::CFDpanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent) : TaskPanelEntry(parent)

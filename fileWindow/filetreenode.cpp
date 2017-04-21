@@ -1,6 +1,6 @@
 #include "filetreenode.h"
 
-#include "../AgaveClientInterface/remotedatainterface.h"
+#include "../AgaveClientInterface/filemetadata.h"
 
 FileTreeNode::FileTreeNode(FileMetaData contents, FileTreeNode * parent):QObject((QObject *)parent)
 {
