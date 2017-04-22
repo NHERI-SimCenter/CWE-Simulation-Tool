@@ -38,10 +38,11 @@ using namespace std;
 #include "vwtinterfacedriver.h"
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
-#include "programWindows/authform.h"
-#include "programWindows/panelwindow.h"
-#include "programWindows/errorpopup.h"
-#include "programWindows/quickinfopopup.h"
+#include "utilWindows/authform.h"
+#include "utilWindows/errorpopup.h"
+#include "utilWindows/quickinfopopup.h"
+#include "taskPanelWindow/panelwindow.h"
+#include "fileWindow/remotefilewindow.h"
 
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
@@ -50,12 +51,17 @@ VWTinterfaceDriver::VWTinterfaceDriver()
     tmpHandle->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
     tmpHandle->registerAgaveAppInfo("openfoam","openfoam-2.4.0u11",{"solver"},{"inputDirectory"},"inputDirectory");
 
-    //The following are bing debuged:
-    tmpHandle->registerAgaveAppInfo("FileEcho", "TODO",{"directory","NewFile", "EchoText"},{},"directory");
+    //The following are being debuged:
+    tmpHandle->registerAgaveAppInfo("FileEcho", "fileEcho-0.1.0",{"directory","NewFile", "EchoText"},{},"directory");
+    tmpHandle->registerAgaveAppInfo("PythonTest", "pythonRun-0.1.0",{"directory","NewFile"},{},"directory");
+    tmpHandle->registerAgaveAppInfo("SectionMesh", "sectionMesh-0.1.0",{"SlicePlane"},{"directory","SGFFile","MeshParams"},"SGFFile");
+
+
 
     theConnector = (RemoteDataInterface *) tmpHandle;
     authWindow = NULL;
     mainWindow = NULL;
+    theFileDisplay = NULL;
 
     QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(getFatalInterfaceError(QString)));
 }
@@ -65,12 +71,15 @@ VWTinterfaceDriver::~VWTinterfaceDriver()
     if (theConnector != NULL) theConnector->deleteLater();
     if (authWindow != NULL) authWindow->deleteLater();
     if (mainWindow != NULL) mainWindow->deleteLater();
+    if (theFileDisplay != NULL) theFileDisplay->deleteLater();
 }
 
 void VWTinterfaceDriver::startup()
 {
     authWindow = new AuthForm(theConnector, this);
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
+    theFileDisplay = new RemoteFileWindow(this);
+    QObject::connect(theFileDisplay->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
     mainWindow = new PanelWindow(this);
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
@@ -119,6 +128,11 @@ RemoteDataInterface * VWTinterfaceDriver::getDataConnection()
     return theConnector;
 }
 
+RemoteFileWindow * VWTinterfaceDriver::getFileDisplay()
+{
+    return theFileDisplay;
+}
+
 void VWTinterfaceDriver::getAuthReply(RequestState authReply)
 {
     if ((authReply == RequestState::GOOD) && (authWindow != NULL) && (authWindow->isVisible()))
@@ -141,8 +155,11 @@ void VWTinterfaceDriver::closeAuthScreen()
     }
     //ErrorPopup("This is a test of the error popup");
 
+    theFileDisplay->resetFileData();
+    theFileDisplay->show();
     mainWindow->setupTaskList();
     mainWindow->show();
+    theFileDisplay->resendSelectedFile();
 
     if (authWindow != NULL)
     {

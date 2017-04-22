@@ -33,111 +33,36 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "taskpanelentry.h"
+#ifndef JOBOPERATOR_H
+#define JOBOPERATOR_H
 
-int TaskPanelEntry::activeFrameId = -1;
-int TaskPanelEntry::nextUnusedFrameId = 0;
+#include <QObject>
+#include <QList>
+#include <QListView>
+#include <QStandardItemModel>
 
-TaskPanelEntry::TaskPanelEntry(QObject *parent) : QObject(parent)
-  , frameNameList({"Invalid Entry", "Invalid Entry"})
+class RemoteFileWindow;
+class RemoteDataInterface;
+
+class JobOperator : public QObject
 {
-    frameId = getNewFrameId();
-    implemented = true;
-    fileTreeVisible = false;
-    ownWidget = NULL;
-}
+    Q_OBJECT
+public:
+    explicit JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, RemoteFileWindow * parent);
 
-TaskPanelEntry::~TaskPanelEntry()
-{
-    if (ownWidget != NULL)
-    {
-        ownWidget->deleteLater();
-    }
-}
+private slots:
+    void refreshRunningJobList();
+    void needRightClickMenu(QPoint);
+    void demandJobDataRefresh();
 
-void TaskPanelEntry::setFrameNameList(QStringList nameList)
-{
-    frameNameList = nameList;
-}
+private:
+    RemoteFileWindow * myFileWindow;
 
-void TaskPanelEntry::setAsNotImplemented()
-{
-    implemented = false;
-}
+    RemoteDataInterface * dataLink;
+    bool jobOperationPending = false;
 
-void TaskPanelEntry::setAsActive()
-{
-    activeFrameId = frameId;
-}
+    QListView * myJobListView;
+    QStandardItemModel theJobList;
+};
 
-void TaskPanelEntry::setFileTreeVisibleSetting(bool newSetting)
-{
-    fileTreeVisible = newSetting;
-}
-
-bool TaskPanelEntry::isImplemented()
-{
-    return implemented;
-}
-
-bool TaskPanelEntry::isCurrentActiveFrame()
-{
-    return (activeFrameId == frameId);
-}
-
-bool TaskPanelEntry::fileTreeIsVisible()
-{
-    return fileTreeVisible;
-}
-
-int TaskPanelEntry::getFrameId()
-{
-    return frameId;
-}
-
-QStringList TaskPanelEntry::getFrameNames()
-{
-    return frameNameList;
-}
-
-QWidget * TaskPanelEntry::getOwnedWidget()
-{
-    if (ownWidget == NULL)
-    {
-        ownWidget = new QWidget();
-        setupOwnFrame();
-    }
-    return ownWidget;
-}
-
-int TaskPanelEntry::getActiveFrameId()
-{
-    return activeFrameId;
-}
-
-int TaskPanelEntry::getNewFrameId()
-{
-    int ret = nextUnusedFrameId;
-    nextUnusedFrameId++;
-    return ret;
-}
-
-//These virtual functions should be overwritten in subclasses
-void TaskPanelEntry::setupOwnFrame()
-{
-    QLabel * warningLabel = new QLabel("Error, this message should never appear.");
-    QHBoxLayout *hLayout = new QHBoxLayout;
-
-    hLayout->addWidget(warningLabel);
-    ownWidget->setLayout(hLayout);
-}
-
-void TaskPanelEntry::frameNowVisible()
-{
-
-}
-
-void TaskPanelEntry::frameNowInvisible()
-{
-
-}
+#endif // JOBOPERATOR_H

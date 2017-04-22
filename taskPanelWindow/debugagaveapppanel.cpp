@@ -35,22 +35,24 @@
 
 #include "debugagaveapppanel.h"
 
-#include "../vwtinterfacedriver.h"
+#include "vwtinterfacedriver.h"
+#include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
-#include "../programWindows/filetreemodelreader.h"
+#include "fileWindow/remotefilewindow.h"
 
-DebugAgaveAppPanel::DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
+DebugAgaveAppPanel::DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent) : TaskPanelEntry(parent)
 {
     this->setFrameNameList({"Debug", "Test Agave App"});
 
     myTreeReader = newReader;
     dataConnection = newDataHandle;
-    this->setFileTreeVisibleSetting(true);
 
     agaveAppList.appendRow(new QStandardItem("FileEcho"));
     inputLists.insert("FileEcho", {"NewFile", "EchoText"});
-    agaveAppList.appendRow(new QStandardItem("Placeholder"));
-    inputLists.insert("Placeholder", {"Something", "SomethingElse"});
+    agaveAppList.appendRow(new QStandardItem("PythonTest"));
+    inputLists.insert("PythonTest", {"NewFile"});
+    agaveAppList.appendRow(new QStandardItem("SectionMesh"));
+    inputLists.insert("SectionMesh", {"directory", "SlicePlane", "MeshParams"});
 }
 
 void DebugAgaveAppPanel::setupOwnFrame()
@@ -144,7 +146,6 @@ void DebugAgaveAppPanel::commandInvoked()
         }
     }
 
-    /*
     RemoteDataReply * theTask = dataConnection->runRemoteJob(selectedApp,allInputs,workingDir);
     if (theTask == NULL)
     {
@@ -156,7 +157,6 @@ void DebugAgaveAppPanel::commandInvoked()
     expectedCommand = selectedApp;
     QObject::connect(theTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(commandReply(RequestState,QJsonDocument*)));
-                     */
 }
 
 void DebugAgaveAppPanel::commandReply(RequestState finalState, QJsonDocument *)

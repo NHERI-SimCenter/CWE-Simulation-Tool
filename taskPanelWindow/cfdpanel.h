@@ -33,52 +33,45 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef PANELWINDOW_H
-#define PANELWINDOW_H
+#ifndef CFDPANEL_H
+#define CFDPANEL_H
 
-#include <QMainWindow>
-#include <QTreeView>
-#include <QStandardItemModel>
-#include <QStackedWidget>
+#include "taskpanelentry.h"
 
-class FileTreeModelReader;
-class TaskPanelEntry;
+#include <QModelIndex>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QJsonValue>
+
+class FileMetaData;
+class RemoteFileWindow;
 class RemoteDataInterface;
-class VWTinterfaceDriver;
+enum class RequestState;
 
-namespace Ui {
-class PanelWindow;
-}
-
-class PanelWindow : public QMainWindow
+class CFDpanel : public TaskPanelEntry
 {
     Q_OBJECT
-
 public:
-    explicit PanelWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
-    ~PanelWindow();
+    CFDpanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent = 0);
 
-    void setupTaskList();
+    virtual void setupOwnFrame();
+    virtual void frameNowVisible();
+    virtual void frameNowInvisible();
 
 private slots:
-    void taskEntryClicked(QModelIndex clickedItem);
-    void menuExit();
-    void menuCopyInfo();
+    void selectedFileChanged(FileMetaData * newSelection);
+    void cfdSelected();
+
+    void finishedCFDinvoke(RequestState finalState, QJsonDocument * rawData);
 
 private:
-    Ui::PanelWindow *ui;
-    VWTinterfaceDriver * myDriver;
-    QTreeView * taskTreeView;
-    QStackedWidget *sharedWidget;
-    RemoteDataInterface * dataLink;
-    FileTreeModelReader * fileTreeModel;
+    QModelIndex currentFileSelected;
+    RemoteFileWindow * myTreeReader;
 
-    QVector<TaskPanelEntry *> taskPanelList;
-    QStandardItemModel taskListModel;
-    const QStringList taskHeaderList = {"Task List:","idNum"};
+    RemoteDataInterface * dataConnection;
 
-    void registerTaskPanel(TaskPanelEntry * newPanel);
-    void takePanelOwnership(TaskPanelEntry * newOwner);
+    QLabel * contentLabel = NULL;
+    QPushButton * startButton;
 };
 
-#endif // PANELWINDOW_H
+#endif // CFDPANEL_H
