@@ -53,6 +53,10 @@ VWTinterfaceDriver::VWTinterfaceDriver()
 
     //The following are being debuged:
     tmpHandle->registerAgaveAppInfo("FileEcho", "fileEcho-0.1.0",{"directory","NewFile", "EchoText"},{},"directory");
+    tmpHandle->registerAgaveAppInfo("PythonTest", "pythonRun-0.1.0",{"directory","NewFile"},{},"directory");
+    tmpHandle->registerAgaveAppInfo("SectionMesh", "sectionMesh-0.1.0",{"SlicePlane"},{"directory","SGFFile","MeshParams"},"SGFFile");
+
+
 
     theConnector = (RemoteDataInterface *) tmpHandle;
     authWindow = NULL;
