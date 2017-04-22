@@ -49,8 +49,10 @@ DebugAgaveAppPanel::DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, Remo
 
     agaveAppList.appendRow(new QStandardItem("FileEcho"));
     inputLists.insert("FileEcho", {"NewFile", "EchoText"});
-    agaveAppList.appendRow(new QStandardItem("Placeholder"));
-    inputLists.insert("Placeholder", {"Something", "SomethingElse"});
+    agaveAppList.appendRow(new QStandardItem("PythonTest"));
+    inputLists.insert("PythonTest", {"NewFile"});
+    agaveAppList.appendRow(new QStandardItem("SectionMesh"));
+    inputLists.insert("SectionMesh", {"directory", "SlicePlane", "MeshParams"});
 }
 
 void DebugAgaveAppPanel::setupOwnFrame()

@@ -173,7 +173,7 @@ void FileOperator::getMoveReply(RequestState replyState, FileMetaData * revisedF
         return;
     }
 
-    myFileWindow->lsClosestNodeToParent(getStringFromInitParams("fullName"));
+    myFileWindow->lsClosestNodeToParent(getStringFromInitParams("from"));
     myFileWindow->lsClosestNode(revisedFileData->getFullPath());
 }
 

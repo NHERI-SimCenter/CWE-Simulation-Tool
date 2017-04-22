@@ -45,6 +45,7 @@ JobOperator::JobOperator(RemoteDataInterface * newDataLink, QListView * newJobLi
     dataLink = newDataLink;
     myFileWindow = parent;
     QObject::connect(dataLink, SIGNAL(longRunningTasksUpdated()), this, SLOT(refreshRunningJobList()));
+    QObject::connect(myJobListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenu(QPoint)));
 }
 
 void JobOperator::refreshRunningJobList()
@@ -52,13 +53,26 @@ void JobOperator::refreshRunningJobList()
     theJobList.clear();
     QList<LongRunningTask *> updatedTaskList = dataLink->getListOfLongTasks();
     theJobList.setColumnCount(2);
-    theJobList.setHorizontalHeaderLabels({"Job ID", "Job Description"});
 
     for (auto itr = updatedTaskList.cbegin(); itr != updatedTaskList.cend(); itr++)
     {
         QList<QStandardItem *> newRow;
-        newRow.append(new QStandardItem((*itr)->getIDstr()));
         newRow.append(new QStandardItem((*itr)->getRawDataStr()));
+        newRow.append(new QStandardItem((*itr)->getIDstr()));
         theJobList.appendRow(newRow);
     }
+}
+
+void JobOperator::needRightClickMenu(QPoint)
+{
+    QMenu jobMenu;
+
+    jobMenu.addAction("Refresh Info", this, SLOT(demandJobDataRefresh()));
+
+    jobMenu.exec(QCursor::pos());
+}
+
+void JobOperator::demandJobDataRefresh()
+{
+    dataLink->forceRefreshOfLongTasks();
 }

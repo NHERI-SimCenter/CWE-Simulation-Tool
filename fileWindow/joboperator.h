@@ -52,6 +52,8 @@ public:
 
 private slots:
     void refreshRunningJobList();
+    void needRightClickMenu(QPoint);
+    void demandJobDataRefresh();
 
 private:
     RemoteFileWindow * myFileWindow;

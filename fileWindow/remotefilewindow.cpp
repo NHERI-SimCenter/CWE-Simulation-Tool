@@ -611,6 +611,11 @@ FileTreeNode * RemoteFileWindow::getDirNearestFromPath(QString filePath)
 
 FileTreeNode * RemoteFileWindow::getNodeFromModel(QStandardItem * toFind)
 {
+    if (toFind == NULL)
+    {
+        return NULL;
+    }
+
     if (toFind->column() != (int)FileColumn::FILENAME)
     {
         QStandardItem * parentItem = toFind->parent();
