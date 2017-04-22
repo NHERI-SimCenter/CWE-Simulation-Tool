@@ -33,53 +33,52 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef DEBUGAGAVEAPPPANEL_H
-#define DEBUGAGAVEAPPPANEL_H
+#ifndef PANELWINDOW_H
+#define PANELWINDOW_H
 
-#include "taskpanelentry.h"
-
-#include <QModelIndex>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QJsonValue>
-
-#include <QListView>
+#include <QMainWindow>
+#include <QTreeView>
 #include <QStandardItemModel>
+#include <QStackedWidget>
 
-class FileMetaData;
-class FileTreeModelReader;
+class RemoteFileWindow;
+class TaskPanelEntry;
 class RemoteDataInterface;
-enum class RequestState;
+class VWTinterfaceDriver;
 
-class DebugAgaveAppPanel : public TaskPanelEntry
+namespace Ui {
+class PanelWindow;
+}
+
+class PanelWindow : public QMainWindow
 {
     Q_OBJECT
-public:
-    DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
 
-    virtual void setupOwnFrame();
+public:
+    explicit PanelWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
+    ~PanelWindow();
+
+    void setupTaskList();
 
 private slots:
-    void commandInvoked();
-    void commandReply(RequestState finalState, QJsonDocument * rawData);
-    void placeInputPairs(QModelIndex newSelected);
+    void taskEntryClicked(QModelIndex clickedItem);
+    void menuExit();
+    void menuCopyInfo();
 
 private:
-    QModelIndex currentFileSelected;
-    FileTreeModelReader * myTreeReader;
+    Ui::PanelWindow *ui;
+    VWTinterfaceDriver * myDriver;
+    QTreeView * taskTreeView;
+    QStackedWidget *sharedWidget;
+    RemoteDataInterface * dataLink;
+    RemoteFileWindow * fileTreeModel;
 
-    RemoteDataInterface * dataConnection;
+    QVector<TaskPanelEntry *> taskPanelList;
+    QStandardItemModel taskListModel;
+    const QStringList taskHeaderList = {"Task List:","idNum"};
 
-    QPushButton * startButton;
-    QStandardItemModel agaveAppList;
-    QListView * agaveOptionList;
-
-    bool waitingOnCommand = false;
-    QString expectedCommand;
-
-    QVBoxLayout * vLayout;
-    QMap<QString, QStringList> inputLists;
-    QGridLayout * buttonArea = NULL;
+    void registerTaskPanel(TaskPanelEntry * newPanel);
+    void takePanelOwnership(TaskPanelEntry * newOwner);
 };
 
-#endif // DEBUGAGAVEAPPPANEL_H
+#endif // PANELWINDOW_H

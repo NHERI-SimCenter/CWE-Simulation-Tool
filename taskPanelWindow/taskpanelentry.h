@@ -33,48 +33,49 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILECOMPRESSPANEL_H
-#define FILECOMPRESSPANEL_H
+#ifndef TASKPANELENTRY_H
+#define TASKPANELENTRY_H
 
-#include "taskpanelentry.h"
+#include <QObject>
+#include <QWidget>
+#include <QLabel>
+#include <QHBoxLayout>
 
-#include <QModelIndex>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QJsonValue>
-
-class FileMetaData;
-class FileTreeModelReader;
-class RemoteDataInterface;
-enum class RequestState;
-
-class FileCompressPanel : public TaskPanelEntry
+class TaskPanelEntry : public QObject
 {
     Q_OBJECT
 public:
-    FileCompressPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
+    explicit TaskPanelEntry(QObject *parent = 0);
+    ~TaskPanelEntry();
 
+    void setFrameNameList(QStringList nameList);
+    void setAsNotImplemented();
+    void setAsActive();
+
+    bool isImplemented();
+    bool isCurrentActiveFrame();
+
+    int getFrameId();
+    QStringList getFrameNames();
+    QWidget * getOwnedWidget();
+
+    static int getActiveFrameId();
+    static int getNewFrameId();
+
+//These virtual functions should be over-written in subclasses:
     virtual void setupOwnFrame();
     virtual void frameNowVisible();
     virtual void frameNowInvisible();
 
-private slots:
-    void selectedFileChanged(FileMetaData * newSelection);
-    void compressSelected();
-    void decompressSelected();
-
-    void finishedFileCompress(RequestState finalState, QJsonDocument * rawData);
-    void finishedFileExtract(RequestState finalState, QJsonDocument * rawData);
-
 private:
-    QModelIndex currentFileSelected;
-    FileTreeModelReader * myTreeReader;
+    static int activeFrameId;
+    static int nextUnusedFrameId;
+    QWidget * ownWidget;
 
-    RemoteDataInterface * dataConnection;
+    QStringList frameNameList;
 
-    QLabel * contentLabel = NULL;
-    QPushButton * compressButton;
-    QPushButton * decompressButton;
+    bool implemented;
+    int frameId;
 };
 
-#endif // FILECOMPRESSPANEL_H
+#endif // TASKPANELENTRY_H

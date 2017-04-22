@@ -33,61 +33,53 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "filemainippanel.h"
+#ifndef DEBUGAGAVEAPPPANEL_H
+#define DEBUGAGAVEAPPPANEL_H
 
-#include "../vwtinterfacedriver.h"
-#include "../AgaveClientInterface/remotedatainterface.h"
-#include "../programWindows/filetreemodelreader.h"
+#include "taskpanelentry.h"
 
-FileMainipPanel::FileMainipPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
+#include <QModelIndex>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QJsonValue>
+
+#include <QListView>
+#include <QStandardItemModel>
+
+class FileMetaData;
+class RemoteFileWindow;
+class RemoteDataInterface;
+enum class RequestState;
+
+class DebugAgaveAppPanel : public TaskPanelEntry
 {
-    this->setFrameNameList({"Remote File Management", "Browse Remote Files"});
+    Q_OBJECT
+public:
+    DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent = 0);
 
-    myTreeReader = newReader;
-    dataConnection = newDataHandle;
-    this->setFileTreeVisibleSetting(true);
-}
+    virtual void setupOwnFrame();
 
-void FileMainipPanel::setupOwnFrame()
-{
-    QVBoxLayout * vLayout = new QVBoxLayout;
+private slots:
+    void commandInvoked();
+    void commandReply(RequestState finalState, QJsonDocument * rawData);
+    void placeInputPairs(QModelIndex newSelected);
 
-    QLabel * headLabel = new QLabel("File Details:");
-    vLayout->addWidget(headLabel);
-    contentLabel = new QLabel("No File Selected.");
-    vLayout->addWidget(contentLabel);
+private:
+    QModelIndex currentFileSelected;
+    RemoteFileWindow * myTreeReader;
 
-    getOwnedWidget()->setLayout(vLayout);
-}
+    RemoteDataInterface * dataConnection;
 
-void FileMainipPanel::frameNowVisible()
-{
-    myTreeReader->setRightClickMenuEnabled(true);
-    QObject::connect(myTreeReader, SIGNAL(newFileSelected(FileMetaData *)), this, SLOT(selectedFileChanged(FileMetaData *)));
-    myTreeReader->resendSelectedFile();
-}
+    QPushButton * startButton;
+    QStandardItemModel agaveAppList;
+    QListView * agaveOptionList;
 
-void FileMainipPanel::frameNowInvisible()
-{
-    myTreeReader->setRightClickMenuEnabled(false);
-    QObject::disconnect(myTreeReader, SIGNAL(newFileSelected(FileMetaData *)), this, SLOT(selectedFileChanged(FileMetaData *)));
-}
+    bool waitingOnCommand = false;
+    QString expectedCommand;
 
-void FileMainipPanel::selectedFileChanged(FileMetaData * newSelection)
-{
-    if ((newSelection->getFileType() == FileType::EMPTY_FOLDER) ||
-        (newSelection->getFileType() == FileType::INVALID) ||
-        (newSelection->getFileType() == FileType::UNLOADED))
-    {
-        contentLabel->setText("No File Selected.");
-        return;
-    }
-    //TODO: Need to make a more user friendly view and add the rest of the info
-    QString blindDump;
+    QVBoxLayout * vLayout;
+    QMap<QString, QStringList> inputLists;
+    QGridLayout * buttonArea = NULL;
+};
 
-    blindDump.append("Name: ");
-    blindDump.append(newSelection->getFileName().toLatin1());
-    blindDump.append("\n");
-
-    contentLabel->setText(blindDump);
-}
+#endif // DEBUGAGAVEAPPPANEL_H

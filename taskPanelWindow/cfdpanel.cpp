@@ -35,17 +35,19 @@
 
 #include "cfdpanel.h"
 
-#include "../vwtinterfacedriver.h"
-#include "../AgaveClientInterface/remotedatainterface.h"
-#include "../programWindows/filetreemodelreader.h"
+#include "vwtinterfacedriver.h"
 
-CFDpanel::CFDpanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent) : TaskPanelEntry(parent)
+#include "../AgaveClientInterface/filemetadata.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
+
+#include "fileWindow/remotefilewindow.h"
+
+CFDpanel::CFDpanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent) : TaskPanelEntry(parent)
 {
     this->setFrameNameList({"Run/Setup Simulation", ". . . Using OpenFOAM"});
 
     myTreeReader = newReader;
     dataConnection = newDataHandle;
-    this->setFileTreeVisibleSetting(true);
 }
 
 void CFDpanel::setupOwnFrame()

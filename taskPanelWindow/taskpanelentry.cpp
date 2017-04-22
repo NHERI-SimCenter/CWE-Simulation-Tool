@@ -33,45 +33,100 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CFDPANEL_H
-#define CFDPANEL_H
-
 #include "taskpanelentry.h"
 
-#include <QModelIndex>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QJsonValue>
+int TaskPanelEntry::activeFrameId = -1;
+int TaskPanelEntry::nextUnusedFrameId = 0;
 
-class FileMetaData;
-class FileTreeModelReader;
-class RemoteDataInterface;
-enum class RequestState;
-
-class CFDpanel : public TaskPanelEntry
+TaskPanelEntry::TaskPanelEntry(QObject *parent) : QObject(parent)
+  , frameNameList({"Invalid Entry", "Invalid Entry"})
 {
-    Q_OBJECT
-public:
-    CFDpanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
+    frameId = getNewFrameId();
+    implemented = true;
+    ownWidget = NULL;
+}
 
-    virtual void setupOwnFrame();
-    virtual void frameNowVisible();
-    virtual void frameNowInvisible();
+TaskPanelEntry::~TaskPanelEntry()
+{
+    if (ownWidget != NULL)
+    {
+        ownWidget->deleteLater();
+    }
+}
 
-private slots:
-    void selectedFileChanged(FileMetaData * newSelection);
-    void cfdSelected();
+void TaskPanelEntry::setFrameNameList(QStringList nameList)
+{
+    frameNameList = nameList;
+}
 
-    void finishedCFDinvoke(RequestState finalState, QJsonDocument * rawData);
+void TaskPanelEntry::setAsNotImplemented()
+{
+    implemented = false;
+}
 
-private:
-    QModelIndex currentFileSelected;
-    FileTreeModelReader * myTreeReader;
+void TaskPanelEntry::setAsActive()
+{
+    activeFrameId = frameId;
+}
 
-    RemoteDataInterface * dataConnection;
+bool TaskPanelEntry::isImplemented()
+{
+    return implemented;
+}
 
-    QLabel * contentLabel = NULL;
-    QPushButton * startButton;
-};
+bool TaskPanelEntry::isCurrentActiveFrame()
+{
+    return (activeFrameId == frameId);
+}
 
-#endif // CFDPANEL_H
+int TaskPanelEntry::getFrameId()
+{
+    return frameId;
+}
+
+QStringList TaskPanelEntry::getFrameNames()
+{
+    return frameNameList;
+}
+
+QWidget * TaskPanelEntry::getOwnedWidget()
+{
+    if (ownWidget == NULL)
+    {
+        ownWidget = new QWidget();
+        setupOwnFrame();
+    }
+    return ownWidget;
+}
+
+int TaskPanelEntry::getActiveFrameId()
+{
+    return activeFrameId;
+}
+
+int TaskPanelEntry::getNewFrameId()
+{
+    int ret = nextUnusedFrameId;
+    nextUnusedFrameId++;
+    return ret;
+}
+
+//These virtual functions should be overwritten in subclasses
+void TaskPanelEntry::setupOwnFrame()
+{
+    QLabel * warningLabel = new QLabel("Error, this message should never appear.");
+    QHBoxLayout *hLayout = new QHBoxLayout;
+
+    hLayout->addWidget(warningLabel);
+    ownWidget->setLayout(hLayout);
+}
+
+void TaskPanelEntry::frameNowVisible()
+{
+
+}
+
+void TaskPanelEntry::frameNowInvisible()
+{
+
+}

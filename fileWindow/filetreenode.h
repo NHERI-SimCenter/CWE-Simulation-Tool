@@ -33,61 +33,43 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef VWTINTERFACEDRIVER_H
-#define VWTINTERFACEDRIVER_H
+#ifndef FILETREENODE_H
+#define FILETREENODE_H
 
-#include <QCoreApplication>
-
-#include <QtGlobal>
 #include <QObject>
-#include <QDialog>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QTreeView>
-#include <QStackedWidget>
-#include <QWindow>
-#include <QThread>
+#include <QList>
 
-enum class VWTerrorType: unsigned int;
-enum class RequestState;
+class FileMetaData;
 
-class RemoteDataInterface;
-class RemoteFileWindow;
-class AuthForm;
-class PanelWindow;
-
-class VWTinterfaceDriver : public QObject
+class FileTreeNode : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit VWTinterfaceDriver();
-    ~VWTinterfaceDriver();
-    void startup();
-    void shutdown();
+    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
+    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
+                                                //depending if the parent is NULL
+    ~FileTreeNode();
 
-    void closeAuthScreen();
+    QList<FileTreeNode *>::iterator fileListStart();
+    QList<FileTreeNode *>::iterator fileListEnd();
 
-    RemoteDataInterface * getDataConnection();
-    RemoteFileWindow * getFileDisplay();
+    void setFileData(FileMetaData newData);
+    void setMark(bool newSetting);
+    bool isMarked();
 
-public slots:
-    void getAuthReply(RequestState authReply);
-    void getFatalInterfaceError(QString errText);
+    bool isRootNode();
+    FileTreeNode * getParentNode();
+    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
+    void clearAllChildren();
+    FileMetaData getFileData();
 
-private slots:
-    void subWindowHidden(bool nowVisible);
-    void shutdownCallback();
+    bool childIsUnloaded();
 
 private:
-    RemoteDataInterface * theConnector;
-    AuthForm * authWindow;
-
-    PanelWindow * mainWindow;
-    RemoteFileWindow * theFileDisplay;
-
-    bool doingShutdown = false;
+    FileMetaData * fileData = NULL;
+    QList<FileTreeNode *> * childList = NULL;
+    bool rootNode;
+    bool marked = false;
 };
 
-#endif // VWTINTERFACEDRIVER_H
+#endif // FILETREENODE_H

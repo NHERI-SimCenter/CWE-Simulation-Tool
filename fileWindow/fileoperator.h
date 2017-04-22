@@ -33,54 +33,63 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef TASKPANELENTRY_H
-#define TASKPANELENTRY_H
+#ifndef FILEOPERATOR_H
+#define FILEOPERATOR_H
 
 #include <QObject>
-#include <QWidget>
-#include <QLabel>
-#include <QHBoxLayout>
+#include <QList>
 
-class TaskPanelEntry : public QObject
+class RemoteFileWindow;
+class FileMetaData;
+class RemoteDataInterface;
+
+enum class RequestState;
+
+class FileOperator : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit TaskPanelEntry(QObject *parent = 0);
-    ~TaskPanelEntry();
+    FileOperator(RemoteDataInterface * newDataLink, RemoteFileWindow * parent);
 
-    void setFrameNameList(QStringList nameList);
-    void setAsNotImplemented();
-    void setAsActive();
-    //Note: This will not change the file tree right away.
-    //Implement that in a subclass, if needed.
-    void setFileTreeVisibleSetting(bool newSetting);
+    void totalResetErrorProcedure();
+    void enactFolderRefresh(FileMetaData folderToRemoteLS);
+    bool operationIsPending();
 
-    bool isImplemented();
-    bool isCurrentActiveFrame();
-    bool fileTreeIsVisible();
+private slots:
+    void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
 
-    int getFrameId();
-    QStringList getFrameNames();
-    QWidget * getOwnedWidget();
+    void sendDeleteReq();
+    void getDeleteReply(RequestState replyState);
+    void sendMoveReq();
+    void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
+    void sendCopyReq();
+    void getCopyReply(RequestState replyState, FileMetaData * newFileData);
+    void sendRenameReq();
+    void getRenameReply(RequestState replyState, FileMetaData * newFileData);
 
-    static int getActiveFrameId();
-    static int getNewFrameId();
+    void sendCreateFolderReq();
+    void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
 
-//These virtual functions should be over-written in subclasses:
-    virtual void setupOwnFrame();
-    virtual void frameNowVisible();
-    virtual void frameNowInvisible();
+    void sendUploadReq();
+    void getUploadReply(RequestState replyState, FileMetaData * newFileData);
+    void sendDownloadReq();
+    void getDownloadReply(RequestState replyState);
+
+    void sendCompressReq();
+    void getCompressReply(RequestState finalState, QJsonDocument * rawData);
+    void sendDecompressReq();
+    void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
+
+    void sendManualRefresh();
 
 private:
-    static int activeFrameId;
-    static int nextUnusedFrameId;
-    QWidget * ownWidget;
+    QString getStringFromInitParams(QString stringKey);
 
-    QStringList frameNameList;
+    RemoteFileWindow * myFileWindow;
 
-    bool fileTreeVisible;
-    bool implemented;
-    int frameId;
+    RemoteDataInterface * dataLink;
+    bool fileOperationPending = false;
 };
 
-#endif // TASKPANELENTRY_H
+#endif // FILEOPERATOR_H

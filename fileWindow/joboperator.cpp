@@ -33,41 +33,46 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILEMAINIPPANEL_H
-#define FILEMAINIPPANEL_H
+#include "joboperator.h"
 
-#include "taskpanelentry.h"
+#include "remotefilewindow.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
 
-#include <QModelIndex>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QJsonValue>
-
-class FileMetaData;
-class FileTreeModelReader;
-class RemoteDataInterface;
-enum class RequestState;
-
-class FileMainipPanel : public TaskPanelEntry
+JobOperator::JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, RemoteFileWindow * parent) : QObject((QObject *)parent)
 {
-    Q_OBJECT
-public:
-    FileMainipPanel(RemoteDataInterface * newDataHandle, FileTreeModelReader * newReader, QObject *parent = 0);
+    myJobListView = newJobList;
+    myJobListView->setModel(&theJobList);
+    dataLink = newDataLink;
+    myFileWindow = parent;
+    QObject::connect(dataLink, SIGNAL(longRunningTasksUpdated()), this, SLOT(refreshRunningJobList()));
+    QObject::connect(myJobListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenu(QPoint)));
+}
 
-    virtual void setupOwnFrame();
-    virtual void frameNowVisible();
-    virtual void frameNowInvisible();
+void JobOperator::refreshRunningJobList()
+{
+    theJobList.clear();
+    QList<LongRunningTask *> updatedTaskList = dataLink->getListOfLongTasks();
+    theJobList.setColumnCount(2);
 
-private slots:
-    void selectedFileChanged(FileMetaData * newSelection);
+    for (auto itr = updatedTaskList.cbegin(); itr != updatedTaskList.cend(); itr++)
+    {
+        QList<QStandardItem *> newRow;
+        newRow.append(new QStandardItem((*itr)->getRawDataStr()));
+        newRow.append(new QStandardItem((*itr)->getIDstr()));
+        theJobList.appendRow(newRow);
+    }
+}
 
-private:    
-    QModelIndex currentFileSelected;
-    FileTreeModelReader * myTreeReader;
+void JobOperator::needRightClickMenu(QPoint)
+{
+    QMenu jobMenu;
 
-    RemoteDataInterface * dataConnection;
+    jobMenu.addAction("Refresh Info", this, SLOT(demandJobDataRefresh()));
 
-    QLabel * contentLabel = NULL;
-};
+    jobMenu.exec(QCursor::pos());
+}
 
-#endif // FILEMAINIPPANEL_H
+void JobOperator::demandJobDataRefresh()
+{
+    dataLink->forceRefreshOfLongTasks();
+}
