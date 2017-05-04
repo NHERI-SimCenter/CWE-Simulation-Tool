@@ -33,26 +33,33 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CFDPANEL_H
-#define CFDPANEL_H
+#ifndef SIMPLENAMEVALPANEL_H
+#define SIMPLENAMEVALPANEL_H
 
 #include "taskpanelentry.h"
 
-#include <QModelIndex>
-#include <QLineEdit>
+#include <QWidget>
+#include <QLabel>
 #include <QPushButton>
-#include <QJsonValue>
+#include <QVBoxLayout>
+#include <QList>
+#include <QLineEdit>
+#include <QStringList>
+#include <QString>
 
 class FileMetaData;
 class RemoteFileWindow;
 class RemoteDataInterface;
 enum class RequestState;
 
-class CFDpanel : public TaskPanelEntry
+class SimpleNameValPanel : public TaskPanelEntry
 {
     Q_OBJECT
 public:
-    CFDpanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent = 0);
+    SimpleNameValPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader,
+                       QStringList frameNames, QStringList indirectParams,
+                       QStringList directParams, QString composedParam,
+                       QString newAppName, QObject *parent = 0);
 
     virtual void setupOwnFrame();
     virtual void frameNowVisible();
@@ -60,18 +67,24 @@ public:
 
 private slots:
     void selectedFileChanged(FileMetaData * newSelection);
-    void cfdSelected();
+    void appInvoked();
 
-    void finishedCFDinvoke(RequestState finalState, QJsonDocument * rawData);
+    void finishedAppInvoke(RequestState finalState, QJsonDocument * rawData);
 
 private:
-    QModelIndex currentFileSelected;
     RemoteFileWindow * myTreeReader;
 
     RemoteDataInterface * dataConnection;
 
-    QLabel * contentLabel = NULL;
-    QPushButton * startButton = NULL;
+    QStringList indirectParamList;
+    QStringList directParamList;
+    QString composedParamName;
+    QString appName;
+
+    QList<QLineEdit *> indirectParamBoxes;
+    QList<QLineEdit *> directParamBoxes;
+
+    QPushButton * startButton;
 };
 
-#endif // CFDPANEL_H
+#endif // SIMPLENAMEVALPANEL_H

@@ -40,6 +40,7 @@
 #include "placeholderpanel.h"
 #include "cfdpanel.h"
 #include "debugagaveapppanel.h"
+#include "simplenamevalpanel.h"
 
 #include "utilWindows/copyrightdialog.h"
 #include "fileWindow/remotefilewindow.h"
@@ -84,17 +85,21 @@ void PanelWindow::setupTaskList()
     aPanel->setPlaceHolderText({"Create Simulation", ". . . Standard Shapes"});
     registerTaskPanel(aPanel);
 
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"Create Simulation", ". . . From Geometry File (2D slice)"});
-    registerTaskPanel(aPanel);
+    realPanel = new SimpleNameValPanel(dataLink, myDriver->getFileDisplay(),
+    {"Create Simulation", ". . . From Geometry File (2D slice)"},
+    {"turbModel", "nu", "velocity", "endTime", "deltaT", "B", "H", "pisoCorrectors", "pisoNonOrthCorrect"},
+    {"SlicePlane", "NewCaseFolder"}, "SimParams" ,"twoDslice");
+    registerTaskPanel(realPanel);
 
     aPanel = new PlaceholderPanel();
     aPanel->setPlaceHolderText({"Create Simulation", ". . . From Geometry File (3D)"});
     registerTaskPanel(aPanel);
 
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"Mesh Generation", ". . . From Simple Geometry Format"});
-    registerTaskPanel(aPanel);
+    realPanel = new SimpleNameValPanel(dataLink, myDriver->getFileDisplay(),
+    {"Mesh Generation", ". . . From Simple Geometry Format"},
+    {"boundaryTop", "boundaryLow", "inPad", "outPad", "topPad", "bottomPad", "meshDensity", "meshDensityFar"},
+    {}, "MeshParams" ,"twoDUmesh");
+    registerTaskPanel(realPanel);
 
     aPanel = new PlaceholderPanel();
     aPanel->setPlaceHolderText({"Mesh Generation", ". . . For Empty Channel"});
