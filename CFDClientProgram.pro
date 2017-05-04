@@ -65,7 +65,8 @@ SOURCES += main.cpp \
     utilWindows/singlelinedialog.cpp \
     fileWindow/filetreenode.cpp \
     ../AgaveClientInterface/filemetadata.cpp \
-    fileWindow/joboperator.cpp
+    fileWindow/joboperator.cpp \
+    taskPanelWindow/simplenamevalpanel.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -89,7 +90,8 @@ HEADERS  += \
     utilWindows/singlelinedialog.h \
     fileWindow/filetreenode.h \
     ../AgaveClientInterface/filemetadata.h \
-    fileWindow/joboperator.h
+    fileWindow/joboperator.h \
+    taskPanelWindow/simplenamevalpanel.h
 
 FORMS    += \
     fileWindow/remotefilewindow.ui \

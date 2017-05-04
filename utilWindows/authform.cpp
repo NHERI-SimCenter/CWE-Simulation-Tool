@@ -88,6 +88,10 @@ void AuthForm::performAuth()
         QObject::connect(authReply,SIGNAL(haveAuthReply(RequestState)),this,SLOT(getAuthReply(RequestState)));
         QObject::connect(authReply,SIGNAL(haveAuthReply(RequestState)),myDriver, SLOT(getAuthReply(RequestState)));
     }
+    else
+    {
+        //TODO: Need fatal error here
+    }
 }
 
 void AuthForm::getAuthReply(RequestState authReply)
