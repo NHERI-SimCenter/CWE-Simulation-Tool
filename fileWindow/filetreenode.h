@@ -38,8 +38,11 @@
 
 #include <QObject>
 #include <QList>
+#include <QByteArray>
 
+enum class RequestState;
 class FileMetaData;
+class RemoteDataInterface;
 
 class FileTreeNode : public QObject
 {
@@ -57,6 +60,11 @@ public:
     void setMark(bool newSetting);
     bool isMarked();
 
+    QByteArray * getFileBuffer();
+    void refreshFileBuffer();
+    void clearFileBuffer();
+    void setDataInterface(RemoteDataInterface * sharedConnection);
+
     bool isRootNode();
     FileTreeNode * getParentNode();
     FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
@@ -65,11 +73,17 @@ public:
 
     bool childIsUnloaded();
 
+private slots:
+    void haveBufferReply(RequestState authReply, QByteArray * fileBuffer);
+
 private:
+    static RemoteDataInterface * dataConnection;
     FileMetaData * fileData = NULL;
     QList<FileTreeNode *> * childList = NULL;
     bool rootNode;
     bool marked = false;
+
+    QByteArray * fileDataBuffer = NULL;
 };
 
 #endif // FILETREENODE_H

@@ -67,6 +67,7 @@ void SimpleNameValPanel::setupOwnFrame()
         nameValPair->addWidget(headLabel);
 
         QLineEdit * dataEntry = new QLineEdit();
+        dataEntry->setObjectName(itemName);
         indirectParamBoxes.append(dataEntry);
         nameValPair->addWidget(dataEntry);
         vLayout->addLayout(nameValPair);

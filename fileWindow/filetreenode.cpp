@@ -36,6 +36,9 @@
 #include "filetreenode.h"
 
 #include "../AgaveClientInterface/filemetadata.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
+
+RemoteDataInterface * FileTreeNode::dataConnection = NULL;
 
 FileTreeNode::FileTreeNode(FileMetaData contents, FileTreeNode * parent):QObject((QObject *)parent)
 {
@@ -103,6 +106,7 @@ FileTreeNode::~FileTreeNode()
         }
         delete this->childList;
     }
+    clearFileBuffer();
 }
 
 QList<FileTreeNode *>::iterator FileTreeNode::fileListStart()
@@ -185,4 +189,38 @@ void FileTreeNode::setMark(bool newSetting)
 bool FileTreeNode::isMarked()
 {
     return marked;
+}
+
+QByteArray * FileTreeNode::getFileBuffer()
+{
+    return fileDataBuffer;
+}
+
+void FileTreeNode::refreshFileBuffer()
+{
+    //TODOS
+}
+
+void FileTreeNode::clearFileBuffer()
+{
+    if (fileDataBuffer != NULL)
+    {
+        delete fileDataBuffer;
+        fileDataBuffer = NULL;
+    }
+}
+
+void FileTreeNode::haveBufferReply(RequestState authReply, QByteArray *fileBuffer)
+{
+    clearFileBuffer();
+    if (authReply != RequestState::GOOD)
+    {
+        return;
+    }
+    fileDataBuffer = new QByteArray(*fileBuffer);
+}
+
+void FileTreeNode::setDataInterface(RemoteDataInterface * sharedConnection)
+{
+    dataConnection = sharedConnection;
 }
