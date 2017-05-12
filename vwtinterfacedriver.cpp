@@ -33,8 +33,6 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-using namespace std;
-
 #include "vwtinterfacedriver.h"
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
@@ -80,13 +78,10 @@ VWTinterfaceDriver::~VWTinterfaceDriver()
 void VWTinterfaceDriver::startup()
 {
     authWindow = new AuthForm(theConnector, this);
+    authWindow->show();
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
     theFileDisplay = new RemoteFileWindow(this);
-    QObject::connect(theFileDisplay->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
     mainWindow = new PanelWindow(this);
-    QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
-
-    authWindow->show();
 }
 
 void VWTinterfaceDriver::shutdown()
@@ -153,7 +148,7 @@ void VWTinterfaceDriver::closeAuthScreen()
 {
     if (mainWindow == NULL)
     {
-        ErrorPopup(VWTerrorType::ERR_WINDOW_SYSTEM);
+        ErrorPopup anError(VWTerrorType::ERR_WINDOW_SYSTEM);
         return;
     }
     //ErrorPopup("This is a test of the error popup");
@@ -163,6 +158,10 @@ void VWTinterfaceDriver::closeAuthScreen()
     mainWindow->setupTaskList();
     mainWindow->show();
     theFileDisplay->resendSelectedFile();
+
+    //The dynamics of this are different in windows. TODO: Find a more cross-platform solution
+    QObject::connect(theFileDisplay->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
+    QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
     if (authWindow != NULL)
     {
