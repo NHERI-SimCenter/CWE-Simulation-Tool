@@ -118,7 +118,12 @@ The SimCenter Agave Client Program makes use of the QT packages (unmodified): co
 
 QT is copyright &quot;The Qt Company Ltd&quot; and licensed under the GNU Lesser General Public License (version 3) which references the GNU General Public License (version 3)
 
-These Licenses can be found at: &lt;http://www.gnu.org/licenses/&gt;</string>
+These Licenses can be found at: &lt;http://www.gnu.org/licenses/&gt;
+
+------------------------------------------------------------------------------------
+
+The SimCenter Agave Client Program makes use the zlib library, by Jean-loup Gailly and Mark Adler, 
+whose authors' request acknowledgement when zlib is used.</string>
    </property>
    <property name="textFormat">
     <enum>Qt::PlainText</enum>
