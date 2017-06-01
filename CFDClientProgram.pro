@@ -40,6 +40,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = CFDClientProgram
 TEMPLATE = app
 
+LIBS += -lz
+
 DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
@@ -66,7 +68,10 @@ SOURCES += main.cpp \
     fileWindow/filetreenode.cpp \
     ../AgaveClientInterface/filemetadata.cpp \
     fileWindow/joboperator.cpp \
-    taskPanelWindow/simplenamevalpanel.cpp
+    taskPanelWindow/simplenamevalpanel.cpp \
+    visualUtils/cfdglcanvas.cpp \
+    visualUtils/cfdtoken.cpp \
+    visualUtils/decompresswrapper.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -91,7 +96,10 @@ HEADERS  += \
     fileWindow/filetreenode.h \
     ../AgaveClientInterface/filemetadata.h \
     fileWindow/joboperator.h \
-    taskPanelWindow/simplenamevalpanel.h
+    taskPanelWindow/simplenamevalpanel.h \
+    visualUtils/cfdglcanvas.h \
+    visualUtils/cfdtoken.h \
+    visualUtils/decompresswrapper.h
 
 FORMS    += \
     fileWindow/remotefilewindow.ui \
