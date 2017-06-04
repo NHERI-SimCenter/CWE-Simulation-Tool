@@ -58,7 +58,6 @@ VWTinterfaceDriver::VWTinterfaceDriver()
     tmpHandle->registerAgaveAppInfo("twoDslice", "twoDslice-0.1.0", {"SlicePlane", "SimParams", "NewCaseFolder"},{"SGFFile"}, "SGFFile");
     tmpHandle->registerAgaveAppInfo("twoDUmesh", "twoDUmesh-0.1.0", {"MeshParams","directory"},{}, "directory");
 
-
     theConnector = (RemoteDataInterface *) tmpHandle;
     authWindow = NULL;
     mainWindow = NULL;

@@ -67,9 +67,8 @@ QByteArray * DeCompressWrapper::getDecompressedFile()
 
     while (resultVal > 0)
     {
-        int buffLen = 1024;
-        char dataBuff[buffLen];
-        resultVal = gzread(compressHandle, dataBuff ,buffLen);
+        char dataBuff[DECOMPRESS_READ_BUF_LEN];
+        resultVal = gzread(compressHandle, dataBuff ,DECOMPRESS_READ_BUF_LEN);
         if (resultVal < 0)
         {
             delete myResultArray;
