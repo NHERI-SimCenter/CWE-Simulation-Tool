@@ -123,7 +123,7 @@ These Licenses can be found at: &lt;http://www.gnu.org/licenses/&gt;
 ------------------------------------------------------------------------------------
 
 The SimCenter Agave Client Program makes use the zlib library, by Jean-loup Gailly and Mark Adler, 
-whose authors' request acknowledgement when zlib is used.</string>
+whose authors request acknowledgement when zlib is used.</string>
    </property>
    <property name="textFormat">
     <enum>Qt::PlainText</enum>

@@ -884,7 +884,7 @@ Public License instead of this License.  But first, please read
 ---------------------------------------------------------------------------------------
 
 The decompress wrapper uses the zlib library, by Jean-loup Gailly and Mark Adler, 
-which is not distributed with this source code, but whose authors' request acknowledgement
+which is not distributed with this source code, but whose authors request acknowledgement
 when zlib is used.
 
 

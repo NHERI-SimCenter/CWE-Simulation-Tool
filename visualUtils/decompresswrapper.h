@@ -36,7 +36,14 @@
 #ifndef DECOMPRESSWRAPPER_H
 #define DECOMPRESSWRAPPER_H
 
-#include <zlib.h>
+#include <QtGlobal>
+#ifdef Q_OS_WIN
+    #include <QtZlib/zlib.h>
+#else
+    #include <zlib.h>
+#endif
+
+#define DECOMPRESS_READ_BUF_LEN 1024
 
 #include <QByteArray>
 #include <QTemporaryFile>
