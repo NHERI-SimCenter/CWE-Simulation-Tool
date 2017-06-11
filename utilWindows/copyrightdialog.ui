@@ -20,7 +20,7 @@
 ** be used to endorse or promote products derived from this software without specific
 ** prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY
 ** EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 ** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
 ** SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
@@ -42,43 +42,33 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>720</height>
+    <width>896</width>
+    <height>781</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QPushButton" name="closeButton">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>670</y>
-     <width>200</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>200</width>
-     <height>16777215</height>
-    </size>
-   </property>
-   <property name="text">
-    <string>Close Window</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>880</width>
-     <height>651</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>The SimCenter Agave Client Program, in source and binary forms, is copyright &quot;The University of Notre Dame&quot; and &quot;The Regents of the University of California&quot; and is licensed under the following copyright and license:
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>862</width>
+        <height>834</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>The SimCenter CFD Client Program, in source and binary forms, is copyright &quot;The University of Notre Dame&quot; and &quot;The Regents of the University of California&quot; and is licensed under the following copyright and license:
 
 BSD 3-Clause License
 
@@ -114,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ------------------------------------------------------------------------------------
 
-The SimCenter Agave Client Program makes use of the QT packages (unmodified): core, gui and network
+The SimCenter CFD Client Program makes use of the QT packages (unmodified): core, gui, widgets and network
 
 QT is copyright &quot;The Qt Company Ltd&quot; and licensed under the GNU Lesser General Public License (version 3) which references the GNU General Public License (version 3)
 
@@ -122,19 +112,68 @@ These Licenses can be found at: &lt;http://www.gnu.org/licenses/&gt;
 
 ------------------------------------------------------------------------------------
 
-The SimCenter Agave Client Program makes use the zlib library, by Jean-loup Gailly and Mark Adler, 
+The SimCenter CFD Client Program makes use the zlib library, by Jean-loup Gailly and Mark Adler, 
 whose authors request acknowledgement when zlib is used.</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::PlainText</enum>
-   </property>
-   <property name="wordWrap">
-    <bool>true</bool>
-   </property>
-   <property name="textInteractionFlags">
-    <set>Qt::NoTextInteraction</set>
-   </property>
-  </widget>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::NoTextInteraction</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closeButton">
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Close Window</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections>

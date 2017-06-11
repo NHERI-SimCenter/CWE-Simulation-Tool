@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ------------------------------------------------------------------------------------
 
-The SimCenter CFD Client Program and Agave Interfaces make use of the Qt packages (unmodified): core, gui and network
+The SimCenter CFD Client Program and Agave Interfaces make use of the Qt packages (unmodified): core, gui, widgets and network
 
 Qt is copyright "The Qt Company Ltd" and licensed under the GNU Lesser General Public License (version 3) which references the GNU General Public License (version 3)
 

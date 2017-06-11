@@ -41,6 +41,7 @@
 #include "cfdpanel.h"
 #include "debugagaveapppanel.h"
 #include "simplenamevalpanel.h"
+#include "visualpanel.h"
 
 #include "utilWindows/copyrightdialog.h"
 #include "fileWindow/remotefilewindow.h"
@@ -126,9 +127,10 @@ void PanelWindow::setupTaskList()
     aPanel = new PlaceholderPanel();
     aPanel->setPlaceHolderText({"View Results", "Quick Simulation Stats"});
     registerTaskPanel(aPanel);
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"View Results", "Visualize Mesh/Geometry"});
-    registerTaskPanel(aPanel);
+
+    realPanel = new VisualPanel(dataLink, fileTreeModel,{"View Results", "Visualize Mesh"},NULL);
+    registerTaskPanel(realPanel);
+
     aPanel = new PlaceholderPanel();
     aPanel->setPlaceHolderText({"View Results", "Visualize Velocity/Pressure Fields"});
     registerTaskPanel(aPanel);
