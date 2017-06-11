@@ -41,7 +41,7 @@ TARGET = CFDClientProgram
 TEMPLATE = app
 
 win32 {
-    LIBS += OpenGL32.libs
+    LIBS += OpenGL32.lib
 } else {
     LIBS += -lz
 }
