@@ -1,4 +1,4 @@
-The SimCenter CFD Client Program and Agave Interfaces, in source and binary forms, is copyright "The University of Notre Dame" and "The Regents of the University of California" and is licensed under the following copyright and license:
+The SimCenter CFD Client Program and Agave Interfaces, in source and binary forms, are copyright "The University of Notre Dame" and "The Regents of the University of California" and are licensed under the following copyright and license:
 
 BSD 3-Clause License
 
@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ------------------------------------------------------------------------------------
 
-The SimCenter Agave Client Program and Agave Interfaces make use of the Qt packages (unmodified): core, gui and network
+The SimCenter CFD Client Program and Agave Interfaces make use of the Qt packages (unmodified): core, gui, widgets and network
 
 Qt is copyright "The Qt Company Ltd" and licensed under the GNU Lesser General Public License (version 3) which references the GNU General Public License (version 3)
 
@@ -880,3 +880,11 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
+
+---------------------------------------------------------------------------------------
+
+The decompress wrapper uses the zlib library, by Jean-loup Gailly and Mark Adler, 
+which is not distributed with this source code, but whose authors request acknowledgement
+when zlib is used.
+
+

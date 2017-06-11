@@ -33,57 +33,89 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILETREENODE_H
-#define FILETREENODE_H
+#ifndef CFDGLCANVAS_H
+#define CFDGLCANVAS_H
+
+#include "cfdglcanvas.h"
 
 #include <QObject>
+#include <QWidget>
+#include <QOpenGLWidget>
+#include <QBuffer>
+
+#include <QOpenGLFunctions>
+#include <QOpenGLBuffer>
+#include <QOpenGLShader>
+#include <QOpenGLTexture>
+#include <QOpenGLVertexArrayObject>
+
+#include <QPointF>
+#include <QPolygonF>
 #include <QList>
-#include <QByteArray>
+#include <QRectF>
 
-enum class RequestState;
-class FileMetaData;
-class RemoteDataInterface;
+#include <QMatrix4x4>
 
-class FileTreeNode : public QObject
+class CFDtoken;
+
+enum class CFDDisplayState
 {
-    Q_OBJECT
-public:
-    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
-    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
-                                                //depending if the parent is NULL
-    ~FileTreeNode();
-
-    QList<FileTreeNode *>::iterator fileListStart();
-    QList<FileTreeNode *>::iterator fileListEnd();
-
-    void setFileData(FileMetaData newData);
-    void setMark(bool newSetting);
-    bool isMarked();
-
-    QByteArray * getFileBuffer();
-    void refreshFileBuffer();
-    void clearFileBuffer();
-    void setDataInterface(RemoteDataInterface * sharedConnection);
-
-    bool isRootNode();
-    FileTreeNode * getParentNode();
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
-    void clearAllChildren();
-    FileMetaData getFileData();
-
-    bool childIsUnloaded();
-
-private slots:
-    void haveBufferReply(RequestState authReply, QByteArray * fileBuffer);
-
-private:
-    static RemoteDataInterface * dataConnection;
-    FileMetaData * fileData = NULL;
-    QList<FileTreeNode *> * childList = NULL;
-    bool rootNode;
-    bool marked = false;
-
-    QByteArray * fileDataBuffer = NULL;
+    TEST_BOX,
+    MESH,
+    FIELD
 };
 
-#endif // FILETREENODE_H
+class CFDglCanvas : public QOpenGLWidget, protected QOpenGLFunctions
+{
+public:
+    CFDglCanvas(QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    ~CFDglCanvas();
+
+    bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
+    bool loadFieldData(QByteArray * rawDataFile);
+    QString getDisplayError();
+
+    void setDisplayState(CFDDisplayState newState);
+
+protected:
+    virtual void initializeGL();
+    virtual void resizeGL(int w, int h);
+    virtual void paintGL();
+
+private:
+    CFDDisplayState myState = CFDDisplayState::TEST_BOX;
+    int myWidth;
+    int myHeight;
+
+    //Note: this should probably be static const
+    double PRECISION = 0.000000001;
+
+    void recomputeProjectionMat();
+    void clearMeshData();
+
+    bool isAllZ0(QList<int> aFace);
+
+    QString currentDisplayError;
+
+    QMatrix4x4 projectionMat;
+
+    //Current Mesh Data:
+    bool haveValidMeshData = false;
+    QList<QList<double>> pointList;
+    QList<QList<int>> faceList;
+    QList<int> ownerList;
+
+    QList<double> dataList;
+
+    QRectF displayBounds;
+
+    //QOpenGLVertexArrayObject myVertexArray;
+    //QOpenGLBuffer myBuffer;
+    /*
+    QOpenGLShaderProgram * myShaderProgram = NULL;
+    QOpenGLShader * myShader = NULL;
+    QOpenGLTexture * myTexture = NULL;
+    */
+};
+
+#endif // CFDGLCANVAS_H

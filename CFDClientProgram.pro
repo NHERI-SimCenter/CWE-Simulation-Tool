@@ -37,8 +37,14 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = AgaveClientProgram
+TARGET = CFDClientProgram
 TEMPLATE = app
+
+win32 {
+    LIBS += OpenGL32.lib
+} else {
+    LIBS += -lz
+}
 
 DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -65,7 +71,12 @@ SOURCES += main.cpp \
     utilWindows/singlelinedialog.cpp \
     fileWindow/filetreenode.cpp \
     ../AgaveClientInterface/filemetadata.cpp \
-    fileWindow/joboperator.cpp
+    fileWindow/joboperator.cpp \
+    taskPanelWindow/simplenamevalpanel.cpp \
+    visualUtils/cfdglcanvas.cpp \
+    visualUtils/cfdtoken.cpp \
+    visualUtils/decompresswrapper.cpp \
+    taskPanelWindow/visualpanel.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -89,7 +100,12 @@ HEADERS  += \
     utilWindows/singlelinedialog.h \
     fileWindow/filetreenode.h \
     ../AgaveClientInterface/filemetadata.h \
-    fileWindow/joboperator.h
+    fileWindow/joboperator.h \
+    taskPanelWindow/simplenamevalpanel.h \
+    visualUtils/cfdglcanvas.h \
+    visualUtils/cfdtoken.h \
+    visualUtils/decompresswrapper.h \
+    taskPanelWindow/visualpanel.h
 
 FORMS    += \
     fileWindow/remotefilewindow.ui \

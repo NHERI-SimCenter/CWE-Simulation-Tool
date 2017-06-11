@@ -71,7 +71,7 @@ private:
     RemoteDataInterface * dataConnection;
 
     QLabel * contentLabel = NULL;
-    QPushButton * startButton;
+    QPushButton * startButton = NULL;
 };
 
 #endif // CFDPANEL_H

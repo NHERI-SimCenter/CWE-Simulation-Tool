@@ -33,57 +33,45 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILETREENODE_H
-#define FILETREENODE_H
+#ifndef VISUALPANEL_H
+#define VISUALPANEL_H
+
+#include "taskpanelentry.h"
 
 #include <QObject>
-#include <QList>
-#include <QByteArray>
 
-enum class RequestState;
 class FileMetaData;
+class RemoteFileWindow;
 class RemoteDataInterface;
+class CFDglCanvas;
+enum class RequestState;
 
-class FileTreeNode : public QObject
+class VisualPanel : public TaskPanelEntry
 {
     Q_OBJECT
 public:
-    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
-    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
-                                                //depending if the parent is NULL
-    ~FileTreeNode();
+    VisualPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader,
+                QStringList frameNames, QObject *parent);
 
-    QList<FileTreeNode *>::iterator fileListStart();
-    QList<FileTreeNode *>::iterator fileListEnd();
-
-    void setFileData(FileMetaData newData);
-    void setMark(bool newSetting);
-    bool isMarked();
-
-    QByteArray * getFileBuffer();
-    void refreshFileBuffer();
-    void clearFileBuffer();
-    void setDataInterface(RemoteDataInterface * sharedConnection);
-
-    bool isRootNode();
-    FileTreeNode * getParentNode();
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
-    void clearAllChildren();
-    FileMetaData getFileData();
-
-    bool childIsUnloaded();
+    virtual void setupOwnFrame();
+    virtual void frameNowVisible();
+    virtual void frameNowInvisible();
 
 private slots:
-    void haveBufferReply(RequestState authReply, QByteArray * fileBuffer);
+    void selectedFileChanged(FileMetaData * newSelection);
+    void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
 
 private:
-    static RemoteDataInterface * dataConnection;
-    FileMetaData * fileData = NULL;
-    QList<FileTreeNode *> * childList = NULL;
-    bool rootNode;
-    bool marked = false;
+    void conditionalPurge(QByteArray ** theArray);
 
-    QByteArray * fileDataBuffer = NULL;
+    RemoteFileWindow * myTreeReader;
+    RemoteDataInterface * dataConnection;
+
+    CFDglCanvas * myCanvas = NULL;
+
+    QByteArray * pointData;
+    QByteArray * faceData;
+    QByteArray * ownerData;
 };
 
-#endif // FILETREENODE_H
+#endif // VISUALPANEL_H

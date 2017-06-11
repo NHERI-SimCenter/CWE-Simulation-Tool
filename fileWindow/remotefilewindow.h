@@ -88,6 +88,9 @@ public:
     void lsClosestNode(QString fullPath);
     void lsClosestNodeToParent(QString fullPath);
 
+    //I don't like having this method public:
+    FileTreeNode * getFileNodeFromPath(QString filePath);
+
 signals:
     void newFileSelected(FileMetaData * newFileData);
 
@@ -100,7 +103,6 @@ private:
     Ui::RemoteFileWindow *ui;
 
     QString getFilePathForNode(QModelIndex dataIndex);
-    FileTreeNode * getFileNodeFromPath(QString filePath);
     FileTreeNode * getDirNearestFromPath(QString filePath);
 
     //Note: if not found, will return NULL and call translateFileDataToModel(), to resync
