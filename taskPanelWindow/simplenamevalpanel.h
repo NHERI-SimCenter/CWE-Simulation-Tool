@@ -33,57 +33,58 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILETREENODE_H
-#define FILETREENODE_H
+#ifndef SIMPLENAMEVALPANEL_H
+#define SIMPLENAMEVALPANEL_H
 
-#include <QObject>
+#include "taskpanelentry.h"
+
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <QList>
-#include <QByteArray>
+#include <QLineEdit>
+#include <QStringList>
+#include <QString>
 
-enum class RequestState;
 class FileMetaData;
+class RemoteFileWindow;
 class RemoteDataInterface;
+enum class RequestState;
 
-class FileTreeNode : public QObject
+class SimpleNameValPanel : public TaskPanelEntry
 {
     Q_OBJECT
 public:
-    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
-    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
-                                                //depending if the parent is NULL
-    ~FileTreeNode();
+    SimpleNameValPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader,
+                       QStringList frameNames, QStringList indirectParams,
+                       QStringList directParams, QString composedParam,
+                       QString newAppName, QObject *parent = 0);
 
-    QList<FileTreeNode *>::iterator fileListStart();
-    QList<FileTreeNode *>::iterator fileListEnd();
-
-    void setFileData(FileMetaData newData);
-    void setMark(bool newSetting);
-    bool isMarked();
-
-    QByteArray * getFileBuffer();
-    void refreshFileBuffer();
-    void clearFileBuffer();
-    void setDataInterface(RemoteDataInterface * sharedConnection);
-
-    bool isRootNode();
-    FileTreeNode * getParentNode();
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
-    void clearAllChildren();
-    FileMetaData getFileData();
-
-    bool childIsUnloaded();
+    virtual void setupOwnFrame();
+    virtual void frameNowVisible();
+    virtual void frameNowInvisible();
 
 private slots:
-    void haveBufferReply(RequestState authReply, QByteArray * fileBuffer);
+    void selectedFileChanged(FileMetaData * newSelection);
+    void appInvoked();
+
+    void finishedAppInvoke(RequestState finalState, QJsonDocument * rawData);
 
 private:
-    static RemoteDataInterface * dataConnection;
-    FileMetaData * fileData = NULL;
-    QList<FileTreeNode *> * childList = NULL;
-    bool rootNode;
-    bool marked = false;
+    RemoteFileWindow * myTreeReader;
 
-    QByteArray * fileDataBuffer = NULL;
+    RemoteDataInterface * dataConnection;
+
+    QStringList indirectParamList;
+    QStringList directParamList;
+    QString composedParamName;
+    QString appName;
+
+    QList<QLineEdit *> indirectParamBoxes;
+    QList<QLineEdit *> directParamBoxes;
+
+    QPushButton * startButton;
 };
 
-#endif // FILETREENODE_H
+#endif // SIMPLENAMEVALPANEL_H

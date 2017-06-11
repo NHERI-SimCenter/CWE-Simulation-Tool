@@ -33,8 +33,6 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-using namespace std;
-
 #include "vwtinterfacedriver.h"
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
@@ -54,9 +52,11 @@ VWTinterfaceDriver::VWTinterfaceDriver()
     //The following are being debuged:
     tmpHandle->registerAgaveAppInfo("FileEcho", "fileEcho-0.1.0",{"directory","NewFile", "EchoText"},{},"directory");
     tmpHandle->registerAgaveAppInfo("PythonTest", "pythonRun-0.1.0",{"directory","NewFile"},{},"directory");
-    tmpHandle->registerAgaveAppInfo("SectionMesh", "sectionMesh-0.1.0",{"SlicePlane"},{"directory","SGFFile","MeshParams"},"SGFFile");
+    tmpHandle->registerAgaveAppInfo("SectionMesh", "sectionMesh-0.1.0",{"SlicePlane"},{"directory","SGFFile","SimParams"},"SGFFile");
+    tmpHandle->registerAgaveAppInfo("tempCFD","tempCFD-2.4.0",{"solver"},{"inputDirectory"},"inputDirectory");
 
-
+    tmpHandle->registerAgaveAppInfo("twoDslice", "twoDslice-0.1.0", {"SlicePlane", "SimParams", "NewCaseFolder"},{"SGFFile"}, "SGFFile");
+    tmpHandle->registerAgaveAppInfo("twoDUmesh", "twoDUmesh-0.1.0", {"MeshParams","directory"},{}, "directory");
 
     theConnector = (RemoteDataInterface *) tmpHandle;
     authWindow = NULL;
@@ -77,13 +77,10 @@ VWTinterfaceDriver::~VWTinterfaceDriver()
 void VWTinterfaceDriver::startup()
 {
     authWindow = new AuthForm(theConnector, this);
+    authWindow->show();
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
     theFileDisplay = new RemoteFileWindow(this);
-    QObject::connect(theFileDisplay->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
     mainWindow = new PanelWindow(this);
-    QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
-
-    authWindow->show();
 }
 
 void VWTinterfaceDriver::shutdown()
@@ -150,7 +147,7 @@ void VWTinterfaceDriver::closeAuthScreen()
 {
     if (mainWindow == NULL)
     {
-        ErrorPopup(VWTerrorType::ERR_WINDOW_SYSTEM);
+        ErrorPopup anError(VWTerrorType::ERR_WINDOW_SYSTEM);
         return;
     }
     //ErrorPopup("This is a test of the error popup");
@@ -160,6 +157,10 @@ void VWTinterfaceDriver::closeAuthScreen()
     mainWindow->setupTaskList();
     mainWindow->show();
     theFileDisplay->resendSelectedFile();
+
+    //The dynamics of this are different in windows. TODO: Find a more cross-platform solution
+    QObject::connect(theFileDisplay->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
+    QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
     if (authWindow != NULL)
     {

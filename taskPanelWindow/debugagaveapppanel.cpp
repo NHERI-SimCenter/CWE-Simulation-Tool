@@ -52,7 +52,7 @@ DebugAgaveAppPanel::DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, Remo
     agaveAppList.appendRow(new QStandardItem("PythonTest"));
     inputLists.insert("PythonTest", {"NewFile"});
     agaveAppList.appendRow(new QStandardItem("SectionMesh"));
-    inputLists.insert("SectionMesh", {"directory", "SlicePlane", "MeshParams"});
+    inputLists.insert("SectionMesh", {"directory", "SlicePlane","SimParams"});
 }
 
 void DebugAgaveAppPanel::setupOwnFrame()

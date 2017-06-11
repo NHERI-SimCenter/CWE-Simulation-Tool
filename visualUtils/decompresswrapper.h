@@ -33,57 +33,31 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILETREENODE_H
-#define FILETREENODE_H
+#ifndef DECOMPRESSWRAPPER_H
+#define DECOMPRESSWRAPPER_H
 
-#include <QObject>
-#include <QList>
+#include <QtGlobal>
+#ifdef Q_OS_WIN
+    #include <QtZlib/zlib.h>
+#else
+    #include <zlib.h>
+#endif
+
+#define DECOMPRESS_READ_BUF_LEN 1024
+
 #include <QByteArray>
+#include <QTemporaryFile>
 
-enum class RequestState;
-class FileMetaData;
-class RemoteDataInterface;
-
-class FileTreeNode : public QObject
+class DeCompressWrapper
 {
-    Q_OBJECT
 public:
-    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
-    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
-                                                //depending if the parent is NULL
-    ~FileTreeNode();
+    explicit DeCompressWrapper(QByteArray *ref);
 
-    QList<FileTreeNode *>::iterator fileListStart();
-    QList<FileTreeNode *>::iterator fileListEnd();
-
-    void setFileData(FileMetaData newData);
-    void setMark(bool newSetting);
-    bool isMarked();
-
-    QByteArray * getFileBuffer();
-    void refreshFileBuffer();
-    void clearFileBuffer();
-    void setDataInterface(RemoteDataInterface * sharedConnection);
-
-    bool isRootNode();
-    FileTreeNode * getParentNode();
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
-    void clearAllChildren();
-    FileMetaData getFileData();
-
-    bool childIsUnloaded();
-
-private slots:
-    void haveBufferReply(RequestState authReply, QByteArray * fileBuffer);
+    QByteArray * getDecompressedFile();
+    static QByteArray * getConditionalCompressedFileContents(QString fileName);
 
 private:
-    static RemoteDataInterface * dataConnection;
-    FileMetaData * fileData = NULL;
-    QList<FileTreeNode *> * childList = NULL;
-    bool rootNode;
-    bool marked = false;
-
-    QByteArray * fileDataBuffer = NULL;
+    QByteArray * myRefArray = NULL;
 };
 
-#endif // FILETREENODE_H
+#endif // DECOMPRESSWRAPPER_H

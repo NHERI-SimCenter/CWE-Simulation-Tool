@@ -33,57 +33,80 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILETREENODE_H
-#define FILETREENODE_H
+#include "decompresswrapper.h"
 
-#include <QObject>
-#include <QList>
-#include <QByteArray>
-
-enum class RequestState;
-class FileMetaData;
-class RemoteDataInterface;
-
-class FileTreeNode : public QObject
+DeCompressWrapper::DeCompressWrapper(QByteArray *ref)
 {
-    Q_OBJECT
-public:
-    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
-    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
-                                                //depending if the parent is NULL
-    ~FileTreeNode();
+    myRefArray = ref;
+}
 
-    QList<FileTreeNode *>::iterator fileListStart();
-    QList<FileTreeNode *>::iterator fileListEnd();
+QByteArray * DeCompressWrapper::getDecompressedFile()
+{
+    QByteArray * myResultArray = NULL;
 
-    void setFileData(FileMetaData newData);
-    void setMark(bool newSetting);
-    bool isMarked();
+    if (myRefArray == NULL)
+    {
+        return NULL;
+    }
 
-    QByteArray * getFileBuffer();
-    void refreshFileBuffer();
-    void clearFileBuffer();
-    void setDataInterface(RemoteDataInterface * sharedConnection);
+    QTemporaryFile compressedFile;
+    if (!compressedFile.open())
+    {
+        return NULL;
+    }
+    QByteArray qFileName = compressedFile.fileName().toLatin1();
+    const char * realFileName = qFileName.data();
+    compressedFile.write(*myRefArray);
+    compressedFile.close();
 
-    bool isRootNode();
-    FileTreeNode * getParentNode();
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
-    void clearAllChildren();
-    FileMetaData getFileData();
+    gzFile compressHandle = gzopen(realFileName, "rb");
 
-    bool childIsUnloaded();
+    myResultArray = new QByteArray();
 
-private slots:
-    void haveBufferReply(RequestState authReply, QByteArray * fileBuffer);
+    int resultVal = 1;
 
-private:
-    static RemoteDataInterface * dataConnection;
-    FileMetaData * fileData = NULL;
-    QList<FileTreeNode *> * childList = NULL;
-    bool rootNode;
-    bool marked = false;
+    while (resultVal > 0)
+    {
+        char dataBuff[DECOMPRESS_READ_BUF_LEN];
+        resultVal = gzread(compressHandle, dataBuff ,DECOMPRESS_READ_BUF_LEN);
+        if (resultVal < 0)
+        {
+            delete myResultArray;
+            myResultArray = NULL;
+            return NULL;
+        }
+        myResultArray->append(dataBuff, resultVal);
+    }
+    gzclose(compressHandle);
 
-    QByteArray * fileDataBuffer = NULL;
-};
+    return myResultArray;
+}
 
-#endif // FILETREENODE_H
+QByteArray * DeCompressWrapper::getConditionalCompressedFileContents(QString fileName)
+{
+    QFile uncompressedFile(fileName);
+    if (uncompressedFile.exists())
+    {
+        QByteArray * ret = NULL;
+        uncompressedFile.open(QIODevice::ReadOnly);
+        *ret = uncompressedFile.readAll();
+        uncompressedFile.close();
+        return ret;
+    }
+
+    fileName = fileName.append(".gz");
+
+    QFile compressedFile(fileName);
+    if (!compressedFile.exists())
+    {
+        return NULL;
+    }
+
+    compressedFile.open(QIODevice::ReadOnly);
+    QByteArray rawContent = compressedFile.readAll();
+    compressedFile.close();
+
+    DeCompressWrapper inflater(&rawContent);
+
+    return inflater.getDecompressedFile();
+}

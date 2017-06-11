@@ -33,57 +33,78 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILETREENODE_H
-#define FILETREENODE_H
+#ifndef CFDTOKEN_H
+#define CFDTOKEN_H
 
-#include <QObject>
-#include <QList>
 #include <QByteArray>
+#include <QLinkedList>
 
-enum class RequestState;
-class FileMetaData;
-class RemoteDataInterface;
+#include <cctype>
 
-class FileTreeNode : public QObject
+//Note: this is not a complete parser,
+//but has the framework if anyone wants to complete it later
+
+//Note: Int and float types might be vulnerable to overflow,
+//check the setString function if you wish to change this
+
+enum class CFDtokenType
 {
-    Q_OBJECT
-public:
-    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
-    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
-                                                //depending if the parent is NULL
-    ~FileTreeNode();
-
-    QList<FileTreeNode *>::iterator fileListStart();
-    QList<FileTreeNode *>::iterator fileListEnd();
-
-    void setFileData(FileMetaData newData);
-    void setMark(bool newSetting);
-    bool isMarked();
-
-    QByteArray * getFileBuffer();
-    void refreshFileBuffer();
-    void clearFileBuffer();
-    void setDataInterface(RemoteDataInterface * sharedConnection);
-
-    bool isRootNode();
-    FileTreeNode * getParentNode();
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
-    void clearAllChildren();
-    FileMetaData getFileData();
-
-    bool childIsUnloaded();
-
-private slots:
-    void haveBufferReply(RequestState authReply, QByteArray * fileBuffer);
-
-private:
-    static RemoteDataInterface * dataConnection;
-    FileMetaData * fileData = NULL;
-    QList<FileTreeNode *> * childList = NULL;
-    bool rootNode;
-    bool marked = false;
-
-    QByteArray * fileDataBuffer = NULL;
+    STRING,
+    INVALID,
+    TREE_NODE,
+    INT,
+    FLOAT,
+    DATA_ARRAY,
+    SPECIAL_CHAR
 };
 
-#endif // FILETREENODE_H
+class CFDtoken
+{
+public:
+    CFDtoken();
+    ~CFDtoken();
+
+    CFDtokenType getType();
+    int getIntVal();
+    double getFloatVal();
+    QByteArray getStringVal();
+    QLinkedList<CFDtoken *> getChildList();
+    int getChildSize();
+    CFDtoken * getParent();
+
+    CFDtoken * getLargestChildArray();
+
+    static QByteArray * stripCFDcomments(QByteArray * rawInput);
+    static CFDtoken * lexifyString(QByteArray * rawInput);
+    static bool parseTokenStream(CFDtoken * rootToken);
+
+private:
+    void nullfiyContent();
+
+    void setInt(int newVal);
+    void setFloat(double newVal);
+    void setString(QByteArray newVal);
+    void addChild(CFDtoken * newChild);
+    void setAsDataArray();
+    void setParent(CFDtoken * newParent);
+
+    static bool collapseParenTokens(CFDtoken * rootToken);
+    static QLinkedList<CFDtoken *>::iterator insertParentToken(
+            CFDtoken * rootToken,
+            QLinkedList<CFDtoken *>::iterator start,
+            QLinkedList<CFDtoken *>::iterator end);
+
+    bool isParenToken();
+
+    CFDtokenType myType;
+
+    CFDtoken * myParent = NULL;
+    QLinkedList<CFDtoken *> childList;
+    QByteArray myString;
+    int myInt;
+    double myFloat;
+
+    char specialChar;
+};
+
+#endif // CFDTOKEN_H

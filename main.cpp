@@ -39,6 +39,9 @@
 #include <string.h>
 #include "vwtinterfacedriver.h"
 
+#include <QSslSocket>
+#include <utilWindows/quickinfopopup.h>
+
 void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
 
 int main(int argc, char *argv[])
@@ -67,6 +70,13 @@ int main(int argc, char *argv[])
     mainRunLoop.setQuitOnLastWindowClosed(false);
     //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
     //Note: Might consider a better way of implementing this.
+
+    if (QSslSocket::supportsSsl() == false)
+    {
+        QuickInfoPopup noSSL("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
+        noSSL.exec();
+        return -1;
+    }
 
     programDriver.startup();
     return mainRunLoop.exec();
