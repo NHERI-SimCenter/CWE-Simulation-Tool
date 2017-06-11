@@ -75,7 +75,8 @@ SOURCES += main.cpp \
     taskPanelWindow/simplenamevalpanel.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \
-    visualUtils/decompresswrapper.cpp
+    visualUtils/decompresswrapper.cpp \
+    taskPanelWindow/visualpanel.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -103,7 +104,8 @@ HEADERS  += \
     taskPanelWindow/simplenamevalpanel.h \
     visualUtils/cfdglcanvas.h \
     visualUtils/cfdtoken.h \
-    visualUtils/decompresswrapper.h
+    visualUtils/decompresswrapper.h \
+    taskPanelWindow/visualpanel.h
 
 FORMS    += \
     fileWindow/remotefilewindow.ui \
