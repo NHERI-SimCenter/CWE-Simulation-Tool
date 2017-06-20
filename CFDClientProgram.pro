@@ -76,7 +76,16 @@ SOURCES += main.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
-    taskPanelWindow/visualpanel.cpp
+    taskPanelWindow/visualpanel.cpp \
+    widgets/sidebar.cpp \
+    widgets/cwe01.cpp \
+    widgets/cwe02.cpp \
+    widgets/cwe03.cpp \
+    widgets/cwe04.cpp \
+    widgets/cwe04a.cpp \
+    widgets/cwe05.cpp \
+    widgets/cwe06.cpp \
+    widgets/cwe07.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -105,7 +114,16 @@ HEADERS  += \
     visualUtils/cfdglcanvas.h \
     visualUtils/cfdtoken.h \
     visualUtils/decompresswrapper.h \
-    taskPanelWindow/visualpanel.h
+    taskPanelWindow/visualpanel.h \
+    widgets/sidebar.h \
+    widgets/cwe01.h \
+    widgets/cwe02.h \
+    widgets/cwe03.h \
+    widgets/cwe04.h \
+    widgets/cwe04a.h \
+    widgets/cwe05.h \
+    widgets/cwe06.h \
+    widgets/cwe07.h
 
 FORMS    += \
     fileWindow/remotefilewindow.ui \
@@ -115,4 +133,13 @@ FORMS    += \
     utilWindows/deleteconfirm.ui \
     utilWindows/errorpopup.ui \
     utilWindows/quickinfopopup.ui \
-    utilWindows/singlelinedialog.ui
+    utilWindows/singlelinedialog.ui \
+    widgets/sidebar.ui \
+    widgets/cwe01.ui \
+    widgets/cwe02.ui \
+    widgets/cwe03.ui \
+    widgets/cwe04.ui \
+    widgets/cwe04a.ui \
+    widgets/cwe05.ui \
+    widgets/cwe06.ui \
+    widgets/cwe07.ui
