@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CWE02</class>
- <widget class="QWidget" name="CWE02">
+ <class>CWE_file_manager</class>
+ <widget class="QWidget" name="CWE_file_manager">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>410</width>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,28 +58,18 @@
           </widget>
          </item>
          <item>
-          <widget class="Line" name="line">
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+          <widget class="QLabel" name="lbl_right_arrows">
+           <property name="text">
+            <string/>
            </property>
-           <property name="lineWidth">
-            <number>3</number>
+           <property name="pixmap">
+            <pixmap>../images/buttons/CWE_button_right_arrows.png</pixmap>
            </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+           <property name="scaledContents">
+            <bool>true</bool>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="Line" name="line_2">
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-           <property name="lineWidth">
-            <number>3</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -112,29 +102,16 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="Line" name="line_4">
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+         <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+          <widget class="QLabel" name="lbl_left_arrows">
+           <property name="text">
+            <string/>
            </property>
-           <property name="lineWidth">
-            <number>3</number>
+           <property name="pixmap">
+            <pixmap>../images/buttons/CWE_button_left_arrows.png</pixmap>
            </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="Line" name="line_3">
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-           <property name="lineWidth">
-            <number>3</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+           <property name="scaledContents">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

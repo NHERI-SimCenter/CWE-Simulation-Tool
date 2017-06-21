@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CWE06</class>
- <widget class="QWidget" name="CWE06">
+ <class>CWE_simulation_details</class>
+ <widget class="QWidget" name="CWE_simulation_details">
   <property name="geometry">
    <rect>
     <x>0</x>

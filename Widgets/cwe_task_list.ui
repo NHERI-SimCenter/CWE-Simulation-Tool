@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CWE07</class>
- <widget class="QWidget" name="CWE07">
+ <class>CWE_task_list</class>
+ <widget class="QWidget" name="CWE_task_list">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -78,14 +78,14 @@ SOURCES += main.cpp \
     visualUtils/decompresswrapper.cpp \
     taskPanelWindow/visualpanel.cpp \
     widgets/sidebar.cpp \
-    widgets/cwe01.cpp \
-    widgets/cwe02.cpp \
-    widgets/cwe03.cpp \
-    widgets/cwe04.cpp \
-    widgets/cwe04a.cpp \
-    widgets/cwe05.cpp \
-    widgets/cwe06.cpp \
-    widgets/cwe07.cpp
+    widgets/cwe_landing.cpp \
+    widgets/cwe_file_manager.cpp \
+    widgets/cwe_help.cpp \
+    widgets/cwe_create_simulation.cpp \
+    widgets/cwe_manage_simulation.cpp \
+    widgets/cwe_simulation_details.cpp \
+    widgets/cwe_task_list.cpp \
+    mainWindow/cwe_mainwindow.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -116,14 +116,14 @@ HEADERS  += \
     visualUtils/decompresswrapper.h \
     taskPanelWindow/visualpanel.h \
     widgets/sidebar.h \
-    widgets/cwe01.h \
-    widgets/cwe02.h \
-    widgets/cwe03.h \
-    widgets/cwe04.h \
-    widgets/cwe04a.h \
-    widgets/cwe05.h \
-    widgets/cwe06.h \
-    widgets/cwe07.h
+    widgets/cwe_landing.h \
+    widgets/cwe_file_manager.h \
+    widgets/cwe_help.h \
+    widgets/cwe_create_simulation.h \
+    widgets/cwe_manage_simulation.h \
+    widgets/cwe_simulation_details.h \
+    widgets/cwe_task_list.h \
+    mainWindow/cwe_mainwindow.h
 
 FORMS    += \
     fileWindow/remotefilewindow.ui \
@@ -135,11 +135,16 @@ FORMS    += \
     utilWindows/quickinfopopup.ui \
     utilWindows/singlelinedialog.ui \
     widgets/sidebar.ui \
-    widgets/cwe01.ui \
-    widgets/cwe02.ui \
-    widgets/cwe03.ui \
-    widgets/cwe04.ui \
-    widgets/cwe04a.ui \
-    widgets/cwe05.ui \
-    widgets/cwe06.ui \
-    widgets/cwe07.ui
+    widgets/cwe_landing.ui \
+    widgets/cwe_file_manager.ui \
+    widgets/cwe_help.ui \
+    widgets/cwe_create_simulation.ui \
+    widgets/cwe_manage_simulation.ui \
+    widgets/cwe_simulation_details.ui \
+    widgets/cwe_task_list.ui \
+    mainWindow/cwe_mainwindow.ui
+
+DISTFILES +=
+
+RESOURCES += \
+    cwe_resources.qrc
