@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CWE04</class>
- <widget class="QWidget" name="CWE04">
+ <class>CWE_create_simulation</class>
+ <widget class="QWidget" name="CWE_create_simulation">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>557</width>
-    <height>428</height>
+    <height>517</height>
    </rect>
   </property>
   <property name="windowTitle">
