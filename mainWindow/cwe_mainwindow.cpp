@@ -7,9 +7,6 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CWE_MainWindow)
 {
-    int idx;
-    QPushButton *btn;
-
     ui->setupUi(this);
 
     myDriver = newDriver;
@@ -28,67 +25,45 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     // get the stacked widget container
     widgetStack = this->findChild<QWidget *>("stackContainer");
 
-    QStackedLayout *stackLayout = new QStackedLayout();
+    stackLayout = new QStackedLayout();
     stackLayout->setContentsMargins(0,0,0,0);
 
     // 1) create new simulation
     taskLanding          = new CWE_landing(widgetStack);
     stackLayout->addWidget(taskLanding);
+    stackedWidgetsIndex.insert(TASK_LANDING, stackLayout->currentIndex());
 
     taskCreateSimulation = new CWE_create_simulation(widgetStack);
     stackLayout->addWidget(taskCreateSimulation);
-    idx = stackLayout->currentIndex();
-    btn = taskSideBar->findChild<QPushButton *>("pb_sideBar_create");
-
-    qDebug() << "2: " << idx << ": " << btn;
-
-    connect(btn, SIGNAL(clicked()), stackLayout, SLOT(setCurrentIndex(idx)));
+    stackedWidgetsIndex.insert(TASK_CREATE_NEW_SIMULATION, stackLayout->currentIndex());
 
     // 2) manage and run simulation
     taskManageSimulation = new CWE_manage_simulation(widgetStack);
     stackLayout->addWidget(taskManageSimulation);
+    stackedWidgetsIndex.insert(TASK_MANAGE_SIMULATION, stackLayout->currentIndex());
 
     // 3) manage and download remote files
     taskFileManager      = new CWE_file_manager(widgetStack);
     stackLayout->addWidget(taskFileManager);
-    idx = stackLayout->currentIndex();
-    btn = taskSideBar->findChild<QPushButton *>("pb_sideBar_files");
-
-    qDebug() << "3: " << idx << ": " << btn;
-
-    connect(btn, SIGNAL(clicked()), stackLayout, SLOT(setCurrentIndex(idx)));
+    stackedWidgetsIndex.insert(TASK_MANAGE_FILES, stackLayout->currentIndex());
 
     // 4) manage remote job
     taskSimulationDetail = new CWE_simulation_details(widgetStack);
-    taskTaskList         = new CWE_task_list(widgetStack);
-
     stackLayout->addWidget(taskSimulationDetail);
-    idx = stackLayout->currentIndex();
-    btn = taskSideBar->findChild<QPushButton *>("pb_sideBar_run");
+    stackedWidgetsIndex.insert(TASK_MANAGE_SIMULATION, stackLayout->currentIndex());
 
-    qDebug() << "4a: " << idx << ": " << btn;
-
-    connect(btn, SIGNAL(clicked()), stackLayout, SLOT(setCurrentIndex(idx)));
-
+    taskTaskList         = new CWE_task_list(widgetStack);
     stackLayout->addWidget(taskTaskList);
-    idx = stackLayout->currentIndex();
-    btn = taskSideBar->findChild<QPushButton *>("pb_sideBar_jobs");
-
-    qDebug() << "4b: " << idx << ": " << btn;
-
-    connect(btn, SIGNAL(clicked()), stackLayout, SLOT(setCurrentIndex(idx)));
+    stackedWidgetsIndex.insert(TASK_LIST_TASKS, stackLayout->currentIndex());
 
     // 5) tutorial and help
     taskHelp             = new CWE_help(widgetStack);
     stackLayout->addWidget(taskHelp);
-    idx = stackLayout->currentIndex();
-    btn = taskSideBar->findChild<QPushButton *>("pb_sideBar_help");
-
-    qDebug() << "5: " << idx << ": " << btn;
-
-    connect(btn, SIGNAL(clicked()), stackLayout, SLOT(setCurrentIndex(idx)));
+    stackedWidgetsIndex.insert(TASK_HELP, stackLayout->currentIndex());
 
     widgetStack->setLayout(stackLayout);
+
+    connect(taskSideBar, SIGNAL(taskSelected(TASK)), this, SLOT(SideBar_task_selected(TASK)));
 }
 
 CWE_MainWindow::~CWE_MainWindow()
@@ -120,6 +95,11 @@ void CWE_MainWindow::on_action_Quit_triggered()
 }
 
 /* side bar functionality */
+void CWE_MainWindow::SideBar_task_selected(TASK task)
+{
+    stackLayout->setCurrentIndex(stackedWidgetsIndex.value(task));
+}
+
 void CWE_MainWindow::selectLanding()
 {
 }
