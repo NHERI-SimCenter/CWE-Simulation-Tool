@@ -62,22 +62,17 @@ enum class FileColumn : int {FILENAME = 0,
 class RemoteDataInterface;
 class FileMetaData;
 class FileTreeNode;
-class VWTinterfaceDriver;
 class FileOperator;
-class JobOperator;
 enum class RequestState;
 
-namespace Ui {
-class RemoteFileWindow;
-}
-
-class RemoteFileWindow : public QMainWindow
+class RemoteFileTree : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit RemoteFileWindow(VWTinterfaceDriver * newDataLink, QWidget *parent = 0);
-    ~RemoteFileWindow();
+    explicit RemoteFileTree(RemoteDataInterface * newDataLink, QTreeView * thefileTree,
+                            QLabel * selectedFileDisp, QObject *parent = 0);
+    ~RemoteFileTree();
 
     void resendSelectedFile();
     FileMetaData getCurrentSelectedFile();
@@ -100,8 +95,6 @@ private slots:
     void needRightClickMenuFiles(QPoint pos);
 
 private:
-    Ui::RemoteFileWindow *ui;
-
     QString getFilePathForNode(QModelIndex dataIndex);
     FileTreeNode * getDirNearestFromPath(QString filePath);
 
@@ -135,8 +128,6 @@ private:
     FileTreeNode * rootFileNode = NULL;
     QStandardItemModel dataStore;
     FileTreeNode * selectedItem = NULL;
-
-    JobOperator * myJobOperator = NULL;
 };
 
 #endif // REMOTEFILEWINDOW_H

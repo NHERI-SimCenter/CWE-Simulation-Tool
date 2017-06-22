@@ -33,52 +33,63 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef PANELWINDOW_H
-#define PANELWINDOW_H
+#ifndef FILEOPERATOR_H
+#define FILEOPERATOR_H
 
-#include <QMainWindow>
-#include <QTreeView>
-#include <QStandardItemModel>
-#include <QStackedWidget>
+#include <QObject>
+#include <QList>
 
-class RemoteFileWindow;
-class TaskPanelEntry;
+class RemoteFileTree;
+class FileMetaData;
 class RemoteDataInterface;
-class VWTinterfaceDriver;
 
-namespace Ui {
-class PanelWindow;
-}
+enum class RequestState;
 
-class PanelWindow : public QMainWindow
+class FileOperator : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit PanelWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
-    ~PanelWindow();
+    FileOperator(RemoteDataInterface * newDataLink, RemoteFileTree * parent);
 
-    void setupTaskList();
+    void totalResetErrorProcedure();
+    void enactFolderRefresh(FileMetaData folderToRemoteLS);
+    bool operationIsPending();
 
 private slots:
-    void taskEntryClicked(QModelIndex clickedItem);
-    void menuExit();
-    void menuCopyInfo();
+    void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
+
+    void sendDeleteReq();
+    void getDeleteReply(RequestState replyState);
+    void sendMoveReq();
+    void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
+    void sendCopyReq();
+    void getCopyReply(RequestState replyState, FileMetaData * newFileData);
+    void sendRenameReq();
+    void getRenameReply(RequestState replyState, FileMetaData * newFileData);
+
+    void sendCreateFolderReq();
+    void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
+
+    void sendUploadReq();
+    void getUploadReply(RequestState replyState, FileMetaData * newFileData);
+    void sendDownloadReq();
+    void getDownloadReply(RequestState replyState);
+
+    void sendCompressReq();
+    void getCompressReply(RequestState finalState, QJsonDocument * rawData);
+    void sendDecompressReq();
+    void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
+
+    void sendManualRefresh();
 
 private:
-    Ui::PanelWindow *ui;
-    VWTinterfaceDriver * myDriver;
-    QTreeView * taskTreeView;
-    QStackedWidget *sharedWidget;
+    QString getStringFromInitParams(QString stringKey);
+
+    RemoteFileTree * myFileTree;
+
     RemoteDataInterface * dataLink;
-    RemoteFileWindow * fileTreeModel;
-
-    QVector<TaskPanelEntry *> taskPanelList;
-    QStandardItemModel taskListModel;
-    const QStringList taskHeaderList = {"Task List:","idNum"};
-
-    void registerTaskPanel(TaskPanelEntry * newPanel);
-    void takePanelOwnership(TaskPanelEntry * newOwner);
+    bool fileOperationPending = false;
 };
 
-#endif // PANELWINDOW_H
+#endif // FILEOPERATOR_H

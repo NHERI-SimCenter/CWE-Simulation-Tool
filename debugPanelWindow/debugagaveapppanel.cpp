@@ -38,9 +38,9 @@
 #include "vwtinterfacedriver.h"
 #include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
-#include "fileWindow/remotefilewindow.h"
+#include "remoteFileOps/remotefiletree.h"
 
-DebugAgaveAppPanel::DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent) : TaskPanelEntry(parent)
+DebugAgaveAppPanel::DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, RemoteFileTree * newReader, QObject *parent) : TaskPanelEntry(parent)
 {
     this->setFrameNameList({"Debug", "Test Agave App"});
 
