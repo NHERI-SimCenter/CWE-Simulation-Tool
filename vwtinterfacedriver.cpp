@@ -42,6 +42,9 @@
 #include "taskPanelWindow/panelwindow.h"
 #include "fileWindow/remotefilewindow.h"
 
+#include "mainWindow/cwe_mainwindow.h"
+
+
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
@@ -80,7 +83,8 @@ void VWTinterfaceDriver::startup()
     authWindow->show();
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
     theFileDisplay = new RemoteFileWindow(this);
-    mainWindow = new PanelWindow(this);
+    // mainWindow = new PanelWindow(this);
+    mainWindow = new CWE_MainWindow(this);
 }
 
 void VWTinterfaceDriver::shutdown()
@@ -154,7 +158,9 @@ void VWTinterfaceDriver::closeAuthScreen()
 
     theFileDisplay->resetFileData();
     theFileDisplay->show();
-    mainWindow->setupTaskList();
+
+    /* next line temporary disabled */
+    //mainWindow->setupTaskList();
     mainWindow->show();
     theFileDisplay->resendSelectedFile();
 
