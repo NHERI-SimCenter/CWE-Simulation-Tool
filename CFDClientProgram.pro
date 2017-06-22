@@ -66,14 +66,6 @@ SOURCES += main.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
-    Widgets/sidebar.cpp \
-    Widgets/cwe_landing.cpp \
-    Widgets/cwe_file_manager.cpp \
-    Widgets/cwe_help.cpp \
-    Widgets/cwe_create_simulation.cpp \
-    Widgets/cwe_manage_simulation.cpp \
-    Widgets/cwe_simulation_details.cpp \
-    Widgets/cwe_task_list.cpp \
     mainWindow/cwe_mainwindow.cpp \
     debugPanelWindow/cfdpanel.cpp \
     debugPanelWindow/debugagaveapppanel.cpp \
@@ -85,7 +77,15 @@ SOURCES += main.cpp \
     remoteFileOps/fileoperator.cpp \
     remoteFileOps/filetreenode.cpp \
     remoteFileOps/joboperator.cpp \
-    remoteFileOps/remotefiletree.cpp
+    remoteFileOps/remotefiletree.cpp \
+    cwe_guiWidgets/cwe_create_simulation.cpp \
+    cwe_guiWidgets/cwe_file_manager.cpp \
+    cwe_guiWidgets/cwe_help.cpp \
+    cwe_guiWidgets/cwe_landing.cpp \
+    cwe_guiWidgets/cwe_manage_simulation.cpp \
+    cwe_guiWidgets/cwe_simulation_details.cpp \
+    cwe_guiWidgets/cwe_task_list.cpp \
+    cwe_guiWidgets/sidebar.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -104,14 +104,6 @@ HEADERS  += \
     visualUtils/cfdglcanvas.h \
     visualUtils/cfdtoken.h \
     visualUtils/decompresswrapper.h \
-    Widgets/sidebar.h \
-    Widgets/cwe_landing.h \
-    Widgets/cwe_file_manager.h \
-    Widgets/cwe_help.h \
-    Widgets/cwe_create_simulation.h \
-    Widgets/cwe_manage_simulation.h \
-    Widgets/cwe_simulation_details.h \
-    Widgets/cwe_task_list.h \
     mainWindow/cwe_mainwindow.h \
     debugPanelWindow/cfdpanel.h \
     debugPanelWindow/debugagaveapppanel.h \
@@ -123,7 +115,16 @@ HEADERS  += \
     remoteFileOps/fileoperator.h \
     remoteFileOps/filetreenode.h \
     remoteFileOps/joboperator.h \
-    remoteFileOps/remotefiletree.h
+    remoteFileOps/remotefiletree.h \
+    cwe_guiWidgets/cwe_create_simulation.h \
+    cwe_guiWidgets/cwe_defines.h \
+    cwe_guiWidgets/cwe_file_manager.h \
+    cwe_guiWidgets/cwe_help.h \
+    cwe_guiWidgets/cwe_landing.h \
+    cwe_guiWidgets/cwe_manage_simulation.h \
+    cwe_guiWidgets/cwe_simulation_details.h \
+    cwe_guiWidgets/cwe_task_list.h \
+    cwe_guiWidgets/sidebar.h
 
 FORMS    += \
     utilWindows/authform.ui \
@@ -132,16 +133,16 @@ FORMS    += \
     utilWindows/errorpopup.ui \
     utilWindows/quickinfopopup.ui \
     utilWindows/singlelinedialog.ui \
-    Widgets/sidebar.ui \
-    Widgets/cwe_landing.ui \
-    Widgets/cwe_file_manager.ui \
-    Widgets/cwe_help.ui \
-    Widgets/cwe_create_simulation.ui \
-    Widgets/cwe_manage_simulation.ui \
-    Widgets/cwe_simulation_details.ui \
-    Widgets/cwe_task_list.ui \
     mainWindow/cwe_mainwindow.ui \
-    debugPanelWindow/debugpanelwindow.ui
+    debugPanelWindow/debugpanelwindow.ui \
+    cwe_guiWidgets/cwe_create_simulation.ui \
+    cwe_guiWidgets/cwe_file_manager.ui \
+    cwe_guiWidgets/cwe_help.ui \
+    cwe_guiWidgets/cwe_landing.ui \
+    cwe_guiWidgets/cwe_manage_simulation.ui \
+    cwe_guiWidgets/cwe_simulation_details.ui \
+    cwe_guiWidgets/cwe_task_list.ui \
+    cwe_guiWidgets/sidebar.ui
 
 DISTFILES +=
 
