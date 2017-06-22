@@ -32,25 +32,36 @@
 
 // Contributors:
 
-#ifndef TESTFRAME_H
-#define TESTFRAME_H
+#ifndef SIDEBAR_H
+#define SIDEBAR_H
 
-#include <QFrame>
+#include <QWidget>
+#include "cwe_guiWidgets/cwe_defines.h"
 
 namespace Ui {
-class TestFrame;
+class SideBar;
 }
 
-class TestFrame : public QFrame
+class SideBar : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit TestFrame(QWidget *parent = 0);
-    ~TestFrame();
+    explicit SideBar(QWidget *parent = 0);
+    ~SideBar();
+
+private slots:
+   void pb_sideBar_create_clicked();
+   void pb_sideBar_files_clicked();
+   void pb_sideBar_run_clicked();
+   void pb_sideBar_jobs_clicked();
+   void pb_sideBar_help_clicked();
+
+signals:
+    void taskSelected(TASK);
 
 private:
-    Ui::TestFrame *ui;
+    Ui::SideBar *ui;
 };
 
-#endif // TESTFRAME_H
+#endif // SIDEBAR_H
