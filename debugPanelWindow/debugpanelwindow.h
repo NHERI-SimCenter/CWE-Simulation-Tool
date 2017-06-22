@@ -33,58 +33,50 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef SIMPLENAMEVALPANEL_H
-#define SIMPLENAMEVALPANEL_H
+#ifndef PANELWINDOW_H
+#define PANELWINDOW_H
 
-#include "taskpanelentry.h"
+#include <QMainWindow>
+#include <QTreeView>
+#include <QStandardItemModel>
+#include <QStackedWidget>
 
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QList>
-#include <QLineEdit>
-#include <QStringList>
-#include <QString>
-
-class FileMetaData;
-class RemoteFileWindow;
+class RemoteFileTree;
+class TaskPanelEntry;
 class RemoteDataInterface;
-enum class RequestState;
+class VWTinterfaceDriver;
 
-class SimpleNameValPanel : public TaskPanelEntry
+namespace Ui {
+class DebugPanelWindow;
+}
+
+class DebugPanelWindow : public QMainWindow
 {
     Q_OBJECT
-public:
-    SimpleNameValPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader,
-                       QStringList frameNames, QStringList indirectParams,
-                       QStringList directParams, QString composedParam,
-                       QString newAppName, QObject *parent = 0);
 
-    virtual void setupOwnFrame();
-    virtual void frameNowVisible();
-    virtual void frameNowInvisible();
+public:
+    explicit DebugPanelWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
+    ~DebugPanelWindow();
+
+    void setupTaskList();
 
 private slots:
-    void selectedFileChanged(FileMetaData * newSelection);
-    void appInvoked();
-
-    void finishedAppInvoke(RequestState finalState, QJsonDocument * rawData);
+    void taskEntryClicked(QModelIndex clickedItem);
 
 private:
-    RemoteFileWindow * myTreeReader;
+    Ui::DebugPanelWindow *ui;
+    VWTinterfaceDriver * myDriver;
+    QTreeView * taskTreeView;
+    QStackedWidget *sharedWidget;
+    RemoteDataInterface * dataLink;
+    RemoteFileTree * fileTreeData;
 
-    RemoteDataInterface * dataConnection;
+    QVector<TaskPanelEntry *> taskPanelList;
+    QStandardItemModel taskListModel;
+    const QStringList taskHeaderList = {"Task List:","idNum"};
 
-    QStringList indirectParamList;
-    QStringList directParamList;
-    QString composedParamName;
-    QString appName;
-
-    QList<QLineEdit *> indirectParamBoxes;
-    QList<QLineEdit *> directParamBoxes;
-
-    QPushButton * startButton;
+    void registerTaskPanel(TaskPanelEntry * newPanel);
+    void takePanelOwnership(TaskPanelEntry * newOwner);
 };
 
-#endif // SIMPLENAMEVALPANEL_H
+#endif // PANELWINDOW_H

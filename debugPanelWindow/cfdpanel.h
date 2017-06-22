@@ -33,46 +33,45 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "joboperator.h"
+#ifndef CFDPANEL_H
+#define CFDPANEL_H
 
-#include "remotefilewindow.h"
-#include "../AgaveClientInterface/remotedatainterface.h"
+#include "taskpanelentry.h"
 
-JobOperator::JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, RemoteFileWindow * parent) : QObject((QObject *)parent)
+#include <QModelIndex>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QJsonValue>
+
+class FileMetaData;
+class RemoteFileTree;
+class RemoteDataInterface;
+enum class RequestState;
+
+class CFDpanel : public TaskPanelEntry
 {
-    myJobListView = newJobList;
-    myJobListView->setModel(&theJobList);
-    dataLink = newDataLink;
-    myFileWindow = parent;
-    QObject::connect(dataLink, SIGNAL(longRunningTasksUpdated()), this, SLOT(refreshRunningJobList()));
-    QObject::connect(myJobListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenu(QPoint)));
-}
+    Q_OBJECT
+public:
+    CFDpanel(RemoteDataInterface * newDataHandle, RemoteFileTree * newReader, QObject *parent = 0);
 
-void JobOperator::refreshRunningJobList()
-{
-    theJobList.clear();
-    QList<LongRunningTask *> updatedTaskList = dataLink->getListOfLongTasks();
-    theJobList.setColumnCount(2);
+    virtual void setupOwnFrame();
+    virtual void frameNowVisible();
+    virtual void frameNowInvisible();
 
-    for (auto itr = updatedTaskList.cbegin(); itr != updatedTaskList.cend(); itr++)
-    {
-        QList<QStandardItem *> newRow;
-        newRow.append(new QStandardItem((*itr)->getRawDataStr()));
-        newRow.append(new QStandardItem((*itr)->getIDstr()));
-        theJobList.appendRow(newRow);
-    }
-}
+private slots:
+    void selectedFileChanged(FileMetaData * newSelection);
+    void cfdSelected();
 
-void JobOperator::needRightClickMenu(QPoint)
-{
-    QMenu jobMenu;
+    void finishedCFDinvoke(RequestState finalState, QJsonDocument * rawData);
 
-    jobMenu.addAction("Refresh Info", this, SLOT(demandJobDataRefresh()));
+private:
+    QModelIndex currentFileSelected;
+    RemoteFileTree * myTreeReader;
 
-    jobMenu.exec(QCursor::pos());
-}
+    RemoteDataInterface * dataConnection;
 
-void JobOperator::demandJobDataRefresh()
-{
-    dataLink->forceRefreshOfLongTasks();
-}
+    QLabel * contentLabel = NULL;
+    QPushButton * startButton = NULL;
+};
+
+#endif // CFDPANEL_H

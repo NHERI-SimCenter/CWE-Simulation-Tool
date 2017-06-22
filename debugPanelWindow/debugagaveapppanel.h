@@ -33,8 +33,8 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CFDPANEL_H
-#define CFDPANEL_H
+#ifndef DEBUGAGAVEAPPPANEL_H
+#define DEBUGAGAVEAPPPANEL_H
 
 #include "taskpanelentry.h"
 
@@ -43,35 +43,43 @@
 #include <QPushButton>
 #include <QJsonValue>
 
+#include <QListView>
+#include <QStandardItemModel>
+
 class FileMetaData;
-class RemoteFileWindow;
+class RemoteFileTree;
 class RemoteDataInterface;
 enum class RequestState;
 
-class CFDpanel : public TaskPanelEntry
+class DebugAgaveAppPanel : public TaskPanelEntry
 {
     Q_OBJECT
 public:
-    CFDpanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent = 0);
+    DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, RemoteFileTree * newReader, QObject *parent = 0);
 
     virtual void setupOwnFrame();
-    virtual void frameNowVisible();
-    virtual void frameNowInvisible();
 
 private slots:
-    void selectedFileChanged(FileMetaData * newSelection);
-    void cfdSelected();
-
-    void finishedCFDinvoke(RequestState finalState, QJsonDocument * rawData);
+    void commandInvoked();
+    void commandReply(RequestState finalState, QJsonDocument * rawData);
+    void placeInputPairs(QModelIndex newSelected);
 
 private:
     QModelIndex currentFileSelected;
-    RemoteFileWindow * myTreeReader;
+    RemoteFileTree * myTreeReader;
 
     RemoteDataInterface * dataConnection;
 
-    QLabel * contentLabel = NULL;
-    QPushButton * startButton = NULL;
+    QPushButton * startButton;
+    QStandardItemModel agaveAppList;
+    QListView * agaveOptionList;
+
+    bool waitingOnCommand = false;
+    QString expectedCommand;
+
+    QVBoxLayout * vLayout;
+    QMap<QString, QStringList> inputLists;
+    QGridLayout * buttonArea = NULL;
 };
 
-#endif // CFDPANEL_H
+#endif // DEBUGAGAVEAPPPANEL_H

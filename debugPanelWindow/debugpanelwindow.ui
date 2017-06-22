@@ -36,8 +36,8 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
  </comment>
- <class>PanelWindow</class>
- <widget class="QMainWindow" name="PanelWindow">
+ <class>DebugPanelWindow</class>
+ <widget class="QMainWindow" name="DebugPanelWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -50,8 +50,87 @@
    <string>panelWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="filesLabel">
+      <property name="text">
+       <string>Remote Files:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="fileSelectedHeader">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Selected File:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3" rowspan="5">
+     <widget class="QStackedWidget" name="stackedView">
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QTreeView" name="remoteFileView">
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="selectedFileInfo">
+      <property name="text">
+       <string>No File Selected.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="2">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Long Running Tasks:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0" colspan="2">
+     <widget class="QListView" name="longTaskView">
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2" rowspan="5">
      <widget class="QTreeView" name="taskTreeView">
       <property name="minimumSize">
        <size>
@@ -73,33 +152,7 @@
       </property>
      </widget>
     </item>
-    <item>
-     <widget class="QStackedWidget" name="stackedView">
-      <property name="currentIndex">
-       <number>-1</number>
-      </property>
-     </widget>
-    </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1000</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionCopyInfo"/>
-    <addaction name="separator"/>
-    <addaction name="actionExit"/>
-   </widget>
-   <addaction name="menuFile"/>
   </widget>
   <action name="actionExit">
    <property name="text">
@@ -116,46 +169,14 @@
  <resources/>
  <connections>
   <connection>
-   <sender>actionExit</sender>
-   <signal>triggered()</signal>
-   <receiver>PanelWindow</receiver>
-   <slot>menuExit()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>499</x>
-     <y>349</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>taskTreeView</sender>
    <signal>clicked(QModelIndex)</signal>
-   <receiver>PanelWindow</receiver>
+   <receiver>DebugPanelWindow</receiver>
    <slot>taskEntryClicked(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>183</x>
      <y>359</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>499</x>
-     <y>349</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionCopyInfo</sender>
-   <signal>triggered()</signal>
-   <receiver>PanelWindow</receiver>
-   <slot>menuCopyInfo()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>499</x>
