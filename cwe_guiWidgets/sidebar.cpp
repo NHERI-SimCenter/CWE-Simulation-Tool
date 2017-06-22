@@ -40,11 +40,17 @@ SideBar::SideBar(QWidget *parent) :
     ui(new Ui::SideBar)
 {
     ui->setupUi(this);
+    connect(ui->pb_sideBar_create, SIGNAL(clicked()), this, SLOT(pb_sideBar_create_clicked()));
+    connect(ui->pb_sideBar_files, SIGNAL(clicked()), this, SLOT(pb_sideBar_files_clicked()));
+    connect(ui->pb_sideBar_run, SIGNAL(clicked()), this, SLOT(pb_sideBar_run_clicked()));
+    connect(ui->pb_sideBar_jobs, SIGNAL(clicked()), this, SLOT(pb_sideBar_jobs_clicked()));
+    connect(ui->pb_sideBar_help, SIGNAL(clicked()), this, SLOT(pb_sideBar_help_clicked()));
 }
 
 SideBar::~SideBar()
 {
     delete ui;
+
 }
 
 /* private slots */
