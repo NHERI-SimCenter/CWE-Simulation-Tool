@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,18 +31,25 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_simulation_details.h"
-#include "ui_cwe_simulation_details.h"
+#ifndef PLACEHOLDERPANEL_H
+#define PLACEHOLDERPANEL_H
 
-CWE_simulation_details::CWE_simulation_details(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_simulation_details)
+#include "taskpanelentry.h"
+
+#include <QWidget>
+#include <QLabel>
+#include <QVBoxLayout>
+
+class PlaceholderPanel : public TaskPanelEntry
 {
-    ui->setupUi(this);
-}
+    Q_OBJECT
+public:
+    PlaceholderPanel(QObject *parent = 0);
+    void setPlaceHolderText(QStringList dummyText);
 
-CWE_simulation_details::~CWE_simulation_details()
-{
-    delete ui;
-}
+    virtual void setupOwnFrame();
+};
+
+#endif // PLACEHOLDERPANEL_H

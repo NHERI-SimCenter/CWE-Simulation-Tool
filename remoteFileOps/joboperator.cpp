@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,18 +31,48 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_simulation_details.h"
-#include "ui_cwe_simulation_details.h"
+#include "joboperator.h"
 
-CWE_simulation_details::CWE_simulation_details(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_simulation_details)
+#include "remotefiletree.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
+
+JobOperator::JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, RemoteFileWindow * parent) : QObject((QObject *)parent)
 {
-    ui->setupUi(this);
+    myJobListView = newJobList;
+    myJobListView->setModel(&theJobList);
+    dataLink = newDataLink;
+    myFileWindow = parent;
+    QObject::connect(dataLink, SIGNAL(longRunningTasksUpdated()), this, SLOT(refreshRunningJobList()));
+    QObject::connect(myJobListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenu(QPoint)));
 }
 
-CWE_simulation_details::~CWE_simulation_details()
+void JobOperator::refreshRunningJobList()
 {
-    delete ui;
+    theJobList.clear();
+    QList<LongRunningTask *> updatedTaskList = dataLink->getListOfLongTasks();
+    theJobList.setColumnCount(2);
+
+    for (auto itr = updatedTaskList.cbegin(); itr != updatedTaskList.cend(); itr++)
+    {
+        QList<QStandardItem *> newRow;
+        newRow.append(new QStandardItem((*itr)->getRawDataStr()));
+        newRow.append(new QStandardItem((*itr)->getIDstr()));
+        theJobList.appendRow(newRow);
+    }
+}
+
+void JobOperator::needRightClickMenu(QPoint)
+{
+    QMenu jobMenu;
+
+    jobMenu.addAction("Refresh Info", this, SLOT(demandJobDataRefresh()));
+
+    jobMenu.exec(QCursor::pos());
+}
+
+void JobOperator::demandJobDataRefresh()
+{
+    dataLink->forceRefreshOfLongTasks();
 }

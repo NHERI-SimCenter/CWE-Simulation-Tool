@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,18 +31,59 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_simulation_details.h"
-#include "ui_cwe_simulation_details.h"
+#ifndef FILETREENODE_H
+#define FILETREENODE_H
 
-CWE_simulation_details::CWE_simulation_details(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_simulation_details)
+#include <QObject>
+#include <QList>
+#include <QByteArray>
+
+enum class RequestState;
+class FileMetaData;
+class RemoteDataInterface;
+
+class FileTreeNode : public QObject
 {
-    ui->setupUi(this);
-}
+    Q_OBJECT
+public:
+    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
+    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
+                                                //depending if the parent is NULL
+    ~FileTreeNode();
 
-CWE_simulation_details::~CWE_simulation_details()
-{
-    delete ui;
-}
+    QList<FileTreeNode *>::iterator fileListStart();
+    QList<FileTreeNode *>::iterator fileListEnd();
+
+    void setFileData(FileMetaData newData);
+    void setMark(bool newSetting);
+    bool isMarked();
+
+    QByteArray * getFileBuffer();
+    void refreshFileBuffer();
+    void clearFileBuffer();
+    void setDataInterface(RemoteDataInterface * sharedConnection);
+
+    bool isRootNode();
+    FileTreeNode * getParentNode();
+    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
+    void clearAllChildren();
+    FileMetaData getFileData();
+
+    bool childIsUnloaded();
+
+private slots:
+    void haveBufferReply(RequestState authReply, QByteArray * fileBuffer);
+
+private:
+    static RemoteDataInterface * dataConnection;
+    FileMetaData * fileData = NULL;
+    QList<FileTreeNode *> * childList = NULL;
+    bool rootNode;
+    bool marked = false;
+
+    QByteArray * fileDataBuffer = NULL;
+};
+
+#endif // FILETREENODE_H

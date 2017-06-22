@@ -33,57 +33,63 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include <QApplication>
+#ifndef FILEOPERATOR_H
+#define FILEOPERATOR_H
+
 #include <QObject>
-#include <QtGlobal>
-#include <string.h>
-#include "vwtinterfacedriver.h"
+#include <QList>
 
-#include <QSslSocket>
-#include <utilWindows/quickinfopopup.h>
+class RemoteFileTree;
+class FileMetaData;
+class RemoteDataInterface;
 
-void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
+enum class RequestState;
 
-int main(int argc, char *argv[])
+class FileOperator : public QObject
 {
-    QApplication mainRunLoop(argc, argv);
-    VWTinterfaceDriver programDriver;
+    Q_OBJECT
 
-    bool debugLoggingEnabled = false;
-    bool debugWindowEnabled = false;
-    for (int i = 0; i < argc; i++)
-    {
-        if (strcmp(argv[i],"enableDebugLogging") == 0)
-        {
-            debugLoggingEnabled = true;
-        }
-        if (strcmp(argv[i],"enableDebugWindow") == 0)
-        {
-            debugWindowEnabled = true;
-            debugLoggingEnabled = true;
-        }
-    }
+public:
+    FileOperator(RemoteDataInterface * newDataLink, RemoteFileTree * parent);
 
-    if (debugLoggingEnabled)
-    {
-        qDebug("NOTE: Debugging text output is enabled.");
-    }
-    else
-    {
-        qInstallMessageHandler(emptyMessageHandler);
-    }
+    void totalResetErrorProcedure();
+    void enactFolderRefresh(FileMetaData folderToRemoteLS);
+    bool operationIsPending();
 
-    mainRunLoop.setQuitOnLastWindowClosed(false);
-    //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
-    //Note: Might consider a better way of implementing this.
+private slots:
+    void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
 
-    if (QSslSocket::supportsSsl() == false)
-    {
-        QuickInfoPopup noSSL("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
-        noSSL.exec();
-        return -1;
-    }
+    void sendDeleteReq();
+    void getDeleteReply(RequestState replyState);
+    void sendMoveReq();
+    void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
+    void sendCopyReq();
+    void getCopyReply(RequestState replyState, FileMetaData * newFileData);
+    void sendRenameReq();
+    void getRenameReply(RequestState replyState, FileMetaData * newFileData);
 
-    programDriver.startup(debugWindowEnabled);
-    return mainRunLoop.exec();
-}
+    void sendCreateFolderReq();
+    void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
+
+    void sendUploadReq();
+    void getUploadReply(RequestState replyState, FileMetaData * newFileData);
+    void sendDownloadReq();
+    void getDownloadReply(RequestState replyState);
+
+    void sendCompressReq();
+    void getCompressReply(RequestState finalState, QJsonDocument * rawData);
+    void sendDecompressReq();
+    void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
+
+    void sendManualRefresh();
+
+private:
+    QString getStringFromInitParams(QString stringKey);
+
+    RemoteFileTree * myFileTree;
+
+    RemoteDataInterface * dataLink;
+    bool fileOperationPending = false;
+};
+
+#endif // FILEOPERATOR_H

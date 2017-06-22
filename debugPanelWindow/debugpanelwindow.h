@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,18 +31,52 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_simulation_details.h"
-#include "ui_cwe_simulation_details.h"
+#ifndef PANELWINDOW_H
+#define PANELWINDOW_H
 
-CWE_simulation_details::CWE_simulation_details(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_simulation_details)
-{
-    ui->setupUi(this);
+#include <QMainWindow>
+#include <QTreeView>
+#include <QStandardItemModel>
+#include <QStackedWidget>
+
+class RemoteFileTree;
+class TaskPanelEntry;
+class RemoteDataInterface;
+class VWTinterfaceDriver;
+
+namespace Ui {
+class DebugPanelWindow;
 }
 
-CWE_simulation_details::~CWE_simulation_details()
+class DebugPanelWindow : public QMainWindow
 {
-    delete ui;
-}
+    Q_OBJECT
+
+public:
+    explicit DebugPanelWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
+    ~DebugPanelWindow();
+
+    void setupTaskList();
+
+private slots:
+    void taskEntryClicked(QModelIndex clickedItem);
+
+private:
+    Ui::DebugPanelWindow *ui;
+    VWTinterfaceDriver * myDriver;
+    QTreeView * taskTreeView;
+    QStackedWidget *sharedWidget;
+    RemoteDataInterface * dataLink;
+    RemoteFileTree * fileTreeData;
+
+    QVector<TaskPanelEntry *> taskPanelList;
+    QStandardItemModel taskListModel;
+    const QStringList taskHeaderList = {"Task List:","idNum"};
+
+    void registerTaskPanel(TaskPanelEntry * newPanel);
+    void takePanelOwnership(TaskPanelEntry * newOwner);
+};
+
+#endif // PANELWINDOW_H

@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,18 +31,47 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_simulation_details.h"
-#include "ui_cwe_simulation_details.h"
+#ifndef VISUALPANEL_H
+#define VISUALPANEL_H
 
-CWE_simulation_details::CWE_simulation_details(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_simulation_details)
+#include "taskpanelentry.h"
+
+#include <QObject>
+
+class FileMetaData;
+class RemoteFileTree;
+class RemoteDataInterface;
+class CFDglCanvas;
+enum class RequestState;
+
+class VisualPanel : public TaskPanelEntry
 {
-    ui->setupUi(this);
-}
+    Q_OBJECT
+public:
+    VisualPanel(RemoteDataInterface * newDataHandle, RemoteFileTree *newReader,
+                QStringList frameNames, QObject *parent);
 
-CWE_simulation_details::~CWE_simulation_details()
-{
-    delete ui;
-}
+    virtual void setupOwnFrame();
+    virtual void frameNowVisible();
+    virtual void frameNowInvisible();
+
+private slots:
+    void selectedFileChanged(FileMetaData * newSelection);
+    void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
+
+private:
+    void conditionalPurge(QByteArray ** theArray);
+
+    RemoteFileTree * myTreeReader;
+    RemoteDataInterface * dataConnection;
+
+    CFDglCanvas * myCanvas = NULL;
+
+    QByteArray * pointData;
+    QByteArray * faceData;
+    QByteArray * ownerData;
+};
+
+#endif // VISUALPANEL_H

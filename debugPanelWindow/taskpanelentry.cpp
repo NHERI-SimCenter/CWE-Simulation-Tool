@@ -33,57 +33,100 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include <QApplication>
-#include <QObject>
-#include <QtGlobal>
-#include <string.h>
-#include "vwtinterfacedriver.h"
+#include "taskpanelentry.h"
 
-#include <QSslSocket>
-#include <utilWindows/quickinfopopup.h>
+int TaskPanelEntry::activeFrameId = -1;
+int TaskPanelEntry::nextUnusedFrameId = 0;
 
-void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
-
-int main(int argc, char *argv[])
+TaskPanelEntry::TaskPanelEntry(QObject *parent) : QObject(parent)
+  , frameNameList({"Invalid Entry", "Invalid Entry"})
 {
-    QApplication mainRunLoop(argc, argv);
-    VWTinterfaceDriver programDriver;
+    frameId = getNewFrameId();
+    implemented = true;
+    ownWidget = NULL;
+}
 
-    bool debugLoggingEnabled = false;
-    bool debugWindowEnabled = false;
-    for (int i = 0; i < argc; i++)
+TaskPanelEntry::~TaskPanelEntry()
+{
+    if (ownWidget != NULL)
     {
-        if (strcmp(argv[i],"enableDebugLogging") == 0)
-        {
-            debugLoggingEnabled = true;
-        }
-        if (strcmp(argv[i],"enableDebugWindow") == 0)
-        {
-            debugWindowEnabled = true;
-            debugLoggingEnabled = true;
-        }
+        ownWidget->deleteLater();
     }
+}
 
-    if (debugLoggingEnabled)
+void TaskPanelEntry::setFrameNameList(QStringList nameList)
+{
+    frameNameList = nameList;
+}
+
+void TaskPanelEntry::setAsNotImplemented()
+{
+    implemented = false;
+}
+
+void TaskPanelEntry::setAsActive()
+{
+    activeFrameId = frameId;
+}
+
+bool TaskPanelEntry::isImplemented()
+{
+    return implemented;
+}
+
+bool TaskPanelEntry::isCurrentActiveFrame()
+{
+    return (activeFrameId == frameId);
+}
+
+int TaskPanelEntry::getFrameId()
+{
+    return frameId;
+}
+
+QStringList TaskPanelEntry::getFrameNames()
+{
+    return frameNameList;
+}
+
+QWidget * TaskPanelEntry::getOwnedWidget()
+{
+    if (ownWidget == NULL)
     {
-        qDebug("NOTE: Debugging text output is enabled.");
+        ownWidget = new QWidget();
+        setupOwnFrame();
     }
-    else
-    {
-        qInstallMessageHandler(emptyMessageHandler);
-    }
+    return ownWidget;
+}
 
-    mainRunLoop.setQuitOnLastWindowClosed(false);
-    //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
-    //Note: Might consider a better way of implementing this.
+int TaskPanelEntry::getActiveFrameId()
+{
+    return activeFrameId;
+}
 
-    if (QSslSocket::supportsSsl() == false)
-    {
-        QuickInfoPopup noSSL("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
-        noSSL.exec();
-        return -1;
-    }
+int TaskPanelEntry::getNewFrameId()
+{
+    int ret = nextUnusedFrameId;
+    nextUnusedFrameId++;
+    return ret;
+}
 
-    programDriver.startup(debugWindowEnabled);
-    return mainRunLoop.exec();
+//These virtual functions should be overwritten in subclasses
+void TaskPanelEntry::setupOwnFrame()
+{
+    QLabel * warningLabel = new QLabel("Error, this message should never appear.");
+    QHBoxLayout *hLayout = new QHBoxLayout;
+
+    hLayout->addWidget(warningLabel);
+    ownWidget->setLayout(hLayout);
+}
+
+void TaskPanelEntry::frameNowVisible()
+{
+
+}
+
+void TaskPanelEntry::frameNowInvisible()
+{
+
 }

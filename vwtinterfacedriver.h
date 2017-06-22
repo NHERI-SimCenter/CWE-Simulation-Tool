@@ -53,9 +53,10 @@ enum class VWTerrorType: unsigned int;
 enum class RequestState;
 
 class RemoteDataInterface;
-class RemoteFileWindow;
+
 class AuthForm;
-//class PanelWindow;
+
+class DebugPanelWindow;
 class CWE_MainWindow;
 
 class VWTinterfaceDriver : public QObject
@@ -65,13 +66,12 @@ class VWTinterfaceDriver : public QObject
 public:
     explicit VWTinterfaceDriver();
     ~VWTinterfaceDriver();
-    void startup();
+    void startup(bool useDebugPanel = false);
     void shutdown();
 
     void closeAuthScreen();
 
     RemoteDataInterface * getDataConnection();
-    RemoteFileWindow * getFileDisplay();
 
 public slots:
     void getAuthReply(RequestState authReply);
@@ -85,9 +85,8 @@ private:
     RemoteDataInterface * theConnector;
     AuthForm * authWindow;
 
-    //PanelWindow * mainWindow;
+    DebugPanelWindow * debugWindow = NULL;
     CWE_MainWindow * mainWindow;
-    RemoteFileWindow * theFileDisplay;
 
     bool doingShutdown = false;
 };

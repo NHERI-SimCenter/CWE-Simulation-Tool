@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,18 +31,55 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_simulation_details.h"
-#include "ui_cwe_simulation_details.h"
+#ifndef DEBUGAGAVEAPPPANEL_H
+#define DEBUGAGAVEAPPPANEL_H
 
-CWE_simulation_details::CWE_simulation_details(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_simulation_details)
+#include "taskpanelentry.h"
+
+#include <QModelIndex>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QJsonValue>
+
+#include <QListView>
+#include <QStandardItemModel>
+
+class FileMetaData;
+class RemoteFileTree;
+class RemoteDataInterface;
+enum class RequestState;
+
+class DebugAgaveAppPanel : public TaskPanelEntry
 {
-    ui->setupUi(this);
-}
+    Q_OBJECT
+public:
+    DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, RemoteFileTree * newReader, QObject *parent = 0);
 
-CWE_simulation_details::~CWE_simulation_details()
-{
-    delete ui;
-}
+    virtual void setupOwnFrame();
+
+private slots:
+    void commandInvoked();
+    void commandReply(RequestState finalState, QJsonDocument * rawData);
+    void placeInputPairs(QModelIndex newSelected);
+
+private:
+    QModelIndex currentFileSelected;
+    RemoteFileTree * myTreeReader;
+
+    RemoteDataInterface * dataConnection;
+
+    QPushButton * startButton;
+    QStandardItemModel agaveAppList;
+    QListView * agaveOptionList;
+
+    bool waitingOnCommand = false;
+    QString expectedCommand;
+
+    QVBoxLayout * vLayout;
+    QMap<QString, QStringList> inputLists;
+    QGridLayout * buttonArea = NULL;
+};
+
+#endif // DEBUGAGAVEAPPPANEL_H
