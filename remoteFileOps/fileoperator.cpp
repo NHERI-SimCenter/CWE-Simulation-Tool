@@ -35,7 +35,7 @@
 
 #include "fileoperator.h"
 
-#include "remotefilewindow.h"
+#include "remotefiletree.h"
 
 #include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
@@ -45,9 +45,9 @@
 #include "utilWindows/singlelinedialog.h"
 #include "utilWindows/quickinfopopup.h"
 
-FileOperator::FileOperator(RemoteDataInterface * newDataLink, RemoteFileWindow * parent) : QObject((QObject *)parent)
+FileOperator::FileOperator(RemoteDataInterface * newDataLink, RemoteFileTree *parent) : QObject((QObject *)parent)
 {
-    myFileWindow = parent;
+    myFileTree = parent;
     dataLink = newDataLink;
 }
 
@@ -104,12 +104,12 @@ void FileOperator::getLSReply(RequestState cmdReply, QList<FileMetaData> * fileD
         totalResetErrorProcedure();
         return;
     }
-    myFileWindow->updateFileInfo(fileDataList);
+    myFileTree->updateFileInfo(fileDataList);
 }
 
 void FileOperator::sendDeleteReq()
 {
-    FileMetaData targetFile = myFileWindow->getCurrentSelectedFile();
+    FileMetaData targetFile = myFileTree->getCurrentSelectedFile();
     //TODO: verify file valid for delete
     DeleteConfirm deletePopup(targetFile.getFullPath());
     if (deletePopup.exec() != QDialog::Accepted)
@@ -137,12 +137,12 @@ void FileOperator::getDeleteReply(RequestState replyState)
         return;
     }
 
-    myFileWindow->lsClosestNodeToParent(getStringFromInitParams("toDelete"));
+    myFileTree->lsClosestNodeToParent(getStringFromInitParams("toDelete"));
 }
 
 void FileOperator::sendMoveReq()
 {
-    FileMetaData targetFile = myFileWindow->getCurrentSelectedFile();
+    FileMetaData targetFile = myFileTree->getCurrentSelectedFile();
     SingleLineDialog newNamePopup("Please type a file name to move to:", "newname");
     //TODO: NEED lots of verification here
     //First, that file can be renamed
@@ -173,13 +173,13 @@ void FileOperator::getMoveReply(RequestState replyState, FileMetaData * revisedF
         return;
     }
 
-    myFileWindow->lsClosestNodeToParent(getStringFromInitParams("from"));
-    myFileWindow->lsClosestNode(revisedFileData->getFullPath());
+    myFileTree->lsClosestNodeToParent(getStringFromInitParams("from"));
+    myFileTree->lsClosestNode(revisedFileData->getFullPath());
 }
 
 void FileOperator::sendCopyReq()
 {
-    FileMetaData targetFile = myFileWindow->getCurrentSelectedFile();
+    FileMetaData targetFile = myFileTree->getCurrentSelectedFile();
     SingleLineDialog newNamePopup("Please type a file name to copy to:", "newname");
     //TODO: NEED lots of verification here
     //First, that file can be renamed
@@ -210,12 +210,12 @@ void FileOperator::getCopyReply(RequestState replyState, FileMetaData * newFileD
         return;
     }
 
-    myFileWindow->lsClosestNode(newFileData->getFullPath());
+    myFileTree->lsClosestNode(newFileData->getFullPath());
 }
 
 void FileOperator::sendRenameReq()
 {
-    FileMetaData targetFile = myFileWindow->getCurrentSelectedFile();
+    FileMetaData targetFile = myFileTree->getCurrentSelectedFile();
     SingleLineDialog newNamePopup("Please type a new file name:", "newname");
     //TODO: NEED lots of verification here
     //First, that file can be renamed
@@ -244,13 +244,13 @@ void FileOperator::getRenameReply(RequestState replyState, FileMetaData * newFil
         return;
     }
 
-    myFileWindow->lsClosestNodeToParent(getStringFromInitParams("fullName"));
-    myFileWindow->lsClosestNodeToParent(newFileData->getFullPath());
+    myFileTree->lsClosestNodeToParent(getStringFromInitParams("fullName"));
+    myFileTree->lsClosestNodeToParent(newFileData->getFullPath());
 }
 
 void FileOperator::sendCreateFolderReq()
 {
-    FileMetaData targetFile = myFileWindow->getCurrentSelectedFile();
+    FileMetaData targetFile = myFileTree->getCurrentSelectedFile();
     SingleLineDialog newFolderNamePopup("Please input a name for the new folder:", "newFolder1");
     //TODO: verification here
     //First, valid folder to create in
@@ -282,12 +282,12 @@ void FileOperator::getMkdirReply(RequestState replyState, FileMetaData * newFold
         return;
     }
 
-    myFileWindow->lsClosestNode(newFolderData->getContainingPath());
+    myFileTree->lsClosestNode(newFolderData->getContainingPath());
 }
 
 void FileOperator::sendUploadReq()
 {
-    FileMetaData targetFile = myFileWindow->getCurrentSelectedFile();
+    FileMetaData targetFile = myFileTree->getCurrentSelectedFile();
     SingleLineDialog uploadNamePopup("Please input full path of file to upload:", "");
     //TODO: NEED lots of verification here
     //First, valid folder to upload to
@@ -320,12 +320,12 @@ void FileOperator::getUploadReply(RequestState replyState, FileMetaData * newFil
         return;
     }
 
-    myFileWindow->lsClosestNode(newFileData->getFullPath());
+    myFileTree->lsClosestNode(newFileData->getFullPath());
 }
 
 void FileOperator::sendDownloadReq()
 {
-    FileMetaData targetFile = myFileWindow->getCurrentSelectedFile();
+    FileMetaData targetFile = myFileTree->getCurrentSelectedFile();
     SingleLineDialog downloadNamePopup("Please input full path download destination:", "");
     //TODO: NEED lots of verification here
     //First, valid folder to upload to
@@ -370,7 +370,7 @@ void FileOperator::sendCompressReq()
     qDebug("Folder compress specified");
     QMultiMap<QString, QString> oneInput;
     oneInput.insert("compression_type","tgz");
-    FileMetaData fileData = myFileWindow->getCurrentSelectedFile();
+    FileMetaData fileData = myFileTree->getCurrentSelectedFile();
     if (fileData.getFileType() != FileType::DIR)
     {
         //TODO: give reasonable error
@@ -401,7 +401,7 @@ void FileOperator::sendDecompressReq()
 {
     qDebug("Folder de-compress specified");
     QMultiMap<QString, QString> oneInput;
-    FileMetaData fileData = myFileWindow->getCurrentSelectedFile();
+    FileMetaData fileData = myFileTree->getCurrentSelectedFile();
     if (fileData.getFileType() == FileType::DIR)
     {
         //TODO: give reasonable error
@@ -432,5 +432,5 @@ void FileOperator::getDecompressReply(RequestState finalState, QJsonDocument *)
 
 void FileOperator::sendManualRefresh()
 {
-    enactFolderRefresh(myFileWindow->getCurrentSelectedFile());
+    enactFolderRefresh(myFileTree->getCurrentSelectedFile());
 }

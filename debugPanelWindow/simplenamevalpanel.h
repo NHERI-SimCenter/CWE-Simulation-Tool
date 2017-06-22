@@ -33,63 +33,58 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILEOPERATOR_H
-#define FILEOPERATOR_H
+#ifndef SIMPLENAMEVALPANEL_H
+#define SIMPLENAMEVALPANEL_H
 
-#include <QObject>
+#include "taskpanelentry.h"
+
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <QList>
+#include <QLineEdit>
+#include <QStringList>
+#include <QString>
 
-class RemoteFileWindow;
 class FileMetaData;
+class RemoteFileTree;
 class RemoteDataInterface;
-
 enum class RequestState;
 
-class FileOperator : public QObject
+class SimpleNameValPanel : public TaskPanelEntry
 {
     Q_OBJECT
-
 public:
-    FileOperator(RemoteDataInterface * newDataLink, RemoteFileWindow * parent);
+    SimpleNameValPanel(RemoteDataInterface * newDataHandle, RemoteFileTree * newReader,
+                       QStringList frameNames, QStringList indirectParams,
+                       QStringList directParams, QString composedParam,
+                       QString newAppName, QObject *parent = 0);
 
-    void totalResetErrorProcedure();
-    void enactFolderRefresh(FileMetaData folderToRemoteLS);
-    bool operationIsPending();
+    virtual void setupOwnFrame();
+    virtual void frameNowVisible();
+    virtual void frameNowInvisible();
 
 private slots:
-    void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
+    void selectedFileChanged(FileMetaData * newSelection);
+    void appInvoked();
 
-    void sendDeleteReq();
-    void getDeleteReply(RequestState replyState);
-    void sendMoveReq();
-    void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
-    void sendCopyReq();
-    void getCopyReply(RequestState replyState, FileMetaData * newFileData);
-    void sendRenameReq();
-    void getRenameReply(RequestState replyState, FileMetaData * newFileData);
-
-    void sendCreateFolderReq();
-    void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
-
-    void sendUploadReq();
-    void getUploadReply(RequestState replyState, FileMetaData * newFileData);
-    void sendDownloadReq();
-    void getDownloadReply(RequestState replyState);
-
-    void sendCompressReq();
-    void getCompressReply(RequestState finalState, QJsonDocument * rawData);
-    void sendDecompressReq();
-    void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
-
-    void sendManualRefresh();
+    void finishedAppInvoke(RequestState finalState, QJsonDocument *);
 
 private:
-    QString getStringFromInitParams(QString stringKey);
+    RemoteFileTree * myTreeReader;
 
-    RemoteFileWindow * myFileWindow;
+    RemoteDataInterface * dataConnection;
 
-    RemoteDataInterface * dataLink;
-    bool fileOperationPending = false;
+    QStringList indirectParamList;
+    QStringList directParamList;
+    QString composedParamName;
+    QString appName;
+
+    QList<QLineEdit *> indirectParamBoxes;
+    QList<QLineEdit *> directParamBoxes;
+
+    QPushButton * startButton;
 };
 
-#endif // FILEOPERATOR_H
+#endif // SIMPLENAMEVALPANEL_H

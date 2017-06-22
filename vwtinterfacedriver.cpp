@@ -39,11 +39,9 @@
 #include "utilWindows/authform.h"
 #include "utilWindows/errorpopup.h"
 #include "utilWindows/quickinfopopup.h"
-#include "taskPanelWindow/panelwindow.h"
-#include "fileWindow/remotefilewindow.h"
+#include "debugPanelWindow/debugpanelwindow.h"
 
 #include "mainWindow/cwe_mainwindow.h"
-
 
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
@@ -64,7 +62,6 @@ VWTinterfaceDriver::VWTinterfaceDriver()
     theConnector = (RemoteDataInterface *) tmpHandle;
     authWindow = NULL;
     mainWindow = NULL;
-    theFileDisplay = NULL;
 
     QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(getFatalInterfaceError(QString)));
 }
@@ -74,17 +71,21 @@ VWTinterfaceDriver::~VWTinterfaceDriver()
     if (theConnector != NULL) theConnector->deleteLater();
     if (authWindow != NULL) authWindow->deleteLater();
     if (mainWindow != NULL) mainWindow->deleteLater();
-    if (theFileDisplay != NULL) theFileDisplay->deleteLater();
+    if (debugWindow != NULL) debugWindow->deleteLater();
 }
 
-void VWTinterfaceDriver::startup()
+void VWTinterfaceDriver::startup(bool useDebugPanel)
 {
     authWindow = new AuthForm(theConnector, this);
     authWindow->show();
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
-    theFileDisplay = new RemoteFileWindow(this);
-    // mainWindow = new PanelWindow(this);
+
     mainWindow = new CWE_MainWindow(this);
+
+    if (useDebugPanel)
+    {
+        debugWindow = new DebugPanelWindow(this);
+    }
 }
 
 void VWTinterfaceDriver::shutdown()
@@ -129,11 +130,6 @@ RemoteDataInterface * VWTinterfaceDriver::getDataConnection()
     return theConnector;
 }
 
-RemoteFileWindow * VWTinterfaceDriver::getFileDisplay()
-{
-    return theFileDisplay;
-}
-
 void VWTinterfaceDriver::getAuthReply(RequestState authReply)
 {
     if ((authReply == RequestState::GOOD) && (authWindow != NULL) && (authWindow->isVisible()))
@@ -156,16 +152,9 @@ void VWTinterfaceDriver::closeAuthScreen()
     }
     //ErrorPopup("This is a test of the error popup");
 
-    theFileDisplay->resetFileData();
-    theFileDisplay->show();
-
-    /* next line temporary disabled */
-    //mainWindow->setupTaskList();
     mainWindow->show();
-    theFileDisplay->resendSelectedFile();
 
     //The dynamics of this are different in windows. TODO: Find a more cross-platform solution
-    QObject::connect(theFileDisplay->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
     if (authWindow != NULL)
@@ -176,5 +165,8 @@ void VWTinterfaceDriver::closeAuthScreen()
         authWindow = NULL;
     }
 
-    //((AgaveHandler*)theConnector)->getAgaveAppList();
+    if (debugWindow != NULL)
+    {
+        debugWindow->show();
+    }
 }

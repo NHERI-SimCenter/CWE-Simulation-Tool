@@ -33,53 +33,45 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef DEBUGAGAVEAPPPANEL_H
-#define DEBUGAGAVEAPPPANEL_H
+#ifndef VISUALPANEL_H
+#define VISUALPANEL_H
 
 #include "taskpanelentry.h"
 
-#include <QModelIndex>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QJsonValue>
-
-#include <QListView>
-#include <QStandardItemModel>
+#include <QObject>
 
 class FileMetaData;
-class RemoteFileWindow;
+class RemoteFileTree;
 class RemoteDataInterface;
+class CFDglCanvas;
 enum class RequestState;
 
-class DebugAgaveAppPanel : public TaskPanelEntry
+class VisualPanel : public TaskPanelEntry
 {
     Q_OBJECT
 public:
-    DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent = 0);
+    VisualPanel(RemoteDataInterface * newDataHandle, RemoteFileTree *newReader,
+                QStringList frameNames, QObject *parent);
 
     virtual void setupOwnFrame();
+    virtual void frameNowVisible();
+    virtual void frameNowInvisible();
 
 private slots:
-    void commandInvoked();
-    void commandReply(RequestState finalState, QJsonDocument * rawData);
-    void placeInputPairs(QModelIndex newSelected);
+    void selectedFileChanged(FileMetaData * newSelection);
+    void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
 
 private:
-    QModelIndex currentFileSelected;
-    RemoteFileWindow * myTreeReader;
+    void conditionalPurge(QByteArray ** theArray);
 
+    RemoteFileTree * myTreeReader;
     RemoteDataInterface * dataConnection;
 
-    QPushButton * startButton;
-    QStandardItemModel agaveAppList;
-    QListView * agaveOptionList;
+    CFDglCanvas * myCanvas = NULL;
 
-    bool waitingOnCommand = false;
-    QString expectedCommand;
-
-    QVBoxLayout * vLayout;
-    QMap<QString, QStringList> inputLists;
-    QGridLayout * buttonArea = NULL;
+    QByteArray * pointData;
+    QByteArray * faceData;
+    QByteArray * ownerData;
 };
 
-#endif // DEBUGAGAVEAPPPANEL_H
+#endif // VISUALPANEL_H

@@ -33,45 +33,46 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef VISUALPANEL_H
-#define VISUALPANEL_H
+#include "joboperator.h"
 
-#include "taskpanelentry.h"
+#include "remotefiletree.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
 
-#include <QObject>
-
-class FileMetaData;
-class RemoteFileWindow;
-class RemoteDataInterface;
-class CFDglCanvas;
-enum class RequestState;
-
-class VisualPanel : public TaskPanelEntry
+JobOperator::JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, RemoteFileWindow * parent) : QObject((QObject *)parent)
 {
-    Q_OBJECT
-public:
-    VisualPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader,
-                QStringList frameNames, QObject *parent);
+    myJobListView = newJobList;
+    myJobListView->setModel(&theJobList);
+    dataLink = newDataLink;
+    myFileWindow = parent;
+    QObject::connect(dataLink, SIGNAL(longRunningTasksUpdated()), this, SLOT(refreshRunningJobList()));
+    QObject::connect(myJobListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenu(QPoint)));
+}
 
-    virtual void setupOwnFrame();
-    virtual void frameNowVisible();
-    virtual void frameNowInvisible();
+void JobOperator::refreshRunningJobList()
+{
+    theJobList.clear();
+    QList<LongRunningTask *> updatedTaskList = dataLink->getListOfLongTasks();
+    theJobList.setColumnCount(2);
 
-private slots:
-    void selectedFileChanged(FileMetaData * newSelection);
-    void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
+    for (auto itr = updatedTaskList.cbegin(); itr != updatedTaskList.cend(); itr++)
+    {
+        QList<QStandardItem *> newRow;
+        newRow.append(new QStandardItem((*itr)->getRawDataStr()));
+        newRow.append(new QStandardItem((*itr)->getIDstr()));
+        theJobList.appendRow(newRow);
+    }
+}
 
-private:
-    void conditionalPurge(QByteArray ** theArray);
+void JobOperator::needRightClickMenu(QPoint)
+{
+    QMenu jobMenu;
 
-    RemoteFileWindow * myTreeReader;
-    RemoteDataInterface * dataConnection;
+    jobMenu.addAction("Refresh Info", this, SLOT(demandJobDataRefresh()));
 
-    CFDglCanvas * myCanvas = NULL;
+    jobMenu.exec(QCursor::pos());
+}
 
-    QByteArray * pointData;
-    QByteArray * faceData;
-    QByteArray * ownerData;
-};
-
-#endif // VISUALPANEL_H
+void JobOperator::demandJobDataRefresh()
+{
+    dataLink->forceRefreshOfLongTasks();
+}

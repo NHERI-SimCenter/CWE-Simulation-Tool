@@ -37,9 +37,9 @@
 
 #include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
-#include "fileWindow/remotefilewindow.h"
+#include "remoteFileOps/remotefiletree.h"
 
-SimpleNameValPanel::SimpleNameValPanel(RemoteDataInterface *newDataHandle, RemoteFileWindow *newReader,
+SimpleNameValPanel::SimpleNameValPanel(RemoteDataInterface *newDataHandle, RemoteFileTree *newReader,
                                        QStringList frameNames, QStringList indirectParams,
                                        QStringList directParams, QString composedParam,
                                        QString newAppName, QObject *parent) : TaskPanelEntry(parent)
@@ -149,7 +149,7 @@ void SimpleNameValPanel::appInvoked()
                      this, SLOT(finishedAppInvoke(RequestState,QJsonDocument*)));
 }
 
-void SimpleNameValPanel::finishedAppInvoke(RequestState finalState, QJsonDocument * rawData)
+void SimpleNameValPanel::finishedAppInvoke(RequestState finalState, QJsonDocument *)
 {
     if (finalState != RequestState::GOOD)
     {

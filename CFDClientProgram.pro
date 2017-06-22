@@ -56,36 +56,36 @@ SOURCES += main.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.cpp \
     ../AgaveClientInterface/remotedatainterface.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavelongrunning.cpp \
-    fileWindow/fileoperator.cpp \
-    fileWindow/remotefilewindow.cpp \
-    taskPanelWindow/cfdpanel.cpp \
-    taskPanelWindow/debugagaveapppanel.cpp \
-    taskPanelWindow/panelwindow.cpp \
-    taskPanelWindow/placeholderpanel.cpp \
-    taskPanelWindow/taskpanelentry.cpp \
+    ../AgaveClientInterface/filemetadata.cpp \
     utilWindows/authform.cpp \
     utilWindows/copyrightdialog.cpp \
     utilWindows/deleteconfirm.cpp \
     utilWindows/errorpopup.cpp \
     utilWindows/quickinfopopup.cpp \
     utilWindows/singlelinedialog.cpp \
-    fileWindow/filetreenode.cpp \
-    ../AgaveClientInterface/filemetadata.cpp \
-    fileWindow/joboperator.cpp \
-    taskPanelWindow/simplenamevalpanel.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
-    taskPanelWindow/visualpanel.cpp \
-    widgets/sidebar.cpp \
-    widgets/cwe_landing.cpp \
-    widgets/cwe_file_manager.cpp \
-    widgets/cwe_help.cpp \
-    widgets/cwe_create_simulation.cpp \
-    widgets/cwe_manage_simulation.cpp \
-    widgets/cwe_simulation_details.cpp \
-    widgets/cwe_task_list.cpp \
-    mainWindow/cwe_mainwindow.cpp
+    Widgets/sidebar.cpp \
+    Widgets/cwe_landing.cpp \
+    Widgets/cwe_file_manager.cpp \
+    Widgets/cwe_help.cpp \
+    Widgets/cwe_create_simulation.cpp \
+    Widgets/cwe_manage_simulation.cpp \
+    Widgets/cwe_simulation_details.cpp \
+    Widgets/cwe_task_list.cpp \
+    mainWindow/cwe_mainwindow.cpp \
+    debugPanelWindow/cfdpanel.cpp \
+    debugPanelWindow/debugagaveapppanel.cpp \
+    debugPanelWindow/debugpanelwindow.cpp \
+    debugPanelWindow/placeholderpanel.cpp \
+    debugPanelWindow/simplenamevalpanel.cpp \
+    debugPanelWindow/taskpanelentry.cpp \
+    debugPanelWindow/visualpanel.cpp \
+    remoteFileOps/fileoperator.cpp \
+    remoteFileOps/filetreenode.cpp \
+    remoteFileOps/joboperator.cpp \
+    remoteFileOps/remotefiletree.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -94,55 +94,54 @@ HEADERS  += \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
     ../AgaveClientInterface/remotedatainterface.h \
     ../AgaveClientInterface/agaveInterfaces/agavelongrunning.h \
-    fileWindow/fileoperator.h \
-    fileWindow/remotefilewindow.h \
-    taskPanelWindow/cfdpanel.h \
-    taskPanelWindow/debugagaveapppanel.h \
-    taskPanelWindow/panelwindow.h \
-    taskPanelWindow/placeholderpanel.h \
-    taskPanelWindow/taskpanelentry.h \
+    ../AgaveClientInterface/filemetadata.h \
     utilWindows/authform.h \
     utilWindows/copyrightdialog.h \
     utilWindows/deleteconfirm.h \
     utilWindows/errorpopup.h \
     utilWindows/quickinfopopup.h \
     utilWindows/singlelinedialog.h \
-    fileWindow/filetreenode.h \
-    ../AgaveClientInterface/filemetadata.h \
-    fileWindow/joboperator.h \
-    taskPanelWindow/simplenamevalpanel.h \
     visualUtils/cfdglcanvas.h \
     visualUtils/cfdtoken.h \
     visualUtils/decompresswrapper.h \
-    taskPanelWindow/visualpanel.h \
-    widgets/sidebar.h \
-    widgets/cwe_landing.h \
-    widgets/cwe_file_manager.h \
-    widgets/cwe_help.h \
-    widgets/cwe_create_simulation.h \
-    widgets/cwe_manage_simulation.h \
-    widgets/cwe_simulation_details.h \
-    widgets/cwe_task_list.h \
-    mainWindow/cwe_mainwindow.h
+    Widgets/sidebar.h \
+    Widgets/cwe_landing.h \
+    Widgets/cwe_file_manager.h \
+    Widgets/cwe_help.h \
+    Widgets/cwe_create_simulation.h \
+    Widgets/cwe_manage_simulation.h \
+    Widgets/cwe_simulation_details.h \
+    Widgets/cwe_task_list.h \
+    mainWindow/cwe_mainwindow.h \
+    debugPanelWindow/cfdpanel.h \
+    debugPanelWindow/debugagaveapppanel.h \
+    debugPanelWindow/debugpanelwindow.h \
+    debugPanelWindow/placeholderpanel.h \
+    debugPanelWindow/simplenamevalpanel.h \
+    debugPanelWindow/taskpanelentry.h \
+    debugPanelWindow/visualpanel.h \
+    remoteFileOps/fileoperator.h \
+    remoteFileOps/filetreenode.h \
+    remoteFileOps/joboperator.h \
+    remoteFileOps/remotefiletree.h
 
 FORMS    += \
-    fileWindow/remotefilewindow.ui \
-    taskPanelWindow/panelwindow.ui \
     utilWindows/authform.ui \
     utilWindows/copyrightdialog.ui \
     utilWindows/deleteconfirm.ui \
     utilWindows/errorpopup.ui \
     utilWindows/quickinfopopup.ui \
     utilWindows/singlelinedialog.ui \
-    widgets/sidebar.ui \
-    widgets/cwe_landing.ui \
-    widgets/cwe_file_manager.ui \
-    widgets/cwe_help.ui \
-    widgets/cwe_create_simulation.ui \
-    widgets/cwe_manage_simulation.ui \
-    widgets/cwe_simulation_details.ui \
-    widgets/cwe_task_list.ui \
-    mainWindow/cwe_mainwindow.ui
+    Widgets/sidebar.ui \
+    Widgets/cwe_landing.ui \
+    Widgets/cwe_file_manager.ui \
+    Widgets/cwe_help.ui \
+    Widgets/cwe_create_simulation.ui \
+    Widgets/cwe_manage_simulation.ui \
+    Widgets/cwe_simulation_details.ui \
+    Widgets/cwe_task_list.ui \
+    mainWindow/cwe_mainwindow.ui \
+    debugPanelWindow/debugpanelwindow.ui
 
 DISTFILES +=
 
