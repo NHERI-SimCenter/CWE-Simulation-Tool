@@ -55,7 +55,8 @@ enum class RequestState;
 class RemoteDataInterface;
 class RemoteFileWindow;
 class AuthForm;
-class PanelWindow;
+//class PanelWindow;
+class CWE_MainWindow;
 
 class VWTinterfaceDriver : public QObject
 {
@@ -84,7 +85,8 @@ private:
     RemoteDataInterface * theConnector;
     AuthForm * authWindow;
 
-    PanelWindow * mainWindow;
+    //PanelWindow * mainWindow;
+    CWE_MainWindow * mainWindow;
     RemoteFileWindow * theFileDisplay;
 
     bool doingShutdown = false;
