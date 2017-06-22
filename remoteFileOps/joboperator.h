@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,18 +31,38 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_simulation_details.h"
-#include "ui_cwe_simulation_details.h"
+#ifndef JOBOPERATOR_H
+#define JOBOPERATOR_H
 
-CWE_simulation_details::CWE_simulation_details(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_simulation_details)
+#include <QObject>
+#include <QList>
+#include <QListView>
+#include <QStandardItemModel>
+
+class RemoteFileWindow;
+class RemoteDataInterface;
+
+class JobOperator : public QObject
 {
-    ui->setupUi(this);
-}
+    Q_OBJECT
+public:
+    explicit JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, RemoteFileWindow * parent);
 
-CWE_simulation_details::~CWE_simulation_details()
-{
-    delete ui;
-}
+private slots:
+    void refreshRunningJobList();
+    void needRightClickMenu(QPoint);
+    void demandJobDataRefresh();
+
+private:
+    RemoteFileWindow * myFileWindow;
+
+    RemoteDataInterface * dataLink;
+    bool jobOperationPending = false;
+
+    QListView * myJobListView;
+    QStandardItemModel theJobList;
+};
+
+#endif // JOBOPERATOR_H

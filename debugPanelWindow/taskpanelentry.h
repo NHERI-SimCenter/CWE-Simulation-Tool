@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,18 +31,51 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_simulation_details.h"
-#include "ui_cwe_simulation_details.h"
+#ifndef TASKPANELENTRY_H
+#define TASKPANELENTRY_H
 
-CWE_simulation_details::CWE_simulation_details(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_simulation_details)
+#include <QObject>
+#include <QWidget>
+#include <QLabel>
+#include <QHBoxLayout>
+
+class TaskPanelEntry : public QObject
 {
-    ui->setupUi(this);
-}
+    Q_OBJECT
+public:
+    explicit TaskPanelEntry(QObject *parent = 0);
+    ~TaskPanelEntry();
 
-CWE_simulation_details::~CWE_simulation_details()
-{
-    delete ui;
-}
+    void setFrameNameList(QStringList nameList);
+    void setAsNotImplemented();
+    void setAsActive();
+
+    bool isImplemented();
+    bool isCurrentActiveFrame();
+
+    int getFrameId();
+    QStringList getFrameNames();
+    QWidget * getOwnedWidget();
+
+    static int getActiveFrameId();
+    static int getNewFrameId();
+
+//These virtual functions should be over-written in subclasses:
+    virtual void setupOwnFrame();
+    virtual void frameNowVisible();
+    virtual void frameNowInvisible();
+
+private:
+    static int activeFrameId;
+    static int nextUnusedFrameId;
+    QWidget * ownWidget;
+
+    QStringList frameNameList;
+
+    bool implemented;
+    int frameId;
+};
+
+#endif // TASKPANELENTRY_H

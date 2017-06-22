@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,18 +31,34 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_simulation_details.h"
-#include "ui_cwe_simulation_details.h"
+#include "placeholderpanel.h"
 
-CWE_simulation_details::CWE_simulation_details(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_simulation_details)
+PlaceholderPanel::PlaceholderPanel(QObject *parent) : TaskPanelEntry(parent)
 {
-    ui->setupUi(this);
+    setAsNotImplemented();
 }
 
-CWE_simulation_details::~CWE_simulation_details()
+void PlaceholderPanel::setPlaceHolderText(QStringList dummyText)
 {
-    delete ui;
+    this->setFrameNameList(dummyText);
 }
+
+void PlaceholderPanel::setupOwnFrame()
+{
+    QString warningMessage = "This feature is not yet implemented:";
+    QStringList frameNames = getFrameNames();
+    for (auto itr = frameNames.cbegin(); itr != frameNames.cend(); itr++)
+    {
+        warningMessage.append("\n");
+        warningMessage.append(*itr);
+    }
+    QLabel * warningLabel = new QLabel(warningMessage);
+    QVBoxLayout *vLayout = new QVBoxLayout;
+
+    vLayout->addWidget(warningLabel);
+
+    getOwnedWidget()->setLayout(vLayout);
+}
+
