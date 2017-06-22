@@ -20,7 +20,7 @@
 ** be used to endorse or promote products derived from this software without specific
 ** prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY
 ** EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
 ** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
 ** SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
@@ -43,7 +43,7 @@
     <x>0</x>
     <y>0</y>
     <width>631</width>
-    <height>231</height>
+    <height>279</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -90,6 +90,9 @@
     </item>
     <item row="4" column="1" colspan="2">
      <layout class="QFormLayout" name="formLayout_2">
+      <property name="verticalSpacing">
+       <number>0</number>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -166,7 +169,7 @@
      <x>0</x>
      <y>0</y>
      <width>631</width>
-     <height>19</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -257,28 +260,12 @@
    <slot>performAuth()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>483</x>
-     <y>159</y>
+     <x>477</x>
+     <y>200</y>
     </hint>
     <hint type="destinationlabel">
      <x>315</x>
-     <y>115</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>unameInput</sender>
-   <signal>returnPressed()</signal>
-   <receiver>AuthForm</receiver>
-   <slot>performAuth()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>483</x>
-     <y>131</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>315</x>
-     <y>115</y>
+     <y>139</y>
     </hint>
    </hints>
   </connection>

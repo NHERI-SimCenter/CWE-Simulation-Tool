@@ -76,7 +76,16 @@ SOURCES += main.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
-    taskPanelWindow/visualpanel.cpp
+    taskPanelWindow/visualpanel.cpp \
+    widgets/sidebar.cpp \
+    widgets/cwe_landing.cpp \
+    widgets/cwe_file_manager.cpp \
+    widgets/cwe_help.cpp \
+    widgets/cwe_create_simulation.cpp \
+    widgets/cwe_manage_simulation.cpp \
+    widgets/cwe_simulation_details.cpp \
+    widgets/cwe_task_list.cpp \
+    mainWindow/cwe_mainwindow.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -105,7 +114,16 @@ HEADERS  += \
     visualUtils/cfdglcanvas.h \
     visualUtils/cfdtoken.h \
     visualUtils/decompresswrapper.h \
-    taskPanelWindow/visualpanel.h
+    taskPanelWindow/visualpanel.h \
+    widgets/sidebar.h \
+    widgets/cwe_landing.h \
+    widgets/cwe_file_manager.h \
+    widgets/cwe_help.h \
+    widgets/cwe_create_simulation.h \
+    widgets/cwe_manage_simulation.h \
+    widgets/cwe_simulation_details.h \
+    widgets/cwe_task_list.h \
+    mainWindow/cwe_mainwindow.h
 
 FORMS    += \
     fileWindow/remotefilewindow.ui \
@@ -115,4 +133,18 @@ FORMS    += \
     utilWindows/deleteconfirm.ui \
     utilWindows/errorpopup.ui \
     utilWindows/quickinfopopup.ui \
-    utilWindows/singlelinedialog.ui
+    utilWindows/singlelinedialog.ui \
+    widgets/sidebar.ui \
+    widgets/cwe_landing.ui \
+    widgets/cwe_file_manager.ui \
+    widgets/cwe_help.ui \
+    widgets/cwe_create_simulation.ui \
+    widgets/cwe_manage_simulation.ui \
+    widgets/cwe_simulation_details.ui \
+    widgets/cwe_task_list.ui \
+    mainWindow/cwe_mainwindow.ui
+
+DISTFILES +=
+
+RESOURCES += \
+    cwe_resources.qrc
