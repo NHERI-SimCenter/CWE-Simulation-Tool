@@ -15,6 +15,18 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QWidget" name="SideBar" native="true">
       <property name="sizePolicy">
@@ -25,29 +37,20 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>150</width>
+        <width>200</width>
         <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>250</width>
+        <height>16777215</height>
        </size>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QStackedWidget" name="stackedWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>350</width>
-        <height>0</height>
-       </size>
-      </property>
-      <widget class="QWidget" name="widget_1"/>
-      <widget class="QWidget" name="widget_2"/>
-     </widget>
+     <widget class="QWidget" name="stackContainer" native="true"/>
     </item>
    </layout>
   </widget>
@@ -68,6 +71,7 @@
     <addaction name="actionOpen_existing"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
+    <addaction name="action_Quit"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -90,42 +94,47 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionCreate_New_Simulation">
    <property name="text">
-    <string>Create New Simulation</string>
+    <string>Create &amp;New Simulation</string>
    </property>
   </action>
   <action name="actionManage_Simulation">
    <property name="text">
-    <string>Manage Simulation</string>
+    <string>&amp;Manage Simulation</string>
    </property>
   </action>
   <action name="actionOpen">
    <property name="text">
-    <string>New</string>
+    <string>&amp;New</string>
    </property>
   </action>
   <action name="actionOpen_existing">
    <property name="text">
-    <string>Open existing</string>
+    <string>&amp;Open existing</string>
    </property>
   </action>
   <action name="actionSave">
    <property name="text">
-    <string>Save</string>
+    <string>&amp;Save</string>
    </property>
   </action>
   <action name="actionSave_As">
    <property name="text">
-    <string>Save As</string>
+    <string>Save &amp;As</string>
    </property>
   </action>
   <action name="actionAbout_CWE">
    <property name="text">
-    <string>About SimCenter CWE</string>
+    <string>&amp;About SimCenter CWE</string>
    </property>
   </action>
   <action name="actionHelp">
    <property name="text">
-    <string>Help</string>
+    <string>&amp;Help</string>
+   </property>
+  </action>
+  <action name="action_Quit">
+   <property name="text">
+    <string>&amp;Quit</string>
    </property>
   </action>
  </widget>

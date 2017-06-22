@@ -62,9 +62,6 @@
            <property name="text">
             <string/>
            </property>
-           <property name="pixmap">
-            <pixmap>../images/buttons/CWE_button_right_arrows.png</pixmap>
-           </property>
            <property name="scaledContents">
             <bool>true</bool>
            </property>
@@ -102,16 +99,13 @@
            </property>
           </widget>
          </item>
-         <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+         <item>
           <widget class="QLabel" name="lbl_left_arrows">
            <property name="text">
             <string/>
            </property>
-           <property name="pixmap">
-            <pixmap>../images/buttons/CWE_button_left_arrows.png</pixmap>
-           </property>
-           <property name="scaledContents">
-            <bool>true</bool>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>

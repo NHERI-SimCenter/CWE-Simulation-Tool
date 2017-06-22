@@ -1,4 +1,5 @@
-<RCC>
+<!DOCTYPE RCC>
+<RCC version="1.0">
     <qresource prefix="/buttons">
         <file>images/CWE_button_left_arrows.png</file>
         <file>images/CWE_button_right_arrows.png</file>
