@@ -6,15 +6,15 @@
 #include <QStackedLayout>
 #include <QPushButton>
 
-#include "Widgets/cwe_defines.h"
-#include "Widgets/cwe_landing.h"
-#include "Widgets/cwe_create_simulation.h"
-#include "Widgets/cwe_file_manager.h"
-#include "Widgets/cwe_manage_simulation.h"
-#include "Widgets/cwe_simulation_details.h"
-#include "Widgets/cwe_task_list.h"
-#include "Widgets/cwe_help.h"
-#include "Widgets/sidebar.h"
+#include "cwe_guiWidgets/cwe_defines.h"
+#include "cwe_guiWidgets/cwe_landing.h"
+#include "cwe_guiWidgets/cwe_create_simulation.h"
+#include "cwe_guiWidgets/cwe_file_manager.h"
+#include "cwe_guiWidgets/cwe_manage_simulation.h"
+#include "cwe_guiWidgets/cwe_simulation_details.h"
+#include "cwe_guiWidgets/cwe_task_list.h"
+#include "cwe_guiWidgets/cwe_help.h"
+#include "cwe_guiWidgets/sidebar.h"
 
 #include "utilWindows/copyrightdialog.h"
 #include "vwtinterfacedriver.h"
@@ -68,20 +68,9 @@ private:
     QTreeView              *taskTreeView;
     QStackedWidget         *sharedWidget;
     RemoteDataInterface    *dataLink;
-    RemoteFileWindow       *fileTreeModel;
 
     QMap<TASK, int>        stackedWidgetsIndex;
     QStackedLayout         *stackLayout;
-
-
-    QVector<TaskPanelEntry *> taskPanelList;
-    QStandardItemModel taskListModel;
-    const QStringList taskHeaderList = {"Task List:","idNum"};
-
-    void registerTaskPanel(TaskPanelEntry * newPanel);
-    void takePanelOwnership(TaskPanelEntry * newOwner);
-
-    RemoteDataInterface *dataLink;
 };
 
 #endif // CWE_MAINWINDOW_H
