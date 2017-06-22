@@ -50,10 +50,16 @@ int main(int argc, char *argv[])
     VWTinterfaceDriver programDriver;
 
     bool debugLoggingEnabled = false;
+    bool debugWindowEnabled = false;
     for (int i = 0; i < argc; i++)
     {
         if (strcmp(argv[i],"enableDebugLogging") == 0)
         {
+            debugLoggingEnabled = true;
+        }
+        if (strcmp(argv[i],"enableDebugWindow") == 0)
+        {
+            debugWindowEnabled = true;
             debugLoggingEnabled = true;
         }
     }
@@ -78,6 +84,6 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    programDriver.startup();
+    programDriver.startup(debugWindowEnabled);
     return mainRunLoop.exec();
 }

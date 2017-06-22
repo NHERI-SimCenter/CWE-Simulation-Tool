@@ -15,15 +15,7 @@
 #include "Widgets/cwe_help.h"
 #include "Widgets/sidebar.h"
 
-#include "taskPanelWindow/taskpanelentry.h"
-#include "taskPanelWindow/placeholderpanel.h"
-#include "taskPanelWindow/cfdpanel.h"
-#include "taskPanelWindow/debugagaveapppanel.h"
-#include "taskPanelWindow/simplenamevalpanel.h"
-#include "taskPanelWindow/visualpanel.h"
-
 #include "utilWindows/copyrightdialog.h"
-#include "fileWindow/remotefilewindow.h"
 #include "vwtinterfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
@@ -55,7 +47,6 @@ public:
     void setupTaskList();
 
 private slots:
-    void taskEntryClicked(QModelIndex clickedItem);
     void menuExit();
     void menuCopyInfo();
 
@@ -85,19 +76,7 @@ private:
     CWE_task_list          *taskTaskList;
     CWE_help               *taskHelp;
 
-    QTreeView           *taskTreeView;
-    QStackedWidget      *sharedWidget;
     RemoteDataInterface *dataLink;
-    RemoteFileWindow    *fileTreeModel;
-
-    QVector<QWidget *>    stackedWidgetsIndex;
-
-    QVector<TaskPanelEntry *> taskPanelList;
-    QStandardItemModel taskListModel;
-    const QStringList taskHeaderList = {"Task List:","idNum"};
-
-    void registerTaskPanel(TaskPanelEntry * newPanel);
-    void takePanelOwnership(TaskPanelEntry * newOwner);
 };
 
 #endif // CWE_MAINWINDOW_H

@@ -33,8 +33,8 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "panelwindow.h"
-#include "ui_panelwindow.h"
+#include "debugpanelwindow.h"
+#include "ui_debugpanelwindow.h"
 
 #include "taskpanelentry.h"
 #include "placeholderpanel.h"
@@ -44,13 +44,14 @@
 #include "visualpanel.h"
 
 #include "utilWindows/copyrightdialog.h"
-#include "fileWindow/remotefilewindow.h"
 #include "vwtinterfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
-PanelWindow::PanelWindow(VWTinterfaceDriver * newDriver, QWidget *parent) :
+#include "remoteFileOps/remotefiletree.h"
+
+DebugPanelWindow::DebugPanelWindow(VWTinterfaceDriver * newDriver, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::PanelWindow)
+    ui(new Ui::DebugPanelWindow)
 {
     ui->setupUi(this);
 
@@ -63,16 +64,18 @@ PanelWindow::PanelWindow(VWTinterfaceDriver * newDriver, QWidget *parent) :
     taskListModel.setHorizontalHeaderLabels(taskHeaderList);
     taskTreeView->hideColumn(1);
 
-    fileTreeModel = myDriver->getFileDisplay();
+    QTreeView * remoteFileView = this->findChild<QTreeView *>("remoteFileView");
+    QLabel * selectedFileInfo = this->findChild<QLabel *>("selectedFileInfo");
+
+    fileTreeData = new RemoteFileTree(dataLink, remoteFileView, selectedFileInfo, this);
 }
 
-PanelWindow::~PanelWindow()
+DebugPanelWindow::~DebugPanelWindow()
 {
     delete ui;
-    delete fileTreeModel;
 }
 
-void PanelWindow::setupTaskList()
+void DebugPanelWindow::setupTaskList()
 {
     //Populate panel list:
     TaskPanelEntry * realPanel;
@@ -86,7 +89,7 @@ void PanelWindow::setupTaskList()
     aPanel->setPlaceHolderText({"Create Simulation", ". . . Standard Shapes"});
     registerTaskPanel(aPanel);
 
-    realPanel = new SimpleNameValPanel(dataLink, myDriver->getFileDisplay(),
+    realPanel = new SimpleNameValPanel(dataLink, fileTreeData,
     {"Create Simulation", ". . . From Geometry File (2D slice)"},
     {"turbModel", "nu", "velocity", "endTime", "deltaT", "B", "H", "pisoCorrectors", "pisoNonOrthCorrect"},
     {"SlicePlane", "NewCaseFolder"}, "SimParams" ,"twoDslice");
@@ -96,7 +99,7 @@ void PanelWindow::setupTaskList()
     aPanel->setPlaceHolderText({"Create Simulation", ". . . From Geometry File (3D)"});
     registerTaskPanel(aPanel);
 
-    realPanel = new SimpleNameValPanel(dataLink, myDriver->getFileDisplay(),
+    realPanel = new SimpleNameValPanel(dataLink, fileTreeData,
     {"Mesh Generation", ". . . From Simple Geometry Format"},
     {"boundaryTop", "boundaryLow", "inPad", "outPad", "topPad", "bottomPad", "meshDensity", "meshDensityFar"},
     {}, "MeshParams" ,"twoDUmesh");
@@ -110,7 +113,7 @@ void PanelWindow::setupTaskList()
     aPanel->setPlaceHolderText({"Mesh Generation", ". . . Using Shape Template"});
     registerTaskPanel(aPanel);
 
-    realPanel = new CFDpanel(dataLink, fileTreeModel);
+    realPanel = new CFDpanel(dataLink, fileTreeData);
     registerTaskPanel(realPanel);
 
     aPanel = new PlaceholderPanel();
@@ -128,7 +131,7 @@ void PanelWindow::setupTaskList()
     aPanel->setPlaceHolderText({"View Results", "Quick Simulation Stats"});
     registerTaskPanel(aPanel);
 
-    realPanel = new VisualPanel(dataLink, fileTreeModel,{"View Results", "Visualize Mesh"},NULL);
+    realPanel = new VisualPanel(dataLink, fileTreeData,{"View Results", "Visualize Mesh"},NULL);
     registerTaskPanel(realPanel);
 
     aPanel = new PlaceholderPanel();
@@ -138,7 +141,7 @@ void PanelWindow::setupTaskList()
     aPanel->setPlaceHolderText({"View Results", "Create Data Graphs"});
     registerTaskPanel(aPanel);
 
-    realPanel = new DebugAgaveAppPanel(dataLink, fileTreeModel);
+    realPanel = new DebugAgaveAppPanel(dataLink, fileTreeData);
     registerTaskPanel(realPanel);
 
     //We then activate the first entry in the list
@@ -146,7 +149,7 @@ void PanelWindow::setupTaskList()
 }
 
 
-void PanelWindow::registerTaskPanel(TaskPanelEntry * newPanel)
+void DebugPanelWindow::registerTaskPanel(TaskPanelEntry * newPanel)
 {
     //TODO: Probably should use style sheets for this coloring
     QColor greyColor(150,150,150);
@@ -203,7 +206,7 @@ void PanelWindow::registerTaskPanel(TaskPanelEntry * newPanel)
     searchNode->parent()->child(currRow,1)->setText(QString::number(newPanel->getFrameId()));
 }
 
-void PanelWindow::takePanelOwnership(TaskPanelEntry * newOwner)
+void DebugPanelWindow::takePanelOwnership(TaskPanelEntry * newOwner)
 {
     if (newOwner->isCurrentActiveFrame())
     {
@@ -222,13 +225,7 @@ void PanelWindow::takePanelOwnership(TaskPanelEntry * newOwner)
     newOwner->frameNowVisible();
 }
 
-void PanelWindow::menuCopyInfo()
-{
-    CopyrightDialog copyrightPopup;
-    copyrightPopup.exec();
-}
-
-void PanelWindow::taskEntryClicked(QModelIndex clickedItem)
+void DebugPanelWindow::taskEntryClicked(QModelIndex clickedItem)
 {
     //TODO: Figure out proper behavior if click down and release up are on two different items
     QStandardItem * clickedTextEntry = taskListModel.itemFromIndex(clickedItem);
@@ -255,9 +252,4 @@ void PanelWindow::taskEntryClicked(QModelIndex clickedItem)
     }
     //Otherwise, give control to that panel
     takePanelOwnership(taskPanelList.at(taskIndex));
-}
-
-void PanelWindow::menuExit()
-{
-    myDriver->shutdown();
 }

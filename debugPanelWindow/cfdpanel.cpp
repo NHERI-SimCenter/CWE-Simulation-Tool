@@ -40,9 +40,9 @@
 #include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
-#include "fileWindow/remotefilewindow.h"
+#include "remoteFileOps/remotefiletree.h"
 
-CFDpanel::CFDpanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader, QObject *parent) : TaskPanelEntry(parent)
+CFDpanel::CFDpanel(RemoteDataInterface * newDataHandle, RemoteFileTree * newReader, QObject *parent) : TaskPanelEntry(parent)
 {
     this->setFrameNameList({"Run/Setup Simulation", ". . . Using OpenFOAM"});
 

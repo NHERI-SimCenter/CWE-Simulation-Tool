@@ -37,12 +37,12 @@
 
 #include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
-#include "fileWindow/remotefilewindow.h"
-#include "fileWindow/filetreenode.h"
+#include "remoteFileOps/remotefiletree.h"
+#include "remoteFileOps/filetreenode.h"
 #include "visualUtils/cfdglcanvas.h"
 #include "visualUtils/decompresswrapper.h"
 
-VisualPanel::VisualPanel(RemoteDataInterface * newDataHandle, RemoteFileWindow * newReader,
+VisualPanel::VisualPanel(RemoteDataInterface * newDataHandle, RemoteFileTree * newReader,
                          QStringList frameNames, QObject *parent) : TaskPanelEntry(parent)
 {
     this->setFrameNameList(frameNames);
