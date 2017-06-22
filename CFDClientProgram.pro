@@ -123,7 +123,8 @@ HEADERS  += \
     widgets/cwe_manage_simulation.h \
     widgets/cwe_simulation_details.h \
     widgets/cwe_task_list.h \
-    mainWindow/cwe_mainwindow.h
+    mainWindow/cwe_mainwindow.h \
+    widgets/cwe_defines.h
 
 FORMS    += \
     fileWindow/remotefilewindow.ui \
