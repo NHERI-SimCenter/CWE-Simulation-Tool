@@ -22,6 +22,12 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -59,6 +65,12 @@
          </item>
          <item>
           <widget class="QLabel" name="lbl_right_arrows">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -75,6 +87,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pb_upload">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>75</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Transfer</string>
            </property>
@@ -104,6 +128,12 @@
          </item>
          <item>
           <widget class="QLabel" name="lbl_left_arrows">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -117,6 +147,18 @@
          </item>
          <item>
           <widget class="QPushButton" name="pb_download">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>75</height>
+            </size>
+           </property>
            <property name="text">
             <string>Transfer</string>
            </property>
@@ -126,19 +168,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QListView" name="listView">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>3</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="resizeMode">
-      <enum>QListView::Fixed</enum>
-     </property>
     </widget>
    </item>
    <item row="1" column="2">
@@ -162,6 +191,16 @@
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>Remote files:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QListView" name="listView_localFiles">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>3</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
     </widget>
    </item>

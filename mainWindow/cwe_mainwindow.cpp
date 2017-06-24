@@ -56,6 +56,8 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
     widgetStack->setLayout(stackLayout);
 
+    SideBar_task_selected(TASK_LANDING);
+
     connect(taskSideBar, SIGNAL(taskSelected(TASK)), this, SLOT(SideBar_task_selected(TASK)));
 }
 
@@ -115,4 +117,66 @@ void CWE_MainWindow::selectManageFiles()
 
 void CWE_MainWindow::selectHelp()
 {
+}
+
+
+void CWE_MainWindow::on_actionOpen_triggered()
+{
+
+}
+
+void CWE_MainWindow::on_actionOpen_existing_triggered()
+{
+
+}
+
+void CWE_MainWindow::on_actionSave_triggered()
+{
+
+}
+
+void CWE_MainWindow::on_actionSave_As_triggered()
+{
+
+}
+
+void CWE_MainWindow::on_actionAbout_CWE_triggered()
+{
+
+}
+
+
+void CWE_MainWindow::on_actionCreate_New_Simulation_triggered()
+{
+    SideBar_task_selected(TASK_CREATE_NEW_SIMULATION);
+}
+
+void CWE_MainWindow::on_actionManage_Simulation_triggered()
+{
+    SideBar_task_selected(TASK_MANAGE_SIMULATION);
+}
+
+void CWE_MainWindow::on_actionHelp_triggered()
+{
+    SideBar_task_selected(TASK_HELP);
+}
+
+void CWE_MainWindow::on_action_Landing_Page_triggered()
+{
+    SideBar_task_selected(TASK_LANDING);
+}
+
+void CWE_MainWindow::on_actionManage_Remote_Jobs_triggered()
+{
+    SideBar_task_selected(TASK_MANAGE_JOBS);
+}
+
+void CWE_MainWindow::on_actionTutorials_and_Help_triggered()
+{
+    SideBar_task_selected(TASK_HELP);
+}
+
+void CWE_MainWindow::on_actionManage_and_Download_Files_triggered()
+{
+    SideBar_task_selected(TASK_MANAGE_FILES);
 }
