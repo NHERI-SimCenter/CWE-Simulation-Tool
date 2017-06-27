@@ -47,15 +47,15 @@ CWE_file_manager::CWE_file_manager(QWidget *parent) :
     localFileModel = new QFileSystemModel(this);
 
     // Set filter
-    localFileModel->setFilter(QDir::AllDirs | QDir::Files);
-    ui->localListView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    localFileModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
+    ui->localTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     // Attach the model to the view
-    ui->localListView->setModel(localFileModel);
+    ui->localTreeView->setModel(localFileModel);
 
     // QFileSystemModel requires root path
     localFileModel->setRootPath(QDir::homePath());
-    ui->localListView->setRootIndex(localFileModel->setRootPath(QDir::homePath()));
+    ui->localTreeView->setRootIndex(localFileModel->setRootPath(QDir::homePath()));
 }
 
 CWE_file_manager::~CWE_file_manager()
@@ -79,6 +79,6 @@ void CWE_file_manager::on_localListView_doubleClicked(const QModelIndex &index)
     if (localFileModel->isDir(index))
     {
        QString mPath = localFileModel->fileInfo(index).absoluteFilePath();
-       ui->localListView->setRootIndex(localFileModel->setRootPath(mPath));
+       ui->localTreeView->setRootIndex(localFileModel->setRootPath(mPath));
     }
 }

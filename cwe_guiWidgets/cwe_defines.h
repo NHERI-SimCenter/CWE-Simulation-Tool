@@ -12,7 +12,13 @@ typedef enum {
     TASK_MANAGE_JOBS,
     TASK_LIST_TASKS,
     TASK_HELP,
-    TASK_MAX_TASKS
+    TASK_MAX_TASKS,
+    TASK_SIMULATION_DETAILS
 } TASK;
+
+typedef enum {
+    SIM_MODE_2D,
+    SIM_MODE_3D
+} SIM_MODE;
 
 #endif // CWE_DEFINES_H

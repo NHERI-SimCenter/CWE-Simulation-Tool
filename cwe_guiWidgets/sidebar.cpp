@@ -72,7 +72,7 @@ void SideBar::pb_sideBar_run_clicked()
 
 void SideBar::pb_sideBar_jobs_clicked()
 {
-   emit taskSelected(TASK_MANAGE_JOBS);
+   emit taskSelected(TASK_LIST_TASKS);
 }
 
 void SideBar::pb_sideBar_help_clicked()
