@@ -50,12 +50,12 @@ CWE_file_manager::CWE_file_manager(QWidget *parent) :
     localFileModel->setFilter(QDir::AllDirs | QDir::Files);
     ui->localListView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    // QFileSystemModel requires root path
-    localFileModel->setRootPath(QDir::homePath());
-    ui->localListView->setRootIndex(localFileModel->index(QDir::currentPath()));
-
     // Attach the model to the view
     ui->localListView->setModel(localFileModel);
+
+    // QFileSystemModel requires root path
+    localFileModel->setRootPath(QDir::homePath());
+    ui->localListView->setRootIndex(localFileModel->setRootPath(QDir::homePath()));
 }
 
 CWE_file_manager::~CWE_file_manager()
