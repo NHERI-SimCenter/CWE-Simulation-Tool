@@ -39,7 +39,7 @@
 #include "utilWindows/authform.h"
 #include "utilWindows/errorpopup.h"
 #include "utilWindows/quickinfopopup.h"
-#include "debugPanelWindow/debugpanelwindow.h"
+#include "utilWindows/debugpanelwindow.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
@@ -84,7 +84,7 @@ void VWTinterfaceDriver::startup(bool useDebugPanel)
 
     if (useDebugPanel)
     {
-        debugWindow = new DebugPanelWindow(this);
+        debugWindow = new DebugPanelWindow(theConnector);
     }
 }
 
@@ -167,6 +167,6 @@ void VWTinterfaceDriver::closeAuthScreen()
 
     if (debugWindow != NULL)
     {
-        debugWindow->show();
+        debugWindow->startAndShow();
     }
 }

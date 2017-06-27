@@ -42,15 +42,13 @@ QuickInfoPopup::QuickInfoPopup(QString message, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QLabel * textLabel = this->findChild<QLabel *>("shownText");
-
     if (message != NULL)
     {
-        textLabel->setText(message);
+        ui->shownText->setText(message);
     }
     else
     {
-        textLabel->setText("Error: blank message created.");
+        ui->shownText->setText("Error: blank message created.");
     }
 }
 

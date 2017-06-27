@@ -67,7 +67,6 @@ SOURCES += main.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
     mainWindow/cwe_mainwindow.cpp \
-    debugPanelWindow/debugpanelwindow.cpp \
     remoteFileOps/fileoperator.cpp \
     remoteFileOps/filetreenode.cpp \
     remoteFileOps/joboperator.cpp \
@@ -79,7 +78,8 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_manage_simulation.cpp \
     cwe_guiWidgets/cwe_simulation_details.cpp \
     cwe_guiWidgets/cwe_task_list.cpp \
-    cwe_guiWidgets/sidebar.cpp
+    cwe_guiWidgets/sidebar.cpp \
+    utilWindows/debugpanelwindow.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -99,7 +99,6 @@ HEADERS  += \
     visualUtils/cfdtoken.h \
     visualUtils/decompresswrapper.h \
     mainWindow/cwe_mainwindow.h \
-    debugPanelWindow/debugpanelwindow.h \
     remoteFileOps/fileoperator.h \
     remoteFileOps/filetreenode.h \
     remoteFileOps/joboperator.h \
@@ -112,7 +111,8 @@ HEADERS  += \
     cwe_guiWidgets/cwe_manage_simulation.h \
     cwe_guiWidgets/cwe_simulation_details.h \
     cwe_guiWidgets/cwe_task_list.h \
-    cwe_guiWidgets/sidebar.h
+    cwe_guiWidgets/sidebar.h \
+    utilWindows/debugpanelwindow.h
 
 FORMS    += \
     utilWindows/authform.ui \
@@ -122,7 +122,6 @@ FORMS    += \
     utilWindows/quickinfopopup.ui \
     utilWindows/singlelinedialog.ui \
     mainWindow/cwe_mainwindow.ui \
-    debugPanelWindow/debugpanelwindow.ui \
     cwe_guiWidgets/cwe_create_simulation.ui \
     cwe_guiWidgets/cwe_file_manager.ui \
     cwe_guiWidgets/cwe_help.ui \
@@ -130,7 +129,8 @@ FORMS    += \
     cwe_guiWidgets/cwe_manage_simulation.ui \
     cwe_guiWidgets/cwe_simulation_details.ui \
     cwe_guiWidgets/cwe_task_list.ui \
-    cwe_guiWidgets/sidebar.ui
+    cwe_guiWidgets/sidebar.ui \
+    utilWindows/debugpanelwindow.ui
 
 DISTFILES +=
 

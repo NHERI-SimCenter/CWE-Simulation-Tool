@@ -36,31 +36,29 @@
 #include "debugpanelwindow.h"
 #include "ui_debugpanelwindow.h"
 
-#include "utilWindows/copyrightdialog.h"
 #include "vwtinterfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
+#include "../AgaveClientInterface/filemetadata.h"
 
+#include "remoteFileOps/filetreenode.h"
 #include "remoteFileOps/remotefiletree.h"
+#include "remoteFileOps/joboperator.h"
 
-DebugPanelWindow::DebugPanelWindow(VWTinterfaceDriver * newDriver, QWidget *parent) :
+#include "visualUtils/decompresswrapper.h"
+
+DebugPanelWindow::DebugPanelWindow(RemoteDataInterface *newDataLink, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::DebugPanelWindow)
 {
     ui->setupUi(this);
 
-    myDriver = newDriver;
-    dataLink = myDriver->getDataConnection();
-    taskTreeView = ui->longTaskView;
-    //sharedWidget = this->findChild<QStackedWidget *>("stackedView");
+    dataLink = newDataLink;
 
-    taskTreeView->setModel(&taskListModel);
-    taskListModel.setHorizontalHeaderLabels(taskHeaderList);
-    taskTreeView->hideColumn(1);
+    fileTreeData = new RemoteFileTree(dataLink, ui->remoteFileView, ui->selectedFileInfo, this);
+    remoteJobLister = new JobOperator(dataLink, ui->longTaskView,this);
 
-    QTreeView * remoteFileView = this->findChild<QTreeView *>("remoteFileView");
-    QLabel * selectedFileInfo = this->findChild<QLabel *>("selectedFileInfo");
-
-    fileTreeData = new RemoteFileTree(dataLink, remoteFileView, selectedFileInfo, this);
+    QObject::connect(fileTreeData, SIGNAL(newFileSelected(FileMetaData*)),
+                     this, SLOT(selectedFileChanged(FileMetaData *)));
 }
 
 DebugPanelWindow::~DebugPanelWindow()
@@ -68,231 +66,74 @@ DebugPanelWindow::~DebugPanelWindow()
     delete ui;
 }
 
-void DebugPanelWindow::setupTaskList()
+void DebugPanelWindow::startAndShow()
 {
-    //Populate panel list:
-    TaskPanelEntry * realPanel;
-    PlaceholderPanel * aPanel;
+    selectedFullPath = "/";
+    fileTreeData->resetFileData();
 
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"Create Simulation", ". . . Empty Channel Flow"});
-    registerTaskPanel(aPanel);
+    ui->agaveAppList->setModel(&taskListModel);
+    ui->agaveAppList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"Create Simulation", ". . . Standard Shapes"});
-    registerTaskPanel(aPanel);
-
-    realPanel = new SimpleNameValPanel(dataLink, fileTreeData,
-    {"Create Simulation", ". . . From Geometry File (2D slice)"},
-    {"turbModel", "nu", "velocity", "endTime", "deltaT", "B", "H", "pisoCorrectors", "pisoNonOrthCorrect"},
-    {"SlicePlane", "NewCaseFolder"}, "SimParams" ,"twoDslice");
-    registerTaskPanel(realPanel);
-
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"Create Simulation", ". . . From Geometry File (3D)"});
-    registerTaskPanel(aPanel);
-
-    realPanel = new SimpleNameValPanel(dataLink, fileTreeData,
-    {"Mesh Generation", ". . . From Simple Geometry Format"},
-    {"boundaryTop", "boundaryLow", "inPad", "outPad", "topPad", "bottomPad", "meshDensity", "meshDensityFar"},
-    {}, "MeshParams" ,"twoDUmesh");
-    registerTaskPanel(realPanel);
-
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"Mesh Generation", ". . . For Empty Channel"});
-    registerTaskPanel(aPanel);
-
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"Mesh Generation", ". . . Using Shape Template"});
-    registerTaskPanel(aPanel);
-
-    realPanel = new CFDpanel(dataLink, fileTreeData);
-    registerTaskPanel(realPanel);
-
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"Run/Setup Simulation", ". . . Modify Turbulence Parameters"});
-    registerTaskPanel(aPanel);
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"Run/Setup Simulation", ". . . Modify Inflow Parameters"});
-    registerTaskPanel(aPanel);
-
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"Post-Process", "Extract Data"});
-    registerTaskPanel(aPanel);
-
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"View Results", "Quick Simulation Stats"});
-    registerTaskPanel(aPanel);
-
-    realPanel = new VisualPanel(dataLink, fileTreeData,{"View Results", "Visualize Mesh"},NULL);
-    registerTaskPanel(realPanel);
-
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"View Results", "Visualize Velocity/Pressure Fields"});
-    registerTaskPanel(aPanel);
-    aPanel = new PlaceholderPanel();
-    aPanel->setPlaceHolderText({"View Results", "Create Data Graphs"});
-    registerTaskPanel(aPanel);
-
-    realPanel = new DebugAgaveAppPanel(dataLink, fileTreeData);
-    registerTaskPanel(realPanel);
-
-    //We then activate the first entry in the list
-    taskEntryClicked(taskListModel.invisibleRootItem()->child(0,0)->index());
+    this->show();
 }
 
-
-void DebugPanelWindow::registerTaskPanel(TaskPanelEntry * newPanel)
+void DebugPanelWindow::selectedFileChanged(FileMetaData * newFileData)
 {
-    //TODO: Probably should use style sheets for this coloring
-    QColor greyColor(150,150,150);
-    QBrush greyFont(greyColor);
-
-    QColor blackColor(0,0,0);
-    QBrush blackFont(blackColor);
-
-    taskPanelList.append(newPanel);
-
-    QWidget * newWidgetPane = newPanel->getOwnedWidget();
-    sharedWidget->addWidget(newWidgetPane);
-
-    //TODO: Double check that id and index numbers match each other
-
-    if (taskPanelList.length() == 1)
-    {
-        takePanelOwnership(newPanel);
-    }
-
-    QStringList nameList = newPanel->getFrameNames();
-
-    QStandardItem * searchNode = taskListModel.invisibleRootItem();
-    for (auto itr = nameList.cbegin(); itr != nameList.cend(); itr++)
-    {
-        bool newEntry = true;
-        for (int i = 0; i < searchNode->rowCount(); i++ )
-        {
-            if (searchNode->child(i)->text() == (*itr))
-            {
-                newEntry = false;
-                searchNode = searchNode->child(i);
-                i = searchNode->rowCount();
-            }
-        }
-        if (newEntry)
-        {
-            QList<QStandardItem*> newItemRow;
-            QStandardItem * nameEntry = new QStandardItem(*itr);
-
-            nameEntry->setForeground(greyFont);
-
-            newItemRow.append(nameEntry);
-            newItemRow.append(new QStandardItem("-1"));
-            searchNode->appendRow(newItemRow);
-            searchNode = searchNode->child(searchNode->rowCount() - 1);
-        }
-        if (newPanel->isImplemented())
-        {
-            searchNode->setForeground(blackFont);
-        }
-    }
-    int currRow = searchNode->row();
-    searchNode->parent()->child(currRow,1)->setText(QString::number(newPanel->getFrameId()));
+    selectedFullPath = newFileData->getFullPath();
 }
 
-void DebugPanelWindow::takePanelOwnership(TaskPanelEntry * newOwner)
+void DebugPanelWindow::agaveAppSelected(QModelIndex clickedItem)
 {
-    if (newOwner->isCurrentActiveFrame())
-    {
-        //This is already active frame, so do nothing.
-        return;
-    }
-    sharedWidget->setCurrentIndex(sharedWidget->indexOf(newOwner->getOwnedWidget()));
-    if ((TaskPanelEntry::getActiveFrameId() >= 0) && (TaskPanelEntry::getActiveFrameId() < taskPanelList.length()))
-    {
-        TaskPanelEntry * oldOwner = taskPanelList.at(TaskPanelEntry::getActiveFrameId());
-        oldOwner->frameNowInvisible();
-    }
-
-    newOwner->setAsActive();
-
-    newOwner->frameNowVisible();
+    selectedAgaveApp = taskListModel.itemFromIndex(clickedItem)->text();
 }
 
-void DebugPanelWindow::taskEntryClicked(QModelIndex clickedItem)
-{
-    //TODO: Figure out proper behavior if click down and release up are on two different items
-    QStandardItem * clickedTextEntry = taskListModel.itemFromIndex(clickedItem);
-    int entryRow = clickedTextEntry->row();
-    int taskIndex = -1;
-    if (clickedTextEntry->parent() == NULL)
-    {
-        taskIndex = taskListModel.invisibleRootItem()->child(entryRow, 1)->text().toInt();
-    }
-    else
-    {
-        taskIndex = clickedTextEntry->parent()->child(entryRow, 1)->text().toInt();
-    }
-    if (taskIndex == -1)
-    {
-        //We need to expand an try again one level down
-        if (clickedTextEntry->hasChildren())
-        {
-            taskTreeView->expand(clickedItem);
-            taskTreeView->selectionModel()->select(clickedTextEntry->child(0,0)->index(),QItemSelectionModel::ClearAndSelect);
-            taskEntryClicked(clickedTextEntry->child(0,0)->index());
-        }
-        return;
-    }
-    //Otherwise, give control to that panel
-    takePanelOwnership(taskPanelList.at(taskIndex));
-}
-
-void VisualPanel::selectedFileChanged(FileMetaData * newSelection)
+void DebugPanelWindow::setTestVisual()
 {
     conditionalPurge(&pointData);
     conditionalPurge(&faceData);
     conditionalPurge(&ownerData);
-    myCanvas->setDisplayState(CFDDisplayState::TEST_BOX);
-
-    if (newSelection->getFileType() == FileType::DIR)
-    {
-        FileTreeNode * currentNode = myTreeReader->getFileNodeFromPath(newSelection->getFullPath());
-
-        FileTreeNode * constantFolder = currentNode->getChildNodeWithName("constant");
-        if (constantFolder == NULL) return;
-        FileTreeNode * polyMeshFolder = constantFolder->getChildNodeWithName("polyMesh");
-        if (polyMeshFolder == NULL) return;
-        FileTreeNode * pointsFile = polyMeshFolder->getChildNodeWithName("points");
-        FileTreeNode * facesFile = polyMeshFolder->getChildNodeWithName("faces");
-        FileTreeNode * ownerFile = polyMeshFolder->getChildNodeWithName("owner");
-        if (pointsFile == NULL) pointsFile = polyMeshFolder->getChildNodeWithName("points.gz");
-        if (facesFile == NULL) facesFile = polyMeshFolder->getChildNodeWithName("faces.gz");
-        if (ownerFile == NULL) ownerFile = polyMeshFolder->getChildNodeWithName("owner.gz");
-
-        if ((pointsFile == NULL) || (facesFile == NULL) || (ownerFile == NULL)) return;
-
-        RemoteDataReply * aReply = dataConnection->downloadBuffer(pointsFile->getFileData().getFullPath());
-        QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
-                         this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
-
-        aReply = dataConnection->downloadBuffer(facesFile->getFileData().getFullPath());
-        QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
-                         this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
-
-        aReply = dataConnection->downloadBuffer(ownerFile->getFileData().getFullPath());
-        QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
-                         this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
-    }
+    ui->openGLcfdWidget->setDisplayState(CFDDisplayState::TEST_BOX);
 }
 
-void VisualPanel::conditionalPurge(QByteArray ** theArray)
+void DebugPanelWindow::setMeshVisual()
+{
+    setTestVisual();
+    FileTreeNode * currentNode = fileTreeData->getFileNodeFromPath(selectedFullPath);
+
+    FileTreeNode * constantFolder = currentNode->getChildNodeWithName("constant");
+    if (constantFolder == NULL) return;
+    FileTreeNode * polyMeshFolder = constantFolder->getChildNodeWithName("polyMesh");
+    if (polyMeshFolder == NULL) return;
+    FileTreeNode * pointsFile = polyMeshFolder->getChildNodeWithName("points");
+    FileTreeNode * facesFile = polyMeshFolder->getChildNodeWithName("faces");
+    FileTreeNode * ownerFile = polyMeshFolder->getChildNodeWithName("owner");
+    if (pointsFile == NULL) pointsFile = polyMeshFolder->getChildNodeWithName("points.gz");
+    if (facesFile == NULL) facesFile = polyMeshFolder->getChildNodeWithName("faces.gz");
+    if (ownerFile == NULL) ownerFile = polyMeshFolder->getChildNodeWithName("owner.gz");
+
+    if ((pointsFile == NULL) || (facesFile == NULL) || (ownerFile == NULL)) return;
+
+    RemoteDataReply * aReply = dataLink->downloadBuffer(pointsFile->getFileData().getFullPath());
+    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
+                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
+
+    aReply = dataLink->downloadBuffer(facesFile->getFileData().getFullPath());
+    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
+                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
+
+    aReply = dataLink->downloadBuffer(ownerFile->getFileData().getFullPath());
+    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
+                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
+}
+
+void DebugPanelWindow::conditionalPurge(QByteArray ** theArray)
 {
     if (*theArray == NULL) return;
     delete *theArray;
     *theArray = NULL;
 }
 
-void VisualPanel::gotNewRawFile(RequestState authReply, QByteArray * fileBuffer)
+void DebugPanelWindow::gotNewRawFile(RequestState authReply, QByteArray * fileBuffer)
 {
     if (authReply != RequestState::GOOD) return;
 
@@ -330,91 +171,41 @@ void VisualPanel::gotNewRawFile(RequestState authReply, QByteArray * fileBuffer)
     }
     if ((pointData != NULL) && (faceData != NULL) && (ownerData != NULL))
     {
-        if(myCanvas->loadMeshData(pointData, faceData, ownerData))
+        if(ui->openGLcfdWidget->loadMeshData(pointData, faceData, ownerData))
         {
-            myCanvas->setDisplayState(CFDDisplayState::MESH);
+            ui->openGLcfdWidget->setDisplayState(CFDDisplayState::MESH);
         }
     }
 }
 
-void CFDpanel::cfdSelected()
-{
-    qDebug("Beginning CFD task");
-    QMultiMap<QString, QString> oneInput;
-    oneInput.insert("solver","pisoFoam");
-    FileMetaData fileData = myTreeReader->getCurrentSelectedFile();
-    if (fileData.getFileType() != FileType::DIR)
-    {
-        //TODO: give reasonable error
-        return;
-    }
-    RemoteDataReply * compressTask = dataConnection->runRemoteJob("openfoam",oneInput,fileData.getFullPath());
-    if (compressTask == NULL)
-    {
-        //TODO: give reasonable error
-        return;
-    }
-    QObject::connect(compressTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(finishedCFDinvoke(RequestState,QJsonDocument*)));
-}
+    //{"Create Simulation", ". . . From Geometry File (2D slice)"},
+    //{"turbModel", "nu", "velocity", "endTime", "deltaT", "B", "H", "pisoCorrectors", "pisoNonOrthCorrect"},
+    //{"SlicePlane", "NewCaseFolder"}, "SimParams" ,"twoDslice");
 
-void CFDpanel::finishedCFDinvoke(RequestState finalState, QJsonDocument *)
-{
-    if (finalState != RequestState::GOOD)
-    {
-        //TODO: give reasonable error
-        return;
-    }
+    //{"Mesh Generation", ". . . From Simple Geometry Format"},
+    //{"boundaryTop", "boundaryLow", "inPad", "outPad", "topPad", "bottomPad", "meshDensity", "meshDensityFar"},
+    //{}, "MeshParams" ,"twoDUmesh");
 
-    //TODO: ask for refresh of relevant containing folder
-}
-
-DebugAgaveAppPanel::DebugAgaveAppPanel(RemoteDataInterface * newDataHandle, RemoteFileTree * newReader, QObject *parent) : TaskPanelEntry(parent)
-{
-    this->setFrameNameList({"Debug", "Test Agave App"});
-
-    myTreeReader = newReader;
-    dataConnection = newDataHandle;
-
-    agaveAppList.appendRow(new QStandardItem("FileEcho"));
+/*
+ * agaveAppList.appendRow(new QStandardItem("FileEcho"));
     inputLists.insert("FileEcho", {"NewFile", "EchoText"});
     agaveAppList.appendRow(new QStandardItem("PythonTest"));
     inputLists.insert("PythonTest", {"NewFile"});
     agaveAppList.appendRow(new QStandardItem("SectionMesh"));
     inputLists.insert("SectionMesh", {"directory", "SlicePlane","SimParams"});
-}
 
-void DebugAgaveAppPanel::setupOwnFrame()
+
+    oneInput.insert("solver","pisoFoam");
+    */
+
+void DebugPanelWindow::placeInputPairs(QModelIndex newSelected)
 {
-    vLayout = new QVBoxLayout;
+    QObjectList childList = ui->AgaveParamWidget->children();
 
-    agaveOptionList = new QListView();
-    agaveOptionList->setModel(&agaveAppList);
-    agaveOptionList->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    QObject::connect(agaveOptionList,SIGNAL(clicked(QModelIndex)), this, SLOT(placeInputPairs(QModelIndex)));
-    vLayout->addWidget(agaveOptionList);
-
-    startButton = new QPushButton("Start Agave App");
-    QObject::connect(startButton,SIGNAL(clicked(bool)),this,SLOT(commandInvoked()));
-    vLayout->addWidget(startButton);
-
-    getOwnedWidget()->setLayout(vLayout);
-}
-
-void DebugAgaveAppPanel::placeInputPairs(QModelIndex newSelected)
-{
-    if (buttonArea != NULL)
+    /*
+    for ()
     {
-        QLayoutItem * toDelete;
-        toDelete = buttonArea->takeAt(0);
-        while (toDelete != NULL)
-        {
-            delete toDelete->widget();
-            delete toDelete;
-            toDelete = buttonArea->takeAt(0);
-        }
-        delete buttonArea;
-        buttonArea = NULL;
+
     }
 
     QString selectedApp = agaveAppList.itemFromIndex(newSelected)->text();
@@ -445,10 +236,12 @@ void DebugAgaveAppPanel::placeInputPairs(QModelIndex newSelected)
     }
 
     vLayout->addLayout(buttonArea);
+    */
 }
 
-void DebugAgaveAppPanel::commandInvoked()
+void DebugPanelWindow::agaveCommandInvoked()
 {
+    /*
     if (waitingOnCommand)
     {
         return;
@@ -485,123 +278,15 @@ void DebugAgaveAppPanel::commandInvoked()
     waitingOnCommand = true;
     expectedCommand = selectedApp;
     QObject::connect(theTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(commandReply(RequestState,QJsonDocument*)));
-}
-
-void DebugAgaveAppPanel::commandReply(RequestState finalState, QJsonDocument *)
-{
-    waitingOnCommand = false;
-    if (finalState != RequestState::GOOD)
-    {
-        //TODO: give reasonable error
-        return;
-    }
-
-    //TODO: ask for refresh of relevant containing folder
-}
-
-void SimpleNameValPanel::setupOwnFrame()
-{
-    QVBoxLayout * vLayout = new QVBoxLayout;
-
-    for (auto itr = indirectParamList.cbegin(); itr != indirectParamList.cend(); itr++)
-    {
-        QString itemName = (*itr);
-        QHBoxLayout * nameValPair = new QHBoxLayout;
-
-        QLabel * headLabel = new QLabel(itemName);
-        nameValPair->addWidget(headLabel);
-
-        QLineEdit * dataEntry = new QLineEdit();
-        dataEntry->setObjectName(itemName);
-        indirectParamBoxes.append(dataEntry);
-        nameValPair->addWidget(dataEntry);
-        vLayout->addLayout(nameValPair);
-    }
-
-    for (auto itr = directParamList.cbegin(); itr != directParamList.cend(); itr++)
-    {
-        QString itemName = (*itr);
-        QHBoxLayout * nameValPair = new QHBoxLayout;
-
-        QLabel * headLabel = new QLabel(itemName);
-        nameValPair->addWidget(headLabel);
-
-        QLineEdit * dataEntry = new QLineEdit();
-        dataEntry->setObjectName(itemName);
-        directParamBoxes.append(dataEntry);
-        nameValPair->addWidget(dataEntry);
-        vLayout->addLayout(nameValPair);
-    }
-
-    startButton = new QPushButton("Begin App");
-    QObject::connect(startButton,SIGNAL(clicked(bool)),this,SLOT(appInvoked()));
-    vLayout->addWidget(startButton);
-    startButton->setVisible(false);
-
-    getOwnedWidget()->setLayout(vLayout);
-}
-
-void SimpleNameValPanel::frameNowVisible()
-{
-    QObject::connect(myTreeReader, SIGNAL(newFileSelected(FileMetaData *)), this, SLOT(selectedFileChanged(FileMetaData *)));
-    myTreeReader->resendSelectedFile();
-}
-
-void SimpleNameValPanel::frameNowInvisible()
-{
-    QObject::disconnect(myTreeReader, SIGNAL(newFileSelected(FileMetaData *)), this, SLOT(selectedFileChanged(FileMetaData *)));
-}
-
-void SimpleNameValPanel::selectedFileChanged(FileMetaData * newSelection)
-{
-    if (newSelection->getFileType() == FileType::DIR)
-    {
-        startButton->setVisible(true);
-    }
-}
-
-void SimpleNameValPanel::appInvoked()
-{
-    qDebug("Beginning CFD task");
-    FileMetaData fileData = myTreeReader->getCurrentSelectedFile();
-
-    QMultiMap<QString, QString> inputList;
-    QString fullIndirectInput;
-    for (auto itr = indirectParamBoxes.cbegin(); itr != indirectParamBoxes.cend(); itr++)
-    {
-        if (!((*itr)->text().isEmpty()))
-        {
-            fullIndirectInput.append((*itr)->objectName());
-            fullIndirectInput.append(" ");
-            fullIndirectInput.append((*itr)->text());
-            fullIndirectInput.append(" ");
-        }
-    }
-    inputList.insert(composedParamName, fullIndirectInput);
-
-    for (auto itr = directParamBoxes.cbegin(); itr != directParamBoxes.cend(); itr++)
-    {
-        inputList.insert((*itr)->objectName(), (*itr)->text());
-    }
-
-    RemoteDataReply * remoteTask = dataConnection->runRemoteJob(appName,inputList,fileData.getFullPath());
-    if (remoteTask == NULL)
-    {
-        //TODO: give reasonable error
-        return;
-    }
-    QObject::connect(remoteTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(finishedAppInvoke(RequestState,QJsonDocument*)));
+*/
 }
 
-void SimpleNameValPanel::finishedAppInvoke(RequestState finalState, QJsonDocument *)
+void DebugPanelWindow::finishedAppInvoke(RequestState finalState, QJsonDocument *)
 {
     if (finalState != RequestState::GOOD)
     {
         //TODO: give reasonable error
         return;
     }
-
-    //TODO: ask for refresh of relevant containing folder
 }
