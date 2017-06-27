@@ -77,8 +77,12 @@
     <property name="title">
      <string>Window</string>
     </property>
+    <addaction name="action_Landing_Page"/>
     <addaction name="actionCreate_New_Simulation"/>
     <addaction name="actionManage_Simulation"/>
+    <addaction name="actionManage_and_Download_Files"/>
+    <addaction name="actionManage_Remote_Jobs"/>
+    <addaction name="actionTutorials_and_Help"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -99,7 +103,7 @@
   </action>
   <action name="actionManage_Simulation">
    <property name="text">
-    <string>&amp;Manage Simulation</string>
+    <string>Manage and &amp;Run Simulation</string>
    </property>
   </action>
   <action name="actionOpen">
@@ -135,6 +139,31 @@
   <action name="action_Quit">
    <property name="text">
     <string>&amp;Quit</string>
+   </property>
+  </action>
+  <action name="action_Landing_Page">
+   <property name="text">
+    <string>&amp;Landing Page</string>
+   </property>
+  </action>
+  <action name="actionManage_Jobs">
+   <property name="text">
+    <string>Manage and &amp;Download Files</string>
+   </property>
+  </action>
+  <action name="actionManage_Remote_Jobs">
+   <property name="text">
+    <string>Manage Remote &amp;Jobs</string>
+   </property>
+  </action>
+  <action name="actionTutorials_and_Help">
+   <property name="text">
+    <string>Tutorials and &amp;Help</string>
+   </property>
+  </action>
+  <action name="actionManage_and_Download_Files">
+   <property name="text">
+    <string>Manage and &amp;Download Files</string>
    </property>
   </action>
  </widget>
