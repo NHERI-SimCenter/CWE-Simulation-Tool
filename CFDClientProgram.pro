@@ -67,13 +67,7 @@ SOURCES += main.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
     mainWindow/cwe_mainwindow.cpp \
-    debugPanelWindow/cfdpanel.cpp \
-    debugPanelWindow/debugagaveapppanel.cpp \
     debugPanelWindow/debugpanelwindow.cpp \
-    debugPanelWindow/placeholderpanel.cpp \
-    debugPanelWindow/simplenamevalpanel.cpp \
-    debugPanelWindow/taskpanelentry.cpp \
-    debugPanelWindow/visualpanel.cpp \
     remoteFileOps/fileoperator.cpp \
     remoteFileOps/filetreenode.cpp \
     remoteFileOps/joboperator.cpp \
@@ -105,13 +99,7 @@ HEADERS  += \
     visualUtils/cfdtoken.h \
     visualUtils/decompresswrapper.h \
     mainWindow/cwe_mainwindow.h \
-    debugPanelWindow/cfdpanel.h \
-    debugPanelWindow/debugagaveapppanel.h \
     debugPanelWindow/debugpanelwindow.h \
-    debugPanelWindow/placeholderpanel.h \
-    debugPanelWindow/simplenamevalpanel.h \
-    debugPanelWindow/taskpanelentry.h \
-    debugPanelWindow/visualpanel.h \
     remoteFileOps/fileoperator.h \
     remoteFileOps/filetreenode.h \
     remoteFileOps/joboperator.h \

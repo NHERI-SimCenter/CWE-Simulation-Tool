@@ -33,100 +33,49 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "taskpanelentry.h"
+#ifndef PANELWINDOW_H
+#define PANELWINDOW_H
 
-int TaskPanelEntry::activeFrameId = -1;
-int TaskPanelEntry::nextUnusedFrameId = 0;
+#include <QMainWindow>
+#include <QTreeView>
+#include <QStandardItemModel>
+#include <QStackedWidget>
 
-TaskPanelEntry::TaskPanelEntry(QObject *parent) : QObject(parent)
-  , frameNameList({"Invalid Entry", "Invalid Entry"})
-{
-    frameId = getNewFrameId();
-    implemented = true;
-    ownWidget = NULL;
+class RemoteFileTree;
+class RemoteDataInterface;
+class VWTinterfaceDriver;
+
+namespace Ui {
+class DebugPanelWindow;
 }
 
-TaskPanelEntry::~TaskPanelEntry()
+class DebugPanelWindow : public QMainWindow
 {
-    if (ownWidget != NULL)
-    {
-        ownWidget->deleteLater();
-    }
-}
+    Q_OBJECT
 
-void TaskPanelEntry::setFrameNameList(QStringList nameList)
-{
-    frameNameList = nameList;
-}
+public:
+    explicit DebugPanelWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
+    ~DebugPanelWindow();
 
-void TaskPanelEntry::setAsNotImplemented()
-{
-    implemented = false;
-}
+    void setupTaskList();
 
-void TaskPanelEntry::setAsActive()
-{
-    activeFrameId = frameId;
-}
+private slots:
+    void taskEntryClicked(QModelIndex clickedItem);
 
-bool TaskPanelEntry::isImplemented()
-{
-    return implemented;
-}
+private:
+    Ui::DebugPanelWindow *ui;
+    VWTinterfaceDriver * myDriver;
+    QTreeView * taskTreeView;
+    QStackedWidget *sharedWidget;
+    RemoteDataInterface * dataLink;
+    RemoteFileTree * fileTreeData;
 
-bool TaskPanelEntry::isCurrentActiveFrame()
-{
-    return (activeFrameId == frameId);
-}
+    QVector<TaskPanelEntry *> taskPanelList;
+    QStandardItemModel taskListModel;
+    const QStringList taskHeaderList = {"Task List:","idNum"};
 
-int TaskPanelEntry::getFrameId()
-{
-    return frameId;
-}
+    void registerTaskPanel(TaskPanelEntry * newPanel);
+    void takePanelOwnership(TaskPanelEntry * newOwner);
+};
 
-QStringList TaskPanelEntry::getFrameNames()
-{
-    return frameNameList;
-}
-
-QWidget * TaskPanelEntry::getOwnedWidget()
-{
-    if (ownWidget == NULL)
-    {
-        ownWidget = new QWidget();
-        setupOwnFrame();
-    }
-    return ownWidget;
-}
-
-int TaskPanelEntry::getActiveFrameId()
-{
-    return activeFrameId;
-}
-
-int TaskPanelEntry::getNewFrameId()
-{
-    int ret = nextUnusedFrameId;
-    nextUnusedFrameId++;
-    return ret;
-}
-
-//These virtual functions should be overwritten in subclasses
-void TaskPanelEntry::setupOwnFrame()
-{
-    QLabel * warningLabel = new QLabel("Error, this message should never appear.");
-    QHBoxLayout *hLayout = new QHBoxLayout;
-
-    hLayout->addWidget(warningLabel);
-    ownWidget->setLayout(hLayout);
-}
-
-void TaskPanelEntry::frameNowVisible()
-{
-
-}
-
-void TaskPanelEntry::frameNowInvisible()
-{
-
-}
+#endif // PANELWINDOW_H
