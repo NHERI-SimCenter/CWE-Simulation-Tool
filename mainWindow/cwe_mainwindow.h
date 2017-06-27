@@ -49,6 +49,20 @@ private slots:
     void selectManageFiles();
     void selectHelp();
 
+    void on_actionCreate_New_Simulation_triggered();
+    void on_actionManage_Simulation_triggered();
+    void on_actionOpen_triggered();
+    void on_actionOpen_existing_triggered();
+    void on_actionSave_triggered();
+    void on_actionSave_As_triggered();
+    void on_actionAbout_CWE_triggered();
+    void on_actionHelp_triggered();
+    void on_action_Landing_Page_triggered();
+    void on_actionManage_Remote_Jobs_triggered();
+    void on_actionTutorials_and_Help_triggered();
+
+    void on_actionManage_and_Download_Files_triggered();
+
 private:
     Ui::CWE_MainWindow *ui;
 
