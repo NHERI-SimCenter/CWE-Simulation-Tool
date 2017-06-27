@@ -36,7 +36,7 @@
 #define CWE_FILE_MANAGER_H
 
 #include <QWidget>
-#include <QFileDialog>
+#include <QFileSystemModel>
 
 namespace Ui {
 class CWE_file_manager;
@@ -50,9 +50,14 @@ public:
     explicit CWE_file_manager(QWidget *parent = 0);
     ~CWE_file_manager();
 
+private slots:
+    void on_pb_upload_clicked();
+    void on_pb_download_clicked();
+    void on_localListView_doubleClicked(const QModelIndex &index);
+
 private:
     Ui::CWE_file_manager *ui;
-    QFileDialog * localFileDialog;
+    QFileSystemModel *localFileModel;
 };
 
 #endif // CWE_FILE_MANAGER_H
