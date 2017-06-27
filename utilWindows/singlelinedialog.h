@@ -57,7 +57,6 @@ public:
 
 private:
     Ui::SingleLineDialog *ui;
-    QLineEdit * inputLine;
 };
 
 #endif // SINGLELINEDIALOG_H

@@ -38,12 +38,11 @@
 #include "remotefiletree.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
-JobOperator::JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, RemoteFileWindow * parent) : QObject((QObject *)parent)
+JobOperator::JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, QObject * parent) : QObject((QObject *)parent)
 {
     myJobListView = newJobList;
     myJobListView->setModel(&theJobList);
     dataLink = newDataLink;
-    myFileWindow = parent;
     QObject::connect(dataLink, SIGNAL(longRunningTasksUpdated()), this, SLOT(refreshRunningJobList()));
     QObject::connect(myJobListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenu(QPoint)));
 }

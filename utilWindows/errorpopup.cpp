@@ -64,14 +64,12 @@ ErrorPopup::ErrorPopup(QString errorText) :
 
 void ErrorPopup::setErrorLabel(QString errorText)
 {
-    QLabel * errorTextElement = this->findChild<QLabel *>("errorText");
-
     QString realErrorText = errorText;
     realErrorText.prepend(": ");
     realErrorText.prepend(QString::number((unsigned int)errorVal));
     realErrorText.prepend("ERROR ");
 
-    errorTextElement->setText(realErrorText);
+    ui->errorText->setText(realErrorText);
     qDebug("%s",qPrintable(realErrorText));
 }
 

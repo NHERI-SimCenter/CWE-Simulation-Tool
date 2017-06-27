@@ -54,7 +54,7 @@
     <item>
      <widget class="QTabWidget" name="stackedView">
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="filePage">
        <attribute name="title">
@@ -145,16 +145,62 @@
        <attribute name="title">
         <string>Agave App Direct</string>
        </attribute>
-       <widget class="QListWidget" name="agaveAppList">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>256</width>
-          <height>192</height>
-         </rect>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="1">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>File Selected:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" colspan="2">
+         <widget class="QPushButton" name="agaveAppEnactButton">
+          <property name="text">
+           <string>Enact Agave App</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QScrollArea" name="ParamArea">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>2</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="AgaveParamWidget">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>630</width>
+             <height>554</height>
+            </rect>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="selectedFileLabel">
+          <property name="text">
+           <string>None</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" rowspan="5">
+         <widget class="QListView" name="agaveAppList">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="VisualTester">
        <attribute name="title">
@@ -162,7 +208,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="CFDglCanvas" name="openGLWidget">
+         <widget class="CFDglCanvas" name="openGLcfdWidget">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
             <horstretch>0</horstretch>
@@ -181,7 +227,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="MeshVisualButton">
+           <widget class="QPushButton" name="meshVisualButton">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -221,10 +267,76 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>testVisualButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DebugPanelWindow</receiver>
+   <slot>setTestVisual()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>666</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>meshVisualButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DebugPanelWindow</receiver>
+   <slot>setMeshVisual()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>740</x>
+     <y>666</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>agaveAppList</sender>
+   <signal>clicked(QModelIndex)</signal>
+   <receiver>DebugPanelWindow</receiver>
+   <slot>placeInputPairs(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>177</x>
+     <y>363</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>agaveAppEnactButton</sender>
+   <signal>clicked()</signal>
+   <receiver>DebugPanelWindow</receiver>
+   <slot>agaveCommandInvoked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>660</x>
+     <y>105</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>349</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
  <slots>
-  <slot>taskEntryClicked(QModelIndex)</slot>
-  <slot>menuExit()</slot>
-  <slot>menuCopyInfo()</slot>
+  <slot>setTestVisual()</slot>
+  <slot>setMeshVisual()</slot>
+  <slot>placeInputPairs(QModelIndex)</slot>
+  <slot>agaveCommandInvoked()</slot>
  </slots>
 </ui>

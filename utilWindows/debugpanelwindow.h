@@ -42,8 +42,11 @@
 #include <QStackedWidget>
 
 class RemoteFileTree;
+class FileMetaData;
 class RemoteDataInterface;
 class VWTinterfaceDriver;
+class JobOperator;
+enum class RequestState;
 
 namespace Ui {
 class DebugPanelWindow;
@@ -54,28 +57,41 @@ class DebugPanelWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit DebugPanelWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
+    explicit DebugPanelWindow(RemoteDataInterface *newDataLink, QWidget *parent = 0);
     ~DebugPanelWindow();
 
-    void setupTaskList();
+    void startAndShow();
 
 private slots:
-    void taskEntryClicked(QModelIndex clickedItem);
+    void agaveAppSelected(QModelIndex clickedItem);
+    void selectedFileChanged(FileMetaData * newFileData);
+
+    void setTestVisual();
+    void setMeshVisual();
+
+    void placeInputPairs(QModelIndex newSelected);
+    void agaveCommandInvoked();
+    void finishedAppInvoke(RequestState finalState, QJsonDocument * rawReply);
 
 private:
+    void conditionalPurge(QByteArray ** theArray);
+    void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
+
     Ui::DebugPanelWindow *ui;
-    VWTinterfaceDriver * myDriver;
-    QTreeView * taskTreeView;
-    QStackedWidget *sharedWidget;
+
     RemoteDataInterface * dataLink;
     RemoteFileTree * fileTreeData;
 
-    QVector<TaskPanelEntry *> taskPanelList;
-    QStandardItemModel taskListModel;
-    const QStringList taskHeaderList = {"Task List:","idNum"};
+    JobOperator * remoteJobLister;
 
-    void registerTaskPanel(TaskPanelEntry * newPanel);
-    void takePanelOwnership(TaskPanelEntry * newOwner);
+    QStandardItemModel taskListModel;
+    QString selectedAgaveApp;
+
+    QString selectedFullPath;
+
+    QByteArray * pointData = NULL;
+    QByteArray * faceData = NULL;
+    QByteArray * ownerData = NULL;
 };
 
 #endif // PANELWINDOW_H
