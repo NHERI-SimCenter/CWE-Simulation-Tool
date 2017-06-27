@@ -43,13 +43,42 @@ CWE_file_manager::CWE_file_manager(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    localFileDialog = new QFileDialog(ui->listView_localFiles);
-    QLayout *layout = new QHBoxLayout;
-    layout->addWidget(localFileDialog);
-    ui->listView_localFiles->setLayout(layout);
+    // Creates our new model and populate
+    localFileModel = new QFileSystemModel(this);
+
+    // Set filter
+    localFileModel->setFilter(QDir::AllDirs | QDir::Files);
+    ui->localListView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+    // QFileSystemModel requires root path
+    localFileModel->setRootPath(QDir::homePath());
+    ui->localListView->setRootIndex(localFileModel->index(QDir::currentPath()));
+
+    // Attach the model to the view
+    ui->localListView->setModel(localFileModel);
 }
 
 CWE_file_manager::~CWE_file_manager()
 {
     delete ui;
+}
+
+void CWE_file_manager::on_pb_upload_clicked()
+{
+    /* upload selected local files */
+}
+
+void CWE_file_manager::on_pb_download_clicked()
+{
+    /* download selected remote files */
+}
+
+void CWE_file_manager::on_localListView_doubleClicked(const QModelIndex &index)
+{
+    QDir mDir = localFileModel->filePath(index);
+    if (localFileModel->isDir(index))
+    {
+       QString mPath = localFileModel->fileInfo(index).absoluteFilePath();
+       ui->localListView->setRootIndex(localFileModel->setRootPath(mPath));
+    }
 }
