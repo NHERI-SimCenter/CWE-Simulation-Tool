@@ -36,6 +36,7 @@
 #define CWE_FILE_MANAGER_H
 
 #include <QWidget>
+#include <QFileDialog>
 
 namespace Ui {
 class CWE_file_manager;
@@ -51,6 +52,7 @@ public:
 
 private:
     Ui::CWE_file_manager *ui;
+    QFileDialog * localFileDialog;
 };
 
 #endif // CWE_FILE_MANAGER_H
