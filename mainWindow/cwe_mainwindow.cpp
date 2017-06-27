@@ -45,7 +45,7 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
     // 4) manage remote job
     taskSimulationDetail = new CWE_simulation_details(widgetStack);
-    stackedWidgetsIndex.insert(TASK_MANAGE_SIMULATION, stackLayout->addWidget(taskSimulationDetail));
+    stackedWidgetsIndex.insert(TASK_SIMULATION_DETAILS, stackLayout->addWidget(taskSimulationDetail));
 
     taskTaskList         = new CWE_task_list(widgetStack);
     stackedWidgetsIndex.insert(TASK_LIST_TASKS, stackLayout->addWidget(taskTaskList));
@@ -56,9 +56,11 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
     widgetStack->setLayout(stackLayout);
 
-    SideBar_task_selected(TASK_LANDING);
+    task_selected(TASK_LANDING);
 
-    connect(taskSideBar, SIGNAL(taskSelected(TASK)), this, SLOT(SideBar_task_selected(TASK)));
+    connect(taskSideBar, SIGNAL(taskSelected(TASK)), this, SLOT(task_selected(TASK)));
+    connect(taskManageSimulation, SIGNAL(CWE_manage_simulation_signal(TASK)), this, SLOT(task_selected(TASK)));
+    connect(taskCreateSimulation, SIGNAL(CWE_create_simulation_signal(TASK, SIM_MODE)), this, SLOT(create_simulation_task_selected(TASK, SIM_MODE)));
 }
 
 CWE_MainWindow::~CWE_MainWindow()
@@ -90,9 +92,15 @@ void CWE_MainWindow::on_action_Quit_triggered()
 }
 
 /* side bar functionality */
-void CWE_MainWindow::SideBar_task_selected(TASK task)
+void CWE_MainWindow::task_selected(TASK task)
 {
     stackLayout->setCurrentIndex(stackedWidgetsIndex.value(task));
+}
+
+void CWE_MainWindow::create_simulation_task_selected(TASK task, SIM_MODE mode)
+{
+    /* mode is SIM_MODE_2D or SIM_MODE_3D, depending on which putton was clicked */
+    task_selected(task);
 }
 
 void CWE_MainWindow::selectLanding()
@@ -148,35 +156,35 @@ void CWE_MainWindow::on_actionAbout_CWE_triggered()
 
 void CWE_MainWindow::on_actionCreate_New_Simulation_triggered()
 {
-    SideBar_task_selected(TASK_CREATE_NEW_SIMULATION);
+    task_selected(TASK_CREATE_NEW_SIMULATION);
 }
 
 void CWE_MainWindow::on_actionManage_Simulation_triggered()
 {
-    SideBar_task_selected(TASK_MANAGE_SIMULATION);
+    task_selected(TASK_MANAGE_SIMULATION);
 }
 
 void CWE_MainWindow::on_actionHelp_triggered()
 {
-    SideBar_task_selected(TASK_HELP);
+    task_selected(TASK_HELP);
 }
 
 void CWE_MainWindow::on_action_Landing_Page_triggered()
 {
-    SideBar_task_selected(TASK_LANDING);
+    task_selected(TASK_LANDING);
 }
 
 void CWE_MainWindow::on_actionManage_Remote_Jobs_triggered()
 {
-    SideBar_task_selected(TASK_MANAGE_JOBS);
+    task_selected(TASK_LIST_TASKS);
 }
 
 void CWE_MainWindow::on_actionTutorials_and_Help_triggered()
 {
-    SideBar_task_selected(TASK_HELP);
+    task_selected(TASK_HELP);
 }
 
 void CWE_MainWindow::on_actionManage_and_Download_Files_triggered()
 {
-    SideBar_task_selected(TASK_MANAGE_FILES);
+    task_selected(TASK_MANAGE_FILES);
 }

@@ -36,6 +36,7 @@
 #define CWE_MANAGE_SIMULATION_H
 
 #include <QWidget>
+#include "cwe_defines.h"
 
 namespace Ui {
 class CWE_manage_simulation;
@@ -48,6 +49,12 @@ class CWE_manage_simulation : public QWidget
 public:
     explicit CWE_manage_simulation(QWidget *parent = 0);
     ~CWE_manage_simulation();
+
+signals:
+    void CWE_manage_simulation_signal(TASK);
+
+private slots:
+    void on_btn_viewRun_clicked();
 
 private:
     Ui::CWE_manage_simulation *ui;

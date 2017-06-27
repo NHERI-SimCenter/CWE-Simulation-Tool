@@ -41,7 +41,8 @@ private slots:
     void on_action_Quit_triggered();
 
     /* side bar functionality */
-    void SideBar_task_selected(TASK);
+    void task_selected(TASK);
+    void create_simulation_task_selected(TASK, SIM_MODE);
     void selectLanding();
     void selectCreateSimulation();
     void selectManageRun();
