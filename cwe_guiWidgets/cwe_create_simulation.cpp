@@ -46,3 +46,24 @@ CWE_create_simulation::~CWE_create_simulation()
 {
     delete ui;
 }
+
+
+void CWE_create_simulation::on_pb_upload_file_clicked()
+{
+    /* upload selected graphics file */
+}
+
+void CWE_create_simulation::on_pb_2D_slice_clicked()
+{
+    emit CWE_create_simulation_signal(TASK_SIMULATION_DETAILS, SIM_MODE_2D);
+}
+
+void CWE_create_simulation::on_pb_full_3D_clicked()
+{
+    emit CWE_create_simulation_signal(TASK_SIMULATION_DETAILS, SIM_MODE_3D);
+}
+
+void CWE_create_simulation::on_pb_get_info_clicked()
+{
+
+}
