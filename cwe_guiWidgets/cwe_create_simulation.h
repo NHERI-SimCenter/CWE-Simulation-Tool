@@ -36,6 +36,7 @@
 #define CWE_CREATE_SIMULATION_H
 
 #include <QWidget>
+#include "cwe_defines.h"
 
 namespace Ui {
 class CWE_create_simulation;
@@ -48,6 +49,15 @@ class CWE_create_simulation : public QWidget
 public:
     explicit CWE_create_simulation(QWidget *parent = 0);
     ~CWE_create_simulation();
+
+signals:
+    void CWE_create_simulation_signal(TASK, SIM_MODE);
+
+private slots:
+    void on_pb_upload_file_clicked();
+    void on_pb_2D_slice_clicked();
+    void on_pb_full_3D_clicked();
+    void on_pb_get_info_clicked();
 
 private:
     Ui::CWE_create_simulation *ui;

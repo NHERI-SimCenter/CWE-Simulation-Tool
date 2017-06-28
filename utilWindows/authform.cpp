@@ -79,7 +79,12 @@ void AuthForm::performAuth()
     QString unameText = ui->unameInput->text();
     QString passText = ui->passwordInput->text();
 
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
     RemoteDataReply * authReply = theConnection->performAuth(unameText, passText);
+
+    QApplication::restoreOverrideCursor();
+
     if (authReply != NULL)
     {
         errorTextElement->setText("Connecting to DesignSafe");
