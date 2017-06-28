@@ -53,7 +53,6 @@ public:
 private slots:
     void on_pb_upload_clicked();
     void on_pb_download_clicked();
-    void on_localListView_doubleClicked(const QModelIndex &index);
 
 private:
     Ui::CWE_file_manager *ui;

@@ -40,6 +40,10 @@
 #include <QTreeView>
 #include <QStandardItemModel>
 #include <QStackedWidget>
+#include <QLineEdit>
+
+#include <QMap>
+#include <QStringList>
 
 class RemoteFileTree;
 class FileMetaData;
@@ -69,13 +73,13 @@ private slots:
     void setTestVisual();
     void setMeshVisual();
 
-    void placeInputPairs(QModelIndex newSelected);
     void agaveCommandInvoked();
     void finishedAppInvoke(RequestState finalState, QJsonDocument * rawReply);
 
+    void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
+
 private:
     void conditionalPurge(QByteArray ** theArray);
-    void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
 
     Ui::DebugPanelWindow *ui;
 
@@ -92,6 +96,10 @@ private:
     QByteArray * pointData = NULL;
     QByteArray * faceData = NULL;
     QByteArray * ownerData = NULL;
+
+    QMap<QString, QStringList> agaveParamLists;
+
+    bool waitingOnCommand = false;
 };
 
 #endif // PANELWINDOW_H
