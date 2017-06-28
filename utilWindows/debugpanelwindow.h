@@ -33,100 +33,65 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "taskpanelentry.h"
+#ifndef PANELWINDOW_H
+#define PANELWINDOW_H
 
-int TaskPanelEntry::activeFrameId = -1;
-int TaskPanelEntry::nextUnusedFrameId = 0;
+#include <QMainWindow>
+#include <QTreeView>
+#include <QStandardItemModel>
+#include <QStackedWidget>
 
-TaskPanelEntry::TaskPanelEntry(QObject *parent) : QObject(parent)
-  , frameNameList({"Invalid Entry", "Invalid Entry"})
-{
-    frameId = getNewFrameId();
-    implemented = true;
-    ownWidget = NULL;
+class RemoteFileTree;
+class FileMetaData;
+class RemoteDataInterface;
+class VWTinterfaceDriver;
+class JobOperator;
+enum class RequestState;
+
+namespace Ui {
+class DebugPanelWindow;
 }
 
-TaskPanelEntry::~TaskPanelEntry()
+class DebugPanelWindow : public QMainWindow
 {
-    if (ownWidget != NULL)
-    {
-        ownWidget->deleteLater();
-    }
-}
+    Q_OBJECT
 
-void TaskPanelEntry::setFrameNameList(QStringList nameList)
-{
-    frameNameList = nameList;
-}
+public:
+    explicit DebugPanelWindow(RemoteDataInterface *newDataLink, QWidget *parent = 0);
+    ~DebugPanelWindow();
 
-void TaskPanelEntry::setAsNotImplemented()
-{
-    implemented = false;
-}
+    void startAndShow();
 
-void TaskPanelEntry::setAsActive()
-{
-    activeFrameId = frameId;
-}
+private slots:
+    void agaveAppSelected(QModelIndex clickedItem);
+    void selectedFileChanged(FileMetaData * newFileData);
 
-bool TaskPanelEntry::isImplemented()
-{
-    return implemented;
-}
+    void setTestVisual();
+    void setMeshVisual();
 
-bool TaskPanelEntry::isCurrentActiveFrame()
-{
-    return (activeFrameId == frameId);
-}
+    void placeInputPairs(QModelIndex newSelected);
+    void agaveCommandInvoked();
+    void finishedAppInvoke(RequestState finalState, QJsonDocument * rawReply);
 
-int TaskPanelEntry::getFrameId()
-{
-    return frameId;
-}
+private:
+    void conditionalPurge(QByteArray ** theArray);
+    void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
 
-QStringList TaskPanelEntry::getFrameNames()
-{
-    return frameNameList;
-}
+    Ui::DebugPanelWindow *ui;
 
-QWidget * TaskPanelEntry::getOwnedWidget()
-{
-    if (ownWidget == NULL)
-    {
-        ownWidget = new QWidget();
-        setupOwnFrame();
-    }
-    return ownWidget;
-}
+    RemoteDataInterface * dataLink;
+    RemoteFileTree * fileTreeData;
 
-int TaskPanelEntry::getActiveFrameId()
-{
-    return activeFrameId;
-}
+    JobOperator * remoteJobLister;
 
-int TaskPanelEntry::getNewFrameId()
-{
-    int ret = nextUnusedFrameId;
-    nextUnusedFrameId++;
-    return ret;
-}
+    QStandardItemModel taskListModel;
+    QString selectedAgaveApp;
 
-//These virtual functions should be overwritten in subclasses
-void TaskPanelEntry::setupOwnFrame()
-{
-    QLabel * warningLabel = new QLabel("Error, this message should never appear.");
-    QHBoxLayout *hLayout = new QHBoxLayout;
+    QString selectedFullPath;
 
-    hLayout->addWidget(warningLabel);
-    ownWidget->setLayout(hLayout);
-}
+    QByteArray * pointData = NULL;
+    QByteArray * faceData = NULL;
+    QByteArray * ownerData = NULL;
+};
 
-void TaskPanelEntry::frameNowVisible()
-{
-
-}
-
-void TaskPanelEntry::frameNowInvisible()
-{
-
-}
+#endif // PANELWINDOW_H

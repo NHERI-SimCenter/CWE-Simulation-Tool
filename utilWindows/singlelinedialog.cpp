@@ -42,11 +42,8 @@ SingleLineDialog::SingleLineDialog(QString textLine, QString defaultInput, QWidg
 {
     ui->setupUi(this);
 
-    inputLine = this->findChild<QLineEdit *>("InputLine");
-    QLabel * inputLabel = this->findChild<QLabel *>("QueryText");
-
-    inputLabel->setText(textLine);
-    inputLine->setText(defaultInput);
+    ui->QueryText->setText(textLine);
+    ui->InputLine->setText(defaultInput);
 }
 
 SingleLineDialog::~SingleLineDialog()
@@ -56,7 +53,5 @@ SingleLineDialog::~SingleLineDialog()
 
 QString SingleLineDialog::getInputText()
 {
-    return inputLine->text();
+    return ui->InputLine->text();
 }
-
-

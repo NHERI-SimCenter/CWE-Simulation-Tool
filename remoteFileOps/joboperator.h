@@ -48,7 +48,7 @@ class JobOperator : public QObject
 {
     Q_OBJECT
 public:
-    explicit JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, RemoteFileWindow * parent);
+    explicit JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, QObject * parent);
 
 private slots:
     void refreshRunningJobList();
@@ -56,8 +56,6 @@ private slots:
     void demandJobDataRefresh();
 
 private:
-    RemoteFileWindow * myFileWindow;
-
     RemoteDataInterface * dataLink;
     bool jobOperationPending = false;
 

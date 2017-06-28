@@ -41,9 +41,7 @@ DeleteConfirm::DeleteConfirm(QString filePath, QWidget *parent) :
     ui(new Ui::DeleteConfirm)
 {
     ui->setupUi(this);
-
-    QLabel * fileNameLabel = this->findChild<QLabel *>("fileNameLabel");
-    fileNameLabel->setText(filePath);
+    ui->fileNameLabel->setText(filePath);
 }
 
 DeleteConfirm::~DeleteConfirm()
