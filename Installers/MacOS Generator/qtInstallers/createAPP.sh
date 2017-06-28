@@ -3,11 +3,10 @@
 #----- adjust user settings -----------------------------
 
 APPNAME=CFDClientProgram.app
-APPDIR=../../../../build-CFDClientProgram-Desktop_Qt_5_7_0_clang_64bit2-Release/
-#APPDIR=../../../../build-CFDClientProgram-Desktop_Qt_5_7_0_clang_64bit2-Debug/
+APPDIR=../../../../build-CFDClientProgram-Desktop_Qt_5_9_0_clang_64bit-Release/
 APPINSTALLER=SetupSimCenterCFDClient
 
-MACDEPLOY=${HOME}/Qt/5.7/clang_64/bin/macdeployqt
+MACDEPLOY=${HOME}/Qt/5.9/clang_64/bin/macdeployqt
 
 QTINSTALLER=${HOME}/Qt/Tools/QtInstallerFramework/2.0/bin/binarycreator
 QTINSTALLEROPTIONS="--offline-only --ignore-translations -c config/config.xml -p packages"
@@ -25,9 +24,10 @@ cp -R ${APPDIR}${APPNAME} release
 
 ${MACDEPLOY} release/${APPNAME}
 
-cp -R release/${APPNAME} installer/packages/com.vendor.product/data
+cp -R release/${APPNAME} installer/packages/nheri.simcenter.cfdclient/data
 
 cd installer
 
+echo ${QTINSTALLER} ${QTINSTALLEROPTIONS} ${APPINSTALLER}
 ${QTINSTALLER} ${QTINSTALLEROPTIONS} ${APPINSTALLER}
 

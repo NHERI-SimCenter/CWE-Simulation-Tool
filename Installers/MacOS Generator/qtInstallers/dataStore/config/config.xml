@@ -5,6 +5,6 @@
       <Title>Client Program installer</Title>
       <Publisher>NHERI SimCenter</Publisher>
       <StartMenuDir>SimCenter CFD</StartMenuDir>
-      <TargetDir>@HomeDir@/SimCenterCFD</TargetDir>
+      <TargetDir>@HomeDir@/Applications/SimCenterCFD</TargetDir>
       <MaintenanceToolName>RemoveSimCenterCFD</MaintenanceToolName>
   </Installer>
