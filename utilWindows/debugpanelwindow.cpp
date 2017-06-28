@@ -59,6 +59,24 @@ DebugPanelWindow::DebugPanelWindow(RemoteDataInterface *newDataLink, QWidget *pa
 
     QObject::connect(fileTreeData, SIGNAL(newFileSelected(FileMetaData*)),
                      this, SLOT(selectedFileChanged(FileMetaData *)));
+
+    agaveParamLists.insert("FileEcho",{"NewFile", "EchoText"});
+    agaveParamLists.insert("PythonTest",{"NewFile"});
+    agaveParamLists.insert("SectionMesh",{"directory", "SlicePlane","SimParams"});
+
+    agaveParamLists.insert("compress",{"directory", "compression_type"});
+    agaveParamLists.insert("extract", {"inputFile"});
+    agaveParamLists.insert("openfoam", {"solver","inputDirectory"});
+    agaveParamLists.insert("tempCFD",{"solver","inputDirectory"});
+
+    agaveParamLists.insert("twoDslice", {"SlicePlane", "SimParams", "NewCaseFolder","SGFFile"});
+    agaveParamLists.insert("twoDUmesh", {"MeshParams","directory"});
+
+    for (auto itr = agaveParamLists.keyBegin(); itr != agaveParamLists.keyEnd(); itr++)
+    {
+        taskListModel.appendRow(new QStandardItem(*itr));
+    }
+    ui->agaveAppList->setModel(&taskListModel);
 }
 
 DebugPanelWindow::~DebugPanelWindow()
@@ -84,7 +102,40 @@ void DebugPanelWindow::selectedFileChanged(FileMetaData * newFileData)
 
 void DebugPanelWindow::agaveAppSelected(QModelIndex clickedItem)
 {
-    selectedAgaveApp = taskListModel.itemFromIndex(clickedItem)->text();
+    QString newSelection = taskListModel.itemFromIndex(clickedItem)->text();
+    if (selectedAgaveApp == newSelection)
+    {
+        return;
+    }
+    selectedAgaveApp = newSelection;
+
+    QGridLayout * panelLayout = new QGridLayout();
+    QObjectList childList = ui->AgaveParamWidget->children();
+
+    while (childList.size() > 0)
+    {
+        QObject * aChild = childList.takeLast();
+        delete aChild;
+    }
+
+    ui->AgaveParamWidget->setLayout(panelLayout);
+
+    QStringList inputList = agaveParamLists.value(selectedAgaveApp);
+    int rowNum = 0;
+
+    for (auto itr = inputList.cbegin(); itr != inputList.cend(); itr++)
+    {
+        QString paramName = "debugAgave_";
+        paramName = paramName.append(*itr);
+
+        QLabel * tmpLabel = new QLabel(*itr);
+        QLineEdit * tmpInput = new QLineEdit();
+        tmpInput->setObjectName(paramName);
+
+        panelLayout->addWidget(tmpLabel,rowNum,0);
+        panelLayout->addWidget(tmpInput,rowNum,1);
+        rowNum++;
+    }
 }
 
 void DebugPanelWindow::setTestVisual()
@@ -178,89 +229,27 @@ void DebugPanelWindow::gotNewRawFile(RequestState authReply, QByteArray * fileBu
     }
 }
 
-    //{"Create Simulation", ". . . From Geometry File (2D slice)"},
-    //{"turbModel", "nu", "velocity", "endTime", "deltaT", "B", "H", "pisoCorrectors", "pisoNonOrthCorrect"},
-    //{"SlicePlane", "NewCaseFolder"}, "SimParams" ,"twoDslice");
-
-    //{"Mesh Generation", ". . . From Simple Geometry Format"},
-    //{"boundaryTop", "boundaryLow", "inPad", "outPad", "topPad", "bottomPad", "meshDensity", "meshDensityFar"},
-    //{}, "MeshParams" ,"twoDUmesh");
-
-/*
- * agaveAppList.appendRow(new QStandardItem("FileEcho"));
-    inputLists.insert("FileEcho", {"NewFile", "EchoText"});
-    agaveAppList.appendRow(new QStandardItem("PythonTest"));
-    inputLists.insert("PythonTest", {"NewFile"});
-    agaveAppList.appendRow(new QStandardItem("SectionMesh"));
-    inputLists.insert("SectionMesh", {"directory", "SlicePlane","SimParams"});
-
-
-    oneInput.insert("solver","pisoFoam");
-    */
-
-void DebugPanelWindow::placeInputPairs(QModelIndex newSelected)
-{
-    QObjectList childList = ui->AgaveParamWidget->children();
-
-    /*
-    for ()
-    {
-
-    }
-
-    QString selectedApp = agaveAppList.itemFromIndex(newSelected)->text();
-    if (selectedApp.isEmpty())
-    {
-        return;
-    }
-
-    QStringList inputList = inputLists.value(selectedApp);
-
-    if (inputList.size() <= 0)
-    {
-        return;
-    }
-
-    buttonArea = new QGridLayout();
-    int rowNum = 0;
-
-    for (auto itr = inputList.cbegin(); itr != inputList.cend(); itr++)
-    {
-        QLabel * tmpLabel = new QLabel(*itr);
-        QLineEdit * tmpInput = new QLineEdit();
-        tmpInput->setObjectName(*itr);
-
-        buttonArea->addWidget(tmpLabel,rowNum,0);
-        buttonArea->addWidget(tmpInput,rowNum,1);
-        rowNum++;
-    }
-
-    vLayout->addLayout(buttonArea);
-    */
-}
-
 void DebugPanelWindow::agaveCommandInvoked()
 {
-    /*
     if (waitingOnCommand)
     {
         return;
     }
+    qDebug("Selected App: %s", qPrintable(selectedAgaveApp));
 
-    qDebug("Agave Command Test Invoked");
-    QString selectedApp = agaveAppList.itemFromIndex(agaveOptionList->currentIndex())->text();
-    qDebug("Selected App: %s", qPrintable(selectedApp));
-
-    QString workingDir = myTreeReader->getCurrentSelectedFile().getFullPath();
+    QString workingDir = fileTreeData->getCurrentSelectedFile().getFullPath();
     qDebug("Working Dir: %s", qPrintable(workingDir));
 
-    QStringList inputList = inputLists.value(selectedApp);
+    QStringList inputList = agaveParamLists.value(selectedAgaveApp);
     QMultiMap<QString, QString> allInputs;
 
     qDebug("Input List:");
     for (auto itr = inputList.cbegin(); itr != inputList.cend(); itr++)
     {
-        QLineEdit * theInput = this->getOwnedWidget()->findChild<QLineEdit *>(*itr);
+        QString paramName = "debugAgave_";
+        paramName = paramName.append(*itr);
+
+        QLineEdit * theInput = ui->AgaveParamWidget->findChild<QLineEdit *>(paramName);
         if (theInput != NULL)
         {
             allInputs.insert((*itr),theInput->text());
@@ -268,25 +257,18 @@ void DebugPanelWindow::agaveCommandInvoked()
         }
     }
 
-    RemoteDataReply * theTask = dataConnection->runRemoteJob(selectedApp,allInputs,workingDir);
+    RemoteDataReply * theTask = dataLink->runRemoteJob(selectedAgaveApp,allInputs,workingDir);
     if (theTask == NULL)
     {
         qDebug("Unable to invoke task");
-        //TODO: give reasonable error
         return;
     }
     waitingOnCommand = true;
-    expectedCommand = selectedApp;
     QObject::connect(theTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(finishedAppInvoke(RequestState,QJsonDocument*)));
-*/
 }
 
-void DebugPanelWindow::finishedAppInvoke(RequestState finalState, QJsonDocument *)
+void DebugPanelWindow::finishedAppInvoke(RequestState, QJsonDocument *)
 {
-    if (finalState != RequestState::GOOD)
-    {
-        //TODO: give reasonable error
-        return;
-    }
+    waitingOnCommand = false;
 }

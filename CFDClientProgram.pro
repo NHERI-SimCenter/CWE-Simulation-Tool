@@ -79,7 +79,7 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_simulation_details.cpp \
     cwe_guiWidgets/cwe_task_list.cpp \
     cwe_guiWidgets/sidebar.cpp \
-    analysistypes/baseanalysistype.cpp
+    analysistypes/baseanalysistype.cpp \
     utilWindows/debugpanelwindow.cpp
 
 HEADERS  += \
@@ -113,7 +113,7 @@ HEADERS  += \
     cwe_guiWidgets/cwe_simulation_details.h \
     cwe_guiWidgets/cwe_task_list.h \
     cwe_guiWidgets/sidebar.h \
-    analysistypes/baseanalysistype.h
+    analysistypes/baseanalysistype.h \
     utilWindows/debugpanelwindow.h
 
 FORMS    += \

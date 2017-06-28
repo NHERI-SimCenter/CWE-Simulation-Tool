@@ -50,7 +50,7 @@
    <string>Debug Panel</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
      <widget class="QTabWidget" name="stackedView">
       <property name="currentIndex">
@@ -146,6 +146,13 @@
         <string>Agave App Direct</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
+        <item row="3" column="1" colspan="2">
+         <widget class="QPushButton" name="agaveAppEnactButton">
+          <property name="text">
+           <string>Enact Agave App</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="1">
          <widget class="QLabel" name="label">
           <property name="text">
@@ -153,10 +160,20 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1" colspan="2">
-         <widget class="QPushButton" name="agaveAppEnactButton">
+        <item row="0" column="0" rowspan="5">
+         <widget class="QListView" name="agaveAppList">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="selectedFileLabel">
           <property name="text">
-           <string>Enact Agave App</string>
+           <string>None</string>
           </property>
          </widget>
         </item>
@@ -180,24 +197,8 @@
              <height>554</height>
             </rect>
            </property>
+           <layout class="QGridLayout" name="gridLayout_2"/>
           </widget>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLabel" name="selectedFileLabel">
-          <property name="text">
-           <string>None</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" rowspan="5">
-         <widget class="QListView" name="agaveAppList">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>1</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
          </widget>
         </item>
        </layout>
@@ -304,7 +305,7 @@
    <sender>agaveAppList</sender>
    <signal>clicked(QModelIndex)</signal>
    <receiver>DebugPanelWindow</receiver>
-   <slot>placeInputPairs(QModelIndex)</slot>
+   <slot>agaveAppSelected(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>177</x>
@@ -336,7 +337,7 @@
  <slots>
   <slot>setTestVisual()</slot>
   <slot>setMeshVisual()</slot>
-  <slot>placeInputPairs(QModelIndex)</slot>
+  <slot>agaveAppSelected(QModelIndex)</slot>
   <slot>agaveCommandInvoked()</slot>
  </slots>
 </ui>
