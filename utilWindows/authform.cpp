@@ -82,7 +82,12 @@ void AuthForm::performAuth()
     QString unameText = unameInput->text();
     QString passText = passwordInput->text();
 
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
     RemoteDataReply * authReply = theConnection->performAuth(unameText, passText);
+
+    QApplication::restoreOverrideCursor();
+
     if (authReply != NULL)
     {
         QObject::connect(authReply,SIGNAL(haveAuthReply(RequestState)),this,SLOT(getAuthReply(RequestState)));
