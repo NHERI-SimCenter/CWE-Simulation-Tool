@@ -85,7 +85,8 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_manage_simulation.cpp \
     cwe_guiWidgets/cwe_simulation_details.cpp \
     cwe_guiWidgets/cwe_task_list.cpp \
-    cwe_guiWidgets/sidebar.cpp
+    cwe_guiWidgets/sidebar.cpp \
+    analysistypes/baseanalysistype.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -124,7 +125,8 @@ HEADERS  += \
     cwe_guiWidgets/cwe_manage_simulation.h \
     cwe_guiWidgets/cwe_simulation_details.h \
     cwe_guiWidgets/cwe_task_list.h \
-    cwe_guiWidgets/sidebar.h
+    cwe_guiWidgets/sidebar.h \
+    analysistypes/baseanalysistype.h
 
 FORMS    += \
     utilWindows/authform.ui \

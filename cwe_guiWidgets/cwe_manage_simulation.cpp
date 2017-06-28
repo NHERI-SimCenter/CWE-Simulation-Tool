@@ -34,6 +34,7 @@
 
 #include "cwe_manage_simulation.h"
 #include "ui_cwe_manage_simulation.h"
+#include "cwe_defines.h"
 
 CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
     QWidget(parent),
@@ -45,4 +46,9 @@ CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
 CWE_manage_simulation::~CWE_manage_simulation()
 {
     delete ui;
+}
+
+void CWE_manage_simulation::on_btn_viewRun_clicked()
+{
+    emit CWE_manage_simulation_signal(TASK_SIMULATION_DETAILS);
 }
