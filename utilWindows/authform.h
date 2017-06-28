@@ -69,8 +69,6 @@ private:
     VWTinterfaceDriver * myDriver;
 
     QLabel * errorTextElement;
-    QLineEdit * unameInput;
-    QLineEdit * passwordInput;
 };
 
 #endif // AUTHFORM_H

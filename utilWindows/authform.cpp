@@ -50,12 +50,9 @@ AuthForm::AuthForm(RemoteDataInterface * newRemoteHandle, VWTinterfaceDriver * t
     theConnection = newRemoteHandle;
     myDriver = theDriver;
 
-    this->setTabOrder(this->findChild<QWidget *>("unameInput"), this->findChild<QWidget *>("passwordInput"));
-    this->setTabOrder(this->findChild<QWidget *>("passwordInput"), this->findChild<QWidget *>("loginButton"));
-    this->setTabOrder(this->findChild<QWidget *>("loginButton"), this->findChild<QWidget *>("quitButton"));
-
-    unameInput = this->findChild<QLineEdit *>("unameInput");
-    passwordInput = this->findChild<QLineEdit *>("passwordInput");
+    this->setTabOrder(ui->unameInput, ui->passwordInput);
+    this->setTabOrder(ui->passwordInput, ui->loginButton);
+    this->setTabOrder(ui->loginButton, ui->quitButton);
 
     errorTextElement = new QLabel("Waiting for Login");
     this->statusBar()->addWidget(errorTextElement);
@@ -79,8 +76,8 @@ void AuthForm::exitAuth()
 
 void AuthForm::performAuth()
 {
-    QString unameText = unameInput->text();
-    QString passText = passwordInput->text();
+    QString unameText = ui->unameInput->text();
+    QString passText = ui->passwordInput->text();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
@@ -90,6 +87,7 @@ void AuthForm::performAuth()
 
     if (authReply != NULL)
     {
+        errorTextElement->setText("Connecting to DesignSafe");
         QObject::connect(authReply,SIGNAL(haveAuthReply(RequestState)),this,SLOT(getAuthReply(RequestState)));
         QObject::connect(authReply,SIGNAL(haveAuthReply(RequestState)),myDriver, SLOT(getAuthReply(RequestState)));
     }
