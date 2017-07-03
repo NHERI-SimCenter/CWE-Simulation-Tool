@@ -43,23 +43,23 @@
 
 class RemoteFileWindow;
 class RemoteDataInterface;
+class RemoteJobLister;
 
 class JobOperator : public QObject
 {
     Q_OBJECT
 public:
-    explicit JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, QObject * parent);
+    explicit JobOperator(RemoteDataInterface * newDataLink, QObject * parent);
+    void linkToJobLister(RemoteJobLister * newLister);
 
 private slots:
     void refreshRunningJobList();
-    void needRightClickMenu(QPoint);
     void demandJobDataRefresh();
 
 private:
     RemoteDataInterface * dataLink;
     bool jobOperationPending = false;
 
-    QListView * myJobListView;
     QStandardItemModel theJobList;
 };
 

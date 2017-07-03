@@ -63,6 +63,11 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     connect(taskCreateSimulation, SIGNAL(CWE_create_simulation_signal(TASK, SIM_MODE)), this, SLOT(create_simulation_task_selected(TASK, SIM_MODE)));
 }
 
+void CWE_MainWindow::runSetupSteps()
+{
+    taskTaskList->linkJobHandle(myDriver->getJobHandler());
+}
+
 CWE_MainWindow::~CWE_MainWindow()
 {
     delete ui;

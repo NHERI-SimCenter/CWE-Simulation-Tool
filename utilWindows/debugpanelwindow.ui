@@ -54,7 +54,7 @@
     <item>
      <widget class="QTabWidget" name="stackedView">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="filePage">
        <attribute name="title">
@@ -115,27 +115,6 @@
           </property>
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="TasksPage">
-       <attribute name="title">
-        <string>Agave Tasks</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Long Running Tasks:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QListView" name="longTaskView">
-          <property name="contextMenuPolicy">
-           <enum>Qt::CustomContextMenu</enum>
           </property>
          </widget>
         </item>

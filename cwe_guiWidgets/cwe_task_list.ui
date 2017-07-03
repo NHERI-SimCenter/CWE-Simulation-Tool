@@ -58,17 +58,30 @@
     </widget>
    </item>
    <item row="0" column="0" rowspan="3">
-    <widget class="QColumnView" name="columnView">
+    <widget class="RemoteJobLister" name="jobListView">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>5</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RemoteJobLister</class>
+   <extends>QListView</extends>
+   <header>remoteFileOps/remotejoblister.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

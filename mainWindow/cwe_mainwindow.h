@@ -32,7 +32,7 @@ public:
     explicit CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
     ~CWE_MainWindow();
 
-    void setupTaskList();
+    void runSetupSteps();
 
 private slots:
     void menuExit();

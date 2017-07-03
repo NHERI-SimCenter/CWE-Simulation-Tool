@@ -49,7 +49,6 @@ class RemoteFileTree;
 class FileMetaData;
 class RemoteDataInterface;
 class VWTinterfaceDriver;
-class JobOperator;
 enum class RequestState;
 
 namespace Ui {
@@ -85,8 +84,6 @@ private:
 
     RemoteDataInterface * dataLink;
     RemoteFileTree * fileTreeData;
-
-    JobOperator * remoteJobLister;
 
     QStandardItemModel taskListModel;
     QString selectedAgaveApp;
