@@ -58,6 +58,7 @@ class AuthForm;
 
 class DebugPanelWindow;
 class CWE_MainWindow;
+class JobOperator;
 
 class VWTinterfaceDriver : public QObject
 {
@@ -72,6 +73,7 @@ public:
     void closeAuthScreen();
 
     RemoteDataInterface * getDataConnection();
+    JobOperator * getJobHandler();
 
 public slots:
     void getAuthReply(RequestState authReply);
@@ -84,6 +86,7 @@ private slots:
 private:
     RemoteDataInterface * theConnector;
     AuthForm * authWindow;
+    JobOperator * myJobHandle = NULL;
 
     DebugPanelWindow * debugWindow = NULL;
     CWE_MainWindow * mainWindow;

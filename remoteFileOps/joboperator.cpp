@@ -36,15 +36,18 @@
 #include "joboperator.h"
 
 #include "remotefiletree.h"
+#include "remotejoblister.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
-JobOperator::JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, QObject * parent) : QObject((QObject *)parent)
+JobOperator::JobOperator(RemoteDataInterface * newDataLink, QObject * parent) : QObject((QObject *)parent)
 {
-    myJobListView = newJobList;
-    myJobListView->setModel(&theJobList);
     dataLink = newDataLink;
     QObject::connect(dataLink, SIGNAL(longRunningTasksUpdated()), this, SLOT(refreshRunningJobList()));
-    QObject::connect(myJobListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenu(QPoint)));
+}
+
+void JobOperator::linkToJobLister(RemoteJobLister * newLister)
+{
+    newLister->setModel(&theJobList);
 }
 
 void JobOperator::refreshRunningJobList()
@@ -60,15 +63,6 @@ void JobOperator::refreshRunningJobList()
         newRow.append(new QStandardItem((*itr)->getIDstr()));
         theJobList.appendRow(newRow);
     }
-}
-
-void JobOperator::needRightClickMenu(QPoint)
-{
-    QMenu jobMenu;
-
-    jobMenu.addAction("Refresh Info", this, SLOT(demandJobDataRefresh()));
-
-    jobMenu.exec(QCursor::pos());
 }
 
 void JobOperator::demandJobDataRefresh()

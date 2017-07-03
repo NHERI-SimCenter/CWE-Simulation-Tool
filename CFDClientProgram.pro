@@ -80,7 +80,8 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_task_list.cpp \
     cwe_guiWidgets/sidebar.cpp \
     analysistypes/baseanalysistype.cpp \
-    utilWindows/debugpanelwindow.cpp
+    utilWindows/debugpanelwindow.cpp \
+    remoteFileOps/remotejoblister.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -114,7 +115,8 @@ HEADERS  += \
     cwe_guiWidgets/cwe_task_list.h \
     cwe_guiWidgets/sidebar.h \
     analysistypes/baseanalysistype.h \
-    utilWindows/debugpanelwindow.h
+    utilWindows/debugpanelwindow.h \
+    remoteFileOps/remotejoblister.h
 
 FORMS    += \
     utilWindows/authform.ui \

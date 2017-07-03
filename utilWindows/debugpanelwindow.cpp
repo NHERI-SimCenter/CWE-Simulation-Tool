@@ -55,7 +55,6 @@ DebugPanelWindow::DebugPanelWindow(RemoteDataInterface *newDataLink, QWidget *pa
     dataLink = newDataLink;
 
     fileTreeData = new RemoteFileTree(dataLink, ui->remoteFileView, ui->selectedFileInfo, this);
-    remoteJobLister = new JobOperator(dataLink, ui->longTaskView,this);
 
     QObject::connect(fileTreeData, SIGNAL(newFileSelected(FileMetaData*)),
                      this, SLOT(selectedFileChanged(FileMetaData *)));

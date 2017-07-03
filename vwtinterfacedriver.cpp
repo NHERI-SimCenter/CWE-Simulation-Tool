@@ -43,6 +43,8 @@
 
 #include "mainWindow/cwe_mainwindow.h"
 
+#include "remoteFileOps/joboperator.h"
+
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
@@ -72,6 +74,7 @@ VWTinterfaceDriver::~VWTinterfaceDriver()
     if (authWindow != NULL) authWindow->deleteLater();
     if (mainWindow != NULL) mainWindow->deleteLater();
     if (debugWindow != NULL) debugWindow->deleteLater();
+    if (myJobHandle != NULL) myJobHandle->deleteLater();
 }
 
 void VWTinterfaceDriver::startup(bool useDebugPanel)
@@ -130,6 +133,11 @@ RemoteDataInterface * VWTinterfaceDriver::getDataConnection()
     return theConnector;
 }
 
+JobOperator * VWTinterfaceDriver::getJobHandler()
+{
+    return myJobHandle;
+}
+
 void VWTinterfaceDriver::getAuthReply(RequestState authReply)
 {
     if ((authReply == RequestState::GOOD) && (authWindow != NULL) && (authWindow->isVisible()))
@@ -152,6 +160,9 @@ void VWTinterfaceDriver::closeAuthScreen()
     }
     //ErrorPopup("This is a test of the error popup");
 
+    myJobHandle = new JobOperator(theConnector,this);
+
+    mainWindow->runSetupSteps();
     mainWindow->show();
 
     //The dynamics of this are different in windows. TODO: Find a more cross-platform solution
