@@ -38,8 +38,6 @@
 
 #include <QMainWindow>
 #include <QtGlobal>
-#include <QStandardItemModel>
-#include <QStandardItem>
 #include <QTreeView>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -59,29 +57,27 @@ enum class FileColumn : int {FILENAME = 0,
                              MIME_TYPE = 5,
                              PERMISSIONS = 6};
 
-class RemoteDataInterface;
 class FileMetaData;
 class FileTreeNode;
 class FileOperator;
 enum class RequestState;
 
-class RemoteFileTree : public QObject
+class RemoteFileTree : public QTreeView
 {
     Q_OBJECT
 
 public:
-    explicit RemoteFileTree(RemoteDataInterface * newDataLink, QTreeView * thefileTree,
-                            QLabel * selectedFileDisp, QObject *parent = 0);
+    explicit RemoteFileTree(QObject *parent = 0);
     ~RemoteFileTree();
 
-    void resendSelectedFile();
+    void setFileOperator(FileOperator * theOperator);
+    void setSelectedLabel(QLabel * selectedFileDisp);
+
+    void refreshSelection();
     FileMetaData getCurrentSelectedFile();
     void resetFileData();
 
     void updateFileInfo(QList<FileMetaData> * fileDataList);
-
-    void lsClosestNode(QString fullPath);
-    void lsClosestNodeToParent(QString fullPath);
 
     //I don't like having this method public:
     FileTreeNode * getFileNodeFromPath(QString filePath);
@@ -122,11 +118,7 @@ private:
     const QStringList hiddenHeaderLabelList = {"name","type","length","lastModified",
                                    "format","mimeType","permissions"};
 
-    QTreeView * linkedFileView = NULL;
     QLabel * selectedFileDisplay = NULL;
-
-    FileTreeNode * rootFileNode = NULL;
-    QStandardItemModel dataStore;
     FileTreeNode * selectedItem = NULL;
 };
 

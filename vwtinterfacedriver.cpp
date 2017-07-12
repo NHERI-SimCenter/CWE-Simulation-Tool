@@ -44,6 +44,7 @@
 #include "mainWindow/cwe_mainwindow.h"
 
 #include "remoteFileOps/joboperator.h"
+#include "remoteFileOps/fileoperator.h"
 
 VWTinterfaceDriver::VWTinterfaceDriver()
 {
@@ -138,6 +139,11 @@ JobOperator * VWTinterfaceDriver::getJobHandler()
     return myJobHandle;
 }
 
+FileOperator * VWTinterfaceDriver::getFileHandler()
+{
+    return myFileHandle;
+}
+
 void VWTinterfaceDriver::getAuthReply(RequestState authReply)
 {
     if ((authReply == RequestState::GOOD) && (authWindow != NULL) && (authWindow->isVisible()))
@@ -161,6 +167,7 @@ void VWTinterfaceDriver::closeAuthScreen()
     //ErrorPopup("This is a test of the error popup");
 
     myJobHandle = new JobOperator(theConnector,this);
+    myFileHandle = new FileOperator(theConnector,this);
 
     mainWindow->runSetupSteps();
     mainWindow->show();

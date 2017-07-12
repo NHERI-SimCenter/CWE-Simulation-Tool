@@ -43,28 +43,30 @@
 
 #include "utilWindows/errorpopup.h"
 
-RemoteFileTree::RemoteFileTree(RemoteDataInterface * newDataLink, QTreeView * thefileTree,
-                               QLabel * selectedFileDisp, QObject *parent) :
-    QObject(parent)
+RemoteFileTree::RemoteFileTree(QObject *parent) :
+    QTreeView(parent)
 {
-    linkedFileView = thefileTree;
-    selectedFileDisplay = selectedFileDisp;
-
-    QObject::connect(linkedFileView, SIGNAL(expanded(QModelIndex)), this, SLOT(folderExpanded(QModelIndex)));
-    QObject::connect(linkedFileView, SIGNAL(clicked(QModelIndex)), this, SLOT(fileEntryTouched(QModelIndex)));
-    QObject::connect(linkedFileView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenuFiles(QPoint)));
-
-    linkedFileView->setModel(&dataStore);
+    QObject::connect(this, SIGNAL(expanded(QModelIndex)), this, SLOT(folderExpanded(QModelIndex)));
+    QObject::connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(fileEntryTouched(QModelIndex)));
+    QObject::connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenuFiles(QPoint)));
 
     selectedItem = NULL;
-
-    //Note: setting this as parent should deconstruct the fileOperator
-    myFileOperator = new FileOperator(newDataLink,this);
 }
 
 RemoteFileTree::~RemoteFileTree()
 {
     //TODO: Delete entries in the file data tree
+}
+
+void RemoteFileTree::setFileOperator(FileOperator * theOperator)
+{
+    myFileOperator = theOperator;
+    myFileOperator->linkToFileTree(this);
+}
+
+void RemoteFileTree::setSelectedLabel(QLabel * selectedFileDisp)
+{
+    selectedFileDisplay = selectedFileDisp;
 }
 
 void RemoteFileTree::resendSelectedFile()
@@ -565,20 +567,7 @@ QString RemoteFileTree::getRawColumnData(int i, FileMetaData * rawFileData)
 
 FileTreeNode * RemoteFileTree::getFileNodeFromPath(QString filePath)
 {
-    QStringList filePathParts = FileMetaData::getPathNameList(filePath);
-    FileTreeNode * searchNode = rootFileNode;
-
-    for (auto itr = filePathParts.cbegin(); itr != filePathParts.cend(); itr++)
-    {
-        FileTreeNode * nextNode = searchNode->getChildNodeWithName(*itr);
-        if (nextNode == NULL)
-        {
-            return NULL;
-        }
-        searchNode = nextNode;
-    }
-
-    return searchNode;
+    //TODO
 }
 
 FileTreeNode * RemoteFileTree::getDirNearestFromPath(QString filePath)
