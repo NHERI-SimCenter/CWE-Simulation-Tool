@@ -45,10 +45,14 @@
 #include "utilWindows/singlelinedialog.h"
 #include "utilWindows/quickinfopopup.h"
 
-FileOperator::FileOperator(RemoteDataInterface * newDataLink, RemoteFileTree *parent) : QObject((QObject *)parent)
+FileOperator::FileOperator(RemoteDataInterface * newDataLink, QObject *parent) : QObject(parent)
 {
-    myFileTree = parent;
     dataLink = newDataLink;
+}
+
+void FileOperator::linkToFileTree(RemoteFileTree * newTreeLink)
+{
+    newTreeLink->setModel(&dataStore);
 }
 
 void FileOperator::totalResetErrorProcedure()

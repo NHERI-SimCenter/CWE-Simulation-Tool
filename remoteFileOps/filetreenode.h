@@ -53,34 +53,27 @@ public:
                                                 //depending if the parent is NULL
     ~FileTreeNode();
 
-    QList<FileTreeNode *>::iterator fileListStart();
-    QList<FileTreeNode *>::iterator fileListEnd();
+    void insertOrUpdateFile(QList<FileMetaData> newDataList);
+    void insertOrUpdateFile(FileMetaData newData);
 
-    void setFileData(FileMetaData newData);
-    void setMark(bool newSetting);
-    bool isMarked();
-
-    QByteArray * getFileBuffer();
-    void refreshFileBuffer();
-    void clearFileBuffer();
-    void setDataInterface(RemoteDataInterface * sharedConnection);
-
-    bool isRootNode();
-    FileTreeNode * getParentNode();
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
-    void clearAllChildren();
     FileMetaData getFileData();
+    QByteArray * getFileBuffer();
+    void setFileBuffer(QByteArray * newFileBuffer);
+
+    FileTreeNode * getNodeWithName(QString filename, bool unrestricted = false);
+    FileTreeNode * getClosestNodeWithName(QString filename, bool unrestricted = false);
+    FileTreeNode * getParentNode();
 
     bool childIsUnloaded();
-
-private slots:
-    void haveBufferReply(RequestState authReply, QByteArray * fileBuffer);
+    void clearAllChildren();
 
 private:
-    static RemoteDataInterface * dataConnection;
+    FileTreeNode * pathSearchHelper(QString filename, bool stopEarly, bool unrestricted = false);
+    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
+
     FileMetaData * fileData = NULL;
-    QList<FileTreeNode *> * childList = NULL;
-    bool rootNode;
+    QList<FileTreeNode *> childList;
+    bool rootNode = false;
     bool marked = false;
 
     QByteArray * fileDataBuffer = NULL;

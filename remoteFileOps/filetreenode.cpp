@@ -38,12 +38,9 @@
 #include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
-RemoteDataInterface * FileTreeNode::dataConnection = NULL;
-
 FileTreeNode::FileTreeNode(FileMetaData contents, FileTreeNode * parent):QObject((QObject *)parent)
 {
     fileData = new FileMetaData(contents);
-    childList = new QList<FileTreeNode *>();
 
     if (parent == NULL)
     {
@@ -52,32 +49,29 @@ FileTreeNode::FileTreeNode(FileMetaData contents, FileTreeNode * parent):QObject
     else
     {
         rootNode = false;
-        parent->childList->append(this);
+        parent->childList.append(this);
     }
 }
 
 FileTreeNode::FileTreeNode(FileTreeNode * parent):QObject((QObject *)parent)
 {
-    childList = new QList<FileTreeNode *>();
-
+    fileData = new FileMetaData();
     if (parent == NULL)
     {
         rootNode = true;
 
-        //Create default root folder
-        fileData = new FileMetaData();
         fileData->setFullFilePath("/");
         fileData->setType(FileType::DIR);
     }
     else
     {
         rootNode = false;
-        parent->childList->append(this);
+        parent->childList.append(this);
 
         //Create loading placeholder
         QString fullPath = parent->fileData->getFullPath();
         fullPath.append("/Loading");
-        fileData = new FileMetaData();
+
         fileData->setFullFilePath(fullPath);
         fileData->setType(FileType::UNLOADED);
     }
@@ -85,63 +79,123 @@ FileTreeNode::FileTreeNode(FileTreeNode * parent):QObject((QObject *)parent)
 
 FileTreeNode::~FileTreeNode()
 {
-    if (this->parent() != NULL)
-    {
-        FileTreeNode * parentNode = (FileTreeNode *)this->parent();
-        if (parentNode->childList->contains(this))
-        {
-            parentNode->childList->removeAll(this);
-        }
-    }
-    if (this->fileData != NULL)
-    {
-        delete this->fileData;
-    }
-    if (this->childList != NULL)
-    {
-        while (this->childList->size() > 0)
-        {
-            FileTreeNode * toDelete = this->childList->takeLast();
-            delete toDelete;
-        }
-        delete this->childList;
-    }
-    clearFileBuffer();
-}
-
-QList<FileTreeNode *>::iterator FileTreeNode::fileListStart()
-{
-    return childList->begin();
-}
-
-QList<FileTreeNode *>::iterator FileTreeNode::fileListEnd()
-{
-    return childList->end();
-}
-
-bool FileTreeNode::isRootNode()
-{
-    return rootNode;
-}
-
-void FileTreeNode::setFileData(FileMetaData newData)
-{
     if (fileData != NULL)
     {
         delete fileData;
     }
-    fileData = new FileMetaData(newData);
+    if (this->parent() != NULL)
+    {
+        FileTreeNode * parentNode = (FileTreeNode *)this->parent();
+        if (parentNode->childList.contains(this))
+        {
+            parentNode->childList.removeAll(this);
+        }
+    }
+    while (this->childList.size() > 0)
+    {
+        FileTreeNode * toDelete = this->childList.takeLast();
+        toDelete->deleteLater();
+    }
+    if (this->fileDataBuffer != NULL)
+    {
+        delete this->fileDataBuffer;
+    }
+}
+
+void FileTreeNode::insertOrUpdateFile(QList<FileMetaData> newDataList)
+{
+    if (rootNode == false) return;
+    for (auto itr = newDataList.cbegin(); itr != newDataList.cend(); itr++)
+    {
+        insertOrUpdateFile(*itr);
+    }
+}
+
+void FileTreeNode::insertOrUpdateFile(FileMetaData newData)
+{
+    if (rootNode == false) return;
+    //TODO
+}
+
+FileMetaData FileTreeNode::getFileData()
+{
+    return *fileData;
+}
+
+QByteArray * FileTreeNode::getFileBuffer()
+{
+    return fileDataBuffer;
+}
+
+void FileTreeNode::setFileBuffer(QByteArray * newFileBuffer)
+{
+    fileDataBuffer = newFileBuffer;
+}
+
+FileTreeNode * FileTreeNode::getNodeWithName(QString filename, bool unrestricted)
+{
+    return pathSearchHelper(filename,false,unrestricted);
+}
+
+FileTreeNode * FileTreeNode::getClosestNodeWithName(QString filename, bool unrestricted)
+{
+    return pathSearchHelper(filename,true,unrestricted);
 }
 
 FileTreeNode * FileTreeNode::getParentNode()
 {
-    FileTreeNode * ret = (FileTreeNode *)this->parent();
-    return ret;
+    if (rootNode == false) return NULL;
+    return (FileTreeNode *)this->parent();
+}
+
+bool FileTreeNode::childIsUnloaded()
+{
+    for (auto itr = childList.cbegin(); itr != childList.cend(); itr++)
+    {
+        if ((*itr)->getFileData().getFileType() == FileType::UNLOADED)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void FileTreeNode::clearAllChildren()
+{
+    while (childList.size() > 0)
+    {
+        FileTreeNode *toDestroy = childList.takeLast();
+        toDestroy->deleteLater();
+    }
+}
+
+FileTreeNode * FileTreeNode::pathSearchHelper(QString filename, bool stopEarly, bool unrestricted)
+{
+    if (rootNode == false) return NULL;
+
+    QStringList filePathParts = FileMetaData::getPathNameList(filename);
+    FileTreeNode * searchNode = this;
+
+    for (auto itr = filePathParts.cbegin(); itr != filePathParts.cend(); itr++)
+    {
+        FileTreeNode * nextNode = searchNode->getChildNodeWithName(*itr,unrestricted);
+        if (nextNode == NULL)
+        {
+            if (stopEarly == true)
+            {
+                return searchNode;
+            }
+            return NULL;
+        }
+        searchNode = nextNode;
+    }
+
+    return searchNode;
 }
 
 FileTreeNode * FileTreeNode::getChildNodeWithName(QString filename, bool unrestricted)
 {
-    for (auto itr = this->childList->begin(); itr != this->childList->end(); itr++)
+    for (auto itr = this->childList.begin(); itr != this->childList.end(); itr++)
     {
         FileMetaData toSearch = (*itr)->getFileData();
         if ((unrestricted) || (toSearch.getFileType() == FileType::DIR) || (toSearch.getFileType() == FileType::FILE))
@@ -153,74 +207,4 @@ FileTreeNode * FileTreeNode::getChildNodeWithName(QString filename, bool unrestr
         }
     }
     return NULL;
-}
-
-void FileTreeNode::clearAllChildren()
-{
-    while (childList->size() > 0)
-    {
-        FileTreeNode *toDestroy = childList->takeLast();
-        toDestroy->deleteLater();
-    }
-}
-
-FileMetaData FileTreeNode::getFileData()
-{
-    return *fileData;
-}
-
-bool FileTreeNode::childIsUnloaded()
-{
-    for (auto itr = childList->cbegin(); itr != childList->cend(); itr++)
-    {
-        if ((*itr)->getFileData().getFileType() == FileType::UNLOADED)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-void FileTreeNode::setMark(bool newSetting)
-{
-    marked = newSetting;
-}
-
-bool FileTreeNode::isMarked()
-{
-    return marked;
-}
-
-QByteArray * FileTreeNode::getFileBuffer()
-{
-    return fileDataBuffer;
-}
-
-void FileTreeNode::refreshFileBuffer()
-{
-    //TODOS
-}
-
-void FileTreeNode::clearFileBuffer()
-{
-    if (fileDataBuffer != NULL)
-    {
-        delete fileDataBuffer;
-        fileDataBuffer = NULL;
-    }
-}
-
-void FileTreeNode::haveBufferReply(RequestState authReply, QByteArray *fileBuffer)
-{
-    clearFileBuffer();
-    if (authReply != RequestState::GOOD)
-    {
-        return;
-    }
-    fileDataBuffer = new QByteArray(*fileBuffer);
-}
-
-void FileTreeNode::setDataInterface(RemoteDataInterface * sharedConnection)
-{
-    dataConnection = sharedConnection;
 }

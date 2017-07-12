@@ -38,10 +38,13 @@
 
 #include <QObject>
 #include <QList>
+#include <QStandardItemModel>
+#include <QStandardItem>
 
 class RemoteFileTree;
 class FileMetaData;
 class RemoteDataInterface;
+class FileTreeNode;
 
 enum class RequestState;
 
@@ -50,11 +53,15 @@ class FileOperator : public QObject
     Q_OBJECT
 
 public:
-    FileOperator(RemoteDataInterface * newDataLink, RemoteFileTree * parent);
+    FileOperator(RemoteDataInterface * newDataLink, QObject * parent);
+    void linkToFileTree(RemoteFileTree * newTreeLink);
 
     void totalResetErrorProcedure();
-    void enactFolderRefresh(FileMetaData folderToRemoteLS);
     bool operationIsPending();
+
+    void lsClosestNode(QString fullPath);
+    void lsClosestNodeToParent(QString fullPath);
+    void enactFolderRefresh(FileMetaData folderToRemoteLS);
 
 private slots:
     void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
@@ -86,9 +93,10 @@ private slots:
 private:
     QString getStringFromInitParams(QString stringKey);
 
-    RemoteFileTree * myFileTree;
-
     RemoteDataInterface * dataLink;
+    FileTreeNode * rootFileNode = NULL;
+    QStandardItemModel dataStore;
+
     bool fileOperationPending = false;
 };
 
