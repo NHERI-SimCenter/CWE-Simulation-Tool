@@ -54,7 +54,7 @@
     <item>
      <widget class="QTabWidget" name="stackedView">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="filePage">
        <attribute name="title">
@@ -109,7 +109,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QTreeView" name="remoteFileView">
+         <widget class="RemoteFileTree" name="remoteFileView">
           <property name="contextMenuPolicy">
            <enum>Qt::CustomContextMenu</enum>
           </property>
@@ -240,6 +240,11 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
+  <customwidget>
+   <class>RemoteFileTree</class>
+   <extends>QTreeView</extends>
+   <header>remoteFileOps/remotefiletree.h</header>
+  </customwidget>
   <customwidget>
    <class>CFDglCanvas</class>
    <extends>QOpenGLWidget</extends>

@@ -75,14 +75,9 @@ void RemoteFileTree::resendSelectedFile()
     fileEntryTouched(linkedFileView->selectionModel()->selectedIndexes().at(0));
 }
 
-FileMetaData RemoteFileTree::getCurrentSelectedFile()
+FileTreeNode * RemoteFileTree::getSelectedNode()
 {
-    if (selectedItem == NULL)
-    {
-        FileMetaData empty;
-        return empty;
-    }
-    return selectedItem->getFileData();
+    return selectedItem;
 }
 
 void RemoteFileTree::resetFileData()
@@ -112,129 +107,7 @@ void RemoteFileTree::resetFileData()
 
 void RemoteFileTree::updateFileInfo(QList<FileMetaData> * fileDataList)
 {
-    QString searchPath;
 
-    for (auto itr = fileDataList->begin(); itr != fileDataList->end(); ++itr)
-    {
-        if ((*itr).getFileName() == ".")
-        {
-            searchPath = (*itr).getContainingPath();
-            break;
-        }
-    }
-
-    if (searchPath.isEmpty())
-    {
-        myFileOperator->totalResetErrorProcedure();
-        return;
-    }
-
-    FileTreeNode * targetNode = NULL;
-
-    //TODO: if our file data is empty, we need to populate it
-    if (rootFileNode->childIsUnloaded())
-    {
-        QString possiblePath = FileMetaData::cleanPathSlashes(searchPath);
-        if (possiblePath.at(0) == '/') possiblePath.remove(0,1);
-        if (possiblePath.at(possiblePath.size() - 1) == '/') possiblePath.remove(possiblePath.size() - 1,1);
-        if (possiblePath.contains('/'))
-        {
-            myFileOperator->totalResetErrorProcedure();
-            return;
-        }
-        possiblePath.prepend("/");
-        rootFileNode->clearAllChildren();
-        FileMetaData userNameRoot;
-        userNameRoot.setType(FileType::DIR);
-        userNameRoot.setFullFilePath(possiblePath);
-        targetNode = new FileTreeNode(userNameRoot, rootFileNode);
-        new FileTreeNode(targetNode);
-    }
-    else
-    {
-        targetNode = getFileNodeFromPath(searchPath);
-    }
-
-    if (targetNode == NULL)
-    {
-        myFileOperator->totalResetErrorProcedure();
-        return;
-    }
-
-    //If the target node has a loading placeholder, clear it
-    if (targetNode->childIsUnloaded())
-    {
-        targetNode->clearAllChildren();
-    }
-
-    //If the incoming list is empty, ie. has one entry (.), place empty file placeholder
-    if (fileDataList->size() <= 1)
-    {
-        targetNode->clearAllChildren();
-
-        FileMetaData emptyFolder;
-        QString emptyName = searchPath;
-        emptyName.append("/Empty Folder");
-        emptyFolder.setFullFilePath(emptyName);
-        emptyFolder.setType(FileType::EMPTY_FOLDER);
-        new FileTreeNode(emptyFolder,targetNode);
-        translateFileDataToModel();
-        return;
-    }
-
-    //Unmark all files in the old list
-    for (auto itr = targetNode->fileListStart(); itr != targetNode->fileListEnd(); itr++)
-    {
-        (*itr)->setMark(false);
-    }
-
-    //For each file in the new file list, check for it
-    //Mark if it is there and IDENTICAL
-    //Place new file and mark not found
-    for (auto itr = fileDataList->begin(); itr != fileDataList->end(); ++itr)
-    {
-        if ((*itr).getFileName() == ".") continue;
-
-        bool foundOldFile = false;
-        for (auto itr2 = targetNode->fileListStart(); itr2 != targetNode->fileListEnd(); itr2++)
-        {
-            if ((*itr2)->isMarked()) continue;
-
-            if ((*itr) == (*itr2)->getFileData())
-            {
-                foundOldFile = true;
-                (*itr2)->setMark(true);
-                break;
-            }
-        }
-        if (!foundOldFile)
-        {
-            FileTreeNode * newFile = new FileTreeNode((*itr),targetNode);
-            if ((*itr).getFileType() == FileType::DIR)
-            {   //If its a new folder, put the loading placeholder in it
-                new FileTreeNode(newFile);
-            }
-            newFile->setMark(true);
-        }
-    }
-
-    FileTreeNode * toRemove = NULL;
-    //Remove all unmarked files from old list -- TODO: This is inelegant code, fix
-    do
-    {
-        toRemove = NULL;
-        for (auto itr = targetNode->fileListStart(); itr != targetNode->fileListEnd(); itr++)
-        {
-            if ((*itr)->isMarked()) continue;
-
-            toRemove = (*itr);
-        }
-        if (toRemove != NULL)
-        {
-            delete toRemove;
-        }
-    }
-    while (toRemove != NULL);
 
     translateFileDataToModel();
 }

@@ -53,8 +53,7 @@ public:
                                                 //depending if the parent is NULL
     ~FileTreeNode();
 
-    void insertOrUpdateFile(QList<FileMetaData> newDataList);
-    void insertOrUpdateFile(FileMetaData newData);
+    void updateFileFolder(QList<FileMetaData> newDataList);
 
     FileMetaData getFileData();
     QByteArray * getFileBuffer();
@@ -65,9 +64,13 @@ public:
     FileTreeNode * getParentNode();
 
     bool childIsUnloaded();
+    bool childIsEmpty();
     void clearAllChildren();
 
 private:
+    void insertFile(FileMetaData *newData);
+    void purgeUnmatchedChildren(QList<FileMetaData> * newChildList);
+
     FileTreeNode * pathSearchHelper(QString filename, bool stopEarly, bool unrestricted = false);
     FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
 

@@ -59,6 +59,8 @@ public:
     void totalResetErrorProcedure();
     bool operationIsPending();
 
+    void refreshItemModel();
+
     void lsClosestNode(QString fullPath);
     void lsClosestNodeToParent(QString fullPath);
     void enactFolderRefresh(FileMetaData folderToRemoteLS);
@@ -66,32 +68,44 @@ public:
 private slots:
     void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
 
-    void sendDeleteReq();
+    void sendDeleteReq(FileTreeNode * selectedNode);
     void getDeleteReply(RequestState replyState);
-    void sendMoveReq();
+    void sendMoveReq(FileTreeNode * selectedNode);
     void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
-    void sendCopyReq();
+    void sendCopyReq(FileTreeNode * selectedNode);
     void getCopyReply(RequestState replyState, FileMetaData * newFileData);
-    void sendRenameReq();
+    void sendRenameReq(FileTreeNode * selectedNode);
     void getRenameReply(RequestState replyState, FileMetaData * newFileData);
 
-    void sendCreateFolderReq();
+    void sendCreateFolderReq(FileTreeNode * selectedNode);
     void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
 
-    void sendUploadReq();
+    void sendUploadReq(FileTreeNode * selectedNode);
     void getUploadReply(RequestState replyState, FileMetaData * newFileData);
-    void sendDownloadReq();
+    void sendDownloadReq(FileTreeNode * selectedNode);
     void getDownloadReply(RequestState replyState);
 
-    void sendCompressReq();
+    void sendCompressReq(FileTreeNode * selectedNode);
     void getCompressReply(RequestState finalState, QJsonDocument * rawData);
-    void sendDecompressReq();
+    void sendDecompressReq(FileTreeNode * selectedNode);
     void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
 
     void sendManualRefresh();
 
 private:
     QString getStringFromInitParams(QString stringKey);
+
+    //Note: if not found, will return NULL and call translateFileDataToModel(), to resync
+    //If input is NULL, return NULL, but don't resync
+    FileTreeNode * getNodeFromModel(QStandardItem * toFind);
+    QStandardItem * getModelEntryFromNode(FileTreeNode * toFind);
+
+    void translateFileDataToModel();
+    void translateFileDataRecurseHelper(FileTreeNode * currentFile, QStandardItem * currentModelEntry);
+
+    bool fileInModel(FileTreeNode * toFind, QStandardItem * compareTo);
+    void changeModelFromFile(QStandardItem * targetRow, FileTreeNode * dataSource);
+    void newModelRowFromFile(QStandardItem * parentItem, FileTreeNode * dataSource);
 
     RemoteDataInterface * dataLink;
     FileTreeNode * rootFileNode = NULL;

@@ -36,6 +36,7 @@
 #include "fileoperator.h"
 
 #include "remotefiletree.h"
+#include "filetreenode.h"
 
 #include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
@@ -108,12 +109,12 @@ void FileOperator::getLSReply(RequestState cmdReply, QList<FileMetaData> * fileD
         totalResetErrorProcedure();
         return;
     }
-    myFileTree->updateFileInfo(fileDataList);
+    rootFileNode->updateFileFolder(*fileDataList);
 }
 
 void FileOperator::sendDeleteReq()
 {
-    FileMetaData targetFile = myFileTree->getCurrentSelectedFile();
+    FileMetaData targetFile = rootFileNode->
     //TODO: verify file valid for delete
     DeleteConfirm deletePopup(targetFile.getFullPath());
     if (deletePopup.exec() != QDialog::Accepted)
