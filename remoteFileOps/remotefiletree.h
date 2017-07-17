@@ -46,6 +46,7 @@
 #include <QPoint>
 #include <QMenu>
 #include <QCursor>
+#include <QStandardItem>
 
 //NOTE: FILENAME MUST == 0 for these functions to work.
 //The other columns can be changed
@@ -74,13 +75,11 @@ public:
     void setSelectedLabel(QLabel * selectedFileDisp);
 
     void refreshSelection();
-    FileMetaData getCurrentSelectedFile();
+    FileTreeNode * getSelectedNode();
     void resetFileData();
 
     void updateFileInfo(QList<FileMetaData> * fileDataList);
 
-    //I don't like having this method public:
-    FileTreeNode * getFileNodeFromPath(QString filePath);
 
 signals:
     void newFileSelected(FileMetaData * newFileData);
@@ -93,19 +92,6 @@ private slots:
 private:
     QString getFilePathForNode(QModelIndex dataIndex);
     FileTreeNode * getDirNearestFromPath(QString filePath);
-
-    //Note: if not found, will return NULL and call translateFileDataToModel(), to resync
-    //If input is NULL, return NULL, but don't resync
-    FileTreeNode * getNodeFromModel(QStandardItem * toFind);
-    QStandardItem * getModelEntryFromNode(FileTreeNode * toFind);
-
-    void totalResetErrorProcedure();
-    void translateFileDataToModel();
-    void translateFileDataRecurseHelper(FileTreeNode * currentFile, QStandardItem * currentModelEntry);
-
-    bool fileInModel(FileTreeNode * toFind, QStandardItem * compareTo);
-    void changeModelFromFile(QStandardItem * targetRow, FileTreeNode * dataSource);
-    void newModelRowFromFile(QStandardItem * parentItem, FileTreeNode * dataSource);
 
     bool columnInUse(int i);
     QString getRawColumnData(int i, FileMetaData * rawFileData);
