@@ -72,6 +72,7 @@ public:
     ~RemoteFileTree();
 
     void setFileOperator(FileOperator * theOperator);
+    FileOperator * getFileOperator();
     void setSelectedLabel(QLabel * selectedFileDisp);
 
     void refreshSelection();
@@ -80,14 +81,12 @@ public:
 
     void updateFileInfo(QList<FileMetaData> * fileDataList);
 
-
 signals:
     void newFileSelected(FileMetaData * newFileData);
 
 private slots:
     void folderExpanded(QModelIndex itemOpened);
     void fileEntryTouched(QModelIndex fileIndex);
-    void needRightClickMenuFiles(QPoint pos);
 
 private:
     QString getFilePathForNode(QModelIndex dataIndex);

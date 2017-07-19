@@ -81,7 +81,8 @@ SOURCES += main.cpp \
     cwe_guiWidgets/sidebar.cpp \
     analysistypes/baseanalysistype.cpp \
     utilWindows/debugpanelwindow.cpp \
-    remoteFileOps/remotejoblister.cpp
+    remoteFileOps/remotejoblister.cpp \
+    remoteFileOps/easyboollock.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -116,7 +117,8 @@ HEADERS  += \
     cwe_guiWidgets/sidebar.h \
     analysistypes/baseanalysistype.h \
     utilWindows/debugpanelwindow.h \
-    remoteFileOps/remotejoblister.h
+    remoteFileOps/remotejoblister.h \
+    remoteFileOps/easyboollock.h
 
 FORMS    += \
     utilWindows/authform.ui \

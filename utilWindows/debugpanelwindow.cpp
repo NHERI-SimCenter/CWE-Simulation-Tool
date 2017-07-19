@@ -41,6 +41,7 @@
 #include "../AgaveClientInterface/filemetadata.h"
 
 #include "remoteFileOps/filetreenode.h"
+#include "remoteFileOps/fileoperator.h"
 #include "remoteFileOps/remotefiletree.h"
 #include "remoteFileOps/joboperator.h"
 
@@ -176,13 +177,6 @@ void DebugPanelWindow::setMeshVisual()
                      this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
 }
 
-void DebugPanelWindow::conditionalPurge(QByteArray ** theArray)
-{
-    if (*theArray == NULL) return;
-    delete *theArray;
-    *theArray = NULL;
-}
-
 void DebugPanelWindow::gotNewRawFile(RequestState authReply, QByteArray * fileBuffer)
 {
     if (authReply != RequestState::GOOD) return;
@@ -270,4 +264,136 @@ void DebugPanelWindow::agaveCommandInvoked()
 void DebugPanelWindow::finishedAppInvoke(RequestState, QJsonDocument *)
 {
     waitingOnCommand = false;
+}
+
+void DebugPanelWindow::customFileMenu(QPoint pos)
+{
+    QModelIndex targetIndex = fileTreeData->indexAt(pos);
+    fileTreeData->fileEntryTouched(targetIndex);
+
+    FileTreeNode * selectedItem = fileTreeData->getSelectedNode();
+
+    //If we did not click anything, we should return
+    if (selectedItem == NULL) return;
+    if (selectedItem->isRootNode()) return;
+    FileMetaData theFileData = selectedItem->getFileData();
+
+    if (theFileData.getFileType() == FileType::INVALID) return;
+    if (theFileData.getFileType() == FileType::UNLOADED) return;
+    if (theFileData.getFileType() == FileType::EMPTY_FOLDER) return;
+
+    QMenu fileMenu;
+
+    if (fileTreeData->getFileOperator()->operationIsPending())
+    {
+        fileMenu.addAction("File Operation In Progress . . .");
+        fileMenu.exec(QCursor::pos());
+        return;
+    }
+
+    fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem(selectedItem)));
+    fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem(selectedItem)));
+    fileMenu.addAction("Rename",this, SLOT(renameMenuItem(selectedItem)));
+    //We don't let the user delete the username folder
+    if (!(selectedItem->getParentNode()->isRootNode()))
+    {
+        fileMenu.addSeparator();
+        fileMenu.addAction("Delete",this, SLOT(deleteMenuItem(selectedItem)));
+        fileMenu.addSeparator();
+    }
+    if (theFileData.getFileType() == FileType::DIR)
+    {
+        fileMenu.addAction("Upload File Here",this, SLOT(uploadMenuItem(selectedItem)));
+        fileMenu.addAction("Create New Folder",this, SLOT(createFolderMenuItem(selectedItem)));
+    }
+    if (theFileData.getFileType() == FileType::FILE)
+    {
+        fileMenu.addAction("Download File",this, SLOT(downloadMenuItem(selectedItem)));
+    }
+    if (theFileData.getFileType() == FileType::DIR)
+    {
+        fileMenu.addAction("Compress Folder",this, SLOT(compressMenuItem(selectedItem)));
+    }
+    else if (theFileData.getFileType() == FileType::FILE)
+    {
+        fileMenu.addAction("De-Compress File",this, SLOT(decompressMenuItem(selectedItem)));
+    }
+
+    if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))
+    {
+        fileMenu.addSeparator();
+        fileMenu.addAction("Refresh Data",this, SLOT(refreshMenuItem(selectedItem)));
+        fileMenu.addSeparator();
+    }
+
+    fileMenu.exec(QCursor::pos());
+}
+
+void DebugPanelWindow::copyMenuItem(FileTreeNode * targetNode)
+{
+
+}
+
+void DebugPanelWindow::moveMenuItem(FileTreeNode * targetNode)
+{
+    SingleLineDialog newNamePopup("Please type a file name to move to:", "newname");
+
+    if (newNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    fileTreeData->getFileOperator()->sendMoveReq(targetNode,newNamePopup.getInputText());
+}
+
+void DebugPanelWindow::renameMenuItem(FileTreeNode * targetNode)
+{
+
+}
+
+void DebugPanelWindow::deleteMenuItem(FileTreeNode * targetNode)
+{
+    DeleteConfirm deletePopup(targetNode->getFileData().getFullPath());
+    if (deletePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+    fileTreeData->getFileOperator()->sendDeleteReq(targetNode);
+}
+
+void DebugPanelWindow::uploadMenuItem(FileTreeNode * targetNode)
+{
+
+}
+
+void DebugPanelWindow::createFolderMenuItem(FileTreeNode * targetNode)
+{
+
+}
+
+void DebugPanelWindow::downloadMenuItem(FileTreeNode * targetNode)
+{
+
+}
+
+void DebugPanelWindow::compressMenuItem(FileTreeNode * targetNode)
+{
+
+}
+
+void DebugPanelWindow::decompressMenuItem(FileTreeNode * targetNode)
+{
+
+}
+
+void DebugPanelWindow::refreshMenuItem(FileTreeNode * targetNode)
+{
+
+}
+
+void DebugPanelWindow::conditionalPurge(QByteArray ** theArray)
+{
+    if (*theArray == NULL) return;
+    delete *theArray;
+    *theArray = NULL;
 }
