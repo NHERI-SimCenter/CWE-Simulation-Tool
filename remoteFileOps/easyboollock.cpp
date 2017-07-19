@@ -33,54 +33,28 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILETREENODE_H
-#define FILETREENODE_H
+#include "easyboollock.h"
 
-#include <QObject>
-#include <QList>
-#include <QByteArray>
+EasyBoolLock::EasyBoolLock(QObject *parent) : QObject(parent) {}
 
-enum class RequestState;
-class FileMetaData;
-class RemoteDataInterface;
-
-class FileTreeNode : public QObject
+bool EasyBoolLock::checkAndClaim()
 {
-    Q_OBJECT
-public:
-    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
-    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
-                                                //depending if the parent is NULL
-    ~FileTreeNode();
+    if (myValue == true) return false;
+    myValue = true;
+    emit lockStateChanged(false);
+    return true;
+}
 
-    void updateFileFolder(QList<FileMetaData> newDataList);
+bool EasyBoolLock::lockClosed()
+{
+    return myValue;
+}
 
-    bool isRootNode();
-    FileMetaData getFileData();
-    QByteArray * getFileBuffer();
-    void setFileBuffer(QByteArray * newFileBuffer);
-
-    FileTreeNode * getNodeWithName(QString filename, bool unrestricted = false);
-    FileTreeNode * getClosestNodeWithName(QString filename, bool unrestricted = false);
-    FileTreeNode * getParentNode();
-
-    bool childIsUnloaded();
-    bool childIsEmpty();
-    void clearAllChildren();
-
-private:
-    void insertFile(FileMetaData *newData);
-    void purgeUnmatchedChildren(QList<FileMetaData> * newChildList);
-
-    FileTreeNode * pathSearchHelper(QString filename, bool stopEarly, bool unrestricted = false);
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
-
-    FileMetaData * fileData = NULL;
-    QList<FileTreeNode *> childList;
-    bool rootNode = false;
-    bool marked = false;
-
-    QByteArray * fileDataBuffer = NULL;
-};
-
-#endif // FILETREENODE_H
+void EasyBoolLock::release()
+{
+    if (myValue == true)
+    {
+        myValue = false;
+        emit lockStateChanged(false);
+    }
+}

@@ -48,7 +48,6 @@ RemoteFileTree::RemoteFileTree(QObject *parent) :
 {
     QObject::connect(this, SIGNAL(expanded(QModelIndex)), this, SLOT(folderExpanded(QModelIndex)));
     QObject::connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(fileEntryTouched(QModelIndex)));
-    QObject::connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenuFiles(QPoint)));
 
     selectedItem = NULL;
 }
@@ -62,6 +61,11 @@ void RemoteFileTree::setFileOperator(FileOperator * theOperator)
 {
     myFileOperator = theOperator;
     myFileOperator->linkToFileTree(this);
+}
+
+FileOperator * RemoteFileTree::getFileOperator()
+{
+    return myFileOperator;
 }
 
 void RemoteFileTree::setSelectedLabel(QLabel * selectedFileDisp)
@@ -144,67 +148,6 @@ void RemoteFileTree::fileEntryTouched(QModelIndex fileIndex)
     selectedFileDisplay->setText(fileString);
 
     emit newFileSelected(&newFileData);
-}
-
-void RemoteFileTree::needRightClickMenuFiles(QPoint pos)
-{
-    QModelIndex targetIndex = linkedFileView->indexAt(pos);
-    fileEntryTouched(targetIndex);
-
-    //If we did not click anything, we should return
-    if (selectedItem == NULL) return;
-    if (selectedItem->isRootNode()) return;
-    FileMetaData theFileData = selectedItem->getFileData();
-
-    if (theFileData.getFileType() == FileType::INVALID) return;
-    if (theFileData.getFileType() == FileType::UNLOADED) return;
-    if (theFileData.getFileType() == FileType::EMPTY_FOLDER) return;
-
-    QMenu fileMenu;
-
-    if (myFileOperator->operationIsPending())
-    {
-        fileMenu.addAction("File Operation In Progress . . .");
-        fileMenu.exec(QCursor::pos());
-        return;
-    }
-
-    fileMenu.addAction("Copy To . . .",myFileOperator, SLOT(sendCopyReq()));
-    fileMenu.addAction("Move To . . .",myFileOperator, SLOT(sendMoveReq()));
-    fileMenu.addAction("Rename",myFileOperator, SLOT(sendRenameReq()));
-    //We don't let the user delete the username folder
-    if (!(selectedItem->getParentNode()->isRootNode()))
-    {
-        fileMenu.addSeparator();
-        fileMenu.addAction("Delete",myFileOperator, SLOT(sendDeleteReq()));
-        fileMenu.addSeparator();
-    }
-    if (theFileData.getFileType() == FileType::DIR)
-    {
-        fileMenu.addAction("Upload File Here",myFileOperator, SLOT(sendUploadReq()));
-        fileMenu.addAction("Create New Folder",myFileOperator, SLOT(sendCreateFolderReq()));
-    }
-    if (theFileData.getFileType() == FileType::FILE)
-    {
-        fileMenu.addAction("Download File",myFileOperator, SLOT(sendDownloadReq()));
-    }
-    if (theFileData.getFileType() == FileType::DIR)
-    {
-        fileMenu.addAction("Compress Folder",myFileOperator, SLOT(sendCompressReq()));
-    }
-    else if (theFileData.getFileType() == FileType::FILE)
-    {
-        fileMenu.addAction("De-Compress File",myFileOperator, SLOT(sendDecompressReq()));
-    }
-
-    if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))
-    {
-        fileMenu.addSeparator();
-        fileMenu.addAction("Refresh Data",myFileOperator, SLOT(sendManualRefresh()));
-        fileMenu.addSeparator();
-    }
-
-    fileMenu.exec(QCursor::pos());
 }
 
 void RemoteFileTree::lsClosestNode(QString fullPath)

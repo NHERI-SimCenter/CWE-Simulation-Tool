@@ -37,6 +37,7 @@
 
 #include "remotefiletree.h"
 #include "filetreenode.h"
+#include "easyboollock.h"
 
 #include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
@@ -49,6 +50,11 @@
 FileOperator::FileOperator(RemoteDataInterface * newDataLink, QObject *parent) : QObject(parent)
 {
     dataLink = newDataLink;
+
+    //Note: will be deconstructed with parent
+    fileOpPending = new EasyBoolLock(this);
+    QObject::connect(fileOpPending, SIGNAL(lockStateChanged(bool)),
+                     this, SLOT(opLockChanged(bool)));
 }
 
 void FileOperator::linkToFileTree(RemoteFileTree * newTreeLink)
@@ -99,7 +105,7 @@ void FileOperator::enactFolderRefresh(FileMetaData folderToRemoteLS)
 
 bool FileOperator::operationIsPending()
 {
-    return fileOperationPending;
+    return fileOpPending.lockClosed();
 }
 
 void FileOperator::getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList)
@@ -112,75 +118,70 @@ void FileOperator::getLSReply(RequestState cmdReply, QList<FileMetaData> * fileD
     rootFileNode->updateFileFolder(*fileDataList);
 }
 
-void FileOperator::sendDeleteReq()
+void FileOperator::opLockChanged(bool newVal)
 {
-    FileMetaData targetFile = rootFileNode->
-    //TODO: verify file valid for delete
-    DeleteConfirm deletePopup(targetFile.getFullPath());
-    if (deletePopup.exec() != QDialog::Accepted)
-    {
-        return;
-    }
+    emit opPendingChange(newVal);
+}
 
-    qDebug("Starting delete procedure: %s",qPrintable(targetFile.getFullPath()));
-    RemoteDataReply * theReply = dataLink->deleteFile(targetFile.getFullPath());
+void FileOperator::sendDeleteReq(FileTreeNode * selectedNode)
+{
+    if (!fileOpPending->checkAndClaim()) return;
+
+    QString targetFile = selectedNode->getFileData().getFullPath();
+    qDebug("Starting delete procedure: %s",qPrintable(targetFile));
+    RemoteDataReply * theReply = dataLink->deleteFile(targetFile);
     if (theReply == NULL)
     {
+        fileOpPending->release();
         //TODO, should have more meaningful error here
         return;
     }
     QObject::connect(theReply, SIGNAL(haveDeleteReply(RequestState)),
                      this, SLOT(getDeleteReply(RequestState)));
-    fileOperationPending = true;
 }
 
 void FileOperator::getDeleteReply(RequestState replyState)
 {
-    fileOperationPending = false;
+    fileOpPending->release();
     if (replyState != RequestState::GOOD)
     {
         return;
     }
 
-    myFileTree->lsClosestNodeToParent(getStringFromInitParams("toDelete"));
+    lsClosestNodeToParent(getStringFromInitParams("toDelete"));
 }
 
-void FileOperator::sendMoveReq()
+void FileOperator::sendMoveReq(FileTreeNode * moveFrom, QString newName)
 {
-    FileMetaData targetFile = myFileTree->getCurrentSelectedFile();
-    SingleLineDialog newNamePopup("Please type a file name to move to:", "newname");
-    //TODO: NEED lots of verification here
-    //First, that file can be renamed
-    //Second, that new file name is valid
-    if (newNamePopup.exec() != QDialog::Accepted)
-    {
-        return;
-    }
+    if (!fileOpPending->checkAndClaim()) return;
+    dataLink->setCurrentRemoteWorkingDirectory(moveFrom->getFileData().getContainingPath());
 
-    dataLink->setCurrentRemoteWorkingDirectory(targetFile.getContainingPath());
-
-    qDebug("Starting move procedure: %s to %s", qPrintable(targetFile.getFullPath()), qPrintable(newNamePopup.getInputText()));
+    qDebug("Starting move procedure: %s to %s",
+           qPrintable(moveFrom->getFileData().getFullPath()),
+           qPrintable(newName));
     RemoteDataReply * theReply = dataLink->moveFile(targetFile.getFullPath(), newNamePopup.getInputText());
     if (theReply == NULL)
     {
+        fileOpPending->release();
         //TODO, should have more meaningful error here
         return;
     }
     QObject::connect(theReply, SIGNAL(haveMoveReply(RequestState,FileMetaData*)), this, SLOT(getMoveReply(RequestState,FileMetaData*)));
-    fileOperationPending = true;
 }
 
 void FileOperator::getMoveReply(RequestState replyState, FileMetaData * revisedFileData)
 {
-    fileOperationPending = false;
+    fileOpPending->release();
     if (replyState != RequestState::GOOD)
     {
         return;
     }
 
-    myFileTree->lsClosestNodeToParent(getStringFromInitParams("from"));
-    myFileTree->lsClosestNode(revisedFileData->getFullPath());
+    lsClosestNodeToParent(getStringFromInitParams("from"));
+    lsClosestNode(revisedFileData->getFullPath());
 }
+
+//DOLINE
 
 void FileOperator::sendCopyReq()
 {
@@ -352,7 +353,7 @@ void FileOperator::sendDownloadReq()
     QObject::connect(theReply, SIGNAL(haveDownloadReply(RequestState)),
                      this, SLOT(getDownloadReply(RequestState)));
 
-    fileOperationPending = true;
+    setOpPending(true);
 }
 
 void FileOperator::getDownloadReply(RequestState replyState)

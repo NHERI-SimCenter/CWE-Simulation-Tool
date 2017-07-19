@@ -47,6 +47,7 @@
 
 class RemoteFileTree;
 class FileMetaData;
+class FileTreeNode;
 class RemoteDataInterface;
 class VWTinterfaceDriver;
 enum class RequestState;
@@ -76,6 +77,19 @@ private slots:
     void finishedAppInvoke(RequestState finalState, QJsonDocument * rawReply);
 
     void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
+
+    void customFileMenu(QPoint pos);
+
+    void copyMenuItem(FileTreeNode * targetNode);
+    void moveMenuItem(FileTreeNode * targetNode);
+    void renameMenuItem(FileTreeNode * targetNode);
+    void deleteMenuItem(FileTreeNode * targetNode);
+    void uploadMenuItem(FileTreeNode * targetNode);
+    void createFolderMenuItem(FileTreeNode * targetNode);
+    void downloadMenuItem(FileTreeNode * targetNode);
+    void compressMenuItem(FileTreeNode * targetNode);
+    void decompressMenuItem(FileTreeNode * targetNode);
+    void refreshMenuItem(FileTreeNode * targetNode);
 
 private:
     void conditionalPurge(QByteArray ** theArray);

@@ -33,54 +33,26 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef FILETREENODE_H
-#define FILETREENODE_H
+
+#ifndef EASYBOOLLOCK_H
+#define EASYBOOLLOCK_H
 
 #include <QObject>
-#include <QList>
-#include <QByteArray>
 
-enum class RequestState;
-class FileMetaData;
-class RemoteDataInterface;
-
-class FileTreeNode : public QObject
+class EasyBoolLock :public QObject
 {
-    Q_OBJECT
 public:
-    FileTreeNode(FileMetaData contents, FileTreeNode * parent = NULL);
-    FileTreeNode(FileTreeNode * parent = NULL); //This creates either the default root folder, or default load pending,
-                                                //depending if the parent is NULL
-    ~FileTreeNode();
+    EasyBoolLock(QObject * parent);
 
-    void updateFileFolder(QList<FileMetaData> newDataList);
+    bool checkAndClaim();
+    bool lockClosed();
+    void release();
 
-    bool isRootNode();
-    FileMetaData getFileData();
-    QByteArray * getFileBuffer();
-    void setFileBuffer(QByteArray * newFileBuffer);
-
-    FileTreeNode * getNodeWithName(QString filename, bool unrestricted = false);
-    FileTreeNode * getClosestNodeWithName(QString filename, bool unrestricted = false);
-    FileTreeNode * getParentNode();
-
-    bool childIsUnloaded();
-    bool childIsEmpty();
-    void clearAllChildren();
+signals:
+    void lockStateChanged(bool newState);
 
 private:
-    void insertFile(FileMetaData *newData);
-    void purgeUnmatchedChildren(QList<FileMetaData> * newChildList);
-
-    FileTreeNode * pathSearchHelper(QString filename, bool stopEarly, bool unrestricted = false);
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
-
-    FileMetaData * fileData = NULL;
-    QList<FileTreeNode *> childList;
-    bool rootNode = false;
-    bool marked = false;
-
-    QByteArray * fileDataBuffer = NULL;
+    bool myValue = false;
 };
 
-#endif // FILETREENODE_H
+#endif // EASYBOOLLOCK_H

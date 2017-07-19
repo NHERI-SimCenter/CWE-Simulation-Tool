@@ -275,6 +275,11 @@ void FileTreeNode::purgeUnmatchedChildren(QList<FileMetaData> * newChildList)
     }
 }
 
+bool FileTreeNode::isRootNode()
+{
+    return rootNode;
+}
+
 FileMetaData FileTreeNode::getFileData()
 {
     return *fileData;

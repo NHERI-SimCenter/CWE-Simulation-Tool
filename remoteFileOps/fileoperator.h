@@ -45,6 +45,7 @@ class RemoteFileTree;
 class FileMetaData;
 class RemoteDataInterface;
 class FileTreeNode;
+class EasyBoolLock;
 
 enum class RequestState;
 
@@ -63,34 +64,42 @@ public:
 
     void lsClosestNode(QString fullPath);
     void lsClosestNodeToParent(QString fullPath);
-    void enactFolderRefresh(FileMetaData folderToRemoteLS);
 
-private slots:
-    void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
+    void enactFolderRefresh(FileTreeNode * selectedNode);
 
     void sendDeleteReq(FileTreeNode * selectedNode);
-    void getDeleteReply(RequestState replyState);
-    void sendMoveReq(FileTreeNode * selectedNode);
-    void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
+    void sendMoveReq(FileTreeNode * moveFrom, QString newName);
     void sendCopyReq(FileTreeNode * selectedNode);
-    void getCopyReply(RequestState replyState, FileMetaData * newFileData);
     void sendRenameReq(FileTreeNode * selectedNode);
-    void getRenameReply(RequestState replyState, FileMetaData * newFileData);
 
     void sendCreateFolderReq(FileTreeNode * selectedNode);
-    void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
 
     void sendUploadReq(FileTreeNode * selectedNode);
-    void getUploadReply(RequestState replyState, FileMetaData * newFileData);
     void sendDownloadReq(FileTreeNode * selectedNode);
-    void getDownloadReply(RequestState replyState);
 
     void sendCompressReq(FileTreeNode * selectedNode);
-    void getCompressReply(RequestState finalState, QJsonDocument * rawData);
     void sendDecompressReq(FileTreeNode * selectedNode);
-    void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
 
-    void sendManualRefresh();
+signals:
+    void opPendingChange(bool opPending);
+
+private slots:
+    void opLockChanged(bool newVal);
+
+    void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
+
+    void getDeleteReply(RequestState replyState);
+    void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
+    void getCopyReply(RequestState replyState, FileMetaData * newFileData);
+    void getRenameReply(RequestState replyState, FileMetaData * newFileData);
+
+    void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
+
+    void getUploadReply(RequestState replyState, FileMetaData * newFileData);
+    void getDownloadReply(RequestState replyState);
+
+    void getCompressReply(RequestState finalState, QJsonDocument * rawData);
+    void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
 
 private:
     QString getStringFromInitParams(QString stringKey);
@@ -111,7 +120,7 @@ private:
     FileTreeNode * rootFileNode = NULL;
     QStandardItemModel dataStore;
 
-    bool fileOperationPending = false;
+    EasyBoolLock * fileOpPending;
 };
 
 #endif // FILEOPERATOR_H
