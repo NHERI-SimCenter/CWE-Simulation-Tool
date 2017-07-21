@@ -80,25 +80,25 @@ private slots:
 
     void customFileMenu(QPoint pos);
 
-    void copyMenuItem(FileTreeNode * targetNode);
-    void moveMenuItem(FileTreeNode * targetNode);
-    void renameMenuItem(FileTreeNode * targetNode);
-    void deleteMenuItem(FileTreeNode * targetNode);
-    void uploadMenuItem(FileTreeNode * targetNode);
-    void createFolderMenuItem(FileTreeNode * targetNode);
-    void downloadMenuItem(FileTreeNode * targetNode);
-    void compressMenuItem(FileTreeNode * targetNode);
-    void decompressMenuItem(FileTreeNode * targetNode);
-    void refreshMenuItem(FileTreeNode * targetNode);
+    void copyMenuItem();
+    void moveMenuItem();
+    void renameMenuItem();
+    void deleteMenuItem();
+    void uploadMenuItem();
+    void createFolderMenuItem();
+    void downloadMenuItem();
+    void compressMenuItem();
+    void decompressMenuItem();
+    void refreshMenuItem();
 
 private:
     void conditionalPurge(QByteArray ** theArray);
 
     Ui::DebugPanelWindow *ui;
 
+    FileTreeNode * targetNode;
     FileOperator * theFileOperator;
     RemoteDataInterface * dataLink;
-    RemoteFileTree * fileTreeData;
 
     QStandardItemModel taskListModel;
     QString selectedAgaveApp;

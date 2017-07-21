@@ -73,8 +73,6 @@ void FileOperator::resetFileData()
         rootFileNode->deleteLater();
     }
     rootFileNode = new FileTreeNode();
-
-    new FileTreeNode(rootFileNode);
     translateFileDataToModel();
 
     enactFolderRefresh(rootFileNode);
@@ -134,6 +132,7 @@ void FileOperator::getLSReply(RequestState cmdReply, QList<FileMetaData> * fileD
         return;
     }
     rootFileNode->updateFileFolder(*fileDataList);
+    translateFileDataToModel();
 }
 
 void FileOperator::opLockChanged(bool newVal)
@@ -453,14 +452,14 @@ FileTreeNode * FileOperator::getNodeFromModel(QStandardItem * toFind)
         toFind = toFind->parent()->child(toFind->row(), 0);
     }
     QString realPath;
-    while (toFind->parent() != NULL)
+    while (toFind != NULL)
     {
         realPath = realPath.prepend(toFind->text());
         realPath = realPath.prepend("/");
 
         toFind = toFind->parent();
     }
-    return rootFileNode->getChildNodeWithName(realPath);
+    return rootFileNode->getNodeWithName(realPath);
 }
 
 QStandardItem * FileOperator::getModelEntryFromNode(FileTreeNode * toFind)
