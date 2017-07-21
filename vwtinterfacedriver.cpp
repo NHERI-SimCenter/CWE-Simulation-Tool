@@ -168,6 +168,7 @@ void VWTinterfaceDriver::closeAuthScreen()
 
     myJobHandle = new JobOperator(theConnector,this);
     myFileHandle = new FileOperator(theConnector,this);
+    myFileHandle->resetFileData();
 
     mainWindow->runSetupSteps();
     mainWindow->show();

@@ -80,7 +80,6 @@ private:
     CWE_task_list          *taskTaskList;
     CWE_help               *taskHelp;
 
-    QTreeView              *taskTreeView;
     QStackedWidget         *sharedWidget;
     RemoteDataInterface    *dataLink;
 
