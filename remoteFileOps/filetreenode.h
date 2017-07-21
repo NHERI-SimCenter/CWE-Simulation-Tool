@@ -68,17 +68,21 @@ public:
     bool childIsEmpty();
     void clearAllChildren();
 
+    QList<FileTreeNode *> * getChildList();
+    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
+
+    //TODO: Clean up the code to make the algorithms using marks cleaner
+    bool marked = false;
+
 private:
     void insertFile(FileMetaData *newData);
     void purgeUnmatchedChildren(QList<FileMetaData> * newChildList);
 
     FileTreeNode * pathSearchHelper(QString filename, bool stopEarly, bool unrestricted = false);
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
 
     FileMetaData * fileData = NULL;
     QList<FileTreeNode *> childList;
     bool rootNode = false;
-    bool marked = false;
 
     QByteArray * fileDataBuffer = NULL;
 };

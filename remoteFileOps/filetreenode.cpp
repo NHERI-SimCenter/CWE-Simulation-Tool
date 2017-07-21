@@ -198,6 +198,11 @@ void FileTreeNode::updateFileFolder(QList<FileMetaData> newDataList)
     }
 }
 
+QList<FileTreeNode *> * FileTreeNode::getChildList()
+{
+    return &childList;
+}
+
 void FileTreeNode::insertFile(FileMetaData * newData)
 {
     if (newData->getFileName() == ".") return;

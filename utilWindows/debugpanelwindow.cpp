@@ -47,6 +47,9 @@
 
 #include "visualUtils/decompresswrapper.h"
 
+#include "utilWindows/singlelinedialog.h"
+#include "utilWindows/deleteconfirm.h"
+
 DebugPanelWindow::DebugPanelWindow(RemoteDataInterface *newDataLink, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::DebugPanelWindow)
@@ -54,11 +57,6 @@ DebugPanelWindow::DebugPanelWindow(RemoteDataInterface *newDataLink, QWidget *pa
     ui->setupUi(this);
 
     dataLink = newDataLink;
-
-    fileTreeData = new RemoteFileTree(dataLink, ui->remoteFileView, ui->selectedFileInfo, this);
-
-    QObject::connect(fileTreeData, SIGNAL(newFileSelected(FileMetaData*)),
-                     this, SLOT(selectedFileChanged(FileMetaData *)));
 
     agaveParamLists.insert("FileEcho",{"NewFile", "EchoText"});
     agaveParamLists.insert("PythonTest",{"NewFile"});
@@ -86,18 +84,16 @@ DebugPanelWindow::~DebugPanelWindow()
 
 void DebugPanelWindow::startAndShow()
 {
-    selectedFullPath = "/";
-    fileTreeData->resetFileData();
+    theFileOperator = new FileOperator(dataLink, this);
+
+    theFileOperator->resetFileData();
+    ui->remoteFileView->setFileOperator(theFileOperator);
+    ui->remoteFileView->setupFileView();
 
     ui->agaveAppList->setModel(&taskListModel);
     ui->agaveAppList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     this->show();
-}
-
-void DebugPanelWindow::selectedFileChanged(FileMetaData * newFileData)
-{
-    selectedFullPath = newFileData->getFullPath();
 }
 
 void DebugPanelWindow::agaveAppSelected(QModelIndex clickedItem)
@@ -148,6 +144,7 @@ void DebugPanelWindow::setTestVisual()
 
 void DebugPanelWindow::setMeshVisual()
 {
+    /*
     setTestVisual();
     FileTreeNode * currentNode = fileTreeData->getFileNodeFromPath(selectedFullPath);
 
@@ -175,10 +172,12 @@ void DebugPanelWindow::setMeshVisual()
     aReply = dataLink->downloadBuffer(ownerFile->getFileData().getFullPath());
     QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
                      this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
+                     */
 }
 
 void DebugPanelWindow::gotNewRawFile(RequestState authReply, QByteArray * fileBuffer)
 {
+    /*
     if (authReply != RequestState::GOOD) return;
 
     RemoteDataReply * mySender = (RemoteDataReply *) QObject::sender();
@@ -220,6 +219,7 @@ void DebugPanelWindow::gotNewRawFile(RequestState authReply, QByteArray * fileBu
             ui->openGLcfdWidget->setDisplayState(CFDDisplayState::MESH);
         }
     }
+    */
 }
 
 void DebugPanelWindow::agaveCommandInvoked()
@@ -230,7 +230,7 @@ void DebugPanelWindow::agaveCommandInvoked()
     }
     qDebug("Selected App: %s", qPrintable(selectedAgaveApp));
 
-    QString workingDir = fileTreeData->getCurrentSelectedFile().getFullPath();
+    QString workingDir = fileTreeData->getSelectedNode()->getFileData().getFullPath();
     qDebug("Working Dir: %s", qPrintable(workingDir));
 
     QStringList inputList = agaveParamLists.value(selectedAgaveApp);
@@ -331,7 +331,13 @@ void DebugPanelWindow::customFileMenu(QPoint pos)
 
 void DebugPanelWindow::copyMenuItem(FileTreeNode * targetNode)
 {
+    SingleLineDialog newNamePopup("Please type a file name to copy to:", "newname");
+    if (newNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
 
+    fileTreeData->getFileOperator()->sendCopyReq(targetNode, newNamePopup.getInputText());
 }
 
 void DebugPanelWindow::moveMenuItem(FileTreeNode * targetNode)
@@ -348,7 +354,14 @@ void DebugPanelWindow::moveMenuItem(FileTreeNode * targetNode)
 
 void DebugPanelWindow::renameMenuItem(FileTreeNode * targetNode)
 {
+    SingleLineDialog newNamePopup("Please type a new file name:", "newname");
 
+    if (newNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    fileTreeData->getFileOperator()->sendRenameReq(targetNode, newNamePopup.getInputText());
 }
 
 void DebugPanelWindow::deleteMenuItem(FileTreeNode * targetNode)
@@ -363,32 +376,50 @@ void DebugPanelWindow::deleteMenuItem(FileTreeNode * targetNode)
 
 void DebugPanelWindow::uploadMenuItem(FileTreeNode * targetNode)
 {
+    SingleLineDialog uploadNamePopup("Please input full path of file to upload:", "");
 
+    if (uploadNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+    fileTreeData->getFileOperator()->sendUploadReq(targetNode, uploadNamePopup.getInputText());
 }
 
 void DebugPanelWindow::createFolderMenuItem(FileTreeNode * targetNode)
 {
+    SingleLineDialog newFolderNamePopup("Please input a name for the new folder:", "newFolder1");
 
+    if (newFolderNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+    fileTreeData->getFileOperator()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
 }
 
 void DebugPanelWindow::downloadMenuItem(FileTreeNode * targetNode)
 {
+    SingleLineDialog downloadNamePopup("Please input full path download destination:", "");
 
+    if (downloadNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+    fileTreeData->getFileOperator()->sendDownloadReq(targetNode, downloadNamePopup.getInputText());
 }
 
 void DebugPanelWindow::compressMenuItem(FileTreeNode * targetNode)
 {
-
+    fileTreeData->getFileOperator()->sendCompressReq(targetNode);
 }
 
 void DebugPanelWindow::decompressMenuItem(FileTreeNode * targetNode)
 {
-
+    fileTreeData->getFileOperator()->sendDecompressReq(targetNode);
 }
 
 void DebugPanelWindow::refreshMenuItem(FileTreeNode * targetNode)
 {
-
+    fileTreeData->getFileOperator()->enactFolderRefresh(targetNode);
 }
 
 void DebugPanelWindow::conditionalPurge(QByteArray ** theArray)
