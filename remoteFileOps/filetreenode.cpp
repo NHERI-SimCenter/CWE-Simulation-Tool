@@ -312,7 +312,7 @@ FileTreeNode * FileTreeNode::getClosestNodeWithName(QString filename, bool unres
 
 FileTreeNode * FileTreeNode::getParentNode()
 {
-    if (rootNode == false) return NULL;
+    if (rootNode == true) return NULL;
     return (FileTreeNode *)this->parent();
 }
 

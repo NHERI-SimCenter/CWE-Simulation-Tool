@@ -89,6 +89,8 @@ void DebugPanelWindow::startAndShow()
     theFileOperator->resetFileData();
     ui->remoteFileView->setFileOperator(theFileOperator);
     ui->remoteFileView->setupFileView();
+    QObject::connect(ui->remoteFileView, SIGNAL(customContextMenuRequested(QPoint)),
+                     this, SLOT(customFileMenu(QPoint)));
 
     ui->agaveAppList->setModel(&taskListModel);
     ui->agaveAppList->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -230,7 +232,7 @@ void DebugPanelWindow::agaveCommandInvoked()
     }
     qDebug("Selected App: %s", qPrintable(selectedAgaveApp));
 
-    QString workingDir = fileTreeData->getSelectedNode()->getFileData().getFullPath();
+    QString workingDir = ui->remoteFileView->getSelectedNode()->getFileData().getFullPath();
     qDebug("Working Dir: %s", qPrintable(workingDir));
 
     QStringList inputList = agaveParamLists.value(selectedAgaveApp);
@@ -268,68 +270,67 @@ void DebugPanelWindow::finishedAppInvoke(RequestState, QJsonDocument *)
 
 void DebugPanelWindow::customFileMenu(QPoint pos)
 {
-    QModelIndex targetIndex = fileTreeData->indexAt(pos);
-    fileTreeData->fileEntryTouched(targetIndex);
-
-    FileTreeNode * selectedItem = fileTreeData->getSelectedNode();
-
-    //If we did not click anything, we should return
-    if (selectedItem == NULL) return;
-    if (selectedItem->isRootNode()) return;
-    FileMetaData theFileData = selectedItem->getFileData();
-
-    if (theFileData.getFileType() == FileType::INVALID) return;
-    if (theFileData.getFileType() == FileType::UNLOADED) return;
-    if (theFileData.getFileType() == FileType::EMPTY_FOLDER) return;
-
     QMenu fileMenu;
-
-    if (fileTreeData->getFileOperator()->operationIsPending())
+    if (ui->remoteFileView->getFileOperator()->operationIsPending())
     {
         fileMenu.addAction("File Operation In Progress . . .");
         fileMenu.exec(QCursor::pos());
         return;
     }
 
-    fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem(selectedItem)));
-    fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem(selectedItem)));
-    fileMenu.addAction("Rename",this, SLOT(renameMenuItem(selectedItem)));
+    QModelIndex targetIndex = ui->remoteFileView->indexAt(pos);
+    ui->remoteFileView->fileEntryTouched(targetIndex);
+
+    targetNode = ui->remoteFileView->getSelectedNode();
+
+    //If we did not click anything, we should return
+    if (targetNode == NULL) return;
+    if (targetNode->isRootNode()) return;
+    FileMetaData theFileData = targetNode->getFileData();
+
+    if (theFileData.getFileType() == FileType::INVALID) return;
+    if (theFileData.getFileType() == FileType::UNLOADED) return;
+    if (theFileData.getFileType() == FileType::EMPTY_FOLDER) return;
+
+    fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
+    fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
+    fileMenu.addAction("Rename",this, SLOT(renameMenuItem()));
     //We don't let the user delete the username folder
-    if (!(selectedItem->getParentNode()->isRootNode()))
+    if (!(targetNode->getParentNode()->isRootNode()))
     {
         fileMenu.addSeparator();
-        fileMenu.addAction("Delete",this, SLOT(deleteMenuItem(selectedItem)));
+        fileMenu.addAction("Delete",this, SLOT(deleteMenuItem()));
         fileMenu.addSeparator();
     }
     if (theFileData.getFileType() == FileType::DIR)
     {
-        fileMenu.addAction("Upload File Here",this, SLOT(uploadMenuItem(selectedItem)));
-        fileMenu.addAction("Create New Folder",this, SLOT(createFolderMenuItem(selectedItem)));
+        fileMenu.addAction("Upload File Here",this, SLOT(uploadMenuItem()));
+        fileMenu.addAction("Create New Folder",this, SLOT(createFolderMenuItem()));
     }
     if (theFileData.getFileType() == FileType::FILE)
     {
-        fileMenu.addAction("Download File",this, SLOT(downloadMenuItem(selectedItem)));
+        fileMenu.addAction("Download File",this, SLOT(downloadMenuItem()));
     }
     if (theFileData.getFileType() == FileType::DIR)
     {
-        fileMenu.addAction("Compress Folder",this, SLOT(compressMenuItem(selectedItem)));
+        fileMenu.addAction("Compress Folder",this, SLOT(compressMenuItem()));
     }
     else if (theFileData.getFileType() == FileType::FILE)
     {
-        fileMenu.addAction("De-Compress File",this, SLOT(decompressMenuItem(selectedItem)));
+        fileMenu.addAction("De-Compress File",this, SLOT(decompressMenuItem()));
     }
 
     if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))
     {
         fileMenu.addSeparator();
-        fileMenu.addAction("Refresh Data",this, SLOT(refreshMenuItem(selectedItem)));
+        fileMenu.addAction("Refresh Data",this, SLOT(refreshMenuItem()));
         fileMenu.addSeparator();
     }
 
     fileMenu.exec(QCursor::pos());
 }
 
-void DebugPanelWindow::copyMenuItem(FileTreeNode * targetNode)
+void DebugPanelWindow::copyMenuItem()
 {
     SingleLineDialog newNamePopup("Please type a file name to copy to:", "newname");
     if (newNamePopup.exec() != QDialog::Accepted)
@@ -337,10 +338,10 @@ void DebugPanelWindow::copyMenuItem(FileTreeNode * targetNode)
         return;
     }
 
-    fileTreeData->getFileOperator()->sendCopyReq(targetNode, newNamePopup.getInputText());
+    ui->remoteFileView->getFileOperator()->sendCopyReq(targetNode, newNamePopup.getInputText());
 }
 
-void DebugPanelWindow::moveMenuItem(FileTreeNode * targetNode)
+void DebugPanelWindow::moveMenuItem()
 {
     SingleLineDialog newNamePopup("Please type a file name to move to:", "newname");
 
@@ -349,10 +350,10 @@ void DebugPanelWindow::moveMenuItem(FileTreeNode * targetNode)
         return;
     }
 
-    fileTreeData->getFileOperator()->sendMoveReq(targetNode,newNamePopup.getInputText());
+    ui->remoteFileView->getFileOperator()->sendMoveReq(targetNode,newNamePopup.getInputText());
 }
 
-void DebugPanelWindow::renameMenuItem(FileTreeNode * targetNode)
+void DebugPanelWindow::renameMenuItem()
 {
     SingleLineDialog newNamePopup("Please type a new file name:", "newname");
 
@@ -361,20 +362,20 @@ void DebugPanelWindow::renameMenuItem(FileTreeNode * targetNode)
         return;
     }
 
-    fileTreeData->getFileOperator()->sendRenameReq(targetNode, newNamePopup.getInputText());
+    ui->remoteFileView->getFileOperator()->sendRenameReq(targetNode, newNamePopup.getInputText());
 }
 
-void DebugPanelWindow::deleteMenuItem(FileTreeNode * targetNode)
+void DebugPanelWindow::deleteMenuItem()
 {
     DeleteConfirm deletePopup(targetNode->getFileData().getFullPath());
     if (deletePopup.exec() != QDialog::Accepted)
     {
         return;
     }
-    fileTreeData->getFileOperator()->sendDeleteReq(targetNode);
+    ui->remoteFileView->getFileOperator()->sendDeleteReq(targetNode);
 }
 
-void DebugPanelWindow::uploadMenuItem(FileTreeNode * targetNode)
+void DebugPanelWindow::uploadMenuItem()
 {
     SingleLineDialog uploadNamePopup("Please input full path of file to upload:", "");
 
@@ -382,10 +383,10 @@ void DebugPanelWindow::uploadMenuItem(FileTreeNode * targetNode)
     {
         return;
     }
-    fileTreeData->getFileOperator()->sendUploadReq(targetNode, uploadNamePopup.getInputText());
+    ui->remoteFileView->getFileOperator()->sendUploadReq(targetNode, uploadNamePopup.getInputText());
 }
 
-void DebugPanelWindow::createFolderMenuItem(FileTreeNode * targetNode)
+void DebugPanelWindow::createFolderMenuItem()
 {
     SingleLineDialog newFolderNamePopup("Please input a name for the new folder:", "newFolder1");
 
@@ -393,10 +394,10 @@ void DebugPanelWindow::createFolderMenuItem(FileTreeNode * targetNode)
     {
         return;
     }
-    fileTreeData->getFileOperator()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
+    ui->remoteFileView->getFileOperator()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
 }
 
-void DebugPanelWindow::downloadMenuItem(FileTreeNode * targetNode)
+void DebugPanelWindow::downloadMenuItem()
 {
     SingleLineDialog downloadNamePopup("Please input full path download destination:", "");
 
@@ -404,22 +405,22 @@ void DebugPanelWindow::downloadMenuItem(FileTreeNode * targetNode)
     {
         return;
     }
-    fileTreeData->getFileOperator()->sendDownloadReq(targetNode, downloadNamePopup.getInputText());
+    ui->remoteFileView->getFileOperator()->sendDownloadReq(targetNode, downloadNamePopup.getInputText());
 }
 
-void DebugPanelWindow::compressMenuItem(FileTreeNode * targetNode)
+void DebugPanelWindow::compressMenuItem()
 {
-    fileTreeData->getFileOperator()->sendCompressReq(targetNode);
+    ui->remoteFileView->getFileOperator()->sendCompressReq(targetNode);
 }
 
-void DebugPanelWindow::decompressMenuItem(FileTreeNode * targetNode)
+void DebugPanelWindow::decompressMenuItem()
 {
-    fileTreeData->getFileOperator()->sendDecompressReq(targetNode);
+    ui->remoteFileView->getFileOperator()->sendDecompressReq(targetNode);
 }
 
-void DebugPanelWindow::refreshMenuItem(FileTreeNode * targetNode)
+void DebugPanelWindow::refreshMenuItem()
 {
-    fileTreeData->getFileOperator()->enactFolderRefresh(targetNode);
+    ui->remoteFileView->getFileOperator()->enactFolderRefresh(targetNode);
 }
 
 void DebugPanelWindow::conditionalPurge(QByteArray ** theArray)
