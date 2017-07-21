@@ -66,6 +66,7 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 void CWE_MainWindow::runSetupSteps()
 {
     taskTaskList->linkJobHandle(myDriver->getJobHandler());
+    taskFileManager->linkFileHandle(myDriver->getFileHandler());
 }
 
 CWE_MainWindow::~CWE_MainWindow()

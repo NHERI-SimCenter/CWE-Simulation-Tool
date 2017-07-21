@@ -63,6 +63,12 @@ CWE_file_manager::~CWE_file_manager()
     delete ui;
 }
 
+void CWE_file_manager::linkFileHandle(FileOperator * theJobhandle)
+{
+    ui->remoteTreeView->setFileOperator(theJobhandle);
+    ui->remoteTreeView->setupFileView();
+}
+
 void CWE_file_manager::on_pb_upload_clicked()
 {
     /* upload selected local files */
