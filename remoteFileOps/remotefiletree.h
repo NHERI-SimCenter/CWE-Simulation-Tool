@@ -68,7 +68,7 @@ class RemoteFileTree : public QTreeView
     Q_OBJECT
 
 public:
-    explicit RemoteFileTree(QObject *parent = 0);
+    explicit RemoteFileTree(QWidget *parent = 0);
     ~RemoteFileTree();
 
     void setFileOperator(FileOperator * theOperator);
@@ -77,31 +77,19 @@ public:
 
     void refreshSelection();
     FileTreeNode * getSelectedNode();
-    void resetFileData();
-
-    void updateFileInfo(QList<FileMetaData> * fileDataList);
+    void setupFileView();
 
 signals:
-    void newFileSelected(FileMetaData * newFileData);
+    void newFileSelected(FileTreeNode * newFileData);
+
+public slots:
+    void fileEntryTouched(QModelIndex fileIndex);
 
 private slots:
     void folderExpanded(QModelIndex itemOpened);
-    void fileEntryTouched(QModelIndex fileIndex);
 
 private:
-    QString getFilePathForNode(QModelIndex dataIndex);
-    FileTreeNode * getDirNearestFromPath(QString filePath);
-
-    bool columnInUse(int i);
-    QString getRawColumnData(int i, FileMetaData * rawFileData);
-
     FileOperator * myFileOperator;
-
-    const int tableNumCols = 7;
-    const QStringList shownHeaderLabelList = {"File Name","Type","Size","Last Changed",
-                                   "Format","mimeType","Permissions"};
-    const QStringList hiddenHeaderLabelList = {"name","type","length","lastModified",
-                                   "format","mimeType","permissions"};
 
     QLabel * selectedFileDisplay = NULL;
     FileTreeNode * selectedItem = NULL;

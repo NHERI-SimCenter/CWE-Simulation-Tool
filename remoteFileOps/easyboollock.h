@@ -41,6 +41,8 @@
 
 class EasyBoolLock :public QObject
 {
+    Q_OBJECT
+
 public:
     EasyBoolLock(QObject * parent);
 

@@ -57,10 +57,14 @@ public:
     FileOperator(RemoteDataInterface * newDataLink, QObject * parent);
     void linkToFileTree(RemoteFileTree * newTreeLink);
 
+    void resetFileData();
+
     void totalResetErrorProcedure();
     bool operationIsPending();
 
-    void refreshItemModel();
+    FileTreeNode * getNodeFromIndex(QModelIndex fileIndex);
+
+    void translateFileDataToModel();
 
     void lsClosestNode(QString fullPath);
     void lsClosestNodeToParent(QString fullPath);
@@ -69,16 +73,16 @@ public:
 
     void sendDeleteReq(FileTreeNode * selectedNode);
     void sendMoveReq(FileTreeNode * moveFrom, QString newName);
-    void sendCopyReq(FileTreeNode * selectedNode);
-    void sendRenameReq(FileTreeNode * selectedNode);
+    void sendCopyReq(FileTreeNode * copyFrom, QString newName);
+    void sendRenameReq(FileTreeNode * selectedNode, QString newName);
 
-    void sendCreateFolderReq(FileTreeNode * selectedNode);
+    void sendCreateFolderReq(FileTreeNode * selectedNode, QString newName);
 
-    void sendUploadReq(FileTreeNode * selectedNode);
-    void sendDownloadReq(FileTreeNode * selectedNode);
+    void sendUploadReq(FileTreeNode * uploadTarget, QString localFile);
+    void sendDownloadReq(FileTreeNode * targetFile, QString localDest);
 
-    void sendCompressReq(FileTreeNode * selectedNode);
-    void sendDecompressReq(FileTreeNode * selectedNode);
+    void sendCompressReq(FileTreeNode * selectedFolder);
+    void sendDecompressReq(FileTreeNode * selectedFolder);
 
 signals:
     void opPendingChange(bool opPending);
@@ -102,6 +106,8 @@ private slots:
     void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
 
 private:
+    bool columnInUse(int i);
+    QString getRawColumnData(int i, FileMetaData * rawFileData);
     QString getStringFromInitParams(QString stringKey);
 
     //Note: if not found, will return NULL and call translateFileDataToModel(), to resync
@@ -109,7 +115,6 @@ private:
     FileTreeNode * getNodeFromModel(QStandardItem * toFind);
     QStandardItem * getModelEntryFromNode(FileTreeNode * toFind);
 
-    void translateFileDataToModel();
     void translateFileDataRecurseHelper(FileTreeNode * currentFile, QStandardItem * currentModelEntry);
 
     bool fileInModel(FileTreeNode * toFind, QStandardItem * compareTo);
@@ -121,6 +126,12 @@ private:
     QStandardItemModel dataStore;
 
     EasyBoolLock * fileOpPending;
+
+    const int tableNumCols = 7;
+    const QStringList shownHeaderLabelList = {"File Name","Type","Size","Last Changed",
+                                   "Format","mimeType","Permissions"};
+    const QStringList hiddenHeaderLabelList = {"name","type","length","lastModified",
+                                   "format","mimeType","permissions"};
 };
 
 #endif // FILEOPERATOR_H

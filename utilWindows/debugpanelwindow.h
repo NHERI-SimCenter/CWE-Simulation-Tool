@@ -48,6 +48,7 @@
 class RemoteFileTree;
 class FileMetaData;
 class FileTreeNode;
+class FileOperator;
 class RemoteDataInterface;
 class VWTinterfaceDriver;
 enum class RequestState;
@@ -68,7 +69,6 @@ public:
 
 private slots:
     void agaveAppSelected(QModelIndex clickedItem);
-    void selectedFileChanged(FileMetaData * newFileData);
 
     void setTestVisual();
     void setMeshVisual();
@@ -96,13 +96,12 @@ private:
 
     Ui::DebugPanelWindow *ui;
 
+    FileOperator * theFileOperator;
     RemoteDataInterface * dataLink;
     RemoteFileTree * fileTreeData;
 
     QStandardItemModel taskListModel;
     QString selectedAgaveApp;
-
-    QString selectedFullPath;
 
     QByteArray * pointData = NULL;
     QByteArray * faceData = NULL;
