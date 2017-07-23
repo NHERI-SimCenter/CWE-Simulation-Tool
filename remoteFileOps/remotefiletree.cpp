@@ -43,23 +43,13 @@
 
 #include "utilWindows/errorpopup.h"
 
-RemoteFileTree::RemoteFileTree(RemoteDataInterface * newDataLink, QTreeView * thefileTree,
-                               QLabel * selectedFileDisp, QObject *parent) :
-    QObject(parent)
+RemoteFileTree::RemoteFileTree(QWidget *parent) :
+    QTreeView(parent)
 {
-    linkedFileView = thefileTree;
-    selectedFileDisplay = selectedFileDisp;
-
-    QObject::connect(linkedFileView, SIGNAL(expanded(QModelIndex)), this, SLOT(folderExpanded(QModelIndex)));
-    QObject::connect(linkedFileView, SIGNAL(clicked(QModelIndex)), this, SLOT(fileEntryTouched(QModelIndex)));
-    QObject::connect(linkedFileView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenuFiles(QPoint)));
-
-    linkedFileView->setModel(&dataStore);
+    QObject::connect(this, SIGNAL(expanded(QModelIndex)), this, SLOT(folderExpanded(QModelIndex)));
+    QObject::connect(this, SIGNAL(clicked(QModelIndex)), this, SLOT(fileEntryTouched(QModelIndex)));
 
     selectedItem = NULL;
-
-    //Note: setting this as parent should deconstruct the fileOperator
-    myFileOperator = new FileOperator(newDataLink,this);
 }
 
 RemoteFileTree::~RemoteFileTree()
@@ -67,565 +57,70 @@ RemoteFileTree::~RemoteFileTree()
     //TODO: Delete entries in the file data tree
 }
 
-void RemoteFileTree::resendSelectedFile()
+void RemoteFileTree::setFileOperator(FileOperator * theOperator)
 {
-    if (linkedFileView->selectionModel()->selectedIndexes().size() <= 0) return;
-    fileEntryTouched(linkedFileView->selectionModel()->selectedIndexes().at(0));
+    myFileOperator = theOperator;
+    myFileOperator->linkToFileTree(this);
 }
 
-FileMetaData RemoteFileTree::getCurrentSelectedFile()
+FileOperator * RemoteFileTree::getFileOperator()
 {
-    if (selectedItem == NULL)
-    {
-        FileMetaData empty;
-        return empty;
-    }
-    return selectedItem->getFileData();
+    return myFileOperator;
 }
 
-void RemoteFileTree::resetFileData()
+void RemoteFileTree::setSelectedLabel(QLabel * selectedFileDisp)
 {
-    //TODO: reconsider needed columns
-    dataStore.clear();
-    dataStore.setColumnCount(tableNumCols);
-    dataStore.setHorizontalHeaderLabels(shownHeaderLabelList);
-    linkedFileView->hideColumn((int)FileColumn::MIME_TYPE);
-    linkedFileView->hideColumn((int)FileColumn::PERMISSIONS);
-    linkedFileView->hideColumn((int)FileColumn::FORMAT);
-    linkedFileView->hideColumn((int)FileColumn::LAST_CHANGED);
-    //TODO: Adjust column size defaults;
+    selectedFileDisplay = selectedFileDisp;
+}
 
-    if (rootFileNode != NULL)
-    {
-        rootFileNode->deleteLater();
-    }
+FileTreeNode * RemoteFileTree::getSelectedNode()
+{
+    return selectedItem;
+}
+
+void RemoteFileTree::setupFileView()
+{
     selectedItem = NULL;
-    rootFileNode = new FileTreeNode();
-
-    new FileTreeNode(rootFileNode);
-    translateFileDataToModel();
-
-    myFileOperator->enactFolderRefresh(rootFileNode->getFileData());
-}
-
-void RemoteFileTree::updateFileInfo(QList<FileMetaData> * fileDataList)
-{
-    QString searchPath;
-
-    for (auto itr = fileDataList->begin(); itr != fileDataList->end(); ++itr)
-    {
-        if ((*itr).getFileName() == ".")
-        {
-            searchPath = (*itr).getContainingPath();
-            break;
-        }
-    }
-
-    if (searchPath.isEmpty())
-    {
-        myFileOperator->totalResetErrorProcedure();
-        return;
-    }
-
-    FileTreeNode * targetNode = NULL;
-
-    //TODO: if our file data is empty, we need to populate it
-    if (rootFileNode->childIsUnloaded())
-    {
-        QString possiblePath = FileMetaData::cleanPathSlashes(searchPath);
-        if (possiblePath.at(0) == '/') possiblePath.remove(0,1);
-        if (possiblePath.at(possiblePath.size() - 1) == '/') possiblePath.remove(possiblePath.size() - 1,1);
-        if (possiblePath.contains('/'))
-        {
-            myFileOperator->totalResetErrorProcedure();
-            return;
-        }
-        possiblePath.prepend("/");
-        rootFileNode->clearAllChildren();
-        FileMetaData userNameRoot;
-        userNameRoot.setType(FileType::DIR);
-        userNameRoot.setFullFilePath(possiblePath);
-        targetNode = new FileTreeNode(userNameRoot, rootFileNode);
-        new FileTreeNode(targetNode);
-    }
-    else
-    {
-        targetNode = getFileNodeFromPath(searchPath);
-    }
-
-    if (targetNode == NULL)
-    {
-        myFileOperator->totalResetErrorProcedure();
-        return;
-    }
-
-    //If the target node has a loading placeholder, clear it
-    if (targetNode->childIsUnloaded())
-    {
-        targetNode->clearAllChildren();
-    }
-
-    //If the incoming list is empty, ie. has one entry (.), place empty file placeholder
-    if (fileDataList->size() <= 1)
-    {
-        targetNode->clearAllChildren();
-
-        FileMetaData emptyFolder;
-        QString emptyName = searchPath;
-        emptyName.append("/Empty Folder");
-        emptyFolder.setFullFilePath(emptyName);
-        emptyFolder.setType(FileType::EMPTY_FOLDER);
-        new FileTreeNode(emptyFolder,targetNode);
-        translateFileDataToModel();
-        return;
-    }
-
-    //Unmark all files in the old list
-    for (auto itr = targetNode->fileListStart(); itr != targetNode->fileListEnd(); itr++)
-    {
-        (*itr)->setMark(false);
-    }
-
-    //For each file in the new file list, check for it
-    //Mark if it is there and IDENTICAL
-    //Place new file and mark not found
-    for (auto itr = fileDataList->begin(); itr != fileDataList->end(); ++itr)
-    {
-        if ((*itr).getFileName() == ".") continue;
-
-        bool foundOldFile = false;
-        for (auto itr2 = targetNode->fileListStart(); itr2 != targetNode->fileListEnd(); itr2++)
-        {
-            if ((*itr2)->isMarked()) continue;
-
-            if ((*itr) == (*itr2)->getFileData())
-            {
-                foundOldFile = true;
-                (*itr2)->setMark(true);
-                break;
-            }
-        }
-        if (!foundOldFile)
-        {
-            FileTreeNode * newFile = new FileTreeNode((*itr),targetNode);
-            if ((*itr).getFileType() == FileType::DIR)
-            {   //If its a new folder, put the loading placeholder in it
-                new FileTreeNode(newFile);
-            }
-            newFile->setMark(true);
-        }
-    }
-
-    FileTreeNode * toRemove = NULL;
-    //Remove all unmarked files from old list -- TODO: This is inelegant code, fix
-    do
-    {
-        toRemove = NULL;
-        for (auto itr = targetNode->fileListStart(); itr != targetNode->fileListEnd(); itr++)
-        {
-            if ((*itr)->isMarked()) continue;
-
-            toRemove = (*itr);
-        }
-        if (toRemove != NULL)
-        {
-            delete toRemove;
-        }
-    }
-    while (toRemove != NULL);
-
-    translateFileDataToModel();
+    emit newFileSelected(NULL);
+    //TODO: reconsider needed columns
+    this->hideColumn((int)FileColumn::MIME_TYPE);
+    this->hideColumn((int)FileColumn::PERMISSIONS);
+    this->hideColumn((int)FileColumn::FORMAT);
+    this->hideColumn((int)FileColumn::LAST_CHANGED);
+    //TODO: Adjust column size defaults;
 }
 
 void RemoteFileTree::folderExpanded(QModelIndex itemOpened)
 {
-    FileTreeNode * theFileNode = getNodeFromModel(dataStore.itemFromIndex(itemOpened));
     fileEntryTouched(itemOpened);
+//Fix this
+    if (selectedItem == NULL) return;
+    if (!selectedItem->childIsUnloaded()) return;
 
-    if (theFileNode == NULL) return;
-    if (!theFileNode->childIsUnloaded()) return;
-
-    myFileOperator->enactFolderRefresh(theFileNode->getFileData());
+    myFileOperator->enactFolderRefresh(selectedItem);
 }
 
 void RemoteFileTree::fileEntryTouched(QModelIndex fileIndex)
 {
-    QStandardItem * touchedItem = dataStore.itemFromIndex(fileIndex);
-    selectedItem = getNodeFromModel(touchedItem);
+    selectedItem = myFileOperator->getNodeFromIndex(fileIndex);
 
-    if (selectedItem == NULL)
+    if (selectedFileDisplay != NULL)
     {
-        selectedFileDisplay->setText("No File Selected.");
-        return;
-    }
+        if (selectedItem == NULL)
+        {
+            selectedFileDisplay->setText("No File Selected.");
+        }
+        else
+        {
+            FileMetaData newFileData = selectedItem->getFileData();
 
-    FileMetaData newFileData = selectedItem->getFileData();
-
-    QString fileString = "Filename: %1\nType: %2\nSize: %3";
-    fileString = fileString.arg(newFileData.getFileName(),
+            QString fileString = "Filename: %1\nType: %2\nSize: %3";
+            fileString = fileString.arg(newFileData.getFileName(),
                                 newFileData.getFileTypeString(),
                                 QString::number(newFileData.getSize()));
-
-    selectedFileDisplay->setText(fileString);
-
-    emit newFileSelected(&newFileData);
-}
-
-void RemoteFileTree::needRightClickMenuFiles(QPoint pos)
-{
-    QModelIndex targetIndex = linkedFileView->indexAt(pos);
-    fileEntryTouched(targetIndex);
-
-    //If we did not click anything, we should return
-    if (selectedItem == NULL) return;
-    if (selectedItem->isRootNode()) return;
-    FileMetaData theFileData = selectedItem->getFileData();
-
-    if (theFileData.getFileType() == FileType::INVALID) return;
-    if (theFileData.getFileType() == FileType::UNLOADED) return;
-    if (theFileData.getFileType() == FileType::EMPTY_FOLDER) return;
-
-    QMenu fileMenu;
-
-    if (myFileOperator->operationIsPending())
-    {
-        fileMenu.addAction("File Operation In Progress . . .");
-        fileMenu.exec(QCursor::pos());
-        return;
-    }
-
-    fileMenu.addAction("Copy To . . .",myFileOperator, SLOT(sendCopyReq()));
-    fileMenu.addAction("Move To . . .",myFileOperator, SLOT(sendMoveReq()));
-    fileMenu.addAction("Rename",myFileOperator, SLOT(sendRenameReq()));
-    //We don't let the user delete the username folder
-    if (!(selectedItem->getParentNode()->isRootNode()))
-    {
-        fileMenu.addSeparator();
-        fileMenu.addAction("Delete",myFileOperator, SLOT(sendDeleteReq()));
-        fileMenu.addSeparator();
-    }
-    if (theFileData.getFileType() == FileType::DIR)
-    {
-        fileMenu.addAction("Upload File Here",myFileOperator, SLOT(sendUploadReq()));
-        fileMenu.addAction("Create New Folder",myFileOperator, SLOT(sendCreateFolderReq()));
-    }
-    if (theFileData.getFileType() == FileType::FILE)
-    {
-        fileMenu.addAction("Download File",myFileOperator, SLOT(sendDownloadReq()));
-    }
-    if (theFileData.getFileType() == FileType::DIR)
-    {
-        fileMenu.addAction("Compress Folder",myFileOperator, SLOT(sendCompressReq()));
-    }
-    else if (theFileData.getFileType() == FileType::FILE)
-    {
-        fileMenu.addAction("De-Compress File",myFileOperator, SLOT(sendDecompressReq()));
-    }
-
-    if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))
-    {
-        fileMenu.addSeparator();
-        fileMenu.addAction("Refresh Data",myFileOperator, SLOT(sendManualRefresh()));
-        fileMenu.addSeparator();
-    }
-
-    fileMenu.exec(QCursor::pos());
-}
-
-void RemoteFileTree::lsClosestNode(QString fullPath)
-{
-    FileTreeNode * nodeToRefresh = getDirNearestFromPath(fullPath);
-    myFileOperator->enactFolderRefresh(nodeToRefresh->getFileData());
-}
-
-void RemoteFileTree::lsClosestNodeToParent(QString fullPath)
-{
-    FileTreeNode * nodeToRefresh = getFileNodeFromPath(fullPath);
-    if (nodeToRefresh != NULL)
-    {
-        if (!nodeToRefresh->isRootNode())
-        {
-            nodeToRefresh = nodeToRefresh->getParentNode();
-        }
-        myFileOperator->enactFolderRefresh(nodeToRefresh->getFileData());
-        return;
-    }
-
-    nodeToRefresh = getDirNearestFromPath(fullPath);
-    myFileOperator->enactFolderRefresh(nodeToRefresh->getFileData());
-}
-
-QString RemoteFileTree::getFilePathForNode(QModelIndex dataIndex)
-{
-    FileTreeNode * nodeToCheck = getNodeFromModel(dataStore.itemFromIndex(dataIndex));
-    if (nodeToCheck == NULL) return "";
-    return nodeToCheck->getFileData().getFullPath();
-}
-
-
-QStandardItem * RemoteFileTree::getModelEntryFromNode(FileTreeNode * toFind)
-{
-    if (toFind == NULL) return NULL;
-
-    QStandardItem * searchPointer = dataStore.invisibleRootItem();
-
-    QStringList pathSearchList = FileMetaData::getPathNameList(toFind->getFileData().getFullPath());
-
-    for (auto itr = pathSearchList.cbegin(); itr != pathSearchList.cend(); itr++)
-    {
-        bool foundNext = false;
-        for (int i = 0; i < searchPointer->rowCount(); i++)
-        {
-            if (searchPointer->child(i,(int)FileColumn::FILENAME)->text() == (*itr))
-            {
-                searchPointer = searchPointer->child(i,(int)FileColumn::FILENAME);
-                foundNext = true;
-                break;
-            }
-        }
-        if (foundNext == false)
-        {
-            return NULL;
+            selectedFileDisplay->setText(fileString);
         }
     }
 
-    if (fileInModel(toFind,searchPointer))
-    {
-        return searchPointer;
-    }
-    return NULL;
-}
-
-void RemoteFileTree::translateFileDataToModel()
-{
-    FileTreeNode * currentFile = rootFileNode;
-    QStandardItem * currentModelEntry = dataStore.invisibleRootItem();
-
-    translateFileDataRecurseHelper(currentFile, currentModelEntry);
-}
-
-void RemoteFileTree::translateFileDataRecurseHelper(FileTreeNode * currentFile, QStandardItem * currentModelEntry)
-{
-    //TODO: I am guessing this could be more efficient
-    for (auto itr = currentFile->fileListStart(); itr != currentFile->fileListEnd(); itr++)
-    {
-        (*itr)->setMark(false);
-    }
-
-    for (int i = 0; i < currentModelEntry->rowCount(); i++)
-    {
-        QStandardItem * testItem = currentModelEntry->child(i, (int)FileColumn::FILENAME);
-        FileTreeNode * testFile = currentFile->getChildNodeWithName(testItem->text());
-        if (testFile == NULL)
-        {
-            currentModelEntry->removeRow(i);
-            i = 0;
-        }
-        else
-        {
-            changeModelFromFile(testItem,testFile);
-            testFile->setMark(true);
-        }
-    }
-
-    for (auto itr = currentFile->fileListStart(); itr != currentFile->fileListEnd(); itr++)
-    {
-        if ((*itr)->isMarked() == false)
-        {
-            newModelRowFromFile(currentModelEntry,(*itr));
-        }
-    }
-
-    for (int i = 0; i < currentModelEntry->rowCount(); i++)
-    {
-        QStandardItem * testItem = currentModelEntry->child(i, (int)FileColumn::FILENAME);
-        FileTreeNode * testFile = currentFile->getChildNodeWithName(testItem->text(), true);
-        if (testFile == NULL)
-        {
-            ErrorPopup("Internal file tree parse is self-inconsistant.");
-            return;
-        }
-        translateFileDataRecurseHelper(testFile,testItem);
-    }
-}
-
-bool RemoteFileTree::fileInModel(FileTreeNode * toFind, QStandardItem * compareTo)
-{
-    if ((toFind == NULL) || (compareTo == NULL))
-    {
-        return false;
-    }
-    FileMetaData rawData = toFind->getFileData();
-    QStandardItem * parentNode = compareTo->parent();
-    if (parentNode == NULL)
-    {
-        parentNode = dataStore.invisibleRootItem();
-    }
-
-    int rowNum = compareTo->row();
-    for (int i = 0; i < tableNumCols; i++)
-    {
-        if (columnInUse(i))
-        {
-            if (parentNode->child(rowNum,i)->text() != getRawColumnData(i,&rawData))
-            {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-void RemoteFileTree::changeModelFromFile(QStandardItem * targetRow, FileTreeNode * dataSource)
-{
-    if ((targetRow == NULL) || (dataSource == NULL))
-    {
-        ErrorPopup("NULL pointer in changeModelFromFile method");
-        return;
-    }
-
-    FileMetaData rawData = dataSource->getFileData();
-    QStandardItem * parentNode = targetRow->parent();
-    if (parentNode == NULL)
-    {
-        parentNode = dataStore.invisibleRootItem();
-    }
-
-    int rowNum = targetRow->row();
-    for (int i = 0; i < tableNumCols; i++)
-    {
-        QStandardItem * valToSwitch = parentNode->child(rowNum,i);
-
-        if (columnInUse(i))
-        {
-            valToSwitch->setText(getRawColumnData(i,&rawData));
-        }
-    }
-}
-
-void RemoteFileTree::newModelRowFromFile(QStandardItem * parentItem, FileTreeNode * dataSource)
-{
-    if ((parentItem == NULL) || (dataSource == NULL))
-    {
-        ErrorPopup("NULL pointer in changeModelFromFile method");
-        return;
-    }
-    FileMetaData rawData = dataSource->getFileData();
-    QList<QStandardItem *> newDataList;
-
-    for (int i = 0; i < tableNumCols; i++)
-    {
-        if (columnInUse(i))
-        {
-            newDataList.append(new QStandardItem(getRawColumnData(i,&rawData)));
-        }
-        else
-        {
-            newDataList.append(new QStandardItem(""));
-        }
-    }
-
-    parentItem->appendRow(newDataList);
-}
-
-bool RemoteFileTree::columnInUse(int i)
-{
-    //TODO: This is a temporary function until the used/hidden columns are clarified
-    if ((FileColumn)i == FileColumn::FILENAME)
-    {
-        return true;
-    }
-    else if ((FileColumn)i == FileColumn::TYPE)
-    {
-        return true;
-    }
-    else if ((FileColumn)i == FileColumn::SIZE)
-    {
-        return true;
-    }
-    return false;
-}
-
-QString RemoteFileTree::getRawColumnData(int i, FileMetaData * rawFileData)
-{
-    if ((FileColumn)i == FileColumn::FILENAME)
-    {
-        return rawFileData->getFileName();
-    }
-    else if ((FileColumn)i == FileColumn::TYPE)
-    {
-        return rawFileData->getFileTypeString();
-    }
-    else if ((FileColumn)i == FileColumn::SIZE)
-    {
-        return QString::number(rawFileData->getSize());
-    }
-    return "";
-}
-
-FileTreeNode * RemoteFileTree::getFileNodeFromPath(QString filePath)
-{
-    QStringList filePathParts = FileMetaData::getPathNameList(filePath);
-    FileTreeNode * searchNode = rootFileNode;
-
-    for (auto itr = filePathParts.cbegin(); itr != filePathParts.cend(); itr++)
-    {
-        FileTreeNode * nextNode = searchNode->getChildNodeWithName(*itr);
-        if (nextNode == NULL)
-        {
-            return NULL;
-        }
-        searchNode = nextNode;
-    }
-
-    return searchNode;
-}
-
-FileTreeNode * RemoteFileTree::getDirNearestFromPath(QString filePath)
-{
-    QStringList filePathParts = FileMetaData::getPathNameList(filePath);
-    FileTreeNode * searchNode = rootFileNode;
-
-    for (auto itr = filePathParts.cbegin(); itr != filePathParts.cend(); itr++)
-    {
-        FileTreeNode * nextNode = searchNode->getChildNodeWithName(*itr);
-        if ((nextNode == NULL) || (nextNode->getFileData().getFileType() != FileType::DIR))
-        {
-            return searchNode;
-        }
-        searchNode = nextNode;
-    }
-
-    return searchNode;
-}
-
-FileTreeNode * RemoteFileTree::getNodeFromModel(QStandardItem * toFind)
-{
-    if (toFind == NULL)
-    {
-        return NULL;
-    }
-
-    if (toFind->column() != (int)FileColumn::FILENAME)
-    {
-        QStandardItem * parentItem = toFind->parent();
-        if (parentItem == NULL)
-        {
-            parentItem = dataStore.invisibleRootItem();
-        }
-        toFind = parentItem->child(toFind->row(),(int)FileColumn::FILENAME);
-    }
-
-    QString pathToFind;
-
-    QStandardItem * searchPointer = toFind;
-
-    while (searchPointer != NULL)
-    {
-        pathToFind.prepend(searchPointer->text());
-        pathToFind.prepend("/");
-        searchPointer = searchPointer->parent();
-    }
-
-    return getFileNodeFromPath(pathToFind);
+    emit newFileSelected(selectedItem);
 }

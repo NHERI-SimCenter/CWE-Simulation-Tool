@@ -40,12 +40,17 @@
 #include <QTreeView>
 #include <QStandardItemModel>
 #include <QStackedWidget>
+#include <QLineEdit>
+
+#include <QMap>
+#include <QStringList>
 
 class RemoteFileTree;
 class FileMetaData;
+class FileTreeNode;
+class FileOperator;
 class RemoteDataInterface;
 class VWTinterfaceDriver;
-class JobOperator;
 enum class RequestState;
 
 namespace Ui {
@@ -64,34 +69,47 @@ public:
 
 private slots:
     void agaveAppSelected(QModelIndex clickedItem);
-    void selectedFileChanged(FileMetaData * newFileData);
 
     void setTestVisual();
     void setMeshVisual();
 
-    void placeInputPairs(QModelIndex newSelected);
     void agaveCommandInvoked();
     void finishedAppInvoke(RequestState finalState, QJsonDocument * rawReply);
 
+    void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
+
+    void customFileMenu(QPoint pos);
+
+    void copyMenuItem();
+    void moveMenuItem();
+    void renameMenuItem();
+    void deleteMenuItem();
+    void uploadMenuItem();
+    void createFolderMenuItem();
+    void downloadMenuItem();
+    void compressMenuItem();
+    void decompressMenuItem();
+    void refreshMenuItem();
+
 private:
     void conditionalPurge(QByteArray ** theArray);
-    void gotNewRawFile(RequestState authReply, QByteArray * fileBuffer);
 
     Ui::DebugPanelWindow *ui;
 
+    FileTreeNode * targetNode;
+    FileOperator * theFileOperator;
     RemoteDataInterface * dataLink;
-    RemoteFileTree * fileTreeData;
-
-    JobOperator * remoteJobLister;
 
     QStandardItemModel taskListModel;
     QString selectedAgaveApp;
 
-    QString selectedFullPath;
-
     QByteArray * pointData = NULL;
     QByteArray * faceData = NULL;
     QByteArray * ownerData = NULL;
+
+    QMap<QString, QStringList> agaveParamLists;
+
+    bool waitingOnCommand = false;
 };
 
 #endif // PANELWINDOW_H

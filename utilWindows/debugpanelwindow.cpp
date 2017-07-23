@@ -41,10 +41,14 @@
 #include "../AgaveClientInterface/filemetadata.h"
 
 #include "remoteFileOps/filetreenode.h"
+#include "remoteFileOps/fileoperator.h"
 #include "remoteFileOps/remotefiletree.h"
 #include "remoteFileOps/joboperator.h"
 
 #include "visualUtils/decompresswrapper.h"
+
+#include "utilWindows/singlelinedialog.h"
+#include "utilWindows/deleteconfirm.h"
 
 DebugPanelWindow::DebugPanelWindow(RemoteDataInterface *newDataLink, QWidget *parent) :
     QMainWindow(parent),
@@ -54,11 +58,23 @@ DebugPanelWindow::DebugPanelWindow(RemoteDataInterface *newDataLink, QWidget *pa
 
     dataLink = newDataLink;
 
-    fileTreeData = new RemoteFileTree(dataLink, ui->remoteFileView, ui->selectedFileInfo, this);
-    remoteJobLister = new JobOperator(dataLink, ui->longTaskView,this);
+    agaveParamLists.insert("FileEcho",{"NewFile", "EchoText"});
+    agaveParamLists.insert("PythonTest",{"NewFile"});
+    agaveParamLists.insert("SectionMesh",{"directory", "SlicePlane","SimParams"});
 
-    QObject::connect(fileTreeData, SIGNAL(newFileSelected(FileMetaData*)),
-                     this, SLOT(selectedFileChanged(FileMetaData *)));
+    agaveParamLists.insert("compress",{"directory", "compression_type"});
+    agaveParamLists.insert("extract", {"inputFile"});
+    agaveParamLists.insert("openfoam", {"solver","inputDirectory"});
+    agaveParamLists.insert("tempCFD",{"solver","inputDirectory"});
+
+    agaveParamLists.insert("twoDslice", {"SlicePlane", "SimParams", "NewCaseFolder","SGFFile"});
+    agaveParamLists.insert("twoDUmesh", {"MeshParams","directory"});
+
+    for (auto itr = agaveParamLists.keyBegin(); itr != agaveParamLists.keyEnd(); itr++)
+    {
+        taskListModel.appendRow(new QStandardItem(*itr));
+    }
+    ui->agaveAppList->setModel(&taskListModel);
 }
 
 DebugPanelWindow::~DebugPanelWindow()
@@ -68,8 +84,13 @@ DebugPanelWindow::~DebugPanelWindow()
 
 void DebugPanelWindow::startAndShow()
 {
-    selectedFullPath = "/";
-    fileTreeData->resetFileData();
+    theFileOperator = new FileOperator(dataLink, this);
+
+    theFileOperator->resetFileData();
+    ui->remoteFileView->setFileOperator(theFileOperator);
+    ui->remoteFileView->setupFileView();
+    QObject::connect(ui->remoteFileView, SIGNAL(customContextMenuRequested(QPoint)),
+                     this, SLOT(customFileMenu(QPoint)));
 
     ui->agaveAppList->setModel(&taskListModel);
     ui->agaveAppList->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -77,14 +98,42 @@ void DebugPanelWindow::startAndShow()
     this->show();
 }
 
-void DebugPanelWindow::selectedFileChanged(FileMetaData * newFileData)
-{
-    selectedFullPath = newFileData->getFullPath();
-}
-
 void DebugPanelWindow::agaveAppSelected(QModelIndex clickedItem)
 {
-    selectedAgaveApp = taskListModel.itemFromIndex(clickedItem)->text();
+    QString newSelection = taskListModel.itemFromIndex(clickedItem)->text();
+    if (selectedAgaveApp == newSelection)
+    {
+        return;
+    }
+    selectedAgaveApp = newSelection;
+
+    QGridLayout * panelLayout = new QGridLayout();
+    QObjectList childList = ui->AgaveParamWidget->children();
+
+    while (childList.size() > 0)
+    {
+        QObject * aChild = childList.takeLast();
+        delete aChild;
+    }
+
+    ui->AgaveParamWidget->setLayout(panelLayout);
+
+    QStringList inputList = agaveParamLists.value(selectedAgaveApp);
+    int rowNum = 0;
+
+    for (auto itr = inputList.cbegin(); itr != inputList.cend(); itr++)
+    {
+        QString paramName = "debugAgave_";
+        paramName = paramName.append(*itr);
+
+        QLabel * tmpLabel = new QLabel(*itr);
+        QLineEdit * tmpInput = new QLineEdit();
+        tmpInput->setObjectName(paramName);
+
+        panelLayout->addWidget(tmpLabel,rowNum,0);
+        panelLayout->addWidget(tmpInput,rowNum,1);
+        rowNum++;
+    }
 }
 
 void DebugPanelWindow::setTestVisual()
@@ -97,6 +146,7 @@ void DebugPanelWindow::setTestVisual()
 
 void DebugPanelWindow::setMeshVisual()
 {
+    /*
     setTestVisual();
     FileTreeNode * currentNode = fileTreeData->getFileNodeFromPath(selectedFullPath);
 
@@ -124,17 +174,12 @@ void DebugPanelWindow::setMeshVisual()
     aReply = dataLink->downloadBuffer(ownerFile->getFileData().getFullPath());
     QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
                      this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
-}
-
-void DebugPanelWindow::conditionalPurge(QByteArray ** theArray)
-{
-    if (*theArray == NULL) return;
-    delete *theArray;
-    *theArray = NULL;
+                     */
 }
 
 void DebugPanelWindow::gotNewRawFile(RequestState authReply, QByteArray * fileBuffer)
 {
+    /*
     if (authReply != RequestState::GOOD) return;
 
     RemoteDataReply * mySender = (RemoteDataReply *) QObject::sender();
@@ -176,91 +221,30 @@ void DebugPanelWindow::gotNewRawFile(RequestState authReply, QByteArray * fileBu
             ui->openGLcfdWidget->setDisplayState(CFDDisplayState::MESH);
         }
     }
-}
-
-    //{"Create Simulation", ". . . From Geometry File (2D slice)"},
-    //{"turbModel", "nu", "velocity", "endTime", "deltaT", "B", "H", "pisoCorrectors", "pisoNonOrthCorrect"},
-    //{"SlicePlane", "NewCaseFolder"}, "SimParams" ,"twoDslice");
-
-    //{"Mesh Generation", ". . . From Simple Geometry Format"},
-    //{"boundaryTop", "boundaryLow", "inPad", "outPad", "topPad", "bottomPad", "meshDensity", "meshDensityFar"},
-    //{}, "MeshParams" ,"twoDUmesh");
-
-/*
- * agaveAppList.appendRow(new QStandardItem("FileEcho"));
-    inputLists.insert("FileEcho", {"NewFile", "EchoText"});
-    agaveAppList.appendRow(new QStandardItem("PythonTest"));
-    inputLists.insert("PythonTest", {"NewFile"});
-    agaveAppList.appendRow(new QStandardItem("SectionMesh"));
-    inputLists.insert("SectionMesh", {"directory", "SlicePlane","SimParams"});
-
-
-    oneInput.insert("solver","pisoFoam");
-    */
-
-void DebugPanelWindow::placeInputPairs(QModelIndex newSelected)
-{
-    QObjectList childList = ui->AgaveParamWidget->children();
-
-    /*
-    for ()
-    {
-
-    }
-
-    QString selectedApp = agaveAppList.itemFromIndex(newSelected)->text();
-    if (selectedApp.isEmpty())
-    {
-        return;
-    }
-
-    QStringList inputList = inputLists.value(selectedApp);
-
-    if (inputList.size() <= 0)
-    {
-        return;
-    }
-
-    buttonArea = new QGridLayout();
-    int rowNum = 0;
-
-    for (auto itr = inputList.cbegin(); itr != inputList.cend(); itr++)
-    {
-        QLabel * tmpLabel = new QLabel(*itr);
-        QLineEdit * tmpInput = new QLineEdit();
-        tmpInput->setObjectName(*itr);
-
-        buttonArea->addWidget(tmpLabel,rowNum,0);
-        buttonArea->addWidget(tmpInput,rowNum,1);
-        rowNum++;
-    }
-
-    vLayout->addLayout(buttonArea);
     */
 }
 
 void DebugPanelWindow::agaveCommandInvoked()
 {
-    /*
     if (waitingOnCommand)
     {
         return;
     }
+    qDebug("Selected App: %s", qPrintable(selectedAgaveApp));
 
-    qDebug("Agave Command Test Invoked");
-    QString selectedApp = agaveAppList.itemFromIndex(agaveOptionList->currentIndex())->text();
-    qDebug("Selected App: %s", qPrintable(selectedApp));
-
-    QString workingDir = myTreeReader->getCurrentSelectedFile().getFullPath();
+    QString workingDir = ui->remoteFileView->getSelectedNode()->getFileData().getFullPath();
     qDebug("Working Dir: %s", qPrintable(workingDir));
 
-    QStringList inputList = inputLists.value(selectedApp);
+    QStringList inputList = agaveParamLists.value(selectedAgaveApp);
     QMultiMap<QString, QString> allInputs;
 
     qDebug("Input List:");
     for (auto itr = inputList.cbegin(); itr != inputList.cend(); itr++)
     {
-        QLineEdit * theInput = this->getOwnedWidget()->findChild<QLineEdit *>(*itr);
+        QString paramName = "debugAgave_";
+        paramName = paramName.append(*itr);
+
+        QLineEdit * theInput = ui->AgaveParamWidget->findChild<QLineEdit *>(paramName);
         if (theInput != NULL)
         {
             allInputs.insert((*itr),theInput->text());
@@ -268,25 +252,180 @@ void DebugPanelWindow::agaveCommandInvoked()
         }
     }
 
-    RemoteDataReply * theTask = dataConnection->runRemoteJob(selectedApp,allInputs,workingDir);
+    RemoteDataReply * theTask = dataLink->runRemoteJob(selectedAgaveApp,allInputs,workingDir);
     if (theTask == NULL)
     {
         qDebug("Unable to invoke task");
-        //TODO: give reasonable error
         return;
     }
     waitingOnCommand = true;
-    expectedCommand = selectedApp;
     QObject::connect(theTask, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(finishedAppInvoke(RequestState,QJsonDocument*)));
-*/
 }
 
-void DebugPanelWindow::finishedAppInvoke(RequestState finalState, QJsonDocument *)
+void DebugPanelWindow::finishedAppInvoke(RequestState, QJsonDocument *)
 {
-    if (finalState != RequestState::GOOD)
+    waitingOnCommand = false;
+}
+
+void DebugPanelWindow::customFileMenu(QPoint pos)
+{
+    QMenu fileMenu;
+    if (ui->remoteFileView->getFileOperator()->operationIsPending())
     {
-        //TODO: give reasonable error
+        fileMenu.addAction("File Operation In Progress . . .");
+        fileMenu.exec(QCursor::pos());
         return;
     }
+
+    QModelIndex targetIndex = ui->remoteFileView->indexAt(pos);
+    ui->remoteFileView->fileEntryTouched(targetIndex);
+
+    targetNode = ui->remoteFileView->getSelectedNode();
+
+    //If we did not click anything, we should return
+    if (targetNode == NULL) return;
+    if (targetNode->isRootNode()) return;
+    FileMetaData theFileData = targetNode->getFileData();
+
+    if (theFileData.getFileType() == FileType::INVALID) return;
+    if (theFileData.getFileType() == FileType::UNLOADED) return;
+    if (theFileData.getFileType() == FileType::EMPTY_FOLDER) return;
+
+    fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
+    fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
+    fileMenu.addAction("Rename",this, SLOT(renameMenuItem()));
+    //We don't let the user delete the username folder
+    if (!(targetNode->getParentNode()->isRootNode()))
+    {
+        fileMenu.addSeparator();
+        fileMenu.addAction("Delete",this, SLOT(deleteMenuItem()));
+        fileMenu.addSeparator();
+    }
+    if (theFileData.getFileType() == FileType::DIR)
+    {
+        fileMenu.addAction("Upload File Here",this, SLOT(uploadMenuItem()));
+        fileMenu.addAction("Create New Folder",this, SLOT(createFolderMenuItem()));
+    }
+    if (theFileData.getFileType() == FileType::FILE)
+    {
+        fileMenu.addAction("Download File",this, SLOT(downloadMenuItem()));
+    }
+    if (theFileData.getFileType() == FileType::DIR)
+    {
+        fileMenu.addAction("Compress Folder",this, SLOT(compressMenuItem()));
+    }
+    else if (theFileData.getFileType() == FileType::FILE)
+    {
+        fileMenu.addAction("De-Compress File",this, SLOT(decompressMenuItem()));
+    }
+
+    if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))
+    {
+        fileMenu.addSeparator();
+        fileMenu.addAction("Refresh Data",this, SLOT(refreshMenuItem()));
+        fileMenu.addSeparator();
+    }
+
+    fileMenu.exec(QCursor::pos());
+}
+
+void DebugPanelWindow::copyMenuItem()
+{
+    SingleLineDialog newNamePopup("Please type a file name to copy to:", "newname");
+    if (newNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    ui->remoteFileView->getFileOperator()->sendCopyReq(targetNode, newNamePopup.getInputText());
+}
+
+void DebugPanelWindow::moveMenuItem()
+{
+    SingleLineDialog newNamePopup("Please type a file name to move to:", "newname");
+
+    if (newNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    ui->remoteFileView->getFileOperator()->sendMoveReq(targetNode,newNamePopup.getInputText());
+}
+
+void DebugPanelWindow::renameMenuItem()
+{
+    SingleLineDialog newNamePopup("Please type a new file name:", "newname");
+
+    if (newNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    ui->remoteFileView->getFileOperator()->sendRenameReq(targetNode, newNamePopup.getInputText());
+}
+
+void DebugPanelWindow::deleteMenuItem()
+{
+    DeleteConfirm deletePopup(targetNode->getFileData().getFullPath());
+    if (deletePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+    ui->remoteFileView->getFileOperator()->sendDeleteReq(targetNode);
+}
+
+void DebugPanelWindow::uploadMenuItem()
+{
+    SingleLineDialog uploadNamePopup("Please input full path of file to upload:", "");
+
+    if (uploadNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+    ui->remoteFileView->getFileOperator()->sendUploadReq(targetNode, uploadNamePopup.getInputText());
+}
+
+void DebugPanelWindow::createFolderMenuItem()
+{
+    SingleLineDialog newFolderNamePopup("Please input a name for the new folder:", "newFolder1");
+
+    if (newFolderNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+    ui->remoteFileView->getFileOperator()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
+}
+
+void DebugPanelWindow::downloadMenuItem()
+{
+    SingleLineDialog downloadNamePopup("Please input full path download destination:", "");
+
+    if (downloadNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+    ui->remoteFileView->getFileOperator()->sendDownloadReq(targetNode, downloadNamePopup.getInputText());
+}
+
+void DebugPanelWindow::compressMenuItem()
+{
+    ui->remoteFileView->getFileOperator()->sendCompressReq(targetNode);
+}
+
+void DebugPanelWindow::decompressMenuItem()
+{
+    ui->remoteFileView->getFileOperator()->sendDecompressReq(targetNode);
+}
+
+void DebugPanelWindow::refreshMenuItem()
+{
+    ui->remoteFileView->getFileOperator()->enactFolderRefresh(targetNode);
+}
+
+void DebugPanelWindow::conditionalPurge(QByteArray ** theArray)
+{
+    if (*theArray == NULL) return;
+    delete *theArray;
+    *theArray = NULL;
 }

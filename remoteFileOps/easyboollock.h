@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,23 +31,30 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_task_list.h"
-#include "ui_cwe_task_list.h"
 
-CWE_task_list::CWE_task_list(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_task_list)
+#ifndef EASYBOOLLOCK_H
+#define EASYBOOLLOCK_H
+
+#include <QObject>
+
+class EasyBoolLock :public QObject
 {
-    ui->setupUi(this);
-}
+    Q_OBJECT
 
-void CWE_task_list::linkJobHandle(JobOperator * theJobhandle)
-{
-    ui->jobListView->setJobHandle(theJobhandle);
-}
+public:
+    EasyBoolLock(QObject * parent);
 
-CWE_task_list::~CWE_task_list()
-{
-    delete ui;
-}
+    bool checkAndClaim();
+    bool lockClosed();
+    void release();
+
+signals:
+    void lockStateChanged(bool newState);
+
+private:
+    bool myValue = false;
+};
+
+#endif // EASYBOOLLOCK_H

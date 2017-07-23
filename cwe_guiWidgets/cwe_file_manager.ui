@@ -172,7 +172,7 @@
     </widget>
    </item>
    <item row="1" column="0" colspan="5">
-    <widget class="QListView" name="remoteListView">
+    <widget class="RemoteFileTree" name="remoteTreeView">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>3</horstretch>
@@ -183,6 +183,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RemoteFileTree</class>
+   <extends>QTreeView</extends>
+   <header>remoteFileOps/remotefiletree.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../cwe_resources.qrc"/>
  </resources>

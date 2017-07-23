@@ -38,8 +38,6 @@
 
 #include <QMainWindow>
 #include <QtGlobal>
-#include <QStandardItemModel>
-#include <QStandardItem>
 #include <QTreeView>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -48,6 +46,7 @@
 #include <QPoint>
 #include <QMenu>
 #include <QCursor>
+#include <QStandardItem>
 
 //NOTE: FILENAME MUST == 0 for these functions to work.
 //The other columns can be changed
@@ -59,74 +58,40 @@ enum class FileColumn : int {FILENAME = 0,
                              MIME_TYPE = 5,
                              PERMISSIONS = 6};
 
-class RemoteDataInterface;
 class FileMetaData;
 class FileTreeNode;
 class FileOperator;
 enum class RequestState;
 
-class RemoteFileTree : public QObject
+class RemoteFileTree : public QTreeView
 {
     Q_OBJECT
 
 public:
-    explicit RemoteFileTree(RemoteDataInterface * newDataLink, QTreeView * thefileTree,
-                            QLabel * selectedFileDisp, QObject *parent = 0);
+    explicit RemoteFileTree(QWidget *parent = 0);
     ~RemoteFileTree();
 
-    void resendSelectedFile();
-    FileMetaData getCurrentSelectedFile();
-    void resetFileData();
+    void setFileOperator(FileOperator * theOperator);
+    FileOperator * getFileOperator();
+    void setSelectedLabel(QLabel * selectedFileDisp);
 
-    void updateFileInfo(QList<FileMetaData> * fileDataList);
-
-    void lsClosestNode(QString fullPath);
-    void lsClosestNodeToParent(QString fullPath);
-
-    //I don't like having this method public:
-    FileTreeNode * getFileNodeFromPath(QString filePath);
+    void refreshSelection();
+    FileTreeNode * getSelectedNode();
+    void setupFileView();
 
 signals:
-    void newFileSelected(FileMetaData * newFileData);
+    void newFileSelected(FileTreeNode * newFileData);
+
+public slots:
+    void fileEntryTouched(QModelIndex fileIndex);
 
 private slots:
     void folderExpanded(QModelIndex itemOpened);
-    void fileEntryTouched(QModelIndex fileIndex);
-    void needRightClickMenuFiles(QPoint pos);
 
 private:
-    QString getFilePathForNode(QModelIndex dataIndex);
-    FileTreeNode * getDirNearestFromPath(QString filePath);
-
-    //Note: if not found, will return NULL and call translateFileDataToModel(), to resync
-    //If input is NULL, return NULL, but don't resync
-    FileTreeNode * getNodeFromModel(QStandardItem * toFind);
-    QStandardItem * getModelEntryFromNode(FileTreeNode * toFind);
-
-    void totalResetErrorProcedure();
-    void translateFileDataToModel();
-    void translateFileDataRecurseHelper(FileTreeNode * currentFile, QStandardItem * currentModelEntry);
-
-    bool fileInModel(FileTreeNode * toFind, QStandardItem * compareTo);
-    void changeModelFromFile(QStandardItem * targetRow, FileTreeNode * dataSource);
-    void newModelRowFromFile(QStandardItem * parentItem, FileTreeNode * dataSource);
-
-    bool columnInUse(int i);
-    QString getRawColumnData(int i, FileMetaData * rawFileData);
-
     FileOperator * myFileOperator;
 
-    const int tableNumCols = 7;
-    const QStringList shownHeaderLabelList = {"File Name","Type","Size","Last Changed",
-                                   "Format","mimeType","Permissions"};
-    const QStringList hiddenHeaderLabelList = {"name","type","length","lastModified",
-                                   "format","mimeType","permissions"};
-
-    QTreeView * linkedFileView = NULL;
     QLabel * selectedFileDisplay = NULL;
-
-    FileTreeNode * rootFileNode = NULL;
-    QStandardItemModel dataStore;
     FileTreeNode * selectedItem = NULL;
 };
 

@@ -55,7 +55,6 @@ SOURCES += main.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.cpp \
     ../AgaveClientInterface/remotedatainterface.cpp \
-    ../AgaveClientInterface/agaveInterfaces/agavelongrunning.cpp \
     ../AgaveClientInterface/filemetadata.cpp \
     utilWindows/authform.cpp \
     utilWindows/copyrightdialog.cpp \
@@ -80,7 +79,10 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_task_list.cpp \
     cwe_guiWidgets/sidebar.cpp \
     analysistypes/baseanalysistype.cpp \
-    utilWindows/debugpanelwindow.cpp
+    utilWindows/debugpanelwindow.cpp \
+    remoteFileOps/remotejoblister.cpp \
+    remoteFileOps/easyboollock.cpp \
+    ../AgaveClientInterface/remotejobdata.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -88,7 +90,6 @@ HEADERS  += \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
     ../AgaveClientInterface/remotedatainterface.h \
-    ../AgaveClientInterface/agaveInterfaces/agavelongrunning.h \
     ../AgaveClientInterface/filemetadata.h \
     utilWindows/authform.h \
     utilWindows/copyrightdialog.h \
@@ -114,7 +115,10 @@ HEADERS  += \
     cwe_guiWidgets/cwe_task_list.h \
     cwe_guiWidgets/sidebar.h \
     analysistypes/baseanalysistype.h \
-    utilWindows/debugpanelwindow.h
+    utilWindows/debugpanelwindow.h \
+    remoteFileOps/remotejoblister.h \
+    remoteFileOps/easyboollock.h \
+    ../AgaveClientInterface/remotejobdata.h
 
 FORMS    += \
     utilWindows/authform.ui \

@@ -12,12 +12,12 @@ BaseAnalysisType::BaseAnalysisType()
     QJsonObject item;
 
     JSONparameters = new QJsonObject;
-    JSONparameters->insert(QString('analysisType'), QJsonValue('Channel flow'));
+    JSONparameters->insert(QString("analysisType"), QJsonValue("Channel flow"));
 
     /* set parameter list for this analysis type */
     // analysis type
 
-    JSONparameters->insert(QString('parameters'), JSONparameterList);
+    JSONparameters->insert(QString("parameters"), JSONparameterList);
 }
 
 BaseAnalysisType::~BaseAnalysisType()
