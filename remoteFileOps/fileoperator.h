@@ -38,10 +38,14 @@
 
 #include <QObject>
 #include <QList>
+#include <QStandardItemModel>
+#include <QStandardItem>
 
 class RemoteFileTree;
 class FileMetaData;
 class RemoteDataInterface;
+class FileTreeNode;
+class EasyBoolLock;
 
 enum class RequestState;
 
@@ -50,46 +54,84 @@ class FileOperator : public QObject
     Q_OBJECT
 
 public:
-    FileOperator(RemoteDataInterface * newDataLink, RemoteFileTree * parent);
+    FileOperator(RemoteDataInterface * newDataLink, QObject * parent);
+    void linkToFileTree(RemoteFileTree * newTreeLink);
+
+    void resetFileData();
 
     void totalResetErrorProcedure();
-    void enactFolderRefresh(FileMetaData folderToRemoteLS);
     bool operationIsPending();
 
+    FileTreeNode * getNodeFromIndex(QModelIndex fileIndex);
+
+    void translateFileDataToModel();
+
+    void lsClosestNode(QString fullPath);
+    void lsClosestNodeToParent(QString fullPath);
+
+    void enactFolderRefresh(FileTreeNode * selectedNode);
+
+    void sendDeleteReq(FileTreeNode * selectedNode);
+    void sendMoveReq(FileTreeNode * moveFrom, QString newName);
+    void sendCopyReq(FileTreeNode * copyFrom, QString newName);
+    void sendRenameReq(FileTreeNode * selectedNode, QString newName);
+
+    void sendCreateFolderReq(FileTreeNode * selectedNode, QString newName);
+
+    void sendUploadReq(FileTreeNode * uploadTarget, QString localFile);
+    void sendDownloadReq(FileTreeNode * targetFile, QString localDest);
+
+    void sendCompressReq(FileTreeNode * selectedFolder);
+    void sendDecompressReq(FileTreeNode * selectedFolder);
+
+signals:
+    void opPendingChange(bool opPending);
+
 private slots:
+    void opLockChanged(bool newVal);
+
     void getLSReply(RequestState cmdReply, QList<FileMetaData> * fileDataList);
 
-    void sendDeleteReq();
     void getDeleteReply(RequestState replyState);
-    void sendMoveReq();
     void getMoveReply(RequestState replyState, FileMetaData * revisedFileData);
-    void sendCopyReq();
     void getCopyReply(RequestState replyState, FileMetaData * newFileData);
-    void sendRenameReq();
     void getRenameReply(RequestState replyState, FileMetaData * newFileData);
 
-    void sendCreateFolderReq();
     void getMkdirReply(RequestState replyState, FileMetaData * newFolderData);
 
-    void sendUploadReq();
     void getUploadReply(RequestState replyState, FileMetaData * newFileData);
-    void sendDownloadReq();
     void getDownloadReply(RequestState replyState);
 
-    void sendCompressReq();
     void getCompressReply(RequestState finalState, QJsonDocument * rawData);
-    void sendDecompressReq();
     void getDecompressReply(RequestState finalState, QJsonDocument * rawData);
 
-    void sendManualRefresh();
-
 private:
+    bool columnInUse(int i);
+    QString getRawColumnData(int i, FileMetaData * rawFileData);
     QString getStringFromInitParams(QString stringKey);
 
-    RemoteFileTree * myFileTree;
+    //Note: if not found, will return NULL and call translateFileDataToModel(), to resync
+    //If input is NULL, return NULL, but don't resync
+    FileTreeNode * getNodeFromModel(QStandardItem * toFind);
+    QStandardItem * getModelEntryFromNode(FileTreeNode * toFind);
+
+    void translateFileDataRecurseHelper(FileTreeNode * currentFile, QStandardItem * currentModelEntry);
+
+    bool fileInModel(FileTreeNode * toFind, QStandardItem * compareTo);
+    void changeModelFromFile(QStandardItem * targetRow, FileTreeNode * dataSource);
+    void newModelRowFromFile(QStandardItem * parentItem, FileTreeNode * dataSource);
 
     RemoteDataInterface * dataLink;
-    bool fileOperationPending = false;
+    FileTreeNode * rootFileNode = NULL;
+    QStandardItemModel dataStore;
+
+    EasyBoolLock * fileOpPending;
+
+    const int tableNumCols = 7;
+    const QStringList shownHeaderLabelList = {"File Name","Type","Size","Last Changed",
+                                   "Format","mimeType","Permissions"};
+    const QStringList hiddenHeaderLabelList = {"name","type","length","lastModified",
+                                   "format","mimeType","permissions"};
 };
 
 #endif // FILEOPERATOR_H

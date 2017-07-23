@@ -53,35 +53,36 @@ public:
                                                 //depending if the parent is NULL
     ~FileTreeNode();
 
-    QList<FileTreeNode *>::iterator fileListStart();
-    QList<FileTreeNode *>::iterator fileListEnd();
-
-    void setFileData(FileMetaData newData);
-    void setMark(bool newSetting);
-    bool isMarked();
-
-    QByteArray * getFileBuffer();
-    void refreshFileBuffer();
-    void clearFileBuffer();
-    void setDataInterface(RemoteDataInterface * sharedConnection);
+    void updateFileFolder(QList<FileMetaData> newDataList);
 
     bool isRootNode();
-    FileTreeNode * getParentNode();
-    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
-    void clearAllChildren();
     FileMetaData getFileData();
+    QByteArray * getFileBuffer();
+    void setFileBuffer(QByteArray * newFileBuffer);
+
+    FileTreeNode * getNodeWithName(QString filename, bool unrestricted = false);
+    FileTreeNode * getClosestNodeWithName(QString filename, bool unrestricted = false);
+    FileTreeNode * getParentNode();
 
     bool childIsUnloaded();
+    bool childIsEmpty();
+    void clearAllChildren();
 
-private slots:
-    void haveBufferReply(RequestState authReply, QByteArray * fileBuffer);
+    QList<FileTreeNode *> * getChildList();
+    FileTreeNode * getChildNodeWithName(QString filename, bool unrestricted = false);
+
+    //TODO: Clean up the code to make the algorithms using marks cleaner
+    bool marked = false;
 
 private:
-    static RemoteDataInterface * dataConnection;
+    void insertFile(FileMetaData *newData);
+    void purgeUnmatchedChildren(QList<FileMetaData> * newChildList);
+
+    FileTreeNode * pathSearchHelper(QString filename, bool stopEarly, bool unrestricted = false);
+
     FileMetaData * fileData = NULL;
-    QList<FileTreeNode *> * childList = NULL;
-    bool rootNode;
-    bool marked = false;
+    QList<FileTreeNode *> childList;
+    bool rootNode = false;
 
     QByteArray * fileDataBuffer = NULL;
 };

@@ -36,42 +36,51 @@
 #include "joboperator.h"
 
 #include "remotefiletree.h"
+#include "remotejoblister.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
+#include "../AgaveClientInterface/remotejobdata.h"
 
-JobOperator::JobOperator(RemoteDataInterface * newDataLink, QListView * newJobList, QObject * parent) : QObject((QObject *)parent)
+JobOperator::JobOperator(RemoteDataInterface * newDataLink, QObject * parent) : QObject((QObject *)parent)
 {
-    myJobListView = newJobList;
-    myJobListView->setModel(&theJobList);
     dataLink = newDataLink;
     QObject::connect(dataLink, SIGNAL(longRunningTasksUpdated()), this, SLOT(refreshRunningJobList()));
-    QObject::connect(myJobListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(needRightClickMenu(QPoint)));
 }
 
-void JobOperator::refreshRunningJobList()
+void JobOperator::linkToJobLister(RemoteJobLister * newLister)
 {
-    theJobList.clear();
-    QList<LongRunningTask *> updatedTaskList = dataLink->getListOfLongTasks();
-    theJobList.setColumnCount(2);
+    newLister->setModel(&theJobList);
+}
 
-    for (auto itr = updatedTaskList.cbegin(); itr != updatedTaskList.cend(); itr++)
+void JobOperator::refreshRunningJobList(RequestState replyState, QList<RemoteJobData> * theData)
+{
+    if (replyState != RequestState::GOOD)
+    {
+        //TODO: some error here
+        return;
+    }
+
+    rawData.clear(); //TODO: make sure no memory leak here
+    for (auto itr = theData->begin(); itr != theData->end(); itr++)
+    {
+        RemoteJobData * newItem = new RemoteJobData();
+        (*newItem) = (*itr);
+        rawData.append(newItem);
+    }
+
+    theJobList.clear(); //TODO: make sure no memory leak here
+    theJobList.setColumnCount(1);
+
+    for (auto itr = rawData.begin(); itr != rawData.end(); itr++)
     {
         QList<QStandardItem *> newRow;
-        newRow.append(new QStandardItem((*itr)->getRawDataStr()));
-        newRow.append(new QStandardItem((*itr)->getIDstr()));
+        newRow.append(new QStandardItem((*itr)->getID()));
         theJobList.appendRow(newRow);
     }
 }
 
-void JobOperator::needRightClickMenu(QPoint)
-{
-    QMenu jobMenu;
-
-    jobMenu.addAction("Refresh Info", this, SLOT(demandJobDataRefresh()));
-
-    jobMenu.exec(QCursor::pos());
-}
-
 void JobOperator::demandJobDataRefresh()
 {
-    dataLink->forceRefreshOfLongTasks();
+    RemoteDataReply * listReply = dataLink->getListOfJobs();
+    QObject::connect(listReply, SIGNAL(haveJobList(RequestState,QList<RemoteJobData>*)),
+                     this, SLOT(refreshRunningJobList(RequestState,QList<RemoteJobData>*)));
 }
