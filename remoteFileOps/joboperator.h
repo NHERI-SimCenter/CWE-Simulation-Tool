@@ -44,6 +44,9 @@
 class RemoteFileWindow;
 class RemoteDataInterface;
 class RemoteJobLister;
+class RemoteJobData;
+
+enum class RequestState;
 
 class JobOperator : public QObject
 {
@@ -53,10 +56,11 @@ public:
     void linkToJobLister(RemoteJobLister * newLister);
 
 private slots:
-    void refreshRunningJobList();
+    void refreshRunningJobList(RequestState replyState, QList<RemoteJobData> *theData);
     void demandJobDataRefresh();
 
 private:
+    QList<RemoteJobData *> rawData;
     RemoteDataInterface * dataLink;
     bool jobOperationPending = false;
 
