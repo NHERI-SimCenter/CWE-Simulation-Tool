@@ -1,7 +1,11 @@
 #!/bin/bash
 
+#----- adjust user settings -----------------------------
+
 QT_HOME=/home/psempoli/Qt/5.9/gcc_64/lib
 QT_PLUGINS=/home/psempoli/Qt/5.9/gcc_64/plugins
+
+#----- do not modify below here -------------------------
 
 rm -rf release
 rm -rf installer
@@ -39,7 +43,7 @@ mkdir installer
 
 cp -R dataStore/packages installer
 cp -R dataStore/config installer
-cp -R release/* installer/packages/com.vendor.product/data/
+cp -R release/* installer/packages/nheri.simcenter.cfdclient/data/
 
 cd installer
 
