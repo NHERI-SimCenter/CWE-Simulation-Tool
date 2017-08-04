@@ -383,3 +383,79 @@ void CFDglCanvas::clearMeshData()
     ownerList.clear();
     haveValidMeshData = false;
 }
+
+/*Saved code:
+ * Need to convert to use file cache ability
+    setTestVisual();
+    FileTreeNode * currentNode = fileTreeData->getFileNodeFromPath(selectedFullPath);
+
+    FileTreeNode * constantFolder = currentNode->getChildNodeWithName("constant");
+    if (constantFolder == NULL) return;
+    FileTreeNode * polyMeshFolder = constantFolder->getChildNodeWithName("polyMesh");
+    if (polyMeshFolder == NULL) return;
+    FileTreeNode * pointsFile = polyMeshFolder->getChildNodeWithName("points");
+    FileTreeNode * facesFile = polyMeshFolder->getChildNodeWithName("faces");
+    FileTreeNode * ownerFile = polyMeshFolder->getChildNodeWithName("owner");
+    if (pointsFile == NULL) pointsFile = polyMeshFolder->getChildNodeWithName("points.gz");
+    if (facesFile == NULL) facesFile = polyMeshFolder->getChildNodeWithName("faces.gz");
+    if (ownerFile == NULL) ownerFile = polyMeshFolder->getChildNodeWithName("owner.gz");
+
+    if ((pointsFile == NULL) || (facesFile == NULL) || (ownerFile == NULL)) return;
+
+    RemoteDataReply * aReply = dataLink->downloadBuffer(pointsFile->getFileData().getFullPath());
+    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
+                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
+
+    aReply = dataLink->downloadBuffer(facesFile->getFileData().getFullPath());
+    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
+                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
+
+    aReply = dataLink->downloadBuffer(ownerFile->getFileData().getFullPath());
+    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
+                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
+}
+
+void ExplorerWindow::gotNewRawFile(RequestState authReply, QByteArray * fileBuffer)
+{
+    if (authReply != RequestState::GOOD) return;
+
+    RemoteDataReply * mySender = (RemoteDataReply *) QObject::sender();
+    if (mySender == NULL) return;
+    QString lookedForFile = mySender->getTaskParamList()->value("remoteName");
+    if (lookedForFile.isEmpty()) return;
+
+    QByteArray * realContents;
+
+    if (lookedForFile.endsWith(".gz"))
+    {
+        lookedForFile.chop(3);
+        DeCompressWrapper decompresser(fileBuffer);
+        realContents = decompresser.getDecompressedFile();
+    }
+    else
+    {
+        realContents = new QByteArray(*fileBuffer);
+    }
+    if (lookedForFile.endsWith("points"))
+    {
+        conditionalPurge(&pointData);
+        pointData = realContents;
+    }
+    if (lookedForFile.endsWith("faces"))
+    {
+        conditionalPurge(&faceData);
+        faceData = realContents;
+    }
+    if (lookedForFile.endsWith("owner"))
+    {
+        conditionalPurge(&ownerData);
+        ownerData = realContents;
+    }
+    if ((pointData != NULL) && (faceData != NULL) && (ownerData != NULL))
+    {
+        if(ui->openGLcfdWidget->loadMeshData(pointData, faceData, ownerData))
+        {
+            ui->openGLcfdWidget->setDisplayState(CFDDisplayState::MESH);
+        }
+    }
+    */

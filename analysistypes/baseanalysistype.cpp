@@ -85,5 +85,6 @@ QVector<PARAMETER_VALUES *> * BaseAnalysisType::ParameterList()
 
 bool BaseAnalysisType::setParemeterList(QVector<PARAMETER_VALUES *>)
 {
-
+    //TODO: Implement
+    return false;
 }

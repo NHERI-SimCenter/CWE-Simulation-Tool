@@ -117,7 +117,7 @@ CWE_MainWindow::~CWE_MainWindow()
 
 void CWE_MainWindow::menuCopyInfo()
 {
-    CopyrightDialog copyrightPopup;
+    CopyrightDialog copyrightPopup(myDriver->getLicense());
     copyrightPopup.exec();
 }
 
