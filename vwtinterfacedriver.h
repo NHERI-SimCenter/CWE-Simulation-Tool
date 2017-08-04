@@ -36,6 +36,8 @@
 #ifndef VWTINTERFACEDRIVER_H
 #define VWTINTERFACEDRIVER_H
 
+#include "../AgaveExplorer/utilWindows/agavesetupdriver.h"
+
 #include <QCoreApplication>
 
 #include <QtGlobal>
@@ -61,40 +63,21 @@ class CWE_MainWindow;
 class JobOperator;
 class FileOperator;
 
-class VWTinterfaceDriver : public QObject
+class VWTinterfaceDriver : public AgaveSetupDriver
 {
     Q_OBJECT
 
 public:
-    explicit VWTinterfaceDriver();
-    ~VWTinterfaceDriver();
-    void startup(bool useDebugPanel = false);
-    void shutdown();
+    explicit VWTinterfaceDriver(QObject *parent = nullptr);
+    virtual void startup();
+    virtual void closeAuthScreen();
 
-    void closeAuthScreen();
-
-    RemoteDataInterface * getDataConnection();
-    JobOperator * getJobHandler();
-    FileOperator * getFileHandler();
-
-public slots:
-    void getAuthReply(RequestState authReply);
-    void getFatalInterfaceError(QString errText);
-
-private slots:
-    void subWindowHidden(bool nowVisible);
-    void shutdownCallback();
+    virtual QString getBanner();
+    virtual QString getVersion();
+    virtual QString getLicense();
 
 private:
-    RemoteDataInterface * theConnector;
-    AuthForm * authWindow;
-    JobOperator * myJobHandle = NULL;
-    FileOperator * myFileHandle = NULL;
-
-    DebugPanelWindow * debugWindow = NULL;
     CWE_MainWindow * mainWindow;
-
-    bool doingShutdown = false;
 };
 
 #endif // VWTINTERFACEDRIVER_H
