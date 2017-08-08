@@ -14,7 +14,7 @@ windeployqt release\CFDClientProgram.exe --no-translations
 
 XCOPY /S /I dataStore installer
 
-XCOPY /S /I release\* installer\packages\com.vendor.product\data
+XCOPY /S /I release\* installer\packages\nheri.simcenter.cfdclient\data
 
 cd installer
 

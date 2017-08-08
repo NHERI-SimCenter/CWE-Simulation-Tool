@@ -38,6 +38,8 @@
 #include <QWidget>
 #include <QFileSystemModel>
 
+class FileOperator;
+
 namespace Ui {
 class CWE_file_manager;
 }
@@ -50,10 +52,11 @@ public:
     explicit CWE_file_manager(QWidget *parent = 0);
     ~CWE_file_manager();
 
+    void linkFileHandle(FileOperator * theJobhandle);
+
 private slots:
     void on_pb_upload_clicked();
     void on_pb_download_clicked();
-    void on_localListView_doubleClicked(const QModelIndex &index);
 
 private:
     Ui::CWE_file_manager *ui;

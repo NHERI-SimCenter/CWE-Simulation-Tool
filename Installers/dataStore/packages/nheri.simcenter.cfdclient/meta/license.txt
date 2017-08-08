@@ -1,4 +1,4 @@
-The SimCenter CFD Client Program and Agave Interfaces, in source and binary forms, are copyright "The University of Notre Dame" and "The Regents of the University of California" and are licensed under the following copyright and license:
+The SimCenter CWE CFD Client Program and its underlying Agave Explorer and Client Interface to Agave, in source and binary forms, are copyright "The University of Notre Dame" and "The Regents of the University of California" and are licensed under the following copyright and license:
 
 BSD 3-Clause License
 
@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ------------------------------------------------------------------------------------
 
-The SimCenter CFD Client Program and Agave Interfaces make use of the Qt packages (unmodified): core, gui, widgets and network
+The SimCenter CWE CFD Client Program makes use of the Qt packages (as libraries, unmodified): core, gui, widgets and network
 
 Qt is copyright "The Qt Company Ltd" and licensed under the GNU Lesser General Public License (version 3) which references the GNU General Public License (version 3)
 
@@ -883,4 +883,4 @@ Public License instead of this License.  But first, please read
 
 ------------------------------------------------------------------------------------
 
-The SimCenter CFD Client Program uses the zlib library, by Jean-loup Gailly and Mark Adler, whose authors request acknowledgement when zlib is used.
+The SimCenter CWE CFD Client Program uses the zlib library, by Jean-loup Gailly and Mark Adler, whose authors request acknowledgement when zlib is used.
