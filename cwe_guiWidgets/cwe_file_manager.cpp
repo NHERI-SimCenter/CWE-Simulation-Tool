@@ -63,6 +63,12 @@ CWE_file_manager::~CWE_file_manager()
     delete ui;
 }
 
+void CWE_file_manager::linkFileHandle(FileOperator * theJobhandle)
+{
+    ui->remoteTreeView->setFileOperator(theJobhandle);
+    ui->remoteTreeView->setupFileView();
+}
+
 void CWE_file_manager::on_pb_upload_clicked()
 {
     /* upload selected local files */
@@ -71,14 +77,4 @@ void CWE_file_manager::on_pb_upload_clicked()
 void CWE_file_manager::on_pb_download_clicked()
 {
     /* download selected remote files */
-}
-
-void CWE_file_manager::on_localListView_doubleClicked(const QModelIndex &index)
-{
-    QDir mDir = localFileModel->filePath(index);
-    if (localFileModel->isDir(index))
-    {
-       QString mPath = localFileModel->fileInfo(index).absoluteFilePath();
-       ui->localTreeView->setRootIndex(localFileModel->setRootPath(mPath));
-    }
 }

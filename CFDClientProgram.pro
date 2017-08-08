@@ -55,29 +55,12 @@ SOURCES += main.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.cpp \
     ../AgaveClientInterface/remotedatainterface.cpp \
-    ../AgaveClientInterface/agaveInterfaces/agavelongrunning.cpp \
     ../AgaveClientInterface/filemetadata.cpp \
-    utilWindows/authform.cpp \
-    utilWindows/copyrightdialog.cpp \
-    utilWindows/deleteconfirm.cpp \
-    utilWindows/errorpopup.cpp \
-    utilWindows/quickinfopopup.cpp \
-    utilWindows/singlelinedialog.cpp \
+    ../AgaveClientInterface/remotejobdata.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
     mainWindow/cwe_mainwindow.cpp \
-    debugPanelWindow/cfdpanel.cpp \
-    debugPanelWindow/debugagaveapppanel.cpp \
-    debugPanelWindow/debugpanelwindow.cpp \
-    debugPanelWindow/placeholderpanel.cpp \
-    debugPanelWindow/simplenamevalpanel.cpp \
-    debugPanelWindow/taskpanelentry.cpp \
-    debugPanelWindow/visualpanel.cpp \
-    remoteFileOps/fileoperator.cpp \
-    remoteFileOps/filetreenode.cpp \
-    remoteFileOps/joboperator.cpp \
-    remoteFileOps/remotefiletree.cpp \
     cwe_guiWidgets/cwe_create_simulation.cpp \
     cwe_guiWidgets/cwe_file_manager.cpp \
     cwe_guiWidgets/cwe_help.cpp \
@@ -86,7 +69,20 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_simulation_details.cpp \
     cwe_guiWidgets/cwe_task_list.cpp \
     cwe_guiWidgets/sidebar.cpp \
-    analysistypes/baseanalysistype.cpp
+    analysistypes/baseanalysistype.cpp \
+    ../AgaveExplorer/remoteFileOps/easyboollock.cpp \
+    ../AgaveExplorer/remoteFileOps/fileoperator.cpp \
+    ../AgaveExplorer/remoteFileOps/filetreenode.cpp \
+    ../AgaveExplorer/remoteFileOps/joboperator.cpp \
+    ../AgaveExplorer/remoteFileOps/remotefiletree.cpp \
+    ../AgaveExplorer/remoteFileOps/remotejoblister.cpp \
+    ../AgaveExplorer/utilWindows/agavesetupdriver.cpp \
+    ../AgaveExplorer/utilWindows/authform.cpp \
+    ../AgaveExplorer/utilWindows/copyrightdialog.cpp \
+    ../AgaveExplorer/utilWindows/deleteconfirm.cpp \
+    ../AgaveExplorer/utilWindows/errorpopup.cpp \
+    ../AgaveExplorer/utilWindows/quickinfopopup.cpp \
+    ../AgaveExplorer/utilWindows/singlelinedialog.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -94,29 +90,12 @@ HEADERS  += \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
     ../AgaveClientInterface/remotedatainterface.h \
-    ../AgaveClientInterface/agaveInterfaces/agavelongrunning.h \
     ../AgaveClientInterface/filemetadata.h \
-    utilWindows/authform.h \
-    utilWindows/copyrightdialog.h \
-    utilWindows/deleteconfirm.h \
-    utilWindows/errorpopup.h \
-    utilWindows/quickinfopopup.h \
-    utilWindows/singlelinedialog.h \
+    ../AgaveClientInterface/remotejobdata.h \
     visualUtils/cfdglcanvas.h \
     visualUtils/cfdtoken.h \
     visualUtils/decompresswrapper.h \
     mainWindow/cwe_mainwindow.h \
-    debugPanelWindow/cfdpanel.h \
-    debugPanelWindow/debugagaveapppanel.h \
-    debugPanelWindow/debugpanelwindow.h \
-    debugPanelWindow/placeholderpanel.h \
-    debugPanelWindow/simplenamevalpanel.h \
-    debugPanelWindow/taskpanelentry.h \
-    debugPanelWindow/visualpanel.h \
-    remoteFileOps/fileoperator.h \
-    remoteFileOps/filetreenode.h \
-    remoteFileOps/joboperator.h \
-    remoteFileOps/remotefiletree.h \
     cwe_guiWidgets/cwe_create_simulation.h \
     cwe_guiWidgets/cwe_defines.h \
     cwe_guiWidgets/cwe_file_manager.h \
@@ -126,17 +105,23 @@ HEADERS  += \
     cwe_guiWidgets/cwe_simulation_details.h \
     cwe_guiWidgets/cwe_task_list.h \
     cwe_guiWidgets/sidebar.h \
-    analysistypes/baseanalysistype.h
+    analysistypes/baseanalysistype.h \
+    ../AgaveExplorer/remoteFileOps/easyboollock.h \
+    ../AgaveExplorer/remoteFileOps/fileoperator.h \
+    ../AgaveExplorer/remoteFileOps/filetreenode.h \
+    ../AgaveExplorer/remoteFileOps/joboperator.h \
+    ../AgaveExplorer/remoteFileOps/remotefiletree.h \
+    ../AgaveExplorer/remoteFileOps/remotejoblister.h \
+    ../AgaveExplorer/utilWindows/agavesetupdriver.h \
+    ../AgaveExplorer/utilWindows/authform.h \
+    ../AgaveExplorer/utilWindows/copyrightdialog.h \
+    ../AgaveExplorer/utilWindows/deleteconfirm.h \
+    ../AgaveExplorer/utilWindows/errorpopup.h \
+    ../AgaveExplorer/utilWindows/quickinfopopup.h \
+    ../AgaveExplorer/utilWindows/singlelinedialog.h
 
 FORMS    += \
-    utilWindows/authform.ui \
-    utilWindows/copyrightdialog.ui \
-    utilWindows/deleteconfirm.ui \
-    utilWindows/errorpopup.ui \
-    utilWindows/quickinfopopup.ui \
-    utilWindows/singlelinedialog.ui \
     mainWindow/cwe_mainwindow.ui \
-    debugPanelWindow/debugpanelwindow.ui \
     cwe_guiWidgets/cwe_create_simulation.ui \
     cwe_guiWidgets/cwe_file_manager.ui \
     cwe_guiWidgets/cwe_help.ui \
@@ -144,7 +129,13 @@ FORMS    += \
     cwe_guiWidgets/cwe_manage_simulation.ui \
     cwe_guiWidgets/cwe_simulation_details.ui \
     cwe_guiWidgets/cwe_task_list.ui \
-    cwe_guiWidgets/sidebar.ui
+    cwe_guiWidgets/sidebar.ui \
+    ../AgaveExplorer/utilWindows/authform.ui \
+    ../AgaveExplorer/utilWindows/copyrightdialog.ui \
+    ../AgaveExplorer/utilWindows/deleteconfirm.ui \
+    ../AgaveExplorer/utilWindows/errorpopup.ui \
+    ../AgaveExplorer/utilWindows/quickinfopopup.ui \
+    ../AgaveExplorer/utilWindows/singlelinedialog.ui
 
 DISTFILES +=
 

@@ -41,6 +41,8 @@ namespace Ui {
 class CWE_task_list;
 }
 
+class JobOperator;
+
 class CWE_task_list : public QWidget
 {
     Q_OBJECT
@@ -48,6 +50,8 @@ class CWE_task_list : public QWidget
 public:
     explicit CWE_task_list(QWidget *parent = 0);
     ~CWE_task_list();
+
+    void linkJobHandle(JobOperator * theJobhandle);
 
 private:
     Ui::CWE_task_list *ui;

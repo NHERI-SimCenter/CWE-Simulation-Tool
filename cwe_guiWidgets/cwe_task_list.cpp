@@ -42,6 +42,11 @@ CWE_task_list::CWE_task_list(QWidget *parent) :
     ui->setupUi(this);
 }
 
+void CWE_task_list::linkJobHandle(JobOperator * theJobhandle)
+{
+    ui->jobListView->setJobHandle(theJobhandle);
+}
+
 CWE_task_list::~CWE_task_list()
 {
     delete ui;
