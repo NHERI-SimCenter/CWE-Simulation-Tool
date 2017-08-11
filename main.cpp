@@ -50,12 +50,22 @@ int main(int argc, char *argv[])
     VWTinterfaceDriver programDriver;
 
     bool debugLoggingEnabled = false;
+    bool runOffline = false;
     for (int i = 0; i < argc; i++)
     {
         if (strcmp(argv[i],"enableDebugLogging") == 0)
         {
             debugLoggingEnabled = true;
         }
+        if (strcmp(argv[i],"offlineMode") == 0)
+        {
+            runOffline = true;
+        }
+    }
+
+    if (runOffline)
+    {
+        qDebug("NOTE: Running CWE client offline.");
     }
 
     if (debugLoggingEnabled)
@@ -78,6 +88,13 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    programDriver.startup();
+    if (runOffline)
+    {
+        programDriver.startOffline();
+    }
+    else
+    {
+        programDriver.startup();
+    }
     return mainRunLoop.exec();
 }

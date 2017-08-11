@@ -72,6 +72,8 @@ public:
     virtual void startup();
     virtual void closeAuthScreen();
 
+    virtual void startOffline();
+
     virtual QString getBanner();
     virtual QString getVersion();
     virtual QString getLicense();
