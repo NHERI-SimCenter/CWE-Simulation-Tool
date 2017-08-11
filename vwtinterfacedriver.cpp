@@ -103,6 +103,18 @@ void VWTinterfaceDriver::closeAuthScreen()
     }
 }
 
+void VWTinterfaceDriver::startOffline()
+{
+    mainWindow = new CWE_MainWindow(this);
+
+    myJobHandle = new JobOperator(theConnector,this);
+    myFileHandle = new FileOperator(theConnector,this);
+
+    mainWindow->show();
+
+    QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
+}
+
 QString VWTinterfaceDriver::getBanner()
 {
     return "SimCenter CWE CFD Client Program";
