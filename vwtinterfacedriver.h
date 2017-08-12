@@ -76,7 +76,6 @@ public:
 
     virtual QString getBanner();
     virtual QString getVersion();
-    virtual QString getLicense();
 
 private:
     CWE_MainWindow * mainWindow;

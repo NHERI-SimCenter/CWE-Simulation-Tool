@@ -82,7 +82,9 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilWindows/deleteconfirm.cpp \
     ../AgaveExplorer/utilWindows/errorpopup.cpp \
     ../AgaveExplorer/utilWindows/quickinfopopup.cpp \
-    ../AgaveExplorer/utilWindows/singlelinedialog.cpp
+    ../AgaveExplorer/utilWindows/singlelinedialog.cpp \
+    ../AgaveExplorer/SimCenterCommon/FooterWidget.cpp \
+    ../AgaveExplorer/SimCenterCommon/HeaderWidget.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -118,7 +120,9 @@ HEADERS  += \
     ../AgaveExplorer/utilWindows/deleteconfirm.h \
     ../AgaveExplorer/utilWindows/errorpopup.h \
     ../AgaveExplorer/utilWindows/quickinfopopup.h \
-    ../AgaveExplorer/utilWindows/singlelinedialog.h
+    ../AgaveExplorer/utilWindows/singlelinedialog.h \
+    ../AgaveExplorer/SimCenterCommon/FooterWidget.h \
+    ../AgaveExplorer/SimCenterCommon/HeaderWidget.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -137,7 +141,6 @@ FORMS    += \
     ../AgaveExplorer/utilWindows/quickinfopopup.ui \
     ../AgaveExplorer/utilWindows/singlelinedialog.ui
 
-DISTFILES +=
-
 RESOURCES += \
-    cwe_resources.qrc
+    cwe_resources.qrc \
+    ../AgaveExplorer/SimCenterCommon/commonResources.qrc
