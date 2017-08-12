@@ -36,6 +36,7 @@
 #include <QApplication>
 #include <QObject>
 #include <QtGlobal>
+#include <QFile>
 #include <string.h>
 #include "vwtinterfacedriver.h"
 
@@ -48,6 +49,15 @@ int main(int argc, char *argv[])
 {
     QApplication mainRunLoop(argc, argv);
     VWTinterfaceDriver programDriver;
+
+    QFile styleFile(":/styleCommon/style.qss");
+
+    if (!styleFile.open(QFile::ReadOnly))
+    {
+        QuickInfoPopup noStyle("Unable to open style file. Install may be corrupted.");
+        noStyle.exec();
+        return -1;
+    }
 
     bool debugLoggingEnabled = false;
     bool runOffline = false;
@@ -96,5 +106,7 @@ int main(int argc, char *argv[])
     {
         programDriver.startup();
     }
+    QString styleText(styleFile.readAll());
+    mainRunLoop.setStyleSheet(styleText);
     return mainRunLoop.exec();
 }
