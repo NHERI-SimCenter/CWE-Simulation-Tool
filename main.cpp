@@ -36,11 +36,11 @@
 #include <QApplication>
 #include <QObject>
 #include <QtGlobal>
+#include <QFile>
 #include <string.h>
 #include "vwtinterfacedriver.h"
 
 #include <QSslSocket>
-#include <../AgaveExplorer/utilWindows/quickinfopopup.h>
 
 void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
 
@@ -48,6 +48,13 @@ int main(int argc, char *argv[])
 {
     QApplication mainRunLoop(argc, argv);
     VWTinterfaceDriver programDriver;
+
+    QFile styleFile(":/styleCommon/style.qss");
+
+    if (!styleFile.open(QFile::ReadOnly))
+    {
+        programDriver.fatalInterfaceError("Unable to open style file. Install may be corrupted.");
+    }
 
     bool debugLoggingEnabled = false;
     bool runOffline = false;
@@ -83,9 +90,7 @@ int main(int argc, char *argv[])
 
     if (QSslSocket::supportsSsl() == false)
     {
-        QuickInfoPopup noSSL("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
-        noSSL.exec();
-        return -1;
+        programDriver.fatalInterfaceError("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
     }
 
     if (runOffline)
@@ -96,5 +101,7 @@ int main(int argc, char *argv[])
     {
         programDriver.startup();
     }
+    QString styleText(styleFile.readAll());
+    mainRunLoop.setStyleSheet(styleText);
     return mainRunLoop.exec();
 }

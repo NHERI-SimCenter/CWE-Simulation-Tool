@@ -30,39 +30,11 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef BASEANALYSISTYPE_H
-#define BASEANALYSISTYPE_H
+#include "CFDagaveApps.h"
 
-#include <QObject>
-#include <QWidget>
-#include <QJsonObject>
-
-typedef struct {
-    QString label;  // display label
-    QString sValue; // alphanumeric value
-    float   fValue; // float value
-    int     iValue; // integer value
-    QString type;   // property type
-} PARAMETER_VALUES;
-
-class BaseAnalysisType
+CFDagaveApps::CFDagaveApps()
 {
-public:
-    BaseAnalysisType();
-    ~BaseAnalysisType();
-    QVector<PARAMETER_VALUES *> * ParameterList();
-    bool setParemeterList(QVector<PARAMETER_VALUES *>);
 
-signals:
-
-private slots:
-
-private:
-    QVector<PARAMETER_VALUES *> * params;
-    PARAMETER_VALUES * newparameter;
-    QJsonObject      * JSONparameters;
-
-};
-
-#endif // BASEANALYSISTYPE_H
+}
