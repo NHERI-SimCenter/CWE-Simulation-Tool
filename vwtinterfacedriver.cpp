@@ -37,9 +37,7 @@
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
 
-#include "../AgaveExplorer/utilWindows/authform.h"
-#include "../AgaveExplorer/utilWindows/errorpopup.h"
-#include "../AgaveExplorer/utilWindows/quickinfopopup.h"
+#include "../AgaveExplorer/utilFuncs/authform.h"
 
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
@@ -63,7 +61,7 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(paren
     tmpHandle->registerAgaveAppInfo("twoDUmesh", "twoDUmesh-0.1.0", {"MeshParams","directory"},{}, "directory");
 
     theConnector = (RemoteDataInterface *) tmpHandle;
-    QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(getFatalInterfaceError(QString)));
+    QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(fatalInterfaceError(QString)));
 }
 
 void VWTinterfaceDriver::startup()
@@ -79,10 +77,8 @@ void VWTinterfaceDriver::closeAuthScreen()
 {
     if (mainWindow == NULL)
     {
-        ErrorPopup anError(VWTerrorType::ERR_WINDOW_SYSTEM);
-        return;
+        fatalInterfaceError("Fatal Error: Main window not found");
     }
-    //ErrorPopup("This is a test of the error popup");
 
     myJobHandle = new JobOperator(theConnector,this);
     myFileHandle = new FileOperator(theConnector,this);

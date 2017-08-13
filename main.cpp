@@ -41,7 +41,6 @@
 #include "vwtinterfacedriver.h"
 
 #include <QSslSocket>
-#include <../AgaveExplorer/utilWindows/quickinfopopup.h>
 
 void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
 
@@ -54,9 +53,7 @@ int main(int argc, char *argv[])
 
     if (!styleFile.open(QFile::ReadOnly))
     {
-        QuickInfoPopup noStyle("Unable to open style file. Install may be corrupted.");
-        noStyle.exec();
-        return -1;
+        programDriver.fatalInterfaceError("Unable to open style file. Install may be corrupted.");
     }
 
     bool debugLoggingEnabled = false;
@@ -93,9 +90,7 @@ int main(int argc, char *argv[])
 
     if (QSslSocket::supportsSsl() == false)
     {
-        QuickInfoPopup noSSL("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
-        noSSL.exec();
-        return -1;
+        programDriver.fatalInterfaceError("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
     }
 
     if (runOffline)
