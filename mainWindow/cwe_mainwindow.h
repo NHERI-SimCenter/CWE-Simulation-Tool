@@ -50,7 +50,7 @@
 #include "cwe_guiWidgets/cwe_help.h"
 #include "cwe_guiWidgets/sidebar.h"
 
-#include "../AgaveExplorer/utilWindows/copyrightdialog.h"
+#include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
 #include "vwtinterfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
