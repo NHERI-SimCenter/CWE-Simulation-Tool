@@ -30,14 +30,15 @@
 ***********************************************************************************/
 
 // Contributors:
+// Renamed, modifed by Peter Sempolinski
 
-#include "baseanalysistype.h"
+#include "CFDanalysisType.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
 
-BaseAnalysisType::BaseAnalysisType()
+CFDanalysisType::CFDanalysisType()
 {
     params = new QVector<PARAMETER_VALUES *>;
 
@@ -53,12 +54,12 @@ BaseAnalysisType::BaseAnalysisType()
     JSONparameters->insert(QString("parameters"), JSONparameterList);
 }
 
-BaseAnalysisType::~BaseAnalysisType()
+CFDanalysisType::~CFDanalysisType()
 {
     if (params) delete params;
 }
 
-QVector<PARAMETER_VALUES *> * BaseAnalysisType::ParameterList()
+QVector<PARAMETER_VALUES *> * CFDanalysisType::ParameterList()
 {
     // 1st parameter
     newparameter = new PARAMETER_VALUES;
@@ -83,7 +84,7 @@ QVector<PARAMETER_VALUES *> * BaseAnalysisType::ParameterList()
     return params;
 }
 
-bool BaseAnalysisType::setParemeterList(QVector<PARAMETER_VALUES *>)
+bool CFDanalysisType::setParemeterList(QVector<PARAMETER_VALUES *>)
 {
     //TODO: Implement
     return false;

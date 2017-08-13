@@ -1,6 +1,5 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
 ** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
@@ -33,52 +32,15 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef VWTINTERFACEDRIVER_H
-#define VWTINTERFACEDRIVER_H
 
-#include "../AgaveExplorer/utilFuncs/agavesetupdriver.h"
+#ifndef CFDAGAVEAPPS_H
+#define CFDAGAVEAPPS_H
 
-#include <QCoreApplication>
 
-#include <QtGlobal>
-#include <QObject>
-#include <QDialog>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QTreeView>
-#include <QStackedWidget>
-#include <QWindow>
-#include <QThread>
-
-enum class VWTerrorType: unsigned int;
-enum class RequestState;
-
-class RemoteDataInterface;
-
-class AuthForm;
-
-class DebugPanelWindow;
-class CWE_MainWindow;
-class JobOperator;
-class FileOperator;
-
-class VWTinterfaceDriver : public AgaveSetupDriver
+class CFDagaveApps
 {
-    Q_OBJECT
-
 public:
-    explicit VWTinterfaceDriver(QObject *parent = nullptr);
-    virtual void startup();
-    virtual void closeAuthScreen();
-
-    virtual void startOffline();
-
-    virtual QString getBanner();
-    virtual QString getVersion();
-
-private:
-    CWE_MainWindow * mainWindow;
+    CFDagaveApps();
 };
 
-#endif // VWTINTERFACEDRIVER_H
+#endif // CFDAGAVEAPPS_H
