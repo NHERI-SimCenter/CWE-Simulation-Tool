@@ -1,6 +1,5 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
 ** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
@@ -31,54 +30,40 @@
 ***********************************************************************************/
 
 // Contributors:
-// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
+// Renamed, modifed by Peter Sempolinski
 
-#ifndef VWTINTERFACEDRIVER_H
-#define VWTINTERFACEDRIVER_H
+#ifndef CFDANALYSISTYPE_H
+#define CFDANALYSISTYPE_H
 
-#include "../AgaveExplorer/utilFuncs/agavesetupdriver.h"
-
-#include <QCoreApplication>
-
-#include <QtGlobal>
 #include <QObject>
-#include <QDialog>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QTreeView>
-#include <QStackedWidget>
-#include <QWindow>
-#include <QThread>
+#include <QWidget>
+#include <QJsonObject>
 
-enum class VWTerrorType: unsigned int;
-enum class RequestState;
+typedef struct {
+    QString label;  // display label
+    QString sValue; // alphanumeric value
+    float   fValue; // float value
+    int     iValue; // integer value
+    QString type;   // property type
+} PARAMETER_VALUES;
 
-class RemoteDataInterface;
-
-class AuthForm;
-
-class DebugPanelWindow;
-class CWE_MainWindow;
-class JobOperator;
-class FileOperator;
-
-class VWTinterfaceDriver : public AgaveSetupDriver
+class CFDanalysisType
 {
-    Q_OBJECT
-
 public:
-    explicit VWTinterfaceDriver(QObject *parent = nullptr);
-    virtual void startup();
-    virtual void closeAuthScreen();
+    CFDanalysisType();
+    ~CFDanalysisType();
+    QVector<PARAMETER_VALUES *> * ParameterList();
+    bool setParemeterList(QVector<PARAMETER_VALUES *>);
 
-    virtual void startOffline();
+signals:
 
-    virtual QString getBanner();
-    virtual QString getVersion();
+private slots:
 
 private:
-    CWE_MainWindow * mainWindow;
+    QVector<PARAMETER_VALUES *> * params;
+    PARAMETER_VALUES * newparameter;
+    QJsonObject      * JSONparameters;
+
 };
 
-#endif // VWTINTERFACEDRIVER_H
+#endif // CFDANALYSISTYPE_H

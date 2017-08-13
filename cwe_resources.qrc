@@ -3,4 +3,7 @@
         <file>images/CWE_button_down_arrows.png</file>
         <file>images/CWE_button_up_arrows.png</file>
     </qresource>
+    <qresource prefix="/">
+        <file>copyText.txt</file>
+    </qresource>
 </RCC>
