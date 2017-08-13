@@ -55,4 +55,26 @@ typedef enum {
     SIM_MODE_3D
 } SIM_MODE;
 
+/* define binary mode flags for all pages of the GUI  */
+/* setting mode = CWE_LANDING_TAB|CWE_RESULTS_TAB|... */
+/* testing if (mode & CWE_LANDING_TAB) { ... }        */
+
+#define CWE_NONE_TAB         0x00000000
+#define CWE_LANDING_TAB      0x00000001
+#define CWE_CREATE_NEW_TAB   0x00000002
+#define CWE_CREATE_COPY_TAB  0x00000004
+#define CWE_CASE_SELECT_TAB  0x00000008
+#define CWE_DETAILS_TAB      0x00000010
+#define CWE_RESULTS_TAB      0x00000020
+#define CWE_HELP_TAB         0x00000040
+#define CWE_WIDGET_PAGE_TAB  0x00000080
+#define CWE_FILE_MANAGER_TAB 0x00000100
+
+/* define state switches */
+#define CWE_STATE_NONE       0x00000000
+#define CWE_STATE_NEW        0x00010000
+#define CWE_STATE_RUNNING    0x00020000
+#define CWE_STATE_RESULTS    0x00040000
+#define CWE_STATE_CLEAR      0x00080000
+
 #endif // CWE_DEFINES_H
