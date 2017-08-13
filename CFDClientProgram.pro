@@ -69,20 +69,20 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_simulation_details.cpp \
     cwe_guiWidgets/cwe_task_list.cpp \
     cwe_guiWidgets/sidebar.cpp \
-    analysistypes/baseanalysistype.cpp \
     ../AgaveExplorer/remoteFileOps/easyboollock.cpp \
     ../AgaveExplorer/remoteFileOps/fileoperator.cpp \
     ../AgaveExplorer/remoteFileOps/filetreenode.cpp \
     ../AgaveExplorer/remoteFileOps/joboperator.cpp \
     ../AgaveExplorer/remoteFileOps/remotefiletree.cpp \
     ../AgaveExplorer/remoteFileOps/remotejoblister.cpp \
-    ../AgaveExplorer/utilWindows/agavesetupdriver.cpp \
-    ../AgaveExplorer/utilWindows/authform.cpp \
-    ../AgaveExplorer/utilWindows/copyrightdialog.cpp \
-    ../AgaveExplorer/utilWindows/deleteconfirm.cpp \
-    ../AgaveExplorer/utilWindows/errorpopup.cpp \
-    ../AgaveExplorer/utilWindows/quickinfopopup.cpp \
-    ../AgaveExplorer/utilWindows/singlelinedialog.cpp
+    ../AgaveExplorer/SimCenterCommon/FooterWidget.cpp \
+    ../AgaveExplorer/SimCenterCommon/HeaderWidget.cpp \
+    ../AgaveExplorer/utilFuncs/agavesetupdriver.cpp \
+    ../AgaveExplorer/utilFuncs/authform.cpp \
+    ../AgaveExplorer/utilFuncs/copyrightdialog.cpp \
+    ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
+    CFDanalysis/CFDagaveApps.cpp \
+    CFDanalysis/CFDanalysisType.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -105,20 +105,20 @@ HEADERS  += \
     cwe_guiWidgets/cwe_simulation_details.h \
     cwe_guiWidgets/cwe_task_list.h \
     cwe_guiWidgets/sidebar.h \
-    analysistypes/baseanalysistype.h \
     ../AgaveExplorer/remoteFileOps/easyboollock.h \
     ../AgaveExplorer/remoteFileOps/fileoperator.h \
     ../AgaveExplorer/remoteFileOps/filetreenode.h \
     ../AgaveExplorer/remoteFileOps/joboperator.h \
     ../AgaveExplorer/remoteFileOps/remotefiletree.h \
     ../AgaveExplorer/remoteFileOps/remotejoblister.h \
-    ../AgaveExplorer/utilWindows/agavesetupdriver.h \
-    ../AgaveExplorer/utilWindows/authform.h \
-    ../AgaveExplorer/utilWindows/copyrightdialog.h \
-    ../AgaveExplorer/utilWindows/deleteconfirm.h \
-    ../AgaveExplorer/utilWindows/errorpopup.h \
-    ../AgaveExplorer/utilWindows/quickinfopopup.h \
-    ../AgaveExplorer/utilWindows/singlelinedialog.h
+    ../AgaveExplorer/SimCenterCommon/FooterWidget.h \
+    ../AgaveExplorer/SimCenterCommon/HeaderWidget.h \
+    ../AgaveExplorer/utilFuncs/agavesetupdriver.h \
+    ../AgaveExplorer/utilFuncs/authform.h \
+    ../AgaveExplorer/utilFuncs/copyrightdialog.h \
+    ../AgaveExplorer/utilFuncs/singlelinedialog.h \
+    CFDanalysis/CFDagaveApps.h \
+    CFDanalysis/CFDanalysisType.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -130,14 +130,10 @@ FORMS    += \
     cwe_guiWidgets/cwe_simulation_details.ui \
     cwe_guiWidgets/cwe_task_list.ui \
     cwe_guiWidgets/sidebar.ui \
-    ../AgaveExplorer/utilWindows/authform.ui \
-    ../AgaveExplorer/utilWindows/copyrightdialog.ui \
-    ../AgaveExplorer/utilWindows/deleteconfirm.ui \
-    ../AgaveExplorer/utilWindows/errorpopup.ui \
-    ../AgaveExplorer/utilWindows/quickinfopopup.ui \
-    ../AgaveExplorer/utilWindows/singlelinedialog.ui
-
-DISTFILES +=
+    ../AgaveExplorer/utilFuncs/authform.ui \
+    ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
+    ../AgaveExplorer/utilFuncs/singlelinedialog.ui
 
 RESOURCES += \
-    cwe_resources.qrc
+    cwe_resources.qrc \
+    ../AgaveExplorer/SimCenterCommon/commonResources.qrc

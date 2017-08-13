@@ -46,6 +46,9 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     myDriver = newDriver;
     dataLink = myDriver->getDataConnection();
 
+    //Set Header text
+    ui->header->setHeadingText("SimCenter CWE Workbench");
+
     /* add the sidebar */
     QWidget *frameSideBar = this->findChild<QWidget *>("SideBar");
     taskSideBar = new SideBar(frameSideBar);
@@ -101,6 +104,14 @@ void CWE_MainWindow::runSetupSteps()
 {
     taskTaskList->linkJobHandle(myDriver->getJobHandler());
     taskFileManager->linkFileHandle(myDriver->getFileHandler());
+
+    //Note: Adding widget to header will re-parent them
+    QLabel * username = new QLabel(myDriver->getDataConnection()->getUserName());
+    ui->header->appendWidget(username);
+
+    QPushButton * logoutButton = new QPushButton("Logout");
+    QObject::connect(logoutButton, SIGNAL(clicked(bool)), myDriver, SLOT(shutdown()));
+    ui->header->appendWidget(logoutButton);
 }
 
 CWE_MainWindow::~CWE_MainWindow()
@@ -117,7 +128,7 @@ CWE_MainWindow::~CWE_MainWindow()
 
 void CWE_MainWindow::menuCopyInfo()
 {
-    CopyrightDialog copyrightPopup(myDriver->getLicense());
+    CopyrightDialog copyrightPopup;
     copyrightPopup.exec();
 }
 
