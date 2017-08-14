@@ -34,6 +34,7 @@
 
 #include "cwe_mainwindow.h"
 #include "ui_cwe_mainwindow.h"
+#include <QDesktopWidget>
 
 #include <QDebug>
 
@@ -49,6 +50,7 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
 
+#ifdef USE_SIDE_BAR
     /* add the sidebar */
     QWidget *frameSideBar = this->findChild<QWidget *>("SideBar");
     taskSideBar = new SideBar(frameSideBar);
@@ -93,11 +95,25 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
     widgetStack->setLayout(stackLayout);
 
-    task_selected(TASK_LANDING);
+    ui->tabContainer->hide();
 
-    connect(taskSideBar, SIGNAL(taskSelected(TASK)), this, SLOT(task_selected(TASK)));
-    connect(taskManageSimulation, SIGNAL(CWE_manage_simulation_signal(TASK)), this, SLOT(task_selected(TASK)));
-    connect(taskCreateSimulation, SIGNAL(CWE_create_simulation_signal(TASK, SIM_MODE)), this, SLOT(create_simulation_task_selected(TASK, SIM_MODE)));
+#else
+    ui->SideBar->hide();
+    ui->stackContainer->hide();
+#endif
+
+    //task_selected(TASK_LANDING);
+
+    //connect(taskSideBar, SIGNAL(taskSelected(TASK)), this, SLOT(task_selected(TASK)));
+    //connect(taskManageSimulation, SIGNAL(CWE_manage_simulation_signal(TASK)), this, SLOT(task_selected(TASK)));
+    //connect(taskCreateSimulation, SIGNAL(CWE_create_simulation_signal(TASK, SIM_MODE)), this, SLOT(create_simulation_task_selected(TASK, SIM_MODE)));
+
+    // adjust application size to display
+    QRect rec = QApplication::desktop()->screenGeometry();
+    int height = this->height()<0.5*rec.height()?this->height():0.5*rec.height();
+    int width  = this->width()<0.5*rec.width()?this->width():0.5*rec.width();
+    this->resize(width, height);
+
 }
 
 void CWE_MainWindow::runSetupSteps()
