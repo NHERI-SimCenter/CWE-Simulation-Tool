@@ -61,33 +61,109 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QWidget" name="SideBar" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+     <widget class="QStackedWidget" name="stackedPageContainer">
+      <widget class="QWidget" name="page_1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
+        <property name="topMargin">
+         <number>0</number>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>250</width>
-          <height>16777215</height>
-         </size>
+        <property name="rightMargin">
+         <number>0</number>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QWidget" name="stackContainer" native="true"/>
-      </item>
-     </layout>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTabWidget" name="tabContainer">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="tabPosition">
+           <enum>QTabWidget::North</enum>
+          </property>
+          <property name="currentIndex">
+           <number>6</number>
+          </property>
+          <widget class="CWE_landing" name="tab_landing_page">
+           <attribute name="title">
+            <string>Home</string>
+           </attribute>
+          </widget>
+          <widget class="CWE_create_simulation" name="tab_create_new">
+           <attribute name="title">
+            <string>Create New</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_manage_and_run">
+           <attribute name="title">
+            <string>Manage and Run</string>
+           </attribute>
+          </widget>
+          <widget class="CWE_simulation_details" name="tab_simulation_details">
+           <attribute name="title">
+            <string>Simulations Details</string>
+           </attribute>
+          </widget>
+          <widget class="CWE_file_manager" name="tab_files">
+           <attribute name="title">
+            <string>Files</string>
+           </attribute>
+          </widget>
+          <widget class="CWE_task_list" name="tab_remote_jobs">
+           <attribute name="title">
+            <string>Remote Jobs</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_spacer">
+           <attribute name="title">
+            <string/>
+           </attribute>
+          </widget>
+          <widget class="CWE_help" name="tab_help">
+           <attribute name="title">
+            <string>Help</string>
+           </attribute>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QWidget" name="SideBar" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>250</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="stackContainer" native="true"/>
+        </item>
+       </layout>
+       <zorder></zorder>
+       <zorder>SideBar</zorder>
+       <zorder>stackContainer</zorder>
+      </widget>
+     </widget>
     </item>
     <item>
      <widget class="FooterWidget" name="footer">
@@ -107,7 +183,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -224,6 +300,42 @@
    <class>FooterWidget</class>
    <extends>QFrame</extends>
    <header>../AgaveExplorer/SimCenterCommon/FooterWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_landing</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_landing.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_help</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_help.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_create_simulation</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_create_simulation.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_file_manager</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_file_manager.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_simulation_details</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_simulation_details.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_task_list</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_task_list.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
