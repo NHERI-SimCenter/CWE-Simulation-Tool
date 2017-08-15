@@ -176,7 +176,7 @@
         "turbModel":{
             "displayname":"Turbulence Model",
             "type":"choose",
-            "default":'Laminar',
+            "default":"Laminar",
             "options":{
                 "Laminar":"Laminar Flow model",
                 "SpalartAllmaras":"S-A one equation model (RANS)",
