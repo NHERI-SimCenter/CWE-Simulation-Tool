@@ -143,7 +143,7 @@
         "lowYPlane":{
             "displayname":"Boundary Condition (Top)",
             "type":"choose",
-            "default":'SYM_PLANE',
+            "default":"SYM_PLANE",
             "options":{
                 "SYM_PLANE": "Symmetry Plane",
                 "WALL": "Wall"
@@ -152,7 +152,7 @@
         "highYPlane":{
             "displayname":"Boundary Condition (Bottom)",
             "type":"choose",
-            "default":'SYM_PLANE',
+            "default":"SYM_PLANE",
             "options":{
                 "SYM_PLANE": "Symmetry Plane",
                 "WALL": "Wall"
