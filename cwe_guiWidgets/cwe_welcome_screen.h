@@ -31,19 +31,26 @@
 ***********************************************************************************/
 
 // Contributors:
-// Peter Mackenzie-Helnwein, UW Seattle
 
-#include "cwe_landing.h"
-#include "ui_cwe_landing.h"
+#ifndef CWE_WELCOME_SCREEN_H
+#define CWE_WELCOME_SCREEN_H
 
-CWE_landing::CWE_landing(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_landing)
-{
-    ui->setupUi(this);
+#include <QFrame>
+
+namespace Ui {
+class CWE_welcome_screen;
 }
 
-CWE_landing::~CWE_landing()
+class CWE_welcome_screen : public QFrame
 {
-    delete ui;
-}
+    Q_OBJECT
+
+public:
+    explicit CWE_welcome_screen(QWidget *parent = 0);
+    ~CWE_welcome_screen();
+
+private:
+    Ui::CWE_welcome_screen *ui;
+};
+
+#endif // CWE_WELCOME_SCREEN_H
