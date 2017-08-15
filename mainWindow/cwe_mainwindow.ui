@@ -85,26 +85,26 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>6</number>
+           <number>0</number>
           </property>
+          <widget class="CWE_welcome_screen" name="tab_welcome_screen">
+           <attribute name="title">
+            <string>Welcome</string>
+           </attribute>
+          </widget>
           <widget class="CWE_landing" name="tab_landing_page">
            <attribute name="title">
-            <string>Home</string>
+            <string>Dashboard</string>
            </attribute>
           </widget>
           <widget class="CWE_create_simulation" name="tab_create_new">
            <attribute name="title">
-            <string>Create New</string>
+            <string>Create Job</string>
            </attribute>
           </widget>
-          <widget class="QWidget" name="tab_manage_and_run">
+          <widget class="CWE_manage_simulation" name="tab_manage_and_run">
            <attribute name="title">
-            <string>Manage and Run</string>
-           </attribute>
-          </widget>
-          <widget class="CWE_simulation_details" name="tab_simulation_details">
-           <attribute name="title">
-            <string>Simulations Details</string>
+            <string>Case Select</string>
            </attribute>
           </widget>
           <widget class="CWE_file_manager" name="tab_files">
@@ -112,9 +112,9 @@
             <string>Files</string>
            </attribute>
           </widget>
-          <widget class="CWE_task_list" name="tab_remote_jobs">
+          <widget class="CWE_help" name="tab_help">
            <attribute name="title">
-            <string>Remote Jobs</string>
+            <string>Help</string>
            </attribute>
           </widget>
           <widget class="QWidget" name="tab_spacer">
@@ -122,9 +122,14 @@
             <string/>
            </attribute>
           </widget>
-          <widget class="CWE_help" name="tab_help">
+          <widget class="QWidget" name="tab_parameters">
            <attribute name="title">
-            <string>Help</string>
+            <string>Parameters</string>
+           </attribute>
+          </widget>
+          <widget class="CWE_simulation_details" name="tab_results">
+           <attribute name="title">
+            <string>Results</string>
            </attribute>
           </widget>
          </widget>
@@ -159,9 +164,6 @@
          <widget class="QWidget" name="stackContainer" native="true"/>
         </item>
        </layout>
-       <zorder></zorder>
-       <zorder>SideBar</zorder>
-       <zorder>stackContainer</zorder>
       </widget>
      </widget>
     </item>
@@ -333,9 +335,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_task_list</class>
+   <class>CWE_manage_simulation</class>
    <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_task_list.h</header>
+   <header>cwe_guiWidgets/cwe_manage_simulation.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_welcome_screen</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_welcome_screen.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
