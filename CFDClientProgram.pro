@@ -139,4 +139,5 @@ FORMS    += \
 
 RESOURCES += \
     cwe_resources.qrc \
-    ../AgaveExplorer/SimCenterCommon/commonResources.qrc
+    ../AgaveExplorer/SimCenterCommon/commonResources.qrc \
+    CFDanalysis/config/cfdconfig.qrc
