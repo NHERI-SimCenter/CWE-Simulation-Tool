@@ -33,17 +33,17 @@
 // Contributors:
 // Peter Mackenzie-Helnwein, UW Seattle
 
-#include "cwe_landing.h"
-#include "ui_cwe_landing.h"
+#include "cwe_welcome_screen.h"
+#include "ui_cwe_welcome_screen.h"
 
-CWE_landing::CWE_landing(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_landing)
+CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
+    QFrame(parent),
+    ui(new Ui::CWE_welcome_screen)
 {
     ui->setupUi(this);
 }
 
-CWE_landing::~CWE_landing()
+CWE_welcome_screen::~CWE_welcome_screen()
 {
     delete ui;
 }

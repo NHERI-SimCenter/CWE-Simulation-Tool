@@ -68,7 +68,8 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_manage_simulation.cpp \
     cwe_guiWidgets/cwe_simulation_details.cpp \
     cwe_guiWidgets/cwe_task_list.cpp \
-    cwe_guiWidgets/sidebar.cpp \
+    cwe_guiWidgets/cwe_welcome_screen.cpp \
+    cwe_guiWidgets/sidebar.cpp  \
     ../AgaveExplorer/remoteFileOps/easyboollock.cpp \
     ../AgaveExplorer/remoteFileOps/fileoperator.cpp \
     ../AgaveExplorer/remoteFileOps/filetreenode.cpp \
@@ -104,6 +105,7 @@ HEADERS  += \
     cwe_guiWidgets/cwe_manage_simulation.h \
     cwe_guiWidgets/cwe_simulation_details.h \
     cwe_guiWidgets/cwe_task_list.h \
+    cwe_guiWidgets/cwe_welcome_screen.h \
     cwe_guiWidgets/sidebar.h \
     ../AgaveExplorer/remoteFileOps/easyboollock.h \
     ../AgaveExplorer/remoteFileOps/fileoperator.h \
@@ -129,6 +131,7 @@ FORMS    += \
     cwe_guiWidgets/cwe_manage_simulation.ui \
     cwe_guiWidgets/cwe_simulation_details.ui \
     cwe_guiWidgets/cwe_task_list.ui \
+    cwe_guiWidgets/cwe_welcome_screen.ui \
     cwe_guiWidgets/sidebar.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
