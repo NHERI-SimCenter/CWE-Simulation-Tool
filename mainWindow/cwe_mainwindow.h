@@ -106,13 +106,13 @@ private:
     SideBar                *taskSideBar;
     QWidget                *widgetStack;
 
-    CWE_create_simulation  *taskCreateSimulation;
-    CWE_file_manager       *taskFileManager;
-    CWE_landing            *taskLanding;
-    CWE_manage_simulation  *taskManageSimulation;
-    CWE_simulation_details *taskSimulationDetail;
-    CWE_task_list          *taskTaskList;
-    CWE_help               *taskHelp;
+    CWE_create_simulation  *taskCreateSimulation = NULL;
+    CWE_file_manager       *taskFileManager = NULL;
+    CWE_landing            *taskLanding = NULL;
+    CWE_manage_simulation  *taskManageSimulation = NULL;
+    CWE_simulation_details *taskSimulationDetail = NULL;
+    CWE_task_list          *taskTaskList = NULL;
+    CWE_help               *taskHelp = NULL;
 
     QStackedWidget         *sharedWidget;
     RemoteDataInterface    *dataLink;

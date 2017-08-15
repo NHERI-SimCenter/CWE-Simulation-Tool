@@ -118,8 +118,12 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
 void CWE_MainWindow::runSetupSteps()
 {
-    taskTaskList->linkJobHandle(myDriver->getJobHandler());
-    taskFileManager->linkFileHandle(myDriver->getFileHandler());
+    #ifdef USE_SIDE_BAR
+        taskTaskList->linkJobHandle(myDriver->getJobHandler());
+        taskFileManager->linkFileHandle(myDriver->getFileHandler());
+    #else
+        ui->tab_files->linkFileHandle(myDriver->getFileHandler());
+    #endif
 
     //Note: Adding widget to header will re-parent them
     QLabel * username = new QLabel(myDriver->getDataConnection()->getUserName());
