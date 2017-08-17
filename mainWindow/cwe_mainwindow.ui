@@ -92,6 +92,16 @@
             <string>Welcome</string>
            </attribute>
           </widget>
+          <widget class="CWE_help" name="tab_help">
+           <attribute name="title">
+            <string>Help</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab_spacer_1">
+           <attribute name="title">
+            <string>Page text space</string>
+           </attribute>
+          </widget>
           <widget class="CWE_landing" name="tab_landing_page">
            <attribute name="title">
             <string>Dashboard</string>
@@ -112,14 +122,9 @@
             <string>Files</string>
            </attribute>
           </widget>
-          <widget class="CWE_help" name="tab_help">
+          <widget class="QWidget" name="tab_spacer_2">
            <attribute name="title">
-            <string>Help</string>
-           </attribute>
-          </widget>
-          <widget class="QWidget" name="tab_spacer">
-           <attribute name="title">
-            <string/>
+            <string>some text for size</string>
            </attribute>
           </widget>
           <widget class="QWidget" name="tab_parameters">
