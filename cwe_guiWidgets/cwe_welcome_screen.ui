@@ -20,34 +20,24 @@
    <enum>QFrame::Raised</enum>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="3">
-    <widget class="QLabel" name="label">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>1</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>This is some information for the inexperienced user on how to get started</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
+   <item row="2" column="2">
     <widget class="QCommandLinkButton" name="commandLinkButton">
      <property name="text">
       <string>Next</string>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QCommandLinkButton" name="commandLinkButton_2">
-     <property name="text">
-      <string>Previous</string>
+     <property name="icon">
+      <iconset resource="../cwe_resources.qrc">
+       <normaloff>:/buttons/images/CWE_right.png</normaloff>:/buttons/images/CWE_right.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>26</width>
+       <height>26</height>
+      </size>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="2" column="1">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -60,8 +50,88 @@
      </property>
     </spacer>
    </item>
+   <item row="2" column="0">
+    <widget class="QCommandLinkButton" name="commandLinkButton_2">
+     <property name="text">
+      <string>Previous</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../cwe_resources.qrc">
+       <normaloff>:/buttons/images/CWE_left.png</normaloff>:/buttons/images/CWE_left.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>26</width>
+       <height>26</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="QStackedWidget" name="WelcomeStackedWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="welcome_page1">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="text_label_1">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>INFO PAGE 1
+This is some information for the inexperienced user on how to get started</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="welcome_page2">
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="text_label_2">
+         <property name="text">
+          <string>INFO PAGE 2
+This is some information for the inexperienced user on how to get started</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="welcome_page3">
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="QLabel" name="text_label_3">
+         <property name="text">
+          <string>INFO PAGE 3
+This is some information for the inexperienced user on how to get started</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="welcome_page4">
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <widget class="QLabel" name="text_label_4">
+         <property name="text">
+          <string>INFO PAGE 4
+This is some information for the inexperienced user on how to get started</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../cwe_resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
