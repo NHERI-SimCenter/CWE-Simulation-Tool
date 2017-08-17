@@ -35,12 +35,64 @@
 
 #include "cwe_landing.h"
 #include "ui_cwe_landing.h"
+#include "cwe_defines.h"
+#include <QTime>
+#include "mytablemodel.h"
 
 CWE_landing::CWE_landing(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CWE_landing)
 {
     ui->setupUi(this);
+
+    QTableView * m_listView = ui->tableView_jobs;
+
+    MyTableModel *model;
+
+    // Create model
+    model = new MyTableModel(this);
+
+    // Make data
+    QStringList List;
+    List << "name given" << "state" << "time created" << "ID" << "application";
+
+    // Populate our model
+    model->addStringList(List);
+
+    // Glue model and view together
+    ui->tableView_jobs->setModel(model);
+
+    /*
+    // Get the position
+    int row = model->rowCount();
+
+    // Enable add one or more rows
+    model->insertRows(row,1);
+
+    // Get the row for Edit mode
+    QModelIndex index = model->index(row);
+
+    // Enable item selection and put it edit mode
+    ui->listView_jobs->setCurrentIndex(index);
+    ui->listView_jobs->edit(index);
+    */
+
+
+    /* set some dummy contents */
+    QString theState;
+    QString theTimeCreated;
+    QString theID;
+    QString theApplication;
+
+    uint state = CWE_STATE_NONE;
+
+    if (state & CWE_STATE_NEW)     {theState = "new";}
+    if (state & CWE_STATE_RUNNING) {theState = "running";}
+    if (state & CWE_STATE_RESULTS) {theState = "done";}
+    if (state & CWE_STATE_NONE)    {theState = "none";}
+    if (state & CWE_STATE_CLEAR)   {theState = "clear";}
+
+    theTimeCreated = QTime::currentTime().toString();
 }
 
 CWE_landing::~CWE_landing()
