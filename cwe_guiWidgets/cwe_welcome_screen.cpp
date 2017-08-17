@@ -41,9 +41,31 @@ CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
     ui(new Ui::CWE_welcome_screen)
 {
     ui->setupUi(this);
+    ui->WelcomeStackedWidget->setCurrentIndex(0);
+
 }
 
 CWE_welcome_screen::~CWE_welcome_screen()
 {
     delete ui;
+}
+
+void CWE_welcome_screen::on_commandLinkButton_2_clicked()
+{
+    /* previous page on welcome screen */
+
+    int index = ui->WelcomeStackedWidget->currentIndex();
+    index--;
+    if (index<0) { index += 4; }
+    ui->WelcomeStackedWidget->setCurrentIndex(index);
+}
+
+void CWE_welcome_screen::on_commandLinkButton_clicked()
+{
+    /* next page on welcome screen */
+
+    int index = ui->WelcomeStackedWidget->currentIndex();
+    index++;
+    if (index>3) { index -= 4; }
+    ui->WelcomeStackedWidget->setCurrentIndex(index);
 }

@@ -2,6 +2,11 @@
     <qresource prefix="/buttons">
         <file>images/CWE_button_down_arrows.png</file>
         <file>images/CWE_button_up_arrows.png</file>
+        <file>images/CWE_down.png</file>
+        <file>images/CWE_left.png</file>
+        <file>images/CWE_right.png</file>
+        <file>images/CWE_up.png</file>
+        <file>images/CWE_icons.idraw</file>
     </qresource>
     <qresource prefix="/">
         <file>copyText.txt</file>
