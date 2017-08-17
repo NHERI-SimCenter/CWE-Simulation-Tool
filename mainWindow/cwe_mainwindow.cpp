@@ -102,6 +102,14 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     ui->stackContainer->hide();
 #endif
 
+    int idx;
+
+    idx = ui->tabContainer->indexOf(ui->tab_spacer_1);
+    ui->tabContainer->setTabEnabled(idx,false);
+
+    idx = ui->tabContainer->indexOf(ui->tab_spacer_2);
+    ui->tabContainer->setTabEnabled(idx,false);
+
     //task_selected(TASK_LANDING);
 
     //connect(taskSideBar, SIGNAL(taskSelected(TASK)), this, SLOT(task_selected(TASK)));
