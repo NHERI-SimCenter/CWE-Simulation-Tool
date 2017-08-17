@@ -49,6 +49,11 @@ public:
     explicit CWE_welcome_screen(QWidget *parent = 0);
     ~CWE_welcome_screen();
 
+private slots:
+    void on_commandLinkButton_2_clicked();
+
+    void on_commandLinkButton_clicked();
+
 private:
     Ui::CWE_welcome_screen *ui;
 };
