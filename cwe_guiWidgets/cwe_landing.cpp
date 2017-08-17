@@ -45,57 +45,50 @@ CWE_landing::CWE_landing(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QTableView * m_listView = ui->tableView_jobs;
-
-    MyTableModel *model;
-
     // Create model
     model = new MyTableModel(this);
 
-    // Make data
-    QStringList List;
-    List << "name given" << "state" << "time created" << "ID" << "application";
-
-    // Populate our model
-    model->addStringList(List);
+    QStringList HeaderList;
+    HeaderList << "name given" << "state" << "time created" << "ID" << "application";
+    model->setHeaders(HeaderList);
 
     // Glue model and view together
     ui->tableView_jobs->setModel(model);
+    ui->tableView_jobs->verticalHeader()->setVisible(false);
 
-    /*
-    // Get the position
-    int row = model->rowCount();
-
-    // Enable add one or more rows
-    model->insertRows(row,1);
-
-    // Get the row for Edit mode
-    QModelIndex index = model->index(row);
-
-    // Enable item selection and put it edit mode
-    ui->listView_jobs->setCurrentIndex(index);
-    ui->listView_jobs->edit(index);
-    */
-
+    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    //ui->tableView_jobs->horizontalHeader()->setSizePolicy();
 
     /* set some dummy contents */
-    QString theState;
-    QString theTimeCreated;
-    QString theID;
-    QString theApplication;
-
-    uint state = CWE_STATE_NONE;
-
-    if (state & CWE_STATE_NEW)     {theState = "new";}
-    if (state & CWE_STATE_RUNNING) {theState = "running";}
-    if (state & CWE_STATE_RESULTS) {theState = "done";}
-    if (state & CWE_STATE_NONE)    {theState = "none";}
-    if (state & CWE_STATE_CLEAR)   {theState = "clear";}
-
-    theTimeCreated = QTime::currentTime().toString();
+    this->addDummyDataRow();
 }
 
 CWE_landing::~CWE_landing()
 {
     delete ui;
+}
+
+void CWE_landing::addDataRow(QString name, uint state, QString time, QString id, QString app)
+{
+    QString theState;
+
+    if (state & CWE_STATE_NEW)          {theState = "new";}
+    else if (state & CWE_STATE_RUNNING) {theState = "running";}
+    else if (state & CWE_STATE_RESULTS) {theState = "done";}
+    else if (state & CWE_STATE_NONE)    {theState = "none";}
+    else if (state & CWE_STATE_CLEAR)   {theState = "clear";}
+    else {theState = "undefined";}
+
+    // Make data
+    QStringList List;
+    List << name << theState << time << id << app;
+
+    // Populate our model
+    model->addStringList(List);
+}
+
+void CWE_landing::addDummyDataRow(void)
+{
+    /* set some dummy contents */
+    this->addDataRow("some URL", CWE_STATE_CLEAR, QTime::currentTime().toString(), "007", "SimCenter super app");
 }
