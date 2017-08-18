@@ -131,6 +131,7 @@ void CWE_MainWindow::runSetupSteps()
         taskFileManager->linkFileHandle(myDriver->getFileHandler());
     #else
         ui->tab_files->linkFileHandle(myDriver->getFileHandler());
+        ui->tab_landing_page->linkJobHandle(myDriver->getJobHandler());
     #endif
 
     //Note: Adding widget to header will re-parent them
