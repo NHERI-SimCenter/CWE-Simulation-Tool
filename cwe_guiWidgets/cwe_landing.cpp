@@ -35,9 +35,13 @@
 
 #include "cwe_landing.h"
 #include "ui_cwe_landing.h"
+
 #include "cwe_defines.h"
 #include <QTime>
 #include "mytablemodel.h"
+
+#include "../AgaveExplorer/remoteFileOps/remotejoblister.h"
+#include "../AgaveExplorer/remoteFileOps/joboperator.h"
 
 CWE_landing::CWE_landing(QWidget *parent) :
     QWidget(parent),
@@ -66,6 +70,11 @@ CWE_landing::CWE_landing(QWidget *parent) :
 CWE_landing::~CWE_landing()
 {
     delete ui;
+}
+
+void CWE_landing::linkJobHandle(JobOperator * theOperator)
+{
+    ui->tableView_jobs->setJobHandle(theOperator);
 }
 
 void CWE_landing::addDataRow(QString name, uint state, QString time, QString id, QString app)
