@@ -85,7 +85,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>9</number>
           </property>
           <widget class="CWE_welcome_screen" name="tab_welcome_screen">
            <attribute name="title">
@@ -132,7 +132,7 @@
             <string>Parameters</string>
            </attribute>
           </widget>
-          <widget class="CWE_simulation_details" name="tab_results">
+          <widget class="CWE_Results" name="tab_results">
            <attribute name="title">
             <string>Results</string>
            </attribute>
@@ -334,12 +334,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_simulation_details</class>
-   <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_simulation_details.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>CWE_manage_simulation</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_manage_simulation.h</header>
@@ -349,6 +343,12 @@
    <class>CWE_welcome_screen</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_welcome_screen.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_Results</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_results.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
