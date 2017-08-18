@@ -38,6 +38,7 @@
 #include <QWidget>
 
 class MyTableModel;
+class JobOperator;
 
 namespace Ui {
 class CWE_landing;
@@ -52,6 +53,8 @@ public:
     ~CWE_landing();
     void addDataRow(QString, uint, QString, QString, QString);
     void addDummyDataRow(void);
+
+    void linkJobHandle(JobOperator * theOperator);
 
 private:
     Ui::CWE_landing *ui;
