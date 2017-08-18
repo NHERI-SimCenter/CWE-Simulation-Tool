@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     QApplication mainRunLoop(argc, argv);
     VWTinterfaceDriver programDriver;
 
-    QFile styleFile(":/styleCommon/style.qss");
+    QFile styleFile(":/cweStyle.qss");
 
     if (!styleFile.open(QFile::ReadOnly))
     {
