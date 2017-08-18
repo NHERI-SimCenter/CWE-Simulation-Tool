@@ -37,6 +37,8 @@
 
 #include <QWidget>
 
+class MyTableModel;
+
 namespace Ui {
 class CWE_landing;
 }
@@ -48,9 +50,12 @@ class CWE_landing : public QWidget
 public:
     explicit CWE_landing(QWidget *parent = 0);
     ~CWE_landing();
+    void addDataRow(QString, uint, QString, QString, QString);
+    void addDummyDataRow(void);
 
 private:
     Ui::CWE_landing *ui;
+    MyTableModel    *model;
 };
 
 #endif // CWE_LANDING_H

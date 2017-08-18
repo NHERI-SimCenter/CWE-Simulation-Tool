@@ -14,9 +14,13 @@ public:
   QVariant data(const QModelIndex& index, int role) const;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const;
   void addStringList(QStringList& list);
+  void setHeaders(QStringList &list) {ColumnLabels=list.toVector(); numColumns=ColumnLabels.size();}
 
 protected:
   QVector<QVector<QString>> Rows;
+  int numColumns;
+  int numRows;
+  QVector<QString> ColumnLabels;
 };
 
 #endif // MYTABLEMODEL_H
