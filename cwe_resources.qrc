@@ -10,5 +10,6 @@
     </qresource>
     <qresource prefix="/">
         <file>copyText.txt</file>
+        <file>cweStyle.qss</file>
     </qresource>
 </RCC>
