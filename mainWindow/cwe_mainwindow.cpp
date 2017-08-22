@@ -50,57 +50,8 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
 
-#ifdef USE_SIDE_BAR
-    /* add the sidebar */
-    QWidget *frameSideBar = this->findChild<QWidget *>("SideBar");
-    taskSideBar = new SideBar(frameSideBar);
-    QGridLayout *layout = new QGridLayout;
-    layout->setContentsMargins(0,0,0,0);
-    layout->addWidget(taskSideBar);
-    frameSideBar->setLayout(layout);
-
-    /* populate the stacked widget */
-
-    // get the stacked widget container
-    widgetStack = this->findChild<QWidget *>("stackContainer");
-
-    stackLayout = new QStackedLayout();
-    stackLayout->setContentsMargins(0,0,0,0);
-
-    // 1) create new simulation
-    taskLanding          = new CWE_landing(widgetStack);
-    stackedWidgetsIndex.insert(TASK_LANDING, stackLayout->addWidget(taskLanding));
-
-    taskCreateSimulation = new CWE_create_simulation(widgetStack);
-    stackedWidgetsIndex.insert(TASK_CREATE_NEW_SIMULATION, stackLayout->addWidget(taskCreateSimulation));
-
-    // 2) manage and run simulation
-    taskManageSimulation = new CWE_manage_simulation(widgetStack);
-    stackedWidgetsIndex.insert(TASK_MANAGE_SIMULATION, stackLayout->addWidget(taskManageSimulation));
-
-    // 3) manage and download remote files
-    taskFileManager      = new CWE_file_manager(widgetStack);
-    stackedWidgetsIndex.insert(TASK_MANAGE_FILES, stackLayout->addWidget(taskFileManager));
-
-    // 4) manage remote job
-    taskSimulationDetail = new CWE_simulation_details(widgetStack);
-    stackedWidgetsIndex.insert(TASK_SIMULATION_DETAILS, stackLayout->addWidget(taskSimulationDetail));
-
-    taskTaskList         = new CWE_task_list(widgetStack);
-    stackedWidgetsIndex.insert(TASK_LIST_TASKS, stackLayout->addWidget(taskTaskList));
-
-    // 5) tutorial and help
-    taskHelp             = new CWE_help(widgetStack);
-    stackedWidgetsIndex.insert(TASK_HELP, stackLayout->addWidget(taskHelp));
-
-    widgetStack->setLayout(stackLayout);
-
-    ui->tabContainer->hide();
-
-#else
     ui->SideBar->hide();
     ui->stackContainer->hide();
-#endif
 
     int idx;
 
@@ -126,13 +77,8 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
 void CWE_MainWindow::runSetupSteps()
 {
-    #ifdef USE_SIDE_BAR
-        taskTaskList->linkJobHandle(myDriver->getJobHandler());
-        taskFileManager->linkFileHandle(myDriver->getFileHandler());
-    #else
-        ui->tab_files->linkFileHandle(myDriver->getFileHandler());
-        ui->tab_landing_page->linkJobHandle(myDriver->getJobHandler());
-    #endif
+    ui->tab_files->linkFileHandle(myDriver->getFileHandler());
+    ui->tab_landing_page->linkJobHandle(myDriver->getJobHandler());
 
     //Note: Adding widget to header will re-parent them
     QLabel * username = new QLabel(myDriver->getDataConnection()->getUserName());
