@@ -38,7 +38,6 @@
 
 #include "cwe_defines.h"
 #include <QTime>
-#include "mytablemodel.h"
 
 #include "../AgaveExplorer/remoteFileOps/remotejoblister.h"
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
@@ -50,18 +49,21 @@ CWE_landing::CWE_landing(QWidget *parent) :
     ui->setupUi(this);
 
     // Create model
-    model = new MyTableModel(this);
+    model = new QStandardItemModel(this);
 
     QStringList HeaderList;
     HeaderList << "name given" << "state" << "time created" << "ID" << "application";
-    model->setHeaders(HeaderList);
+    model->setHorizontalHeaderLabels(HeaderList);
 
     // Glue model and view together
     ui->tableView_jobs->setModel(model);
     ui->tableView_jobs->verticalHeader()->setVisible(false);
 
-    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    //ui->tableView_jobs->horizontalHeader()->setSizePolicy();
+    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Stretch);
+    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(1,QHeaderView::ResizeToContents);
+    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(2,QHeaderView::ResizeToContents);
+    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(3,QHeaderView::ResizeToContents);
+    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(4,QHeaderView::Stretch);
 
     /* set some dummy contents */
     this->addDummyDataRow();
@@ -89,11 +91,21 @@ void CWE_landing::addDataRow(QString name, uint state, QString time, QString id,
     else {theState = "undefined";}
 
     // Make data
-    QStringList List;
-    List << name << theState << time << id << app;
+    QList<QStandardItem *> List;
+
+    QStandardItem *var1 = new QStandardItem(name);
+    List.append(var1);
+    QStandardItem *var2 = new QStandardItem(theState);
+    List.append(var2);
+    QStandardItem *var3 = new QStandardItem(time);
+    List.append(var3);
+    QStandardItem *var4 = new QStandardItem(id);
+    List.append(var4);
+    QStandardItem *var5 = new QStandardItem(app);
+    List.append(var5);
 
     // Populate our model
-    model->addStringList(List);
+    model->appendRow(List);
 }
 
 void CWE_landing::addDummyDataRow(void)

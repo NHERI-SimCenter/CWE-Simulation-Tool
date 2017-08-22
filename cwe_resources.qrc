@@ -7,6 +7,9 @@
         <file>images/CWE_right.png</file>
         <file>images/CWE_up.png</file>
         <file>images/CWE_icons.idraw</file>
+        <file>images/CWE_download.png</file>
+        <file>images/CWE_eye.png</file>
+        <file>images/CWE_empty.png</file>
     </qresource>
     <qresource prefix="/">
         <file>copyText.txt</file>
