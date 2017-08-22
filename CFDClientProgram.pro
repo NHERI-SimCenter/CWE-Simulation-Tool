@@ -69,6 +69,8 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_simulation_details.cpp \
     cwe_guiWidgets/cwe_task_list.cpp \
     cwe_guiWidgets/cwe_welcome_screen.cpp \
+    cwe_guiWidgets/cwe_results.cpp \
+    cwe_guiWidgets/cwe_parameters.cpp \
     cwe_guiWidgets/sidebar.cpp  \
     ../AgaveExplorer/remoteFileOps/easyboollock.cpp \
     ../AgaveExplorer/remoteFileOps/fileoperator.cpp \
@@ -84,8 +86,7 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
     CFDanalysis/CFDagaveApps.cpp \
     CFDanalysis/CFDanalysisType.cpp \
-    cwe_guiWidgets/cwe_results.cpp \
-    ../MDOF/sectiontitle.cpp
+    ../widgets/Common/sectiontitle.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -108,6 +109,8 @@ HEADERS  += \
     cwe_guiWidgets/cwe_simulation_details.h \
     cwe_guiWidgets/cwe_task_list.h \
     cwe_guiWidgets/cwe_welcome_screen.h \
+    cwe_guiWidgets/cwe_results.h \
+    cwe_guiWidgets/cwe_parameters.h \
     cwe_guiWidgets/sidebar.h \
     ../AgaveExplorer/remoteFileOps/easyboollock.h \
     ../AgaveExplorer/remoteFileOps/fileoperator.h \
@@ -123,8 +126,7 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/singlelinedialog.h \
     CFDanalysis/CFDagaveApps.h \
     CFDanalysis/CFDanalysisType.h \
-    cwe_guiWidgets/cwe_results.h \
-    ../MDOF/sectiontitle.h
+    ../widgets/Common/sectiontitle.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -136,11 +138,12 @@ FORMS    += \
     cwe_guiWidgets/cwe_simulation_details.ui \
     cwe_guiWidgets/cwe_task_list.ui \
     cwe_guiWidgets/cwe_welcome_screen.ui \
+    cwe_guiWidgets/cwe_results.ui \
+    cwe_guiWidgets/cwe_parameters.ui \
     cwe_guiWidgets/sidebar.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
-    ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
-    cwe_guiWidgets/cwe_results.ui
+    ../AgaveExplorer/utilFuncs/singlelinedialog.ui
 
 RESOURCES += \
     cwe_resources.qrc \
