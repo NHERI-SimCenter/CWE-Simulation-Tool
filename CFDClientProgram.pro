@@ -84,8 +84,8 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
     CFDanalysis/CFDagaveApps.cpp \
     CFDanalysis/CFDanalysisType.cpp \
-    cwe_guiWidgets/mytablemodel.cpp \
-    cwe_guiWidgets/cwe_results.cpp
+    cwe_guiWidgets/cwe_results.cpp \
+    ../MDOF/sectiontitle.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -123,8 +123,8 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/singlelinedialog.h \
     CFDanalysis/CFDagaveApps.h \
     CFDanalysis/CFDanalysisType.h \
-    cwe_guiWidgets/mytablemodel.h \
-    cwe_guiWidgets/cwe_results.h
+    cwe_guiWidgets/cwe_results.h \
+    ../MDOF/sectiontitle.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \

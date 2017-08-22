@@ -2,7 +2,8 @@
 #define CWE_RESULTS_H
 
 #include <QWidget>
-class MyTableModel;
+#include <QStandardItem>
+#include <QStandardItemModel>
 
 namespace Ui {
 class CWE_Results;
@@ -20,9 +21,12 @@ public:
     void setLocation(const QString &s);
     void addResult(QString, bool, bool, QString, QString, QString);
 
+private slots:
+    void on_downloadEntireCaseButton_clicked();
+
 private:
-    Ui::CWE_Results *ui;
-    MyTableModel    *model;
+    Ui::CWE_Results    *ui;
+    QStandardItemModel *model;
     void addDummyResult(void);
 };
 
