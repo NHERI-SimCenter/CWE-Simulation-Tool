@@ -36,8 +36,9 @@
 #define CWE_LANDING_H
 
 #include <QWidget>
+#include <QStandardItem>
+#include <QStandardItemModel>
 
-class MyTableModel;
 class JobOperator;
 
 namespace Ui {
@@ -57,8 +58,8 @@ public:
     void linkJobHandle(JobOperator * theOperator);
 
 private:
-    Ui::CWE_landing *ui;
-    MyTableModel    *model;
+    Ui::CWE_landing    *ui;
+    QStandardItemModel *model;
 };
 
 #endif // CWE_LANDING_H
