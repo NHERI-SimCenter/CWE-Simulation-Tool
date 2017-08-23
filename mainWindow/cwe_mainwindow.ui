@@ -85,7 +85,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>8</number>
           </property>
           <widget class="CWE_welcome_screen" name="tab_welcome_screen">
            <attribute name="title">
@@ -127,7 +127,7 @@
             <string>some text for size</string>
            </attribute>
           </widget>
-          <widget class="QWidget" name="tab_parameters">
+          <widget class="CWE_Parameters" name="tab_parameters">
            <attribute name="title">
             <string>Parameters</string>
            </attribute>
@@ -190,7 +190,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -349,6 +349,12 @@
    <class>CWE_Results</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_results.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_Parameters</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_parameters.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
