@@ -169,7 +169,7 @@
             "default": false
         },
         "useFieldPmean":{
-            "displayname":"Compute Mean Pressure Feild?",
+            "displayname":"Compute Mean Pressure Field?",
             "type":"bool",
             "default": false
         },
