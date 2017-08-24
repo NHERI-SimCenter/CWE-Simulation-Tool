@@ -1,6 +1,6 @@
 {
-   "name":"2D Building",
-   "stages":{
+    "name":"2D Building",
+    "stages":{
         "mesh":[
             "Building Geometry",
             "Mesh Density",
@@ -13,12 +13,12 @@
         ]
     },
     "varGroups":{
-       "Building Geometry":[
+        "Building Geometry":[
             "geoFile",
             "slicePlane",
             "sliceAngle"
         ],
-       "Mesh Density":[
+        "Mesh Density":[
             "inPad",
             "outPad",
             "topPad",
@@ -26,7 +26,7 @@
             "meshDensity",
             "meshDensityFar"
         ],
-       "Subdomains":[
+        "Subdomains":[
             "innerDomains",
             "inPadDom1",
             "outPadDom1",
@@ -44,17 +44,17 @@
             "bottomPadDom3",
             "meshDensityDom3"
         ],
-       "Boundaries":[
+        "Boundaries":[
             "lowYPlane",
-            "highYPlane",
+            "highYPlane"
         ],
-       "Simulation Control":[
-          "endTime",
-          "deltaT",
-          "velocity",
-          "nu"
+        "Simulation Control":[
+            "endTime",
+            "deltaT",
+            "velocity",
+            "nu"
         ],
-       "Advanced":[
+        "Advanced":[
             "turbModel",
             "useForceCoeffs",
             "useFieldUmean",
@@ -161,17 +161,17 @@
         "useForceCoeffs":{
             "displayname":"Compute Force Coefficients?",
             "type":"bool",
-            "default": true,
+            "default": true
         },
         "useFieldUmean":{
             "displayname":"Compute Mean Velocity Field?",
             "type":"bool",
-            "default": false,
+            "default": false
         },
         "useFieldPmean":{
-            "displayname":"Compute Mean Pressure Feild?",
+            "displayname":"Compute Mean Pressure Field?",
             "type":"bool",
-            "default": false,
+            "default": false
         },
         "turbModel":{
             "displayname":"Turbulence Model",
@@ -182,23 +182,23 @@
                 "SpalartAllmaras":"S-A one equation model (RANS)",
                 "kEpsilon":"k-epsilon model (RANS)",
                 "Smagorinsky":"Smagorinsky turbulence model (LES)",
-                "dynOneEqEddy":"Dynamic One Equation model (LES)",
+                "dynOneEqEddy":"Dynamic One Equation model (LES)"
             }
         },
         "pisoCorrectors":{
             "displayname":"Number of PISO Correctors",
             "type":"std",
-            "default":"2",
+            "default":"2"
         },
         "pisoNonOrthCorrect":{
             "displayname":"Number of non-orthogonal Correctors",
             "type":"std",
-            "default":"1",
+            "default":"1"
         },
         "innerDomains":{
             "displayname":"Number of Subdomains",
             "type":"std",
-            "default":"0",
+            "default":"0"
         },
         "inPadDom1":{
             "displayname":"Subdomain 1 Length (Inlet)",
@@ -295,7 +295,7 @@
         {
             "name":"Mesh View",
             "type":"GLmesh",
-            "stage":"mesh",
+            "stage":"mesh"
         },
         {
             "name":"Final Flow Velocity Field",
@@ -315,7 +315,7 @@
             "name":"Force Coefficients",
             "type":"text",
             "stage":"sim",
-            "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat",
+            "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat"
         }
     ]
 }
