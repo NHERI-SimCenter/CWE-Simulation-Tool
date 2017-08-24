@@ -42,7 +42,7 @@ CFDagaveApps::CFDagaveApps(FileTreeNode * caseRef)
 
 bool CFDagaveApps::isValidCase()
 {
-
+    return false;
 }
 
 void CFDagaveApps::changeParameters(QMap<QString, QString> paramList)
