@@ -86,7 +86,8 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
     CFDanalysis/CFDagaveApps.cpp \
     CFDanalysis/CFDanalysisType.cpp \
-    ../widgets/Common/sectiontitle.cpp
+    ../widgets/Common/sectiontitle.cpp \
+    cwe_guiWidgets/cwe_parametertab.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -126,7 +127,8 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/singlelinedialog.h \
     CFDanalysis/CFDagaveApps.h \
     CFDanalysis/CFDanalysisType.h \
-    ../widgets/Common/sectiontitle.h
+    ../widgets/Common/sectiontitle.h \
+    cwe_guiWidgets/cwe_parametertab.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -143,7 +145,8 @@ FORMS    += \
     cwe_guiWidgets/sidebar.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
-    ../AgaveExplorer/utilFuncs/singlelinedialog.ui
+    ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
+    cwe_guiWidgets/cwe_parametertab.ui
 
 RESOURCES += \
     cwe_resources.qrc \
