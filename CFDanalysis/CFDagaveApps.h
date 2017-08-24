@@ -36,11 +36,22 @@
 #ifndef CFDAGAVEAPPS_H
 #define CFDAGAVEAPPS_H
 
+#include <QString>
+
+class FileTreeNode;
 
 class CFDagaveApps
 {
 public:
-    CFDagaveApps();
+    CFDagaveApps(FileTreeNode * caseRef);
+
+    bool isValidCase();
+
+    void changeParameters(QMap<QString, QString> paramList);
+
+private:
+    QString casePath;
+    bool dataRetrieved = false;
 };
 
 #endif // CFDAGAVEAPPS_H
