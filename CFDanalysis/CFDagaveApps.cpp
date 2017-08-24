@@ -34,7 +34,18 @@
 
 #include "CFDagaveApps.h"
 
-CFDagaveApps::CFDagaveApps()
+CFDagaveApps::CFDagaveApps(FileTreeNode * caseRef)
+{
+
+}
+
+
+bool CFDagaveApps::isValidCase()
+{
+
+}
+
+void CFDagaveApps::changeParameters(QMap<QString, QString> paramList)
 {
 
 }
