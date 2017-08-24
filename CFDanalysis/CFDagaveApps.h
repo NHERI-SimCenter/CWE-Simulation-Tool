@@ -37,6 +37,7 @@
 #define CFDAGAVEAPPS_H
 
 #include <QString>
+#include <QMap>
 
 class FileTreeNode;
 
