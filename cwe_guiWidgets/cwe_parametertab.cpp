@@ -12,3 +12,8 @@ CWE_ParameterTab::~CWE_ParameterTab()
 {
     delete ui;
 }
+
+QWidget * CWE_ParameterTab::getParameterSpace()
+{
+    return ui->parameterSpace;
+}

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class CFDanalysisType;
+
 namespace Ui {
 class CWE_Parameters;
 }
@@ -17,7 +19,7 @@ public:
     void setName(const QString &s);
     void setType(const QString &s);
     void setLocation(const QString &s);
-    int  setTemplate(const QString &filename);
+    int  setTemplate(CFDanalysisType * theTemplate);
 
 private slots:
     void on_pbtn_saveAllParameters_clicked();

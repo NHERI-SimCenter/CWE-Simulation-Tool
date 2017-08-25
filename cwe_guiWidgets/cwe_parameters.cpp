@@ -17,13 +17,13 @@
 
 #include "qdebug.h"
 
+#include <CFDanalysis/CFDanalysisType.h>
+
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
-
-    this->setTemplate(":/config/building2D.json");
 }
 
 CWE_Parameters::~CWE_Parameters()
@@ -43,31 +43,18 @@ void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
 
 }
 
-int CWE_Parameters::setTemplate(const QString &filename)
+int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
 {
     int nParameters = 0;
 
-    QString val;
-    QFile file;
-
-    QStringList propertyNames;
-    QStringList propertyKeys;
-
-    file.setFileName(filename);
-    //file.setFileName(":/config/building2D.json");
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    val = file.readAll();
-    file.close();
-
-    QJsonDocument config = QJsonDocument::fromJson(val.toUtf8());
-    QJsonObject   obj    = config.object();
+    QJsonObject   obj    = theTemplate->getRawConfig()->object();
 
     QJsonObject   stages     = obj["stages"].toObject();
     QJsonArray    meshStages = stages["mesh"].toArray();
     QJsonArray    simulationStages = stages["sim"].toArray();
     QJsonObject   varGroups  = obj["varGroups"].toObject();
     QJsonObject   vars       = obj["vars"].toObject();
-    QJsonArray    results    = obj["results"].toArray();
+    //QJsonArray    results    = obj["results"].toArray();
 
     this->setType(obj["name"].toString());
 
@@ -75,12 +62,12 @@ int CWE_Parameters::setTemplate(const QString &filename)
 
     foreach (const QJsonValue & meshTab, meshStages)
     {
-        QWidget *paramTab = new CWE_ParameterTab();
+        CWE_ParameterTab *paramTab = new CWE_ParameterTab();
         QString key = meshTab.toString();
         meshTabWidgets.insert(key, paramTab);
         ui->mesh_tabWidget->addTab(paramTab, key);
 
-        QWidget *displayWidget = paramTab->findChild<QWidget *>("parameterSpace");
+        QWidget *displayWidget = paramTab->getParameterSpace();
 
         QGridLayout *layout = (QGridLayout*)(displayWidget->layout());
 
@@ -111,7 +98,6 @@ int CWE_Parameters::setTemplate(const QString &filename)
                 layout->addWidget(theUnit, row,2);
             }
             else if (type == "choose") {
-                QJsonArray options     = vObj["options"].toArray();
                 QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
                 QComboBox *theSelection = new QComboBox(displayWidget);
@@ -131,8 +117,6 @@ int CWE_Parameters::setTemplate(const QString &filename)
             }
             else if (type == "file") {
                 // a filename
-                QVariant defaultOption = vObj["default"].toVariant();
-                // bool def = defaultOption.toBool();
                 QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
                 QLineEdit *theFileName = new QLineEdit(displayWidget);
@@ -142,8 +126,6 @@ int CWE_Parameters::setTemplate(const QString &filename)
                 layout->addWidget(theFileName,row,1,1,2);
             }
             else if (type == "bool") {
-                QVariant defaultOption = vObj["default"].toVariant();
-                // bool def = defaultOption.toBool();
                 QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
                 QCheckBox *theBox = new QCheckBox(displayWidget);
@@ -153,8 +135,6 @@ int CWE_Parameters::setTemplate(const QString &filename)
                 layout->addWidget(theBox, row,1);
             }
             else {
-                QVariant defaultOption = vObj["default"].toVariant();
-                // bool def = defaultOption.toBool();
                 QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
                 int row = layout->rowCount();
@@ -168,12 +148,12 @@ int CWE_Parameters::setTemplate(const QString &filename)
 
     foreach (const QJsonValue & simulationTab, simulationStages)
     {
-        QWidget *simTab = new CWE_ParameterTab();
+        CWE_ParameterTab *simTab = new CWE_ParameterTab();
         QString key = simulationTab.toString();
         simulationTabWidgets.insert(key, simTab);
         ui->simulation_tabWidget->addTab(simTab, key);
 
-        QWidget *displayWidget = simTab->findChild<QWidget *>("parameterSpace");
+        QWidget *displayWidget = simTab->getParameterSpace();
 
         QGridLayout *layout = (QGridLayout*)(displayWidget->layout());
 
@@ -250,12 +230,15 @@ int CWE_Parameters::setTemplate(const QString &filename)
     }
 
     // this is crazy slow -- requires a better solution
-    QFile styleFile(":/cweStyle.qss");
-    QString styleText(styleFile.readAll());
-    QList<QWidget *> container = this->findChildren<QWidget *>();
-    foreach ( QWidget *var, container) {
-        var->setStyleSheet(styleText);
-    }
+    //QFile styleFile(":/cweStyle.qss");
+    //styleFile.open(QFile::ReadOnly);
+    //QString styleText(styleFile.readAll());
+    //qDebug("%s",qPrintable(styleText));
+    //QList<QWidget *> container = this->findChildren<QWidget *>();
+    //foreach ( QWidget *var, container) {
+    //    var->setStyleSheet(styleText);
+    //}
+    //qApp->setStyleSheet(styleText);
 
     return nParameters;
 }
