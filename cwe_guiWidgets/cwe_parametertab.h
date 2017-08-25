@@ -14,6 +14,7 @@ class CWE_ParameterTab : public QScrollArea
 public:
     explicit CWE_ParameterTab(QWidget *parent = 0);
     ~CWE_ParameterTab();
+    QWidget * getParameterSpace();
 
 private:
     Ui::CWE_ParameterTab *ui;

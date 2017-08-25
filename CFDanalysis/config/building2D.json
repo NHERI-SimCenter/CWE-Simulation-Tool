@@ -1,5 +1,7 @@
 {
     "name":"2D Building",
+    "brandingFile":".cwe_2d_u",
+    "internalName":"buildingSlice",
     "stages":{
         "mesh":[
             "Building Geometry",
