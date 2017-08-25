@@ -62,6 +62,7 @@ class DebugPanelWindow;
 class CWE_MainWindow;
 class JobOperator;
 class FileOperator;
+class CFDanalysisType;
 
 class VWTinterfaceDriver : public AgaveSetupDriver
 {
@@ -77,8 +78,12 @@ public:
     virtual QString getBanner();
     virtual QString getVersion();
 
+    QList<CFDanalysisType *> * getTemplateList();
+
 private:
     CWE_MainWindow * mainWindow;
+
+    QList<CFDanalysisType *> templateList;
 };
 
 #endif // VWTINTERFACEDRIVER_H

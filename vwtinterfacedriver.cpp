@@ -42,6 +42,8 @@
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 
+#include "CFDanalysis/CFDanalysisType.h"
+
 #include "mainWindow/cwe_mainwindow.h"
 
 VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(parent)
@@ -62,6 +64,9 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(paren
 
     theConnector = (RemoteDataInterface *) tmpHandle;
     QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(fatalInterfaceError(QString)));
+
+    CFDanalysisType * newTemplate = new CFDanalysisType(":/config/building2D.json");
+    templateList.append(newTemplate);
 }
 
 void VWTinterfaceDriver::startup()
@@ -120,4 +125,9 @@ QString VWTinterfaceDriver::getBanner()
 QString VWTinterfaceDriver::getVersion()
 {
     return "Version: 0.1";
+}
+
+QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()
+{
+    return &templateList;
 }

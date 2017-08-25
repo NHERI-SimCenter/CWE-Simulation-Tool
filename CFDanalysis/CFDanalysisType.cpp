@@ -33,59 +33,35 @@
 // Renamed, modifed by Peter Sempolinski
 
 #include "CFDanalysisType.h"
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
 
-CFDanalysisType::CFDanalysisType()
+CFDanalysisType::CFDanalysisType(QString configFile)
 {
-    params = new QVector<PARAMETER_VALUES *>;
+    QFile inFile(configFile);
+    inFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray val = inFile.readAll();
+    inFile.close();
 
-    QJsonArray JSONparameterList;
-    QJsonObject item;
+    myConfiguration = QJsonDocument::fromJson(val);
 
-    JSONparameters = new QJsonObject;
-    JSONparameters->insert(QString("analysisType"), QJsonValue("Channel flow"));
-
-    /* set parameter list for this analysis type */
-    // analysis type
-
-    JSONparameters->insert(QString("parameters"), JSONparameterList);
+    QJsonObject obj    = myConfiguration.object();
+    myName = obj["name"].toString();
 }
 
-CFDanalysisType::~CFDanalysisType()
+QJsonDocument * CFDanalysisType::getRawConfig()
 {
-    if (params) delete params;
+    return &myConfiguration;
 }
 
-QVector<PARAMETER_VALUES *> * CFDanalysisType::ParameterList()
+QString CFDanalysisType::getBrandingFile()
 {
-    // 1st parameter
-    newparameter = new PARAMETER_VALUES;
-    newparameter->label = "type";
-    newparameter->type  = "string";  // "int"||"float"||"string"
-    newparameter->fValue = 0.0; // ignored
-    newparameter->iValue = 0;   // ignored
-    newparameter->sValue = "Channel flow";
-    params->append(newparameter);
-
-    // 2nd parameter
-    newparameter = new PARAMETER_VALUES;
-    newparameter->label = "a";
-    newparameter->type  = "";  // "int"||"float"||"string"
-    newparameter->fValue = 1.0;
-    newparameter->iValue = 0;   // ignored
-    newparameter->sValue = "";  // ignored
-    params->append(newparameter);
-
-    // 3rd ...
-
-    return params;
+    QJsonObject obj = myConfiguration.object();
+    return obj["brandingFile"].toString();
 }
 
-bool CFDanalysisType::setParemeterList(QVector<PARAMETER_VALUES *>)
+QString CFDanalysisType::getInternalName()
 {
-    //TODO: Implement
-    return false;
+    QJsonObject obj = myConfiguration.object();
+    return obj["internalName"].toString();
 }
+
+

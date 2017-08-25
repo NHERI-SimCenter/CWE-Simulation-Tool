@@ -38,21 +38,71 @@
 
 #include <QString>
 #include <QMap>
+#include <QStringList>
+
+//For debug:
+#include <QTimer>
 
 class FileTreeNode;
+class CFDanalysisType;
+class EasyBoolLock;
+class JobOperator;
 
-class CFDagaveApps
+class VWTinterfaceDriver;
+
+enum class stageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
+
+class CFDagaveApps : public QObject
 {
+    Q_OBJECT
+
 public:
-    CFDagaveApps(FileTreeNode * caseRef);
+    CFDagaveApps(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
+    CFDagaveApps(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
 
-    bool isValidCase();
+    bool isDefunct();
+    bool knownNotValid();
+    bool stateKnown();
+    bool operationPending();
 
+    //Note: For these, it can always answer "I don't know"
+    CFDanalysisType * getMyType();
+    QMap<QString, QString> getCurrentParams();
+    QMap<QString, stageState> getStageStates();
+
+    //This enacts the LS needed to get all info
+    //Listen on dataStateChange till full state is known
+    void forceInfoRefresh();
+
+    //Of the following, only one enacted at a time
+    void createCase(QString newName, FileTreeNode * containingFolder);
     void changeParameters(QMap<QString, QString> paramList);
+    void mesh(FileTreeNode * geoFile = NULL); //Leave NULL if not used
+    void rollBack(QStringList stagesToDelete);
+    void openFOAM();
+    void postProcess();
+
+signals:
+    void dataStateChange(bool fullStateKnown);
+
+private slots:
+    void underlyingFilesUpdated();
+    void caseFolderRemoved();
+
+    //Will call forceInfoRefresh() after finishing
+    void agaveAppDone();
 
 private:
-    QString casePath;
-    bool dataRetrieved = false;
+    bool defunct = false;
+
+    VWTinterfaceDriver * theDriver;
+
+    FileTreeNode * caseFolder = NULL;
+    CFDanalysisType * myType = NULL;
+
+    EasyBoolLock * myLock;
+
+    QString expectedNewCaseFolder;
 };
 
 #endif // CFDAGAVEAPPS_H
