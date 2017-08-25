@@ -71,37 +71,31 @@ bool CFDagaveApps::isDefunct()
     return defunct;
 }
 
-bool CFDagaveApps::knownNotValid()
+CaseState CFDagaveApps::getCaseState()
 {
-    if (defunct) return true;
-    if (caseFolder == NULL) return false;
-    if (caseFolder->childIsUnloaded()) return false;
-    if (caseFolder->getChildNodeWithName(".varStore") == NULL) return true;
-    if (myType == NULL) return true;
-    return false;
-}
+    if (defunct) return CaseState::DEFUNCT;
+    if (myLock->lockClosed()) return CaseState::AGAVE_INVOKE;
 
-bool CFDagaveApps::stateKnown()
-{
-    if (defunct) return false;
-    if (myType == NULL) return false;
-    if (caseFolder == NULL) return false;
-    if (caseFolder->childIsUnloaded()) return false;
-    if (caseFolder->getChildNodeWithName(".varStore") == NULL) return false;
-    QMap<QString, stageState> stages = getStageStates();
+    if (caseFolder == NULL) return CaseState::LOADING;
+    if (myType == NULL) return CaseState::LOADING;
+    if (caseFolder->childIsUnloaded()) return CaseState::LOADING;
+
+    if (caseFolder->getChildNodeWithName(".varStore") == NULL) return CaseState::INVALID;
+    if (myType == NULL) return CaseState::INVALID;
+
+    QMap<QString, StageState> stages = getStageStates();
     for (auto itr = stages.cbegin(); itr != stages.cend(); itr++)
     {
-        if ((*itr) == stageState::LOADING)
+        if ((*itr) == StageState::LOADING)
         {
-            return false;
+            return CaseState::LOADING;
+        }
+        if ((*itr) == StageState::ERROR)
+        {
+            return CaseState::ERROR;
         }
     }
-    return true;
-}
-
-bool CFDagaveApps::operationPending()
-{
-    return myLock->lockClosed();
+    return CaseState::READY;
 }
 
 CFDanalysisType * CFDagaveApps::getMyType()
@@ -126,15 +120,15 @@ QMap<QString, QString> CFDagaveApps::getCurrentParams()
     return ret;
 }
 
-QMap<QString, stageState> CFDagaveApps::getStageStates()
+QMap<QString, StageState> CFDagaveApps::getStageStates()
 {
     //TODO: check job handler for running tasks on this folder
     //TODO: check known files for expected result files
     //TODO: may return loading if relevant folders are not available
-    QMap<QString, stageState> ret;
+    QMap<QString, StageState> ret;
     if (defunct) return ret;
-    ret.insert("mesh", stageState::UNRUN);
-    ret.insert("sim", stageState::UNRUN);
+    ret.insert("mesh", StageState::UNRUN);
+    ret.insert("sim", StageState::UNRUN);
     return ret;
 }
 
@@ -219,7 +213,8 @@ void CFDagaveApps::underlyingFilesUpdated()
     //TODO: if caseFolder exists, try to determine myType from brandingFile list
     //Obtain list of CFDanalysis types from VWT driver to get brandingFile list
     //If case type determined, call: forceInfoRefresh() (To get varStore)
-    emit dataStateChange(stateKnown());
+    //If type known call getStageStates(), set a 5 second update timer to run forceInfoRefresh() (unless already set)
+    emit dataStateChange(getCaseState());
 }
 
 void CFDagaveApps::caseFolderRemoved()
