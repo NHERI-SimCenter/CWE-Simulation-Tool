@@ -53,6 +53,8 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     ui->SideBar->hide();
     ui->stackContainer->hide();
 
+    ui->tab_parameters->setTemplate(newDriver->getTemplateList()->at(0));
+
     int idx;
 
     idx = ui->tabContainer->indexOf(ui->tab_spacer_1);

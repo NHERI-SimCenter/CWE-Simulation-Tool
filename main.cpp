@@ -55,6 +55,8 @@ int main(int argc, char *argv[])
     {
         programDriver.fatalInterfaceError("Unable to open style file. Install may be corrupted.");
     }
+    QString styleText(styleFile.readAll());
+    mainRunLoop.setStyleSheet(styleText);
 
     bool debugLoggingEnabled = false;
     bool runOffline = false;
@@ -93,6 +95,7 @@ int main(int argc, char *argv[])
         programDriver.fatalInterfaceError("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
     }
 
+
     if (runOffline)
     {
         programDriver.startOffline();
@@ -101,7 +104,7 @@ int main(int argc, char *argv[])
     {
         programDriver.startup();
     }
-    QString styleText(styleFile.readAll());
-    mainRunLoop.setStyleSheet(styleText);
+    //mainRunLoop.setStyleSheet(styleText);
+
     return mainRunLoop.exec();
 }
