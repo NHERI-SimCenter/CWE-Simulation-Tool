@@ -107,7 +107,7 @@
        </rect>
       </property>
       <attribute name="label">
-       <string>Mesh Parameters</string>
+       <string>Set Mesh Parameters</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
@@ -258,7 +258,7 @@
        </rect>
       </property>
       <attribute name="label">
-       <string>Simulation Parameters</string>
+       <string>Set Simulation Parameters</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>

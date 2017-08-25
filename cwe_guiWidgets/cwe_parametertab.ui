@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>CWE_ParameterTab</class>
- <widget class="QWidget" name="CWE_ParameterTab">
+ <widget class="QScrollArea" name="CWE_ParameterTab">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>558</width>
-    <height>418</height>
+    <width>550</width>
+    <height>405</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>ScrollArea</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout"/>
+  <property name="widgetResizable">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="parameterSpace">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>548</width>
+     <height>403</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout"/>
+  </widget>
  </widget>
  <resources/>
  <connections/>

@@ -1,13 +1,13 @@
 #ifndef CWE_PARAMETERTAB_H
 #define CWE_PARAMETERTAB_H
 
-#include <QWidget>
+#include <QScrollArea>
 
 namespace Ui {
 class CWE_ParameterTab;
 }
 
-class CWE_ParameterTab : public QWidget
+class CWE_ParameterTab : public QScrollArea
 {
     Q_OBJECT
 

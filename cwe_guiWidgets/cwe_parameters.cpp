@@ -79,7 +79,10 @@ int CWE_Parameters::setTemplate(const QString &filename)
         QString key = meshTab.toString();
         meshTabWidgets.insert(key, paramTab);
         ui->mesh_tabWidget->addTab(paramTab, key);
-        QGridLayout *layout = (QGridLayout*)(paramTab->layout());
+
+        QWidget *displayWidget = paramTab->findChild<QWidget *>("parameterSpace");
+
+        QGridLayout *layout = (QGridLayout*)(displayWidget->layout());
 
         QJsonArray paramList = varGroups[key].toArray();
 
@@ -96,11 +99,11 @@ int CWE_Parameters::setTemplate(const QString &filename)
                 QVariant defaultOption = vObj["default"].toVariant();
                 QString unit           = vObj["unit"].toString();
                 // double def = defaultOption.toDouble();
-                QLabel *theName = new QLabel(paramTab);
+                QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
-                QDoubleSpinBox *theValue = new QDoubleSpinBox(paramTab);
+                QDoubleSpinBox *theValue = new QDoubleSpinBox(displayWidget);
                 theValue->setValue(defaultOption.toDouble());
-                QLabel *theUnit = new QLabel(paramTab);
+                QLabel *theUnit = new QLabel(displayWidget);
                 theUnit->setText(unit);
                 int row = layout->rowCount();
                 layout->addWidget(theName, row,0);
@@ -109,9 +112,9 @@ int CWE_Parameters::setTemplate(const QString &filename)
             }
             else if (type == "choose") {
                 QJsonArray options     = vObj["options"].toArray();
-                QLabel *theName = new QLabel(paramTab);
+                QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
-                QComboBox *theSelection = new QComboBox(paramTab);
+                QComboBox *theSelection = new QComboBox(displayWidget);
                 QJsonObject combo_options = vObj["options"].toObject();
                 QStandardItemModel *theModel = new QStandardItemModel();
                 foreach (const QString &theKey, combo_options.keys())
@@ -130,9 +133,9 @@ int CWE_Parameters::setTemplate(const QString &filename)
                 // a filename
                 QVariant defaultOption = vObj["default"].toVariant();
                 // bool def = defaultOption.toBool();
-                QLabel *theName = new QLabel(paramTab);
+                QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
-                QLineEdit *theFileName = new QLineEdit(paramTab);
+                QLineEdit *theFileName = new QLineEdit(displayWidget);
                 theFileName->setText("unknown file name");
                 int row = layout->rowCount();
                 layout->addWidget(theName,row,0);
@@ -141,9 +144,9 @@ int CWE_Parameters::setTemplate(const QString &filename)
             else if (type == "bool") {
                 QVariant defaultOption = vObj["default"].toVariant();
                 // bool def = defaultOption.toBool();
-                QLabel *theName = new QLabel(paramTab);
+                QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
-                QCheckBox *theBox = new QCheckBox(paramTab);
+                QCheckBox *theBox = new QCheckBox(displayWidget);
                 theBox->setChecked(vObj["default"].toBool());
                 int row = layout->rowCount();
                 layout->addWidget(theName,row,0);
@@ -152,7 +155,7 @@ int CWE_Parameters::setTemplate(const QString &filename)
             else {
                 QVariant defaultOption = vObj["default"].toVariant();
                 // bool def = defaultOption.toBool();
-                QLabel *theName = new QLabel(paramTab);
+                QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
                 int row = layout->rowCount();
                 layout->addWidget(theName,row,0);
@@ -169,7 +172,10 @@ int CWE_Parameters::setTemplate(const QString &filename)
         QString key = simulationTab.toString();
         simulationTabWidgets.insert(key, simTab);
         ui->simulation_tabWidget->addTab(simTab, key);
-        QGridLayout *layout = (QGridLayout*)(simTab->layout());
+
+        QWidget *displayWidget = simTab->findChild<QWidget *>("parameterSpace");
+
+        QGridLayout *layout = (QGridLayout*)(displayWidget->layout());
 
         QJsonArray paramList = varGroups[key].toArray();
 
@@ -186,11 +192,11 @@ int CWE_Parameters::setTemplate(const QString &filename)
                 QVariant defaultOption = vObj["default"].toVariant();
                 QString unit           = vObj["unit"].toString();
                 // double def = defaultOption.toDouble();
-                QLabel *theName = new QLabel(simTab);
+                QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
-                QDoubleSpinBox *theValue = new QDoubleSpinBox(simTab);
+                QDoubleSpinBox *theValue = new QDoubleSpinBox(displayWidget);
                 theValue->setValue(defaultOption.toDouble());
-                QLabel *theUnit = new QLabel(simTab);
+                QLabel *theUnit = new QLabel(displayWidget);
                 theUnit->setText(unit);
                 int row = layout->rowCount();
                 layout->addWidget(theName, row,0);
@@ -199,9 +205,9 @@ int CWE_Parameters::setTemplate(const QString &filename)
             }
             else if (type == "choose") {
                 QJsonArray options     = vObj["options"].toArray();
-                QLabel *theName = new QLabel(simTab);
+                QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
-                QComboBox *theSelection = new QComboBox(simTab);
+                QComboBox *theSelection = new QComboBox(displayWidget);
                 QJsonObject combo_options = vObj["options"].toObject();
                 QStandardItemModel *theModel = new QStandardItemModel();
                 foreach (const QString &theKey, combo_options.keys())
@@ -223,9 +229,9 @@ int CWE_Parameters::setTemplate(const QString &filename)
             else if (type == "bool") {
                 QVariant defaultOption = vObj["default"].toVariant();
                 // bool def = defaultOption.toBool();
-                QLabel *theName = new QLabel(simTab);
+                QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
-                QCheckBox *theBox = new QCheckBox(simTab);
+                QCheckBox *theBox = new QCheckBox(displayWidget);
                 theBox->setChecked(vObj["default"].toBool());
                 int row = layout->rowCount();
                 layout->addWidget(theName,row,0);
@@ -234,13 +240,21 @@ int CWE_Parameters::setTemplate(const QString &filename)
             else {
                 QVariant defaultOption = vObj["default"].toVariant();
                 // bool def = defaultOption.toBool();
-                QLabel *theName = new QLabel(simTab);
+                QLabel *theName = new QLabel(displayWidget);
                 theName->setText(displayname);
                 int row = layout->rowCount();
                 layout->addWidget(theName,row,0);
             }
         }
         layout->addItem(new QSpacerItem(10, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), layout->rowCount(), 2);
+    }
+
+    // this is crazy slow -- requires a better solution
+    QFile styleFile(":/cweStyle.qss");
+    QString styleText(styleFile.readAll());
+    QList<QWidget *> container = this->findChildren<QWidget *>();
+    foreach ( QWidget *var, container) {
+        var->setStyleSheet(styleText);
     }
 
     return nParameters;
