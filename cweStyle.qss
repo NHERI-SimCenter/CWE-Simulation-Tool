@@ -1,6 +1,5 @@
 QPushButton {
     color: white;
-    border-style: outset;
     background-color: #64B5F6;
     border-style: outset;
     border-width: 1px;
@@ -64,11 +63,46 @@ QLineEdit {
     border-radius: 5px;
 }
 
+QSpinBox {
+    background-color: #E0E0E0;
+    border-radius: 5px;
+}
+
+QDoubleSpinBox {
+    background-color: #E0E0E0;
+    border-radius: 5px;
+}
+
 QTabBar::tab:disabled {
     width: 100px;
     color: transparent;
     background: transparent;
  }
+
+QWidget#parameterSpace {
+    background-color: white;
+}
+
+QToolBox::tab {
+   background-color: #B0BEC5;
+   border-style: outset;
+   border-width: 1px;
+   border-radius: 5px;
+   border-color: #607D8B;
+   color: #6495D6;
+   font: 16px slanted;
+}
+
+QToolBox::tab:selected {
+   background-color: #B0BEC5;
+   color: #6495D6;
+   font: 16px bold;
+}
+
+/*
+* background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #B0BEC5, stop: 0.4 #B0BEC5, stop: 0.5 #B0BEC5, stop: 1.0 #B0BEC5);
+* background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #B0BEC5, stop: 0.4 #B0BEC5, stop: 0.5 #B0BEC5, stop: 1.0 #B0BEC5);
+*/
 
 /*
 * ======= <HEADER AND FOOTER> =======
