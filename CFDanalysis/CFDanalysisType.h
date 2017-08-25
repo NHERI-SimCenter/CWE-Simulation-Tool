@@ -35,34 +35,26 @@
 #ifndef CFDANALYSISTYPE_H
 #define CFDANALYSISTYPE_H
 
-#include <QObject>
-#include <QWidget>
+#include <QString>
+#include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
 
-typedef struct {
-    QString label;  // display label
-    QString sValue; // alphanumeric value
-    float   fValue; // float value
-    int     iValue; // integer value
-    QString type;   // property type
-} PARAMETER_VALUES;
+#include <QFile>
 
 class CFDanalysisType
 {
 public:
-    CFDanalysisType();
-    ~CFDanalysisType();
-    QVector<PARAMETER_VALUES *> * ParameterList();
-    bool setParemeterList(QVector<PARAMETER_VALUES *>);
+    CFDanalysisType(QString configFile);
 
-signals:
-
-private slots:
+    QJsonDocument * getRawConfig();
+    QString getBrandingFile();
+    QString getInternalName();
 
 private:
-    QVector<PARAMETER_VALUES *> * params;
-    PARAMETER_VALUES * newparameter;
-    QJsonObject      * JSONparameters;
+    QString myName;
+    QJsonDocument myConfiguration;
 
 };
 
