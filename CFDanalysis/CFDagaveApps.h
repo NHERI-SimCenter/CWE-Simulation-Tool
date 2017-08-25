@@ -50,7 +50,8 @@ class JobOperator;
 
 class VWTinterfaceDriver;
 
-enum class stageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
+enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_INVOKE};
 
 class CFDagaveApps : public QObject
 {
@@ -61,18 +62,12 @@ public:
     CFDagaveApps(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
 
     bool isDefunct();
-    bool knownNotValid();
-    bool stateKnown();
-    bool operationPending();
+    CaseState getCaseState();
 
     //Note: For these, it can always answer "I don't know"
     CFDanalysisType * getMyType();
     QMap<QString, QString> getCurrentParams();
-    QMap<QString, stageState> getStageStates();
-
-    //This enacts the LS needed to get all info
-    //Listen on dataStateChange till full state is known
-    void forceInfoRefresh();
+    QMap<QString, StageState> getStageStates();
 
     //Of the following, only one enacted at a time
     void createCase(QString newName, FileTreeNode * containingFolder);
@@ -82,14 +77,15 @@ public:
     void openFOAM();
     void postProcess();
 
+public slots:
+    void forceInfoRefresh();
+
 signals:
-    void dataStateChange(bool fullStateKnown);
+    void dataStateChange(CaseState currentState); //This now give generic state
 
 private slots:
     void underlyingFilesUpdated();
     void caseFolderRemoved();
-
-    //Will call forceInfoRefresh() after finishing
     void agaveAppDone();
 
 private:
