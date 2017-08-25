@@ -35,8 +35,6 @@ void CWE_Parameters::setName(const QString &s)     {ui->label_theName->setText(s
 void CWE_Parameters::setType(const QString &s)     {ui->label_theType->setText(s);}
 void CWE_Parameters::setLocation(const QString &s) {ui->label_theLocation->setText(s);}
 
-
-
 void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
 {
     /* save all parameters */
