@@ -34,18 +34,203 @@
 
 #include "CFDagaveApps.h"
 
-CFDagaveApps::CFDagaveApps(FileTreeNode * caseRef)
-{
+#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
+#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "../AgaveExplorer/remoteFileOps/easyboollock.h"
+#include "../AgaveExplorer/remoteFileOps/joboperator.h"
 
+#include "vwtinterfacedriver.h"
+
+CFDagaveApps::CFDagaveApps(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver):
+    QObject((QObject *) mainDriver)
+{
+    caseFolder = newCaseFolder;
+    theDriver = mainDriver;
+
+    QObject::connect(theDriver->getFileHandler(), SIGNAL(newFileInfo()),
+                     this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
+                     this, SLOT(caseFolderRemoved()));
+
+    underlyingFilesUpdated();
+    forceInfoRefresh();
 }
 
-
-bool CFDagaveApps::isValidCase()
+CFDagaveApps::CFDagaveApps(CFDanalysisType * caseType, VWTinterfaceDriver *mainDriver):
+    QObject((QObject *) mainDriver)
 {
+    myType = caseType;
+    theDriver = mainDriver;
+
+    QObject::connect(theDriver->getFileHandler(), SIGNAL(newFileInfo()),
+                     this, SLOT(underlyingFilesUpdated()));
+}
+
+bool CFDagaveApps::isDefunct()
+{
+    return defunct;
+}
+
+bool CFDagaveApps::knownNotValid()
+{
+    if (defunct) return true;
+    if (caseFolder == NULL) return false;
+    if (caseFolder->childIsUnloaded()) return false;
+    if (caseFolder->getChildNodeWithName(".varStore") == NULL) return true;
+    if (myType == NULL) return true;
     return false;
+}
+
+bool CFDagaveApps::stateKnown()
+{
+    if (defunct) return false;
+    if (myType == NULL) return false;
+    if (caseFolder == NULL) return false;
+    if (caseFolder->childIsUnloaded()) return false;
+    if (caseFolder->getChildNodeWithName(".varStore") == NULL) return false;
+    QMap<QString, stageState> stages = getStageStates();
+    for (auto itr = stages.cbegin(); itr != stages.cend(); itr++)
+    {
+        if ((*itr) == stageState::LOADING)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool CFDagaveApps::operationPending()
+{
+    return myLock->lockClosed();
+}
+
+CFDanalysisType * CFDagaveApps::getMyType()
+{
+    if (defunct) return NULL;
+    return myType;
+}
+
+QMap<QString, QString> CFDagaveApps::getCurrentParams()
+{
+    QMap<QString, QString> ret;
+    if (defunct) return ret;
+    if (caseFolder == NULL) return ret;
+    if (caseFolder->childIsUnloaded()) return ret;
+    FileTreeNode * vars = caseFolder->getChildNodeWithName(".varStore");
+    if (vars == NULL) return ret;
+
+    QByteArray * rawVars = vars->getFileBuffer();
+    if (rawVars == NULL) return ret;
+
+    //TODO: Return list read from current cache of .varStore
+    return ret;
+}
+
+QMap<QString, stageState> CFDagaveApps::getStageStates()
+{
+    //TODO: check job handler for running tasks on this folder
+    //TODO: check known files for expected result files
+    //TODO: may return loading if relevant folders are not available
+    QMap<QString, stageState> ret;
+    if (defunct) return ret;
+    ret.insert("mesh", stageState::UNRUN);
+    ret.insert("sim", stageState::UNRUN);
+    return ret;
+}
+
+void CFDagaveApps::forceInfoRefresh()
+{
+    if (defunct) return;
+
+    //Enact LS of case folder itself
+
+    //If case type known:
+    //Enact LS of folders from list of check files in configuration
+    //Enact buffer download of .varStore
+}
+
+void CFDagaveApps::createCase(QString newName, FileTreeNode * containingFolder)
+{
+    if (defunct) return;
+    if (!myLock->checkAndClaim()) return;
+    //TODO: set expectedNewCaseFolder
+    //TODO: invoke agave app to create new case in folder
+
+    //Debug:
+    QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
 }
 
 void CFDagaveApps::changeParameters(QMap<QString, QString> paramList)
 {
+    if (defunct) return;
+    if (!myLock->checkAndClaim()) return;
+    //TODO: Invoke change paramters agave app
 
+    //Debug:
+    QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
+}
+
+void CFDagaveApps::mesh(FileTreeNode * geoFile)
+{
+    if (defunct) return;
+    if (!myLock->checkAndClaim()) return;
+    //TODO: invoke mesh app
+
+    //Debug:
+    QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
+}
+
+void CFDagaveApps::rollBack(QStringList stagesToDelete)
+{
+    if (defunct) return;
+    if (!myLock->checkAndClaim()) return;
+    //TODO: invoke roll back app
+
+    //Debug:
+    QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
+}
+
+void CFDagaveApps::openFOAM()
+{
+    if (defunct) return;
+    if (!myLock->checkAndClaim()) return;
+    //TODO: invoke openFOAM app
+
+    //Debug:
+    QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
+}
+
+void CFDagaveApps::postProcess()
+{
+    if (defunct) return;
+    if (!myLock->checkAndClaim()) return;
+    //TODO: invoke postProcess app
+
+    //Debug:
+    QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
+}
+
+void CFDagaveApps::underlyingFilesUpdated()
+{
+    if (defunct) return;
+    //If caseFolder is null, try to find expectedNewCaseFolder as file node
+    //If setting file node, connect caseFolderRemoved slot
+
+    //TODO: if caseFolder exists, try to determine myType from brandingFile list
+    //Obtain list of CFDanalysis types from VWT driver to get brandingFile list
+    //If case type determined, call: forceInfoRefresh() (To get varStore)
+    emit dataStateChange(stateKnown());
+}
+
+void CFDagaveApps::caseFolderRemoved()
+{
+    defunct = true;
+}
+
+void CFDagaveApps::agaveAppDone()
+{
+    if (defunct) return;
+    myLock->release();
+    underlyingFilesUpdated();
+    forceInfoRefresh();
 }
