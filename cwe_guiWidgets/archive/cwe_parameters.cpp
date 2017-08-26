@@ -37,6 +37,12 @@ void CWE_Parameters::setLocation(const QString &s) {ui->label_theLocation->setTe
 
 
 
+void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
+{
+    /* save all parameters */
+
+}
+
 int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
 {
     int nParameters = 0;
@@ -47,14 +53,18 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
     QList<QString>   stageNames = stages.keys();
 
     //qDebug() << stageNames;
+    QTabBar *tabBar = ui->theTabWidget->tabBar();
+    tabBar->setExpanding(true);
+    //ui->theTabWidget->setTabBar(tabBar);
+    ui->theTabWidget->setStyleSheet("QTabWidget::tab { height: 100px; width: 100px; }");
 
     foreach (QString name, stageNames)
     {
         if (name == "mesh") {
-            //ui->theTabWidget->setTabText(0,"Mesh Parameters");
+            ui->theTabWidget->setTabText(0,"Mesh Parameters");
         }
         else if (name == "sim") {
-            //ui->theTabWidget->setTabText(1,"Simulation Parameters");
+            ui->theTabWidget->setTabText(1,"Simulation Parameters");
         }
         else {
 
@@ -76,9 +86,7 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
         CWE_ParameterTab *paramTab = new CWE_ParameterTab();
         QString key = meshTab.toString();
         meshTabWidgets.insert(key, paramTab);
-
-        //ui->mesh_tabWidget->addTab(paramTab, key);
-        ui->theTabWidget->addTab(paramTab, key);
+        ui->mesh_tabWidget->addTab(paramTab, key);
 
         QWidget *displayWidget = paramTab->getParameterSpace();
 
@@ -164,9 +172,7 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
         CWE_ParameterTab *simTab = new CWE_ParameterTab();
         QString key = simulationTab.toString();
         simulationTabWidgets.insert(key, simTab);
-
-        //ui->simulation_tabWidget->addTab(simTab, key);
-        ui->theTabWidget->addTab(simTab, key);
+        ui->simulation_tabWidget->addTab(simTab, key);
 
         QWidget *displayWidget = simTab->getParameterSpace();
 
@@ -247,7 +253,6 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
     return nParameters;
 }
 
-/*
 void CWE_Parameters::on_pBtn_simulation_run_clicked()
 {
 
@@ -287,10 +292,3 @@ void CWE_Parameters::on_pBtn_model_rollback_clicked()
 {
 
 }
-
-void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
-{
-
-}
-*/
-
