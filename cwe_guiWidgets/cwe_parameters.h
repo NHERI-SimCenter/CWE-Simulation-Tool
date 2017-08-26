@@ -34,6 +34,10 @@ private slots:
 
 private:
     Ui::CWE_Parameters *ui;
+
+    int meshIdx;
+    int simuIdx;
+    int postIdx;
 };
 
 #endif // CWE_PARAMETERS_H

@@ -24,6 +24,9 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
+    meshIdx = -1;
+    simuIdx = -1;
+    postIdx = -1;
 }
 
 CWE_Parameters::~CWE_Parameters()
@@ -35,16 +38,14 @@ void CWE_Parameters::setName(const QString &s)     {ui->label_theName->setText(s
 void CWE_Parameters::setType(const QString &s)     {ui->label_theType->setText(s);}
 void CWE_Parameters::setLocation(const QString &s) {ui->label_theLocation->setText(s);}
 
-
-
 int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
 {
     int nParameters = 0;
 
     QJsonObject   obj    = theTemplate->getRawConfig()->object();
 
-    QJsonObject   stages     = obj["stages"].toObject();
-    QList<QString>   stageNames = stages.keys();
+    QJsonObject    stages     = obj["stages"].toObject();
+    QList<QString> stageNames = stages.keys();
 
     //qDebug() << stageNames;
 
@@ -53,15 +54,20 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
         if (name == "mesh") {
             //ui->theTabWidget->setTabText(0,"Mesh Parameters");
             QTabWidget * master = new QTabWidget();
-            ui->theTabWidget->addMasterTab(master, "Mesh\nParameters");
+            meshIdx = ui->theTabWidget->addMasterTab(master, "Mesh\nParameters");
         }
         else if (name == "sim") {
             //ui->theTabWidget->setTabText(1,"Simulation Parameters");
             QTabWidget * master = new QTabWidget();
-            ui->theTabWidget->addMasterTab(master, "Simulation\nParameters");
+            simuIdx = ui->theTabWidget->addMasterTab(master, "Simulation\nParameters");
+        }
+        else if (name == "post") {
+            QTabWidget * master = new QTabWidget();
+            postIdx = ui->theTabWidget->addMasterTab(master, "Post\nProcessing\nParameters");
         }
         else {
-
+            QTabWidget * master = new QTabWidget();
+            ui->theTabWidget->addMasterTab(master, name);
         }
     }
 
