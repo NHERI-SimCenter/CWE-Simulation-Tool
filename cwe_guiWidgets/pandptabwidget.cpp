@@ -32,12 +32,15 @@ QWidget *PandPTabWidget::widget(int idx)
 
 int PandPTabWidget::addTab(QWidget *page, const QString &label)
 {
+    // identify the parent
+    QWidget * container = ui->stackedWidget->currentWidget();
+
     // create the tab
     CWE_WithStatusButton *newTab = new CWE_WithStatusButton();
     newTab->setText("Something\nFunny\nParameters");
     newTab->setStatus("* unknown *");
-    int row = ui->verticalTabLayout->count()-1;
-    //ui->verticalTabLayout->insertWidget(row, newTab);
+    int index = ui->verticalTabLayout->count()-1;
+    //ui->verticalTabLayout->insertWidget(index, newTab);
 
     // create the widget to hold the parameter input
     //QTabWidget *pWidget = new QTabWidget();
@@ -51,7 +54,7 @@ int PandPTabWidget::addTab(QWidget *page, const QString &label)
     //lyt->addWidget(itm);
     //pWidget->setLayout(lyt);
 
-    return row;
+    return index;
 }
 
 int PandPTabWidget::addMasterTab(QWidget *page, const QString &label)
@@ -60,20 +63,13 @@ int PandPTabWidget::addMasterTab(QWidget *page, const QString &label)
     CWE_WithStatusButton *newTab = new CWE_WithStatusButton();
     newTab->setText(label);
     newTab->setStatus("* unknown *");
-    int row = ui->verticalTabLayout->count()-1;
-    ui->verticalTabLayout->insertWidget(row, newTab);
+    int index = ui->verticalTabLayout->count()-1;
+    ui->verticalTabLayout->insertWidget(index, newTab);
 
     // create the widget to hold the parameter input
-    ui->stackedWidget->insertWidget(row,page);
+    ui->stackedWidget->insertWidget(index,page);
 
-    //QFrame *itm = new QFrame();
-    //itm->setStyleSheet("QFrame {background: red}");
-    //pWidget->addTab(itm, "something");
-    //QVBoxLayout *lyt = new QVBoxLayout();
-    //lyt->addWidget(itm);
-    //pWidget->setLayout(lyt);
-
-    return row;
+    return index;
 }
 
 void PandPTabWidget::on_pbtn_run_clicked()
