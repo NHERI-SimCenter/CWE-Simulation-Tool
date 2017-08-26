@@ -87,7 +87,9 @@ SOURCES += main.cpp \
     CFDanalysis/CFDagaveApps.cpp \
     CFDanalysis/CFDanalysisType.cpp \
     ../widgets/Common/sectiontitle.cpp \
-    cwe_guiWidgets/cwe_parametertab.cpp
+    cwe_guiWidgets/cwe_parametertab.cpp \
+    cwe_guiWidgets/pandptabwidget.cpp \
+    cwe_guiWidgets/cwe_withstatusbutton.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -128,7 +130,9 @@ HEADERS  += \
     CFDanalysis/CFDagaveApps.h \
     CFDanalysis/CFDanalysisType.h \
     ../widgets/Common/sectiontitle.h \
-    cwe_guiWidgets/cwe_parametertab.h
+    cwe_guiWidgets/cwe_parametertab.h \
+    cwe_guiWidgets/pandptabwidget.h \
+    cwe_guiWidgets/cwe_withstatusbutton.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -146,7 +150,9 @@ FORMS    += \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
-    cwe_guiWidgets/cwe_parametertab.ui
+    cwe_guiWidgets/cwe_parametertab.ui \
+    cwe_guiWidgets/pandptabwidget.ui \
+    cwe_guiWidgets/cwe_withstatusbutton.ui
 
 RESOURCES += \
     cwe_resources.qrc \

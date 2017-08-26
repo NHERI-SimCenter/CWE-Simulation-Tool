@@ -74,10 +74,10 @@ QDoubleSpinBox {
 }
 
 QTabBar::tab:disabled {
-    width: 100px;
-    color: transparent;
-    background: transparent;
- }
+     width: 100px;
+     color: transparent;
+     background: transparent;
+  }
 
 QWidget#parameterSpace {
     background-color: white;
@@ -98,11 +98,6 @@ QToolBox::tab:selected {
    color: #6495D6;
    font: 16px bold;
 }
-
-/*
-* background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #B0BEC5, stop: 0.4 #B0BEC5, stop: 0.5 #B0BEC5, stop: 1.0 #B0BEC5);
-* background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #B0BEC5, stop: 0.4 #B0BEC5, stop: 0.5 #B0BEC5, stop: 1.0 #B0BEC5);
-*/
 
 /*
 * ======= <HEADER AND FOOTER> =======
