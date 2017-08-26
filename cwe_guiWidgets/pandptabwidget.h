@@ -14,6 +14,7 @@ class PandPTabWidget : public QWidget
 public:
     explicit PandPTabWidget(QWidget *parent = 0);
     ~PandPTabWidget();
+    int addMasterTab(QWidget *page, const QString &label);
     int addTab(QWidget *page, const QString &label);
     void setCurrentWidget(QWidget *);
     QWidget * currentWidget();

@@ -52,9 +52,13 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
     {
         if (name == "mesh") {
             //ui->theTabWidget->setTabText(0,"Mesh Parameters");
+            QTabWidget * master = new QTabWidget();
+            ui->theTabWidget->addMasterTab(master, "Mesh\nParameters");
         }
         else if (name == "sim") {
             //ui->theTabWidget->setTabText(1,"Simulation Parameters");
+            QTabWidget * master = new QTabWidget();
+            ui->theTabWidget->addMasterTab(master, "Simulation\nParameters");
         }
         else {
 
