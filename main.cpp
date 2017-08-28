@@ -104,7 +104,6 @@ int main(int argc, char *argv[])
     {
         programDriver.startup();
     }
-    //mainRunLoop.setStyleSheet(styleText);
 
     return mainRunLoop.exec();
 }
