@@ -24,9 +24,6 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
-    meshIdx = -1;
-    simuIdx = -1;
-    postIdx = -1;
 }
 
 CWE_Parameters::~CWE_Parameters()
@@ -38,36 +35,39 @@ void CWE_Parameters::setName(const QString &s)     {ui->label_theName->setText(s
 void CWE_Parameters::setType(const QString &s)     {ui->label_theType->setText(s);}
 void CWE_Parameters::setLocation(const QString &s) {ui->label_theLocation->setText(s);}
 
+
+
+void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
+{
+    /* save all parameters */
+
+}
+
 int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
 {
     int nParameters = 0;
 
     QJsonObject   obj    = theTemplate->getRawConfig()->object();
 
-    QJsonObject    stages     = obj["stages"].toObject();
-    QList<QString> stageNames = stages.keys();
+    QJsonObject   stages     = obj["stages"].toObject();
+    QList<QString>   stageNames = stages.keys();
 
     //qDebug() << stageNames;
+    QTabBar *tabBar = ui->theTabWidget->tabBar();
+    tabBar->setExpanding(true);
+    //ui->theTabWidget->setTabBar(tabBar);
+    ui->theTabWidget->setStyleSheet("QTabWidget::tab { height: 100px; width: 100px; }");
 
     foreach (QString name, stageNames)
     {
         if (name == "mesh") {
-            //ui->theTabWidget->setTabText(0,"Mesh Parameters");
-            QTabWidget * master = new QTabWidget();
-            meshIdx = ui->theTabWidget->addMasterTab(master, "Mesh\nParameters");
+            ui->theTabWidget->setTabText(0,"Mesh Parameters");
         }
         else if (name == "sim") {
-            //ui->theTabWidget->setTabText(1,"Simulation Parameters");
-            QTabWidget * master = new QTabWidget();
-            simuIdx = ui->theTabWidget->addMasterTab(master, "Simulation\nParameters");
-        }
-        else if (name == "post") {
-            QTabWidget * master = new QTabWidget();
-            postIdx = ui->theTabWidget->addMasterTab(master, "Post\nProcessing\nParameters");
+            ui->theTabWidget->setTabText(1,"Simulation Parameters");
         }
         else {
-            QTabWidget * master = new QTabWidget();
-            ui->theTabWidget->addMasterTab(master, name);
+
         }
     }
 
@@ -86,9 +86,7 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
         CWE_ParameterTab *paramTab = new CWE_ParameterTab();
         QString key = meshTab.toString();
         meshTabWidgets.insert(key, paramTab);
-
-        //ui->mesh_tabWidget->addTab(paramTab, key);
-        ui->theTabWidget->addTab(paramTab, key);
+        ui->mesh_tabWidget->addTab(paramTab, key);
 
         QWidget *displayWidget = paramTab->getParameterSpace();
 
@@ -174,9 +172,7 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
         CWE_ParameterTab *simTab = new CWE_ParameterTab();
         QString key = simulationTab.toString();
         simulationTabWidgets.insert(key, simTab);
-
-        //ui->simulation_tabWidget->addTab(simTab, key);
-        ui->theTabWidget->addTab(simTab, key);
+        ui->simulation_tabWidget->addTab(simTab, key);
 
         QWidget *displayWidget = simTab->getParameterSpace();
 
@@ -257,7 +253,6 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
     return nParameters;
 }
 
-/*
 void CWE_Parameters::on_pBtn_simulation_run_clicked()
 {
 
@@ -297,10 +292,3 @@ void CWE_Parameters::on_pBtn_model_rollback_clicked()
 {
 
 }
-
-void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
-{
-
-}
-*/
-
