@@ -61,7 +61,7 @@ int PandPTabWidget::addGroupTab(QString key, const QString &label)
 
     // create the widget to hold the parameter input
     QTabWidget *pWidget = new QTabWidget();
-    pWidget->setStyleSheet("background: green");
+    //pWidget->setStyleSheet("background: green");  // identify by color
     ui->stackedWidget->insertWidget(index, pWidget);
 
     groupWidget->insert(key, pWidget);
@@ -70,6 +70,11 @@ int PandPTabWidget::addGroupTab(QString key, const QString &label)
     this->addVarTab(key, "on!");
 
     return index;
+}
+
+int PandPTabWidget::addVarTab(QString key, const QString &label, QJsonObject *varList)
+{
+    int index = addVarTab(key, label);
 }
 
 int PandPTabWidget::addVarTab(QString key, const QString &label)

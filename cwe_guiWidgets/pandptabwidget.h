@@ -34,6 +34,7 @@ public:
     void setWidget(QWidget *);
 
     int addVarTab(QString key, const QString &label);
+    int addVarTab(QString key, const QString &label, QJsonObject *varList);
 
 private slots:
     void on_pbtn_run_clicked();
