@@ -2,6 +2,7 @@
 #define CWE_WITHSTATUSBUTTON_H
 
 #include <QFrame>
+//#include <QAbstractButton>
 
 namespace Ui {
 class CWE_WithStatusButton;
@@ -31,6 +32,7 @@ private slots:
 private:
     Ui::CWE_WithStatusButton *ui;
     void setSelected(bool);
+    //void paintEvent(QPaintEvent*);
 
     QString m_text;
     QString m_status = "unknown";
