@@ -1,5 +1,6 @@
 #include "cwe_withstatusbutton.h"
 #include "ui_cwe_withstatusbutton.h"
+//#include <QPainter>
 
 CWE_WithStatusButton::CWE_WithStatusButton(QWidget *parent) :
     QFrame(parent),
@@ -50,3 +51,33 @@ void CWE_WithStatusButton::setSelected(bool state)
         this->setStyleSheet("QFrame {background: #64B5F6;}");
     }
 }
+
+
+#if 0
+void CWE_WithStatusButton::paintEvent(QPaintEvent* evt)
+{
+    QPainter painter(this);
+    QPen myPen;
+    myPen.setWidth(2);
+
+    if(isChecked())
+    {
+        myPen.setColor(Qt::black);
+        painter.setPen(myPen);
+        painter.drawLine(20,29,50,20);
+        int a = 1;
+        emit valueChanged(a);
+    }
+    else
+    {
+        myPen.setColor(Qt::darkGray);
+        painter.setPen(myPen);
+        painter.drawLine(20,29,30,0);
+        int b = 0;
+        emit valueChanged(b);
+    }
+    painter.drawLine(0,30,20,30);
+    painter.drawLine(50,30,70,30);
+    painter.drawLine(50,30,50,20);
+}
+#endif
