@@ -28,8 +28,8 @@ PandPTabWidget::PandPTabWidget(QWidget *parent) :
 
     groupWidget     = new QMap<QString, CWE_WithStatusButton *>();
     groupTabList    = new QMap<QString, QTabWidget *>();
-    variableWidgets = new QMap<QString, QWidget *>();
     varTabWidgets   = new QMap<QString, QMap<QString, QWidget *> *>();
+    variableWidgets = new QMap<QString, InputDataType *>();
 }
 
 PandPTabWidget::~PandPTabWidget()
@@ -100,7 +100,7 @@ void PandPTabWidget::addVarsToTab(QString key, const QString &label, QJsonArray 
     {
         QString varKey = item.toString();
         QJsonObject variableObject = (*varsInfo)[varKey].toObject();
-        this->addVariable(variableObject, key, label);
+        this->addVariable(varKey, variableObject, key, label);
     }
     this->addVSpacer(key, label);
 }
@@ -131,7 +131,7 @@ void PandPTabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
 
 }
 
-void PandPTabWidget::addStd(QJsonObject JSONvar, QWidget *parent)
+QWidget * PandPTabWidget::addStd(QJsonObject JSONvar, QWidget *parent)
 {
     QVariant defaultOption = JSONvar["default"].toVariant();
     QString unit           = JSONvar["unit"].toString();
@@ -153,9 +153,11 @@ void PandPTabWidget::addStd(QJsonObject JSONvar, QWidget *parent)
     layout->addWidget(theName, row,0);
     layout->addWidget(theValue,row,1);
     layout->addWidget(theUnit, row,2);
+
+    return theValue;
 }
 
-void PandPTabWidget::addBool(QJsonObject JSONvar, QWidget *parent)
+QWidget * PandPTabWidget::addBool(QJsonObject JSONvar, QWidget *parent)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -168,9 +170,11 @@ void PandPTabWidget::addBool(QJsonObject JSONvar, QWidget *parent)
     int row = layout->rowCount();
     layout->addWidget(theName,row,0);
     layout->addWidget(theBox, row,1);
+
+    return theBox;
 }
 
-void PandPTabWidget::addFile(QJsonObject JSONvar, QWidget *parent)
+QWidget * PandPTabWidget::addFile(QJsonObject JSONvar, QWidget *parent)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -183,9 +187,11 @@ void PandPTabWidget::addFile(QJsonObject JSONvar, QWidget *parent)
     int row = layout->rowCount();
     layout->addWidget(theName,row,0);
     layout->addWidget(theFileName,row,1,1,2);
+
+    return theFileName;
 }
 
-void PandPTabWidget::addChoice(QJsonObject JSONvar, QWidget *parent)
+QWidget * PandPTabWidget::addChoice(QJsonObject JSONvar, QWidget *parent)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -208,9 +214,11 @@ void PandPTabWidget::addChoice(QJsonObject JSONvar, QWidget *parent)
     int row = layout->rowCount();
     layout->addWidget(theName, row,0);
     layout->addWidget(theSelection,row,1,1,2);
+
+    return theSelection;
 }
 
-void PandPTabWidget::addUnknown(QJsonObject JSONvar, QWidget *parent)
+QWidget * PandPTabWidget::addUnknown(QJsonObject JSONvar, QWidget *parent)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -219,18 +227,34 @@ void PandPTabWidget::addUnknown(QJsonObject JSONvar, QWidget *parent)
     QGridLayout *layout = (QGridLayout*)(parent->layout());
     int row = layout->rowCount();
     layout->addWidget(theName,row,0);
+
+    return NULL;
 }
 
-void PandPTabWidget::addType(const QString type, QJsonObject JSONvar, QWidget *parent)
+void PandPTabWidget::addType(const QString &varName, const QString &type, QJsonObject JSONvar, QWidget *parent)
 {
-    if (type == "std") { this->addStd(JSONvar, parent); }
-    else if (type == "bool") { this->addBool(JSONvar, parent); }
-    else if (type == "file") { this->addFile(JSONvar, parent); }
-    else if (type == "choose") { this->addChoice(JSONvar, parent); }
-    else { this->addUnknown(JSONvar, parent); }
+    QWidget *widget;
+    QString val;
+
+    widget = NULL;
+
+    if      (type == "std")    { widget = this->addStd(JSONvar, parent); }
+    else if (type == "bool")   { widget = this->addBool(JSONvar, parent); }
+    else if (type == "file")   { widget = this->addFile(JSONvar, parent); }
+    else if (type == "choose") { widget = this->addChoice(JSONvar, parent); }
+    else                       { widget = this->addUnknown(JSONvar, parent); }
+
+    // store information for reset operations, data collection, and validation
+    InputDataType *varData = new InputDataType;
+    varData->name        = varName;
+    varData->displayName = JSONvar["displayname"].toString();
+    varData->type        = type;
+    varData->defValue    = JSONvar["default"].toString();
+    varData->widget      = widget;
+    variableWidgets->insert(varName, varData);
 }
 
-bool PandPTabWidget::addVariable(QJsonObject JSONvar, const QString &key, const QString &label)
+bool PandPTabWidget::addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label)
 {
     QString type = JSONvar["type"].toString();
     if (type == "") {
@@ -241,7 +265,7 @@ bool PandPTabWidget::addVariable(QJsonObject JSONvar, const QString &key, const 
         QWidget *parent = varTabWidgets->value(key)->value(label);
         if (parent != NULL)
         {
-            this->addType(type, JSONvar, parent);
+            this->addType(varName, type, JSONvar, parent);
             return true;
         }
         else { return false; }
@@ -288,6 +312,39 @@ void PandPTabWidget::setWidget(QWidget *w)
 
 void PandPTabWidget::on_pbtn_run_clicked()
 {
+    QString val;
+
+    // collect all parameter values
+    foreach (const InputDataType *itm, variableWidgets->values())
+    {
+        // store information for reset operations, data collection, and validation
+        QString varName  = itm->name;
+        QString type     = itm->type;
+        QString defValue = itm->defValue;
+        QWidget *widget  = itm->widget;
+
+        if (type == "std")         {
+            val = ((QDoubleSpinBox *)widget)->value();
+        }
+        else if (type == "bool")   {
+            val = (((QCheckBox *)widget)->checkState() == Qt::Checked)?tr("true"):tr("false") ;
+        }
+        else if (type == "file")   {
+            val = ((QLineEdit *)widget)->text() ;
+        }
+        else if (type == "choose") {
+            QString txt = ((QComboBox *)widget)->currentText() ;
+            // ???
+            val = txt;
+        }
+        else {
+            val = "";
+        }
+
+        qDebug() << itm->name << ":" << itm->displayName << ":" << itm->type << "=" << val;
+    }
+
+    // transfer values to Design-safe
 
 }
 

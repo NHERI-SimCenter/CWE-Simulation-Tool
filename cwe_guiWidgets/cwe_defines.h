@@ -35,6 +35,9 @@
 #ifndef CWE_DEFINES_H
 #define CWE_DEFINES_H
 
+#include <QString>
+#include <QWidget>
+
 /* define an enum for all tasks/widgets stacked on the right side of cwe_mainwindow */
 /* note: TASK_MAX_TASKS must always be the last entry.                              *
  *       It will be used for dimensioning a storage array                           */
@@ -76,5 +79,13 @@ typedef enum {
 #define CWE_STATE_RUNNING    0x00020000
 #define CWE_STATE_RESULTS    0x00040000
 #define CWE_STATE_CLEAR      0x00080000
+
+struct InputDataType {
+    QString name;
+    QString displayName;
+    QString type;
+    QString defValue;
+    QWidget *widget;
+};
 
 #endif // CWE_DEFINES_H
