@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QList>
 #include <QTabWidget>
+#include "cwe_defines.h"
 #include "cwe_withstatusbutton.h"
 
 namespace Ui {
@@ -22,7 +23,7 @@ public:
     int  addGroupTab(QString key, const QString &label);
 
     void setCurrentWidget(QWidget *);
-    bool addVariable(QJsonObject, const QString &key, const QString &label );
+    bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label );
 
     int  index() { return activeIndex;};
     void setIndex(int );
@@ -46,12 +47,12 @@ private slots:
     void on_groupTabSelected(int);
 
 protected:
-    void addStd(QJsonObject, QWidget *parent );
-    void addBool(QJsonObject, QWidget *parent );
-    void addFile(QJsonObject, QWidget *parent );
-    void addChoice(QJsonObject, QWidget *parent );
-    void addUnknown(QJsonObject, QWidget *parent );
-    void addType(const QString, QJsonObject, QWidget *parent );
+    QWidget * addStd(QJsonObject, QWidget *parent );
+    QWidget * addBool(QJsonObject, QWidget *parent );
+    QWidget * addFile(QJsonObject, QWidget *parent );
+    QWidget * addChoice(QJsonObject, QWidget *parent );
+    QWidget * addUnknown(QJsonObject, QWidget *parent );
+    void addType(const QString &, const QString &, QJsonObject, QWidget *parent );
 
 private:
     Ui::PandPTabWidget *ui;
@@ -59,8 +60,8 @@ private:
     QWidget *displayWidget;
     QMap<QString, CWE_WithStatusButton *> *groupWidget;
     QMap<QString, QTabWidget *> *groupTabList;
-    QMap<QString, QWidget *> *variableWidgets;
     QMap<QString, QMap<QString, QWidget *> *> *varTabWidgets;
+    QMap<QString, InputDataType *> *variableWidgets;
 };
 
 #endif // PANDPTABWIDGET_H
