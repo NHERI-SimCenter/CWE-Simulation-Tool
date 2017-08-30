@@ -18,26 +18,33 @@ public:
     void setStatus(QString);
     void setText(QString);
     void setName(const QString s) {m_name = s;};
+    void setIndex(int idx) {m_index = idx;};
     QString name() {return m_name;};
     QString text() {return m_text;};
     QString status() {return m_status;};
+    int index() {return m_index;};
+    void setActive(bool b=true);
+    void setInActive(bool b=true);
 
 signals:
-    void btn_clicked();
+    void btn_pressed(int);
+    void btn_released(int);
 
 private slots:
-    void on_statusLabel_linkActivated(const QString &link);
-    void on_mainLabel_linkActivated(const QString &link);
+
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
     Ui::CWE_WithStatusButton *ui;
-    void setSelected(bool);
     //void paintEvent(QPaintEvent*);
 
     QString m_text;
     QString m_status = "unknown";
     QString m_name = "label text";
-    bool selected;
+    int m_index = -1;
+    bool m_active;
 };
 
 #endif // CWE_WITHSTATUSBUTTON_H

@@ -4,6 +4,9 @@
 #include "cwe_withstatusbutton.h"
 
 #include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
+
 #include <QLabel>
 #include <QDoubleSpinBox>
 #include <QCheckBox>
@@ -23,8 +26,10 @@ PandPTabWidget::PandPTabWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    groupWidget  = new QMap<QString, QWidget *>();
-    groupTabList = new QMap<QString, QList<QWidget *> *>();
+    groupWidget     = new QMap<QString, QWidget *>();
+    groupTabList    = new QMap<QString, QWidget *>();
+    variableWidgets = new QMap<QString, QWidget *>();
+    varTabWidgets   = new QMap<QString, QMap<QString, QWidget *> *>();
 }
 
 PandPTabWidget::~PandPTabWidget()
@@ -49,48 +54,71 @@ QWidget *PandPTabWidget::widget(int idx)
 
 int PandPTabWidget::addGroupTab(QString key, const QString &label)
 {
-    QList<QWidget *> *tabList = new QList<QWidget *>();
-    groupTabList->insert(key, tabList);
+    varTabWidgets->insert(key, new QMap<QString, QWidget *>());
 
     // create the tab
     CWE_WithStatusButton *newTab = new CWE_WithStatusButton();
     newTab->setText(label);
     newTab->setStatus("* unknown *");
     int index = ui->verticalTabLayout->count()-1;
+    newTab->setIndex(index);
     ui->verticalTabLayout->insertWidget(index, newTab);
+
+    connect(newTab,SIGNAL(btn_pressed(int)),this,SLOT(on_groupTabSelected(int)));
 
     // create the widget to hold the parameter input
     QTabWidget *pWidget = new QTabWidget();
-    //pWidget->setStyleSheet("background: green");  // identify by color
     ui->stackedWidget->insertWidget(index, pWidget);
 
     groupWidget->insert(key, pWidget);
 
-    this->addVarTab(key, "game");
-    this->addVarTab(key, "on!");
+    // EXAMPLES: how to add tabs ...
+    //this->addVarTab(key, tr("%1 game").arg(key));
+    //this->addVarTab(key, tr("%1 on!").arg(key));
 
     return index;
 }
 
-int PandPTabWidget::addVarTab(QString key, const QString &label, QJsonObject *varList)
+int PandPTabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo)
 {
     int index = addVarTab(key, label);
+    if (index >= 0)
+    {
+        addVarsToTab(key, label, varList, varsInfo);
+    }
+}
+
+void PandPTabWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo)
+{
+    QWidget *groupTab = groupWidget->value(key);
+    QWidget *varTab   = varTabWidgets->value(key)->value(label);
+
+    foreach (const QJsonValue &item, *varList)
+    {
+        QString varKey = item.toString();
+        QJsonObject variableObject = (*varsInfo)[varKey].toObject();
+        this->addVariable(variableObject, key, label);
+    }
+    this->addVSpacer(key, label);
 }
 
 int PandPTabWidget::addVarTab(QString key, const QString &label)
 {
-    qDebug() << "PandPTabWidget::addVarTab" << label;
-
     // create the widget to hold the parameter input
-    //ui->stackedWidget->insertWidget(index,page);
 
-    QFrame *itm = new QFrame();
-    itm->setStyleSheet("QFrame {background: lightblue}");
+    QScrollArea *itm = new QScrollArea();
+    //itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    //itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    //itm->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::MinimumExpanding);
+
+    QGridLayout *lyt = new QGridLayout();
+    itm->setLayout(lyt);
+
+    varTabWidgets->value(key)->insert(label, itm);
+    //itm->setStyleSheet("QFrame {background: lightblue}");
+
     QTabWidget * qf = (QTabWidget *)groupWidget->value(key);
     int index = qf->addTab(itm, label);
-
-    QList<QWidget *> *ql = (QList<QWidget *> *)groupTabList->value(key);
-    ql->append(itm);
 
     return index;
 }
@@ -100,65 +128,67 @@ void PandPTabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
 
 }
 
-void PandPTabWidget::addStd(QJsonObject JSONvar)
+void PandPTabWidget::addStd(QJsonObject JSONvar, QWidget *parent)
 {
     QVariant defaultOption = JSONvar["default"].toVariant();
     QString unit           = JSONvar["unit"].toString();
 
-    QLabel *theName = new QLabel(displayWidget);
+    QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
     theName->setText(displayname);
+    theName->setMinimumHeight(16);
+    //theName->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding);
 
-    QDoubleSpinBox *theValue = new QDoubleSpinBox(displayWidget);
+    QDoubleSpinBox *theValue = new QDoubleSpinBox(parent);
     theValue->setValue(defaultOption.toDouble());
 
-    QLabel *theUnit = new QLabel(displayWidget);
+    QLabel *theUnit = new QLabel(parent);
     theUnit->setText(unit);
 
-    QGridLayout *layout = (QGridLayout*)(displayWidget->layout());
+    QGridLayout *layout = (QGridLayout*)(parent->layout());
     int row = layout->rowCount();
     layout->addWidget(theName, row,0);
     layout->addWidget(theValue,row,1);
     layout->addWidget(theUnit, row,2);
 }
 
-void PandPTabWidget::addBool(QJsonObject JSONvar)
+void PandPTabWidget::addBool(QJsonObject JSONvar, QWidget *parent)
 {
-    QLabel *theName = new QLabel(displayWidget);
+    QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
     theName->setText(displayname);
 
-    QCheckBox *theBox = new QCheckBox(displayWidget);
+    QCheckBox *theBox = new QCheckBox(parent);
     theBox->setChecked(JSONvar["default"].toBool());
 
-    QGridLayout *layout = (QGridLayout*)(displayWidget->layout());
+    QGridLayout *layout = (QGridLayout*)(parent->layout());
     int row = layout->rowCount();
     layout->addWidget(theName,row,0);
     layout->addWidget(theBox, row,1);
 }
 
-void PandPTabWidget::addFile(QJsonObject JSONvar)
+void PandPTabWidget::addFile(QJsonObject JSONvar, QWidget *parent)
 {
-    QLabel *theName = new QLabel(displayWidget);
+    QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
     theName->setText(displayname);
 
-    QLineEdit *theFileName = new QLineEdit(displayWidget);
+    QLineEdit *theFileName = new QLineEdit(parent);
     theFileName->setText("unknown file name");
 
-    QGridLayout *layout = (QGridLayout*)(displayWidget->layout());
+    QGridLayout *layout = (QGridLayout*)(parent->layout());
     int row = layout->rowCount();
     layout->addWidget(theName,row,0);
     layout->addWidget(theFileName,row,1,1,2);
 }
 
-void PandPTabWidget::addChoice(QJsonObject JSONvar)
+void PandPTabWidget::addChoice(QJsonObject JSONvar, QWidget *parent)
 {
-    QLabel *theName = new QLabel(displayWidget);
+    QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
     theName->setText(displayname);
 
-    QComboBox *theSelection = new QComboBox(displayWidget);
+    QComboBox *theSelection = new QComboBox(parent);
     QJsonObject combo_options = JSONvar["options"].toObject();
 
     QStandardItemModel *theModel = new QStandardItemModel();
@@ -171,30 +201,58 @@ void PandPTabWidget::addChoice(QJsonObject JSONvar)
     theSelection->setModel(theModel);
     theSelection->setCurrentText(combo_options[JSONvar["default"].toString()].toString());
 
-    QGridLayout *layout = (QGridLayout*)(displayWidget->layout());
+    QGridLayout *layout = (QGridLayout*)(parent->layout());
     int row = layout->rowCount();
     layout->addWidget(theName, row,0);
     layout->addWidget(theSelection,row,1,1,2);
 }
 
-void PandPTabWidget::addUnknown(QJsonObject JSONvar)
+void PandPTabWidget::addUnknown(QJsonObject JSONvar, QWidget *parent)
 {
-    QLabel *theName = new QLabel(displayWidget);
+    QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
     theName->setText(displayname);
 
-    QGridLayout *layout = (QGridLayout*)(displayWidget->layout());
+    QGridLayout *layout = (QGridLayout*)(parent->layout());
     int row = layout->rowCount();
     layout->addWidget(theName,row,0);
 }
 
-void PandPTabWidget::addType(const QString type, QJsonObject JSONvar)
+void PandPTabWidget::addType(const QString type, QJsonObject JSONvar, QWidget *parent)
 {
-    if (type == "std") { this->addStd(JSONvar); }
-    else if (type == "bool") { this->addBool(JSONvar); }
-    else if (type == "file") { this->addFile(JSONvar); }
-    else if (type == "choose") { this->addChoice(JSONvar); }
-    else { this->addUnknown(JSONvar); }
+    if (type == "std") { this->addStd(JSONvar, parent); }
+    else if (type == "bool") { this->addBool(JSONvar, parent); }
+    else if (type == "file") { this->addFile(JSONvar, parent); }
+    else if (type == "choose") { this->addChoice(JSONvar, parent); }
+    else { this->addUnknown(JSONvar, parent); }
+}
+
+bool PandPTabWidget::addVariable(QJsonObject JSONvar, const QString &key, const QString &label)
+{
+    QString type = JSONvar["type"].toString();
+    if (type == "") {
+        return false;
+    }
+    else
+    {
+        QWidget *parent = varTabWidgets->value(key)->value(label);
+        if (parent != NULL)
+        {
+            this->addType(type, JSONvar, parent);
+            return true;
+        }
+        else { return false; }
+    }
+}
+
+void PandPTabWidget::addVSpacer(const QString &key, const QString &label)
+{
+    QWidget *parent = varTabWidgets->value(key)->value(label);
+    if (parent != NULL)
+    {
+        QGridLayout *layout = (QGridLayout*)(parent->layout());
+        layout->addItem(new QSpacerItem(10, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), layout->rowCount(), 2);
+    }
 }
 
 void PandPTabWidget::setIndex(int idx)
@@ -203,6 +261,18 @@ void PandPTabWidget::setIndex(int idx)
     ui->stackedWidget->setCurrentIndex(idx);
     activeIndex   = ui->stackedWidget->currentIndex();
     displayWidget = ui->stackedWidget->currentWidget();
+
+    // set stylesheet for buttons
+    foreach (const QString &key, groupWidget->keys())
+    {
+        CWE_WithStatusButton *btn = (CWE_WithStatusButton *)(groupWidget->value(key));
+        if (btn->index() == idx) {
+            btn->setActive(true);
+        }
+        else {
+            btn->setActive(false);
+        }
+    }
 }
 
 void PandPTabWidget::setWidget(QWidget *w)
@@ -231,4 +301,9 @@ void PandPTabWidget::on_pbtn_results_clicked()
 void PandPTabWidget::on_pbtn_rollback_clicked()
 {
 
+}
+
+void PandPTabWidget::on_groupTabSelected(int idx)
+{
+    ui->stackedWidget->setCurrentIndex(idx);
 }

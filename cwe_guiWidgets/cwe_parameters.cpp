@@ -44,10 +44,18 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
 
     QJsonObject   obj    = theTemplate->getRawConfig()->object();
 
+    this->setType(obj["name"].toString());
+
     QJsonObject    stages     = obj["stages"].toObject();
     QList<QString> stageNames = stages.keys();
+    QJsonObject    varGroups  = obj["varGroups"].toObject();
+    QJsonObject    vars       = obj["vars"].toObject();
+
+    //QJsonArray    results    = obj["results"].toArray();
 
     //qDebug() << stageNames;
+
+    int cnt = 0;
 
     foreach (QString name, stageNames)
     {
@@ -58,49 +66,23 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
         else if (name == "post") { labelText = "Post\nProcessing\nParameters"; }
         else                     { labelText = name; }
 
+        // add a stage tab to ui->theTabWidget
         int idx = ui->theTabWidget->addGroupTab(name, labelText);
         parameterTabs.insert(name, idx);
-    }
 
-    QJsonArray    meshStages = stages["mesh"].toArray();
-    QJsonArray    simulationStages = stages["sim"].toArray();
-    QJsonObject   varGroups  = obj["varGroups"].toObject();
-    QJsonObject   vars       = obj["vars"].toObject();
-    //QJsonArray    results    = obj["results"].toArray();
-
-    this->setType(obj["name"].toString());
-
-#if 0
-    QMap<QString, QWidget *> meshTabWidgets;
-
-    foreach (const QJsonValue & meshTab, meshStages)
-    {
-        CWE_ParameterTab *paramTab = new CWE_ParameterTab();
-        QString key = meshTab.toString();
-        meshTabWidgets.insert(key, paramTab);
-
-        //ui->mesh_tabWidget->addTab(paramTab, key);
-        ui->theTabWidget->addTab(paramTab, key);
-
-        QWidget *displayWidget = paramTab->getParameterSpace();
-
-        QGridLayout *layout = (QGridLayout*)(displayWidget->layout());
-
-        QJsonArray paramList = varGroups[key].toArray();
-
-        foreach (const QJsonValue & meshParam, paramList)
+        // add varGroub tabs
+        QJsonArray theGroups = stages[name].toArray();
+        foreach (const QJsonValue item, theGroups)
         {
-            nParameters++;
-
-            QString vKey     = meshParam.toString();
-            QJsonObject vObj = vars[vKey].toObject();
-            QString type     = vObj["type"].toString();
-
-            ui->theTabWidget->addType(type, vObj);
+            QString subTitle = item.toString();
+            QJsonArray varList = varGroups[subTitle].toArray();
+            ui->theTabWidget->addVarTab(name, subTitle, &varList, &vars);
         }
-        layout->addItem(new QSpacerItem(10, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), layout->rowCount(), 2);
+
+        cnt++;
     }
-#endif
+
+    if (cnt>0) {ui->theTabWidget->setIndex(0);}
 
     return nParameters;
 }

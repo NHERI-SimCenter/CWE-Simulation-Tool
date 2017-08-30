@@ -17,37 +17,48 @@ class PandPTabWidget : public QWidget
 public:
     explicit PandPTabWidget(QWidget *parent = 0);
     ~PandPTabWidget();
-    int addGroupTab(QString key, const QString &label);
-    void addVarsData(QJsonObject , QJsonObject );
-    void setCurrentWidget(QWidget *);
-    QWidget * currentWidget();
-    QWidget * widget(int);
-    void addStd(QJsonObject );
-    void addBool(QJsonObject );
-    void addFile(QJsonObject );
-    void addChoice(QJsonObject );
-    void addUnknown(QJsonObject );
-    void addType(const QString, QJsonObject );
+    int  addGroupTab(QString key, const QString &label);
 
-    int index() { return activeIndex;};
+    void setCurrentWidget(QWidget *);
+    bool addVariable(QJsonObject, const QString &key, const QString &label );
+
+    int  index() { return activeIndex;};
     void setIndex(int );
     void setWidget(QWidget *);
 
-    int addVarTab(QString key, const QString &label);
-    int addVarTab(QString key, const QString &label, QJsonObject *varList);
+    QWidget * currentWidget();
+    QWidget * widget(int);
+
+    int  addVarTab(QString key, const QString &label);
+    int  addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo);
+    void addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo);
+    void addVSpacer(const QString &key, const QString &label);
+
+    void addVarsData(QJsonObject , QJsonObject );
 
 private slots:
     void on_pbtn_run_clicked();
     void on_pbtn_cancel_clicked();
     void on_pbtn_results_clicked();
     void on_pbtn_rollback_clicked();
+    void on_groupTabSelected(int);
+
+protected:
+    void addStd(QJsonObject, QWidget *parent );
+    void addBool(QJsonObject, QWidget *parent );
+    void addFile(QJsonObject, QWidget *parent );
+    void addChoice(QJsonObject, QWidget *parent );
+    void addUnknown(QJsonObject, QWidget *parent );
+    void addType(const QString, QJsonObject, QWidget *parent );
 
 private:
     Ui::PandPTabWidget *ui;
     int activeIndex;
     QWidget *displayWidget;
     QMap<QString, QWidget *> *groupWidget;
-    QMap<QString, QList<QWidget *> *>  *groupTabList;
+    QMap<QString, QWidget *> *groupTabList;
+    QMap<QString, QWidget *> *variableWidgets;
+    QMap<QString, QMap<QString, QWidget *> *> *varTabWidgets;
 };
 
 #endif // PANDPTABWIDGET_H

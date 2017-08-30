@@ -1,13 +1,15 @@
 #include "cwe_withstatusbutton.h"
 #include "ui_cwe_withstatusbutton.h"
 //#include <QPainter>
+#include <QMouseEvent>
 
 CWE_WithStatusButton::CWE_WithStatusButton(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::CWE_WithStatusButton)
 {
+    m_active = true;
     ui->setupUi(this);
-    this->setSelected(false);
+    this->setInActive();
 }
 
 CWE_WithStatusButton::~CWE_WithStatusButton()
@@ -27,29 +29,35 @@ void CWE_WithStatusButton::setText(QString s)
     ui->mainLabel->setText(s);
 }
 
-void CWE_WithStatusButton::on_statusLabel_linkActivated(const QString &link)
+void CWE_WithStatusButton::mousePressEvent(QMouseEvent *event)
 {
-    this->setSelected(true);
-    emit btn_clicked();
+    if (event->button() == Qt::LeftButton) {
+        this->setActive(true);
+        this->setStyleSheet("background: #B0BEC5;");
+        emit btn_pressed(m_index);
+    }
 }
 
-void CWE_WithStatusButton::on_mainLabel_linkActivated(const QString &link)
+void CWE_WithStatusButton::mouseReleaseEvent(QMouseEvent *event)
 {
-    this->setSelected(true);
-    emit btn_clicked();
+    if (event->button() == Qt::LeftButton) {
+        this->setActive();
+        emit btn_released(m_index);
+    }
 }
 
-void CWE_WithStatusButton::setSelected(bool state)
+void CWE_WithStatusButton::setActive(bool b)
 {
-    selected = state;
-    if (selected)
-    {
-        this->setStyleSheet("QFrame {background: #B0BEC5;}");
-    }
-    else
-    {
-        this->setStyleSheet("QFrame {background: #64B5F6;}");
-    }
+    this->setStyleSheet("background: #64B5F6;");
+    if (!b) this->setInActive();
+    m_active = b;
+}
+
+void CWE_WithStatusButton::setInActive(bool b)
+{
+    this->setStyleSheet("background: #84d5Ff;");
+    if (!b) this->setActive();
+    m_active = !b;
 }
 
 
