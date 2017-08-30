@@ -7,7 +7,8 @@
             "Building Geometry",
             "Mesh Density",
             "Subdomains",
-            "Boundaries"
+            "Boundaries",
+            "Piles"
         ],
         "sim":[
             "Simulation Control",
@@ -15,6 +16,10 @@
         ]
     },
     "varGroups":{
+        "Piles":[
+            "numPiles",
+            "numLayers"
+        ],
         "Building Geometry":[
             "geoFile",
             "slicePlane",
@@ -66,6 +71,18 @@
         ]
     },
     "vars":{
+        "numPiles":{
+            "displayname":"Number of Piles",
+            "type":"std",
+            "default":"1",
+            "unit":""
+        },
+        "numLayers":{
+            "displayname":"Number of soil layers",
+            "type":"std",
+            "default":"3",
+            "unit":""
+        },
         "geoFile":{
             "displayname":"Geometry File",
             "type":"file"
