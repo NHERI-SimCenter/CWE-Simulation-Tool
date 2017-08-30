@@ -67,6 +67,7 @@ int PandPTabWidget::addGroupTab(QString key, const QString &label)
     groupWidget->insert(key, newTab);
 
     connect(newTab,SIGNAL(btn_pressed(int)),this,SLOT(on_groupTabSelected(int)));
+    //connect(newTab,SIGNAL(btn_released(int)),this,SLOT(on_groupTabSelected(int)));
 
     // create the widget to hold the parameter input
     QTabWidget *pWidget = new QTabWidget();
@@ -268,12 +269,12 @@ void PandPTabWidget::setIndex(int idx)
     foreach (const QString &key, groupWidget->keys())
     {
         CWE_WithStatusButton *btn = groupWidget->value(key);
-        if (btn->index() == idx) {
-            //btn->setActive(true);
-        }
-        else {
-            //btn->setActive(false);
-        }
+        //qDebug() << idx << "<>" << btn->index();
+
+        if (btn->index() == idx)
+            { btn->setActive(); }
+        else
+            { btn->setInActive(); }
     }
 }
 
@@ -307,5 +308,5 @@ void PandPTabWidget::on_pbtn_rollback_clicked()
 
 void PandPTabWidget::on_groupTabSelected(int idx)
 {
-    ui->stackedWidget->setCurrentIndex(idx);
+    this->setIndex(idx);
 }

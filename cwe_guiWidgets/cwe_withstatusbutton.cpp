@@ -7,7 +7,7 @@ CWE_WithStatusButton::CWE_WithStatusButton(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::CWE_WithStatusButton)
 {
-    m_active = true;
+    //m_active = true;
     ui->setupUi(this);
     this->setInActive();
 }
@@ -33,7 +33,7 @@ void CWE_WithStatusButton::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         this->setActive(true);
-        this->setStyleSheet("background: #B0BEC5;");
+        this->setStyleSheet("QFrame {background: #B0BEC5;}");
         emit btn_pressed(m_index);
     }
 }
@@ -48,14 +48,14 @@ void CWE_WithStatusButton::mouseReleaseEvent(QMouseEvent *event)
 
 void CWE_WithStatusButton::setActive(bool b)
 {
-    this->setStyleSheet("background: #64B5F6;");
+    this->setStyleSheet("QFrame {background: #64B5F6; border-color: #808080; border-width: 1.5px; border-radius: 3px; border-style: inset;} QLabel {border-style: none}");
     if (!b) this->setInActive();
     m_active = b;
 }
 
 void CWE_WithStatusButton::setInActive(bool b)
 {
-    this->setStyleSheet("background: #84d5Ff;");
+    this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none}");
     if (!b) this->setActive();
     m_active = !b;
 }
