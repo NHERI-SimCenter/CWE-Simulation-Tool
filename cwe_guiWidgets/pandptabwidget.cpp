@@ -26,8 +26,8 @@ PandPTabWidget::PandPTabWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    groupWidget     = new QMap<QString, QWidget *>();
-    groupTabList    = new QMap<QString, QWidget *>();
+    groupWidget     = new QMap<QString, CWE_WithStatusButton *>();
+    groupTabList    = new QMap<QString, QTabWidget *>();
     variableWidgets = new QMap<QString, QWidget *>();
     varTabWidgets   = new QMap<QString, QMap<QString, QWidget *> *>();
 }
@@ -64,13 +64,15 @@ int PandPTabWidget::addGroupTab(QString key, const QString &label)
     newTab->setIndex(index);
     ui->verticalTabLayout->insertWidget(index, newTab);
 
+    groupWidget->insert(key, newTab);
+
     connect(newTab,SIGNAL(btn_pressed(int)),this,SLOT(on_groupTabSelected(int)));
 
     // create the widget to hold the parameter input
     QTabWidget *pWidget = new QTabWidget();
     ui->stackedWidget->insertWidget(index, pWidget);
 
-    groupWidget->insert(key, pWidget);
+    groupTabList->insert(key, pWidget);
 
     // EXAMPLES: how to add tabs ...
     //this->addVarTab(key, tr("%1 game").arg(key));
@@ -90,8 +92,8 @@ int PandPTabWidget::addVarTab(QString key, const QString &label, QJsonArray *var
 
 void PandPTabWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo)
 {
-    QWidget *groupTab = groupWidget->value(key);
-    QWidget *varTab   = varTabWidgets->value(key)->value(label);
+    //QTabWidget *groupTab = groupTabList->value(key);
+    //QWidget    *varTab   = varTabWidgets->value(key)->value(label);
 
     foreach (const QJsonValue &item, *varList)
     {
@@ -107,7 +109,7 @@ int PandPTabWidget::addVarTab(QString key, const QString &label)
     // create the widget to hold the parameter input
 
     QScrollArea *itm = new QScrollArea();
-    //itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     //itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     //itm->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::MinimumExpanding);
 
@@ -115,9 +117,9 @@ int PandPTabWidget::addVarTab(QString key, const QString &label)
     itm->setLayout(lyt);
 
     varTabWidgets->value(key)->insert(label, itm);
-    //itm->setStyleSheet("QFrame {background: lightblue}");
+    //itm->setStyleSheet("QFrame {background: lightblue}");  // this works, so why doesn't the style sheet work?
 
-    QTabWidget * qf = (QTabWidget *)groupWidget->value(key);
+    QTabWidget * qf = groupTabList->value(key);
     int index = qf->addTab(itm, label);
 
     return index;
@@ -265,12 +267,12 @@ void PandPTabWidget::setIndex(int idx)
     // set stylesheet for buttons
     foreach (const QString &key, groupWidget->keys())
     {
-        CWE_WithStatusButton *btn = (CWE_WithStatusButton *)(groupWidget->value(key));
+        CWE_WithStatusButton *btn = groupWidget->value(key);
         if (btn->index() == idx) {
-            btn->setActive(true);
+            //btn->setActive(true);
         }
         else {
-            btn->setActive(false);
+            //btn->setActive(false);
         }
     }
 }

@@ -5,6 +5,8 @@
 #include <QFrame>
 #include <QMap>
 #include <QList>
+#include <QTabWidget>
+#include "cwe_withstatusbutton.h"
 
 namespace Ui {
 class PandPTabWidget;
@@ -55,8 +57,8 @@ private:
     Ui::PandPTabWidget *ui;
     int activeIndex;
     QWidget *displayWidget;
-    QMap<QString, QWidget *> *groupWidget;
-    QMap<QString, QWidget *> *groupTabList;
+    QMap<QString, CWE_WithStatusButton *> *groupWidget;
+    QMap<QString, QTabWidget *> *groupTabList;
     QMap<QString, QWidget *> *variableWidgets;
     QMap<QString, QMap<QString, QWidget *> *> *varTabWidgets;
 };
