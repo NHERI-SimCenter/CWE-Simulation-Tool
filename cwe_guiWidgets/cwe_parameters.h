@@ -2,6 +2,7 @@
 #define CWE_PARAMETERS_H
 
 #include <QWidget>
+#include <QMap>
 
 class CFDanalysisType;
 
@@ -34,6 +35,8 @@ private slots:
 
 private:
     Ui::CWE_Parameters *ui;
+
+    QMap<QString, int> parameterTabs;
 
     int meshIdx;
     int simuIdx;
