@@ -64,4 +64,10 @@ QString CFDanalysisType::getInternalName()
     return obj["internalName"].toString();
 }
 
+QString CFDanalysisType::getName()
+{
+    QJsonObject obj = myConfiguration.object();
+    return obj["name"].toString();
+}
+
 

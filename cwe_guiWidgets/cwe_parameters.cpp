@@ -17,16 +17,15 @@
 
 #include "qdebug.h"
 
-#include <CFDanalysis/CFDanalysisType.h>
+#include "vwtinterfacedriver.h"
+#include "CFDanalysis/CFDanalysisType.h"
+#include "CFDanalysis/CFDcaseInstance.h"
 
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
-    meshIdx = -1;
-    simuIdx = -1;
-    postIdx = -1;
 }
 
 CWE_Parameters::~CWE_Parameters()
@@ -34,17 +33,27 @@ CWE_Parameters::~CWE_Parameters()
     delete ui;
 }
 
-void CWE_Parameters::setName(const QString &s)     {ui->label_theName->setText(s);}
-void CWE_Parameters::setType(const QString &s)     {ui->label_theType->setText(s);}
-void CWE_Parameters::setLocation(const QString &s) {ui->label_theLocation->setText(s);}
-
-int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
+void CWE_Parameters::linkWithDriver(VWTinterfaceDriver * newDriver)
 {
-    int nParameters = 0;
+    myDriver = newDriver;
+}
+
+void CWE_Parameters::resetViewInfo()
+{
+    viewIsValid = false;
+    CFDcaseInstance * currentCase = myDriver->getCurrentCase();
+    if (currentCase == NULL) return;
+    CFDanalysisType * theTemplate = currentCase->getMyType();
+    if (theTemplate == NULL) return;
+    QMap<QString, StageState> currentStates = currentCase->getStageStates();
+
+    viewIsValid = true;
+
+    ui->label_theName->setText(currentCase->getCaseName());
+    ui->label_theType->setText(theTemplate->getName());
+    ui->label_theLocation->setText(currentCase->getCaseFolder());
 
     QJsonObject   obj    = theTemplate->getRawConfig()->object();
-
-    this->setType(obj["name"].toString());
 
     QJsonObject    stages     = obj["stages"].toObject();
     QList<QString> stageNames = stages.keys();
@@ -59,19 +68,18 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
 
     foreach (QString name, stageNames)
     {
+        QJsonObject stageInfo = stages[name].toObject();
         QString labelText;
 
-        if      (name == "mesh") { labelText = "Mesh\nParameters"; }
-        else if (name == "sim" ) { labelText = "Simulation\nParameters"; }
-        else if (name == "post") { labelText = "Post\nProcessing\nParameters"; }
-        else                     { labelText = name; }
+        labelText = stageInfo["name"].toString();
+        labelText = labelText.append("\nParameters");
 
         // add a stage tab to ui->theTabWidget
         int idx = ui->theTabWidget->addGroupTab(name, labelText);
         parameterTabs.insert(name, idx);
 
         // add varGroub tabs
-        QJsonArray theGroups = stages[name].toArray();
+        QJsonArray theGroups = stageInfo["groups"].toArray();
         foreach (const QJsonValue item, theGroups)
         {
             QString subTitle = item.toString();
@@ -83,54 +91,19 @@ int CWE_Parameters::setTemplate(CFDanalysisType * theTemplate)
     }
 
     if (cnt>0) {ui->theTabWidget->setIndex(0);}
-
-    return nParameters;
-}
-
-/*
-void CWE_Parameters::on_pBtn_simulation_run_clicked()
-{
-
-}
-
-void CWE_Parameters::on_pBtn_simulation_cancel_clicked()
-{
-
-}
-
-void CWE_Parameters::on_pBtn_simulation_results_clicked()
-{
-
-}
-
-void CWE_Parameters::on_pBtn_simulation_rollback_clicked()
-{
-
-}
-
-void CWE_Parameters::on_pBtn_model_run_clicked()
-{
-
-}
-
-void CWE_Parameters::on_pBtn_model_cancel_clicked()
-{
-
-}
-
-void CWE_Parameters::on_pBtn_model_results_clicked()
-{
-
-}
-
-void CWE_Parameters::on_pBtn_model_rollback_clicked()
-{
-
 }
 
 void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
 {
-
+    saveAllParams();
 }
-*/
+
+void CWE_Parameters::saveAllParams()
+{
+    CFDcaseInstance * linkedCFDCase = myDriver->getCurrentCase();
+    if (linkedCFDCase != NULL)
+    {
+        linkedCFDCase->changeParameters(ui->theTabWidget->collectParamData());
+    }
+}
 

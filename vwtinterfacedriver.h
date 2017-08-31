@@ -63,6 +63,7 @@ class CWE_MainWindow;
 class JobOperator;
 class FileOperator;
 class CFDanalysisType;
+class CFDcaseInstance;
 
 class VWTinterfaceDriver : public AgaveSetupDriver
 {
@@ -79,11 +80,15 @@ public:
     virtual QString getVersion();
 
     QList<CFDanalysisType *> * getTemplateList();
+    CFDcaseInstance * getCurrentCase();
+    void setCurrentCase(CFDcaseInstance * newCase);
 
 private:
     CWE_MainWindow * mainWindow;
 
     QList<CFDanalysisType *> templateList;
+
+    CFDcaseInstance * currentCFDCase = NULL;
 };
 
 #endif // VWTINTERFACEDRIVER_H

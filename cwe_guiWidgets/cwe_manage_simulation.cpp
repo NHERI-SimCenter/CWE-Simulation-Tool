@@ -50,5 +50,5 @@ CWE_manage_simulation::~CWE_manage_simulation()
 
 void CWE_manage_simulation::on_btn_viewRun_clicked()
 {
-    emit CWE_manage_simulation_signal(TASK_SIMULATION_DETAILS);
+
 }

@@ -2,23 +2,7 @@
 #include "ui_pandptabwidget.h"
 #include "cwe_parametertab.h"
 #include "cwe_withstatusbutton.h"
-
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
-
-#include <QLabel>
-#include <QDoubleSpinBox>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QComboBox>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QLayout>
-
-#include <QList>
-
-#include "qdebug.h"
+#include "CFDanalysis/CFDcaseInstance.h"
 
 PandPTabWidget::PandPTabWidget(QWidget *parent) :
     QWidget(parent),
@@ -89,6 +73,7 @@ int PandPTabWidget::addVarTab(QString key, const QString &label, QJsonArray *var
     {
         addVarsToTab(key, label, varList, varsInfo);
     }
+    return index;
 }
 
 void PandPTabWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo)
@@ -318,8 +303,13 @@ void PandPTabWidget::setWidget(QWidget *w)
 
 void PandPTabWidget::on_pbtn_run_clicked()
 {
+
+}
+
+QMap<QString, QString> PandPTabWidget::collectParamData()
+{
     QString val;
-    QMap<QString, QString> * currentParameters = new QMap<QString, QString>();
+    QMap<QString, QString> currentParameters;
 
     // collect all parameter values
     foreach (const InputDataType *itm, variableWidgets->values())
@@ -351,16 +341,11 @@ void PandPTabWidget::on_pbtn_run_clicked()
             val = "";
         }
 
-        //qDebug() << itm->name << ":" << itm->displayName << ":" << itm->type << "=" << val;
-
         // add to output
-        currentParameters->insert(varName, val);
+        currentParameters.insert(varName, val);
     }
 
-    qDebug() << "sending ...\n" << *currentParameters;
-
-    // hand over data to the CFDagaveApp
-    emit run_analysis_on_design_safe_pressed(currentParameters);
+    return currentParameters;
 }
 
 void PandPTabWidget::on_pbtn_cancel_clicked()

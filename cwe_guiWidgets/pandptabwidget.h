@@ -6,8 +6,22 @@
 #include <QMap>
 #include <QList>
 #include <QTabWidget>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
+
+#include <QLabel>
+#include <QDoubleSpinBox>
+#include <QCheckBox>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QLayout>
+
 #include "cwe_defines.h"
-#include "cwe_withstatusbutton.h"
+
+class CWE_WithStatusButton;
 
 namespace Ui {
 class PandPTabWidget;
@@ -32,18 +46,14 @@ public:
     QWidget * currentWidget();
     QWidget * widget(int);
 
-    int  addVarTab(QString key, const QString &label);
-    int  addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo);
+    int addVarTab(QString key, const QString &label);
+    int addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo);
     void addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo);
     void addVSpacer(const QString &key, const QString &label);
 
     void addVarsData(QJsonObject , QJsonObject );
 
-signals:
-    void run_analysis_on_design_safe_pressed(QMap<QString, QString> *);
-    void cancel_analysis_on_design_safe_pressed();
-    void reset_analysis_on_design_safe_pressed(QMap<QString, QString> *);
-    //void _analysis_on_design_safe_pressed(QMap<QString, QString> *);
+    QMap<QString, QString> collectParamData();
 
 private slots:
     void on_pbtn_run_clicked();

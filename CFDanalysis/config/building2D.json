@@ -1,19 +1,25 @@
 {
-    "name":"2D Building",
+    "name":"2D Building Slice",
     "brandingFile":".cwe_2d_u",
     "internalName":"buildingSlice",
     "stages":{
-        "mesh":[
-            "Building Geometry",
-            "Mesh Density",
-            "Subdomains",
-            "Boundaries",
-            "Piles"
-        ],
-        "sim":[
-            "Simulation Control",
-            "Advanced"
-        ]
+        "mesh":{
+            "name":"Mesh",
+            "groups":[
+                "Building Geometry",
+                "Mesh Density",
+                "Subdomains",
+                "Boundaries",
+                "Piles"
+            ]
+        },
+        "sim":{
+            "name":"Simulation",
+            "groups":[
+                "Simulation Control",
+                "Advanced"
+            ]
+        }
     },
     "varGroups":{
         "Piles":[
