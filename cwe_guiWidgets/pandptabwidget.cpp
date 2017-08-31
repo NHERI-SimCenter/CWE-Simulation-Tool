@@ -324,7 +324,7 @@ void PandPTabWidget::on_pbtn_run_clicked()
         QWidget *widget  = itm->widget;
 
         if (type == "std")         {
-            val = ((QDoubleSpinBox *)widget)->value();
+            val = tr("%1").arg(((QDoubleSpinBox *)widget)->value(), 0, 'g', 16);
         }
         else if (type == "bool")   {
             val = (((QCheckBox *)widget)->checkState() == Qt::Checked)?tr("true"):tr("false") ;
@@ -342,6 +342,9 @@ void PandPTabWidget::on_pbtn_run_clicked()
         }
 
         qDebug() << itm->name << ":" << itm->displayName << ":" << itm->type << "=" << val;
+
+        // add to output
+
     }
 
     // transfer values to Design-safe
