@@ -33,8 +33,8 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 
-#ifndef CFDAGAVEAPPS_H
-#define CFDAGAVEAPPS_H
+#ifndef CFDCASEINSTANCE_H
+#define CFDCASEINSTANCE_H
 
 #include <QString>
 #include <QMap>
@@ -53,16 +53,18 @@ class VWTinterfaceDriver;
 enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_INVOKE};
 
-class CFDagaveApps : public QObject
+class CFDcaseInstance : public QObject
 {
     Q_OBJECT
 
 public:
-    CFDagaveApps(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
-    CFDagaveApps(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
+    CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
+    CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
 
     bool isDefunct();
     CaseState getCaseState();
+    QString getCaseFolder();
+    QString getCaseName();
 
     //Note: For these, it can always answer "I don't know"
     CFDanalysisType * getMyType();
@@ -79,10 +81,9 @@ public:
 
 public slots:
     void forceInfoRefresh();
-    void set_parameters_and_run(QMap<QString, QString> *);
 
 signals:
-    void dataStateChange(CaseState currentState); //This now give generic state
+    void dataStateChange(CaseState currentState);
 
 private slots:
     void underlyingFilesUpdated();
@@ -104,4 +105,4 @@ private:
     QMap<QString, QString> *currentParameters = NULL;
 };
 
-#endif // CFDAGAVEAPPS_H
+#endif // CFDCASEINSTANCE_H

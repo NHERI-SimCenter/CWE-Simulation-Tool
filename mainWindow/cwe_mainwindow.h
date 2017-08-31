@@ -48,7 +48,6 @@
 #include "cwe_guiWidgets/cwe_simulation_details.h"
 #include "cwe_guiWidgets/cwe_task_list.h"
 #include "cwe_guiWidgets/cwe_help.h"
-#include "cwe_guiWidgets/sidebar.h"
 
 #include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
 #include "vwtinterfacedriver.h"
@@ -69,20 +68,12 @@ public:
     void runSetupSteps();
 
 private slots:
+    void tabChanged(int newIndex);
+
     void menuExit();
     void menuCopyInfo();
 
     void on_action_Quit_triggered();
-
-    /* side bar functionality */
-    void task_selected(TASK);
-    void create_simulation_task_selected(TASK, SIM_MODE);
-    void selectLanding();
-    void selectCreateSimulation();
-    void selectManageRun();
-    void selectManageJobs();
-    void selectManageFiles();
-    void selectHelp();
 
     void on_actionCreate_New_Simulation_triggered();
     void on_actionManage_Simulation_triggered();
@@ -103,9 +94,6 @@ private:
 
     VWTinterfaceDriver     *myDriver;
 
-    SideBar                *taskSideBar;
-    QWidget                *widgetStack;
-
     CWE_create_simulation  *taskCreateSimulation = NULL;
     CWE_file_manager       *taskFileManager = NULL;
     CWE_landing            *taskLanding = NULL;
@@ -114,11 +102,7 @@ private:
     CWE_task_list          *taskTaskList = NULL;
     CWE_help               *taskHelp = NULL;
 
-    QStackedWidget         *sharedWidget;
     RemoteDataInterface    *dataLink;
-
-    QMap<TASK, int>        stackedWidgetsIndex;
-    QStackedLayout         *stackLayout;
 };
 
 #endif // CWE_MAINWINDOW_H
