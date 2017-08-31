@@ -81,11 +81,12 @@ typedef enum {
 #define CWE_STATE_CLEAR      0x00080000
 
 struct InputDataType {
-    QString name;
-    QString displayName;
-    QString type;
-    QString defValue;
-    QWidget *widget;
+    QString      name;
+    QString      displayName;
+    QString      type;
+    QString      defValue;
+    QWidget     *widget;
+    QJsonObject *options;
 };
 
 #endif // CWE_DEFINES_H
