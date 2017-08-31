@@ -39,6 +39,12 @@ public:
 
     void addVarsData(QJsonObject , QJsonObject );
 
+signals:
+    void run_analysis_on_design_safe_pressed(QMap<QString, QString> *);
+    void cancel_analysis_on_design_safe_pressed();
+    void reset_analysis_on_design_safe_pressed(QMap<QString, QString> *);
+    //void _analysis_on_design_safe_pressed(QMap<QString, QString> *);
+
 private slots:
     void on_pbtn_run_clicked();
     void on_pbtn_cancel_clicked();
