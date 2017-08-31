@@ -52,6 +52,13 @@ CFDagaveApps::CFDagaveApps(FileTreeNode * newCaseFolder, VWTinterfaceDriver * ma
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
 
+    /* PETER S, PLEASE HAVE A LOOK AT THIS ONE ... ~PMH
+    // the following connect needs to be somewhere else, likely MainWindow::MainWindow() ???
+    QObject::connect(thePandPTabWidget__in_CWE_Parameters,
+                     SIGNAL(run_analysis_on_design_safe_pressed(QMap<QString, QString> *)),
+                     theAgaveApp, SLOT(set_parameters_and_run(QMap<QString, QString> *)));
+    */
+
     underlyingFilesUpdated();
     forceInfoRefresh();
 }
@@ -228,4 +235,12 @@ void CFDagaveApps::agaveAppDone()
     myLock->release();
     underlyingFilesUpdated();
     forceInfoRefresh();
+}
+
+/*
+ * public slots
+ */
+void CFDagaveApps::set_parameters_and_run(QMap<QString, QString> *ptr)
+{
+    currentParameters = ptr;
 }

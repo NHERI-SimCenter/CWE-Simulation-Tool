@@ -2,6 +2,7 @@
 #define CWE_PARAMETERTAB_H
 
 #include <QScrollArea>
+#include <QMap>
 
 namespace Ui {
 class CWE_ParameterTab;

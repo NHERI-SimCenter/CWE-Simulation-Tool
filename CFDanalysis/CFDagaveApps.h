@@ -79,6 +79,7 @@ public:
 
 public slots:
     void forceInfoRefresh();
+    void set_parameters_and_run(QMap<QString, QString> *);
 
 signals:
     void dataStateChange(CaseState currentState); //This now give generic state
@@ -99,6 +100,8 @@ private:
     EasyBoolLock * myLock;
 
     QString expectedNewCaseFolder;
+
+    QMap<QString, QString> *currentParameters = NULL;
 };
 
 #endif // CFDAGAVEAPPS_H
