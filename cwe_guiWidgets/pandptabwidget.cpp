@@ -251,6 +251,12 @@ void PandPTabWidget::addType(const QString &varName, const QString &type, QJsonO
     varData->type        = type;
     varData->defValue    = JSONvar["default"].toString();
     varData->widget      = widget;
+    if (type == "choose") {
+        varData->options = new QJsonObject(JSONvar["options"].toObject());
+    }
+    else {
+        varData->options = NULL;
+    }
     variableWidgets->insert(varName, varData);
 }
 
@@ -313,6 +319,7 @@ void PandPTabWidget::setWidget(QWidget *w)
 void PandPTabWidget::on_pbtn_run_clicked()
 {
     QString val;
+    QMap<QString, QString> * currentParameters = new QMap<QString, QString>();
 
     // collect all parameter values
     foreach (const InputDataType *itm, variableWidgets->values())
@@ -327,28 +334,33 @@ void PandPTabWidget::on_pbtn_run_clicked()
             val = tr("%1").arg(((QDoubleSpinBox *)widget)->value(), 0, 'g', 16);
         }
         else if (type == "bool")   {
-            val = (((QCheckBox *)widget)->checkState() == Qt::Checked)?tr("true"):tr("false") ;
+            val = (((QCheckBox *)widget)->checkState() == Qt::Checked)?"true":"false" ;
         }
         else if (type == "file")   {
             val = ((QLineEdit *)widget)->text() ;
         }
         else if (type == "choose") {
             QString txt = ((QComboBox *)widget)->currentText() ;
-            // ???
+            QJsonObject *options = itm->options;
             val = txt;
+            foreach (QString key, options->keys()) {
+                if (options->value(key) == txt) { val = key; }
+            }
         }
         else {
             val = "";
         }
 
-        qDebug() << itm->name << ":" << itm->displayName << ":" << itm->type << "=" << val;
+        //qDebug() << itm->name << ":" << itm->displayName << ":" << itm->type << "=" << val;
 
         // add to output
-
+        currentParameters->insert(varName, val);
     }
 
-    // transfer values to Design-safe
+    qDebug() << "sending ...\n" << *currentParameters;
 
+    // hand over data to the CFDagaveApp
+    emit run_analysis_on_design_safe_pressed(currentParameters);
 }
 
 void PandPTabWidget::on_pbtn_cancel_clicked()
