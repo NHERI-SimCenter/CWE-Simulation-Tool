@@ -60,7 +60,6 @@ class CFDcaseInstance : public QObject
 public:
     CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
     CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
-    ~CFDcaseInstance();
 
     bool isDefunct();
     CaseState getCaseState();
