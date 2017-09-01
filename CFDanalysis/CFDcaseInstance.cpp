@@ -70,14 +70,6 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
                      this, SLOT(underlyingFilesUpdated()));
 }
 
-CFDcaseInstance::~CFDcaseInstance()
-{
-    if (myLock != NULL)
-    {
-        delete myLock;
-    }
-}
-
 bool CFDcaseInstance::isDefunct()
 {
     return defunct;

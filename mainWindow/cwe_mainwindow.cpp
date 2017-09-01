@@ -73,6 +73,8 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     this->resize(width, height);
 
     ui->tab_parameters->linkWithDriver(myDriver);
+    QObject::connect(myDriver, SIGNAL(haveNewCase()),
+                     this, SLOT(newActiveCase()));
 }
 
 void CWE_MainWindow::runSetupSteps()
@@ -91,10 +93,6 @@ void CWE_MainWindow::runSetupSteps()
 
 void CWE_MainWindow::attachCaseSignals(CFDcaseInstance * newCase)
 {
-    QObject::connect(newCase, SIGNAL(detachCase()),
-                     ui->tab_parameters, SLOT(newCaseGiven()));
-    QObject::connect(newCase, SIGNAL(detachCase()),
-                     this, SLOT(newActiveCase()));
     QObject::connect(newCase, SIGNAL(haveNewState(CaseState,CaseState)),
                      ui->tab_parameters, SLOT(newCaseState(CaseState,CaseState)));
 }
