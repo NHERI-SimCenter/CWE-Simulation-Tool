@@ -2,6 +2,7 @@
     "name":"2D Building Slice",
     "brandingFile":".cwe_2d_u",
     "internalName":"buildingSlice",
+    "sequence":["mesh","sim"],
     "stages":{
         "mesh":{
             "name":"Mesh",
@@ -11,6 +12,12 @@
                 "Subdomains",
                 "Boundaries",
                 "Piles"
+            ],
+            "results":[
+                {
+                    "name":"Mesh View",
+                    "type":"GLmesh"
+                }
             ]
         },
         "sim":{
@@ -18,6 +25,25 @@
             "groups":[
                 "Simulation Control",
                 "Advanced"
+            ],
+            "results":[
+                {
+                    "name":"Final Flow Velocity Field",
+                    "type":"GLdata",
+                    "file":"U",
+                    "values":"magnitude"
+                },
+                {
+                    "name":"Final Flow Pressure Field",
+                    "type":"GLdata",
+                    "file":"p",
+                    "values":"scalar"
+                },
+                {
+                    "name":"Force Coefficients",
+                    "type":"text",
+                    "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat"
+                }
             ]
         }
     },
@@ -315,32 +341,5 @@
             "default":"3",
             "unit":"m"
         }
-    },
-    "results":[
-        {
-            "name":"Mesh View",
-            "type":"GLmesh",
-            "stage":"mesh"
-        },
-        {
-            "name":"Final Flow Velocity Field",
-            "type":"GLdata",
-            "stage":"sim",
-            "file":"U",
-            "values":"magnitude"
-        },
-        {
-            "name":"Final Flow Pressure Field",
-            "type":"GLdata",
-            "stage":"sim",
-            "file":"p",
-            "values":"scalar"
-        },
-        {
-            "name":"Force Coefficients",
-            "type":"text",
-            "stage":"sim",
-            "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat"
-        }
-    ]
+    }
 }

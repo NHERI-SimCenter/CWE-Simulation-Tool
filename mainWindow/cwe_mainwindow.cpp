@@ -46,8 +46,13 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 {
     ui->setupUi(this);
 
+    //Esablish connections with driver
     myDriver = newDriver;
     dataLink = myDriver->getDataConnection();
+
+    ui->tab_parameters->linkWithDriver(myDriver);
+    QObject::connect(myDriver, SIGNAL(haveNewCase()),
+                     this, SLOT(newActiveCase()));
 
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
@@ -63,18 +68,14 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     idx = ui->tabContainer->indexOf(ui->tab_spacer_2);
     ui->tabContainer->setTabEnabled(idx,false);
 
-    QObject::connect(ui->tabContainer, SIGNAL(currentChanged(int)),
-                     this, SLOT(tabChanged(int)));
+    //QObject::connect(ui->tabContainer, SIGNAL(currentChanged(int)),
+    //                 this, SLOT(tabChanged(int)));
 
     // adjust application size to display
     QRect rec = QApplication::desktop()->screenGeometry();
     int height = this->height()<0.5*rec.height()?this->height():0.5*rec.height();
     int width  = this->width()<0.5*rec.width()?this->width():0.5*rec.width();
     this->resize(width, height);
-
-    ui->tab_parameters->linkWithDriver(myDriver);
-    QObject::connect(myDriver, SIGNAL(haveNewCase()),
-                     this, SLOT(newActiveCase()));
 }
 
 void CWE_MainWindow::runSetupSteps()
@@ -95,6 +96,7 @@ void CWE_MainWindow::attachCaseSignals(CFDcaseInstance * newCase)
 {
     QObject::connect(newCase, SIGNAL(haveNewState(CaseState,CaseState)),
                      ui->tab_parameters, SLOT(newCaseState(CaseState,CaseState)));
+    //It is expected that this list will grow
 }
 
 void CWE_MainWindow::tabChanged(int)
