@@ -36,14 +36,15 @@ QWidget *PandPTabWidget::widget(int idx)
     return ui->stackedWidget->widget(idx);
 }
 
-int PandPTabWidget::addGroupTab(QString key, const QString &label)
+int PandPTabWidget::addGroupTab(QString key, const QString &label, StageState currentState)
 {
     varTabWidgets->insert(key, new QMap<QString, QWidget *>());
 
     // create the tab
     CWE_WithStatusButton *newTab = new CWE_WithStatusButton();
     newTab->setText(label);
-    newTab->setStatus("* unknown *");
+
+    newTab->setStatus(getStateText(currentState));
     int index = ui->verticalTabLayout->count()-1;
     newTab->setIndex(index);
     ui->verticalTabLayout->insertWidget(index, newTab);
@@ -366,4 +367,19 @@ void PandPTabWidget::on_pbtn_rollback_clicked()
 void PandPTabWidget::on_groupTabSelected(int idx)
 {
     this->setIndex(idx);
+}
+
+QString PandPTabWidget::getStateText(StageState theState)
+{
+    if (theState == StageState::ERROR)
+        return "*** ERROR ***";
+    if (theState == StageState::FINISHED)
+        return "Task Finished";
+    if (theState == StageState::LOADING)
+        return "Loading Data ...";
+    if (theState == StageState::RUNNING)
+        return "Task Running";
+    if (theState == StageState::UNRUN)
+        return "Not Yet Run";
+    return "*** TOTAL ERROR ***";
 }

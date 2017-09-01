@@ -60,6 +60,7 @@ class CFDcaseInstance : public QObject
 public:
     CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
     CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
+    ~CFDcaseInstance();
 
     bool isDefunct();
     CaseState getCaseState();
@@ -79,11 +80,14 @@ public:
     void openFOAM();
     void postProcess();
 
-public slots:
-    void forceInfoRefresh();
+    void killCaseConnection();
 
 signals:
-    void dataStateChange(CaseState currentState);
+    void detachCase();
+    void haveNewState(CaseState oldState, CaseState newState);
+
+public slots:
+    void forceInfoRefresh();
 
 private slots:
     void underlyingFilesUpdated();
@@ -91,7 +95,10 @@ private slots:
     void agaveAppDone();
 
 private:
+    void emitNewState();
+
     bool defunct = false;
+    CaseState oldState = CaseState::LOADING;
 
     VWTinterfaceDriver * theDriver;
 
@@ -101,8 +108,6 @@ private:
     EasyBoolLock * myLock;
 
     QString expectedNewCaseFolder;
-
-    QMap<QString, QString> *currentParameters = NULL;
 };
 
 #endif // CFDCASEINSTANCE_H

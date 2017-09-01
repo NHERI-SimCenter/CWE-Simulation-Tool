@@ -22,6 +22,7 @@
 #include "cwe_defines.h"
 
 class CWE_WithStatusButton;
+enum class StageState;
 
 namespace Ui {
 class PandPTabWidget;
@@ -34,7 +35,7 @@ class PandPTabWidget : public QWidget
 public:
     explicit PandPTabWidget(QWidget *parent = 0);
     ~PandPTabWidget();
-    int  addGroupTab(QString key, const QString &label);
+    int  addGroupTab(QString key, const QString &label, StageState currentState);
 
     void setCurrentWidget(QWidget *);
     bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label );
@@ -71,6 +72,8 @@ protected:
     void addType(const QString &, const QString &, QJsonObject, QWidget *parent );
 
 private:
+    static QString getStateText(StageState theState);
+
     Ui::PandPTabWidget *ui;
     int activeIndex;
     QWidget *displayWidget;

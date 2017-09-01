@@ -53,6 +53,7 @@
 
 enum class VWTerrorType: unsigned int;
 enum class RequestState;
+enum class CaseState;
 
 class RemoteDataInterface;
 
@@ -82,6 +83,9 @@ public:
     QList<CFDanalysisType *> * getTemplateList();
     CFDcaseInstance * getCurrentCase();
     void setCurrentCase(CFDcaseInstance * newCase);
+
+private slots:
+    void currentCaseInvalidated();
 
 private:
     CWE_MainWindow * mainWindow;
