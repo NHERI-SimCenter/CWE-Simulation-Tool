@@ -50,9 +50,6 @@ public:
     explicit CWE_create_simulation(QWidget *parent = 0);
     ~CWE_create_simulation();
 
-signals:
-    void CWE_create_simulation_signal(TASK, SIM_MODE);
-
 private slots:
     void on_pb_upload_file_clicked();
     void on_pb_2D_slice_clicked();

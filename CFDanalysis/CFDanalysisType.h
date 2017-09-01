@@ -51,6 +51,7 @@ public:
     QJsonDocument * getRawConfig();
     QString getBrandingFile();
     QString getInternalName();
+    QString getName();
 
 private:
     QString myName;
