@@ -57,6 +57,10 @@ protected:
     QWidget * addBool(QJsonObject, QWidget *parent );
     QWidget * addFile(QJsonObject, QWidget *parent );
     QWidget * addChoice(QJsonObject, QWidget *parent );
+    QWidget * addVector3D(QJsonObject, QWidget *parent );
+    QWidget * addVector2D(QJsonObject, QWidget *parent );
+    QWidget * addTensor3D(QJsonObject, QWidget *parent );
+    QWidget * addTensor2D(QJsonObject, QWidget *parent );
     QWidget * addUnknown(QJsonObject, QWidget *parent );
     void addType(const QString &, const QString &, QJsonObject, QWidget *parent );
 
