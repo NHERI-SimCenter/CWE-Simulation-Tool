@@ -33,8 +33,8 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 
-#ifndef CFDAGAVEAPPS_H
-#define CFDAGAVEAPPS_H
+#ifndef CFDCASEINSTANCE_H
+#define CFDCASEINSTANCE_H
 
 #include <QString>
 #include <QMap>
@@ -53,16 +53,19 @@ class VWTinterfaceDriver;
 enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_INVOKE};
 
-class CFDagaveApps : public QObject
+class CFDcaseInstance : public QObject
 {
     Q_OBJECT
 
 public:
-    CFDagaveApps(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
-    CFDagaveApps(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
+    CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
+    CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
+    ~CFDcaseInstance();
 
     bool isDefunct();
     CaseState getCaseState();
+    QString getCaseFolder();
+    QString getCaseName();
 
     //Note: For these, it can always answer "I don't know"
     CFDanalysisType * getMyType();
@@ -77,12 +80,14 @@ public:
     void openFOAM();
     void postProcess();
 
-public slots:
-    void forceInfoRefresh();
-    void set_parameters_and_run(QMap<QString, QString> *);
+    void killCaseConnection();
 
 signals:
-    void dataStateChange(CaseState currentState); //This now give generic state
+    void detachCase();
+    void haveNewState(CaseState oldState, CaseState newState);
+
+public slots:
+    void forceInfoRefresh();
 
 private slots:
     void underlyingFilesUpdated();
@@ -90,7 +95,10 @@ private slots:
     void agaveAppDone();
 
 private:
+    void emitNewState();
+
     bool defunct = false;
+    CaseState oldState = CaseState::LOADING;
 
     VWTinterfaceDriver * theDriver;
 
@@ -100,8 +108,6 @@ private:
     EasyBoolLock * myLock;
 
     QString expectedNewCaseFolder;
-
-    QMap<QString, QString> *currentParameters = NULL;
 };
 
-#endif // CFDAGAVEAPPS_H
+#endif // CFDCASEINSTANCE_H

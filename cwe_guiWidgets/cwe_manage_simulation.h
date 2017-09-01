@@ -50,9 +50,6 @@ public:
     explicit CWE_manage_simulation(QWidget *parent = 0);
     ~CWE_manage_simulation();
 
-signals:
-    void CWE_manage_simulation_signal(TASK);
-
 private slots:
     void on_btn_viewRun_clicked();
 

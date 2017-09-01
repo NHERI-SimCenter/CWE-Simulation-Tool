@@ -71,7 +71,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_welcome_screen.cpp \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
-    cwe_guiWidgets/sidebar.cpp  \
     ../AgaveExplorer/remoteFileOps/easyboollock.cpp \
     ../AgaveExplorer/remoteFileOps/fileoperator.cpp \
     ../AgaveExplorer/remoteFileOps/filetreenode.cpp \
@@ -84,12 +83,12 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/authform.cpp \
     ../AgaveExplorer/utilFuncs/copyrightdialog.cpp \
     ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
-    CFDanalysis/CFDagaveApps.cpp \
     CFDanalysis/CFDanalysisType.cpp \
     ../widgets/Common/sectiontitle.cpp \
     cwe_guiWidgets/cwe_parametertab.cpp \
     cwe_guiWidgets/pandptabwidget.cpp \
-    cwe_guiWidgets/cwe_withstatusbutton.cpp
+    cwe_guiWidgets/cwe_withstatusbutton.cpp \
+    CFDanalysis/CFDcaseInstance.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -114,7 +113,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_welcome_screen.h \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
-    cwe_guiWidgets/sidebar.h \
     ../AgaveExplorer/remoteFileOps/easyboollock.h \
     ../AgaveExplorer/remoteFileOps/fileoperator.h \
     ../AgaveExplorer/remoteFileOps/filetreenode.h \
@@ -127,12 +125,12 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/authform.h \
     ../AgaveExplorer/utilFuncs/copyrightdialog.h \
     ../AgaveExplorer/utilFuncs/singlelinedialog.h \
-    CFDanalysis/CFDagaveApps.h \
     CFDanalysis/CFDanalysisType.h \
     ../widgets/Common/sectiontitle.h \
     cwe_guiWidgets/cwe_parametertab.h \
     cwe_guiWidgets/pandptabwidget.h \
-    cwe_guiWidgets/cwe_withstatusbutton.h
+    cwe_guiWidgets/cwe_withstatusbutton.h \
+    CFDanalysis/CFDcaseInstance.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -146,7 +144,6 @@ FORMS    += \
     cwe_guiWidgets/cwe_welcome_screen.ui \
     cwe_guiWidgets/cwe_results.ui \
     cwe_guiWidgets/cwe_parameters.ui \
-    cwe_guiWidgets/sidebar.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \

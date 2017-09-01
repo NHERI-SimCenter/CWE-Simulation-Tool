@@ -42,6 +42,7 @@
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 
+#include "CFDanalysis/CFDcaseInstance.h"
 #include "CFDanalysis/CFDanalysisType.h"
 
 #include "mainWindow/cwe_mainwindow.h"
@@ -112,6 +113,8 @@ void VWTinterfaceDriver::startOffline()
     myJobHandle = new JobOperator(theConnector,this);
     myFileHandle = new FileOperator(theConnector,this);
 
+    setCurrentCase(new CFDcaseInstance(templateList.at(0),this));
+
     mainWindow->show();
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
@@ -130,4 +133,36 @@ QString VWTinterfaceDriver::getVersion()
 QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()
 {
     return &templateList;
+}
+
+CFDcaseInstance * VWTinterfaceDriver::getCurrentCase()
+{
+    return currentCFDCase;
+}
+
+void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
+{
+    CFDcaseInstance * oldCase = currentCFDCase;
+    currentCFDCase = newCase;
+
+    if (oldCase != NULL)
+    {
+        QObject::disconnect(oldCase,0,0,0);
+        if (!oldCase->isDefunct())
+        {
+            oldCase->killCaseConnection();
+        }
+    }
+
+    if (newCase != NULL)
+    {
+        QObject::connect(newCase, SIGNAL(detachCase()),
+                         this, SLOT(currentCaseInvalidated()));
+        mainWindow->attachCaseSignals(newCase);
+    }
+}
+
+void VWTinterfaceDriver::currentCaseInvalidated()
+{
+    setCurrentCase(NULL);
 }

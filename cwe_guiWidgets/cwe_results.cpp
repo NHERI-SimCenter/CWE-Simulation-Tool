@@ -85,7 +85,7 @@ void CWE_Results::addDummyResult(void)
 
 void CWE_Results::on_downloadEntireCaseButton_clicked()
 {
-    /* download the entire case */
+    /* download the entire case TODO*/
     QFileDialog *saveDialog = new QFileDialog();
 
     QString foldername = "unknown";
