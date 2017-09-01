@@ -84,6 +84,9 @@ public:
     CFDcaseInstance * getCurrentCase();
     void setCurrentCase(CFDcaseInstance * newCase);
 
+signals:
+    void haveNewCase();
+
 private slots:
     void currentCaseInvalidated();
 
