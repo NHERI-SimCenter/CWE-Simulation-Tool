@@ -204,6 +204,27 @@ QWidget * PandPTabWidget::addChoice(QJsonObject JSONvar, QWidget *parent)
     return theSelection;
 }
 
+
+QWidget * PandPTabWidget::addVector3D(QJsonObject JSONvar, QWidget *parent )
+{
+    return NULL;
+}
+
+QWidget * PandPTabWidget::addVector2D(QJsonObject JSONvar, QWidget *parent )
+{
+    return NULL;
+}
+
+QWidget * PandPTabWidget::addTensor3D(QJsonObject JSONvar, QWidget *parent )
+{
+    return NULL;
+}
+
+QWidget * PandPTabWidget::addTensor2D(QJsonObject JSONvar, QWidget *parent )
+{
+    return NULL;
+}
+
 QWidget * PandPTabWidget::addUnknown(QJsonObject JSONvar, QWidget *parent)
 {
     QLabel *theName = new QLabel(parent);
@@ -224,11 +245,15 @@ void PandPTabWidget::addType(const QString &varName, const QString &type, QJsonO
 
     widget = NULL;
 
-    if      (type == "std")    { widget = this->addStd(JSONvar, parent); }
-    else if (type == "bool")   { widget = this->addBool(JSONvar, parent); }
-    else if (type == "file")   { widget = this->addFile(JSONvar, parent); }
-    else if (type == "choose") { widget = this->addChoice(JSONvar, parent); }
-    else                       { widget = this->addUnknown(JSONvar, parent); }
+    if      (type == "std")      { widget = this->addStd(JSONvar, parent); }
+    else if (type == "bool")     { widget = this->addBool(JSONvar, parent); }
+    else if (type == "file")     { widget = this->addFile(JSONvar, parent); }
+    else if (type == "choose")   { widget = this->addChoice(JSONvar, parent); }
+    else if (type == "vector2D") { widget = this->addVector2D(JSONvar, parent); }
+    else if (type == "tensor2D") { widget = this->addTensor2D(JSONvar, parent); }
+    else if (type == "vector3D") { widget = this->addVector3D(JSONvar, parent); }
+    else if (type == "tensor3D") { widget = this->addTensor3D(JSONvar, parent); }
+    else                         { widget = this->addUnknown(JSONvar, parent); }
 
     // store information for reset operations, data collection, and validation
     InputDataType *varData = new InputDataType;
