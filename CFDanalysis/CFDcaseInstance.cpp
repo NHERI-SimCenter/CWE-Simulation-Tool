@@ -32,16 +32,18 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "CFDagaveApps.h"
+#include "CFDcaseInstance.h"
 
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "../AgaveExplorer/remoteFileOps/easyboollock.h"
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 
+#include "../AgaveClientInterface/filemetadata.h"
+
 #include "vwtinterfacedriver.h"
 
-CFDagaveApps::CFDagaveApps(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver):
+CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver):
     QObject((QObject *) mainDriver)
 {
     caseFolder = newCaseFolder;
@@ -52,18 +54,13 @@ CFDagaveApps::CFDagaveApps(FileTreeNode * newCaseFolder, VWTinterfaceDriver * ma
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
 
-    /* PETER S, PLEASE HAVE A LOOK AT THIS ONE ... ~PMH
-    // the following connect needs to be somewhere else, likely MainWindow::MainWindow() ???
-    QObject::connect(thePandPTabWidget__in_CWE_Parameters,
-                     SIGNAL(run_analysis_on_design_safe_pressed(QMap<QString, QString> *)),
-                     theAgaveApp, SLOT(set_parameters_and_run(QMap<QString, QString> *)));
-    */
+    myLock = new EasyBoolLock(this);
 
     underlyingFilesUpdated();
     forceInfoRefresh();
 }
 
-CFDagaveApps::CFDagaveApps(CFDanalysisType * caseType, VWTinterfaceDriver *mainDriver):
+CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver *mainDriver):
     QObject((QObject *) mainDriver)
 {
     myType = caseType;
@@ -73,12 +70,20 @@ CFDagaveApps::CFDagaveApps(CFDanalysisType * caseType, VWTinterfaceDriver *mainD
                      this, SLOT(underlyingFilesUpdated()));
 }
 
-bool CFDagaveApps::isDefunct()
+CFDcaseInstance::~CFDcaseInstance()
+{
+    if (myLock != NULL)
+    {
+        delete myLock;
+    }
+}
+
+bool CFDcaseInstance::isDefunct()
 {
     return defunct;
 }
 
-CaseState CFDagaveApps::getCaseState()
+CaseState CFDcaseInstance::getCaseState()
 {
     if (defunct) return CaseState::DEFUNCT;
     if (myLock->lockClosed()) return CaseState::AGAVE_INVOKE;
@@ -105,13 +110,27 @@ CaseState CFDagaveApps::getCaseState()
     return CaseState::READY;
 }
 
-CFDanalysisType * CFDagaveApps::getMyType()
+QString CFDcaseInstance::getCaseFolder()
+{
+    QString ret;
+    if (caseFolder == NULL) return ret;
+    return caseFolder->getFileData().getFullPath();
+}
+
+QString CFDcaseInstance::getCaseName()
+{
+    QString ret;
+    if (caseFolder == NULL) return ret;
+    return caseFolder->getFileData().getFileName();
+}
+
+CFDanalysisType * CFDcaseInstance::getMyType()
 {
     if (defunct) return NULL;
     return myType;
 }
 
-QMap<QString, QString> CFDagaveApps::getCurrentParams()
+QMap<QString, QString> CFDcaseInstance::getCurrentParams()
 {
     QMap<QString, QString> ret;
     if (defunct) return ret;
@@ -127,7 +146,7 @@ QMap<QString, QString> CFDagaveApps::getCurrentParams()
     return ret;
 }
 
-QMap<QString, StageState> CFDagaveApps::getStageStates()
+QMap<QString, StageState> CFDcaseInstance::getStageStates()
 {
     //TODO: check job handler for running tasks on this folder
     //TODO: check known files for expected result files
@@ -139,7 +158,7 @@ QMap<QString, StageState> CFDagaveApps::getStageStates()
     return ret;
 }
 
-void CFDagaveApps::forceInfoRefresh()
+void CFDcaseInstance::forceInfoRefresh()
 {
     if (defunct) return;
 
@@ -150,7 +169,7 @@ void CFDagaveApps::forceInfoRefresh()
     //Enact buffer download of .varStore
 }
 
-void CFDagaveApps::createCase(QString newName, FileTreeNode * containingFolder)
+void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolder)
 {
     if (defunct) return;
     if (!myLock->checkAndClaim()) return;
@@ -161,17 +180,25 @@ void CFDagaveApps::createCase(QString newName, FileTreeNode * containingFolder)
     QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
 }
 
-void CFDagaveApps::changeParameters(QMap<QString, QString> paramList)
+void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 {
     if (defunct) return;
     if (!myLock->checkAndClaim()) return;
+    //TODO: Clear the cache of var store
+
     //TODO: Invoke change paramters agave app
+
+    qDebug("sending ...\n");
+    for (auto itr = paramList.cbegin(); itr != paramList.cend(); itr++)
+    {
+        qDebug("%s: %s", qPrintable(itr.key()), qPrintable(*itr));
+    }
 
     //Debug:
     QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
 }
 
-void CFDagaveApps::mesh(FileTreeNode * geoFile)
+void CFDcaseInstance::mesh(FileTreeNode * geoFile)
 {
     if (defunct) return;
     if (!myLock->checkAndClaim()) return;
@@ -181,7 +208,7 @@ void CFDagaveApps::mesh(FileTreeNode * geoFile)
     QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
 }
 
-void CFDagaveApps::rollBack(QStringList stagesToDelete)
+void CFDcaseInstance::rollBack(QStringList stagesToDelete)
 {
     if (defunct) return;
     if (!myLock->checkAndClaim()) return;
@@ -191,7 +218,7 @@ void CFDagaveApps::rollBack(QStringList stagesToDelete)
     QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
 }
 
-void CFDagaveApps::openFOAM()
+void CFDcaseInstance::openFOAM()
 {
     if (defunct) return;
     if (!myLock->checkAndClaim()) return;
@@ -201,7 +228,7 @@ void CFDagaveApps::openFOAM()
     QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
 }
 
-void CFDagaveApps::postProcess()
+void CFDcaseInstance::postProcess()
 {
     if (defunct) return;
     if (!myLock->checkAndClaim()) return;
@@ -211,7 +238,14 @@ void CFDagaveApps::postProcess()
     QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
 }
 
-void CFDagaveApps::underlyingFilesUpdated()
+void CFDcaseInstance::killCaseConnection()
+{
+    defunct = true;
+    emit detachCase();
+    this->deleteLater();
+}
+
+void CFDcaseInstance::underlyingFilesUpdated()
 {
     if (defunct) return;
     //If caseFolder is null, try to find expectedNewCaseFolder as file node
@@ -221,15 +255,16 @@ void CFDagaveApps::underlyingFilesUpdated()
     //Obtain list of CFDanalysis types from VWT driver to get brandingFile list
     //If case type determined, call: forceInfoRefresh() (To get varStore)
     //If type known call getStageStates(), set a 5 second update timer to run forceInfoRefresh() (unless already set)
-    emit dataStateChange(getCaseState());
+    emitNewState();
 }
 
-void CFDagaveApps::caseFolderRemoved()
+void CFDcaseInstance::caseFolderRemoved()
 {
-    defunct = true;
+    killCaseConnection();
+    theDriver->setCurrentCase(NULL);
 }
 
-void CFDagaveApps::agaveAppDone()
+void CFDcaseInstance::agaveAppDone()
 {
     if (defunct) return;
     myLock->release();
@@ -237,10 +272,11 @@ void CFDagaveApps::agaveAppDone()
     forceInfoRefresh();
 }
 
-/*
- * public slots
- */
-void CFDagaveApps::set_parameters_and_run(QMap<QString, QString> *ptr)
+void CFDcaseInstance::emitNewState()
 {
-    currentParameters = ptr;
+    if (defunct == true) return;
+    CaseState newState = getCaseState();
+    if (newState == oldState) return;
+    emit haveNewState(oldState, newState);
+    oldState = newState;
 }

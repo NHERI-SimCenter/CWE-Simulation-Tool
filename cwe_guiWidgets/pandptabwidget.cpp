@@ -2,23 +2,7 @@
 #include "ui_pandptabwidget.h"
 #include "cwe_parametertab.h"
 #include "cwe_withstatusbutton.h"
-
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
-
-#include <QLabel>
-#include <QDoubleSpinBox>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QComboBox>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QLayout>
-
-#include <QList>
-
-#include "qdebug.h"
+#include "CFDanalysis/CFDcaseInstance.h"
 
 PandPTabWidget::PandPTabWidget(QWidget *parent) :
     QWidget(parent),
@@ -52,14 +36,15 @@ QWidget *PandPTabWidget::widget(int idx)
     return ui->stackedWidget->widget(idx);
 }
 
-int PandPTabWidget::addGroupTab(QString key, const QString &label)
+int PandPTabWidget::addGroupTab(QString key, const QString &label, StageState currentState)
 {
     varTabWidgets->insert(key, new QMap<QString, QWidget *>());
 
     // create the tab
     CWE_WithStatusButton *newTab = new CWE_WithStatusButton();
     newTab->setText(label);
-    newTab->setStatus("* unknown *");
+
+    newTab->setStatus(getStateText(currentState));
     int index = ui->verticalTabLayout->count()-1;
     newTab->setIndex(index);
     ui->verticalTabLayout->insertWidget(index, newTab);
@@ -89,6 +74,7 @@ int PandPTabWidget::addVarTab(QString key, const QString &label, QJsonArray *var
     {
         addVarsToTab(key, label, varList, varsInfo);
     }
+    return index;
 }
 
 void PandPTabWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo)
@@ -318,8 +304,13 @@ void PandPTabWidget::setWidget(QWidget *w)
 
 void PandPTabWidget::on_pbtn_run_clicked()
 {
+
+}
+
+QMap<QString, QString> PandPTabWidget::collectParamData()
+{
     QString val;
-    QMap<QString, QString> * currentParameters = new QMap<QString, QString>();
+    QMap<QString, QString> currentParameters;
 
     // collect all parameter values
     foreach (const InputDataType *itm, variableWidgets->values())
@@ -351,16 +342,11 @@ void PandPTabWidget::on_pbtn_run_clicked()
             val = "";
         }
 
-        //qDebug() << itm->name << ":" << itm->displayName << ":" << itm->type << "=" << val;
-
         // add to output
-        currentParameters->insert(varName, val);
+        currentParameters.insert(varName, val);
     }
 
-    qDebug() << "sending ...\n" << *currentParameters;
-
-    // hand over data to the CFDagaveApp
-    emit run_analysis_on_design_safe_pressed(currentParameters);
+    return currentParameters;
 }
 
 void PandPTabWidget::on_pbtn_cancel_clicked()
@@ -381,4 +367,19 @@ void PandPTabWidget::on_pbtn_rollback_clicked()
 void PandPTabWidget::on_groupTabSelected(int idx)
 {
     this->setIndex(idx);
+}
+
+QString PandPTabWidget::getStateText(StageState theState)
+{
+    if (theState == StageState::ERROR)
+        return "*** ERROR ***";
+    if (theState == StageState::FINISHED)
+        return "Task Finished";
+    if (theState == StageState::LOADING)
+        return "Loading Data ...";
+    if (theState == StageState::RUNNING)
+        return "Task Running";
+    if (theState == StageState::UNRUN)
+        return "Not Yet Run";
+    return "*** TOTAL ERROR ***";
 }

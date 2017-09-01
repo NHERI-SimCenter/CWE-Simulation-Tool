@@ -4,7 +4,11 @@
 #include <QWidget>
 #include <QMap>
 
+class CFDcaseInstance;
 class CFDanalysisType;
+class VWTinterfaceDriver;
+
+enum class CaseState;
 
 namespace Ui {
 class CWE_Parameters;
@@ -17,30 +21,25 @@ class CWE_Parameters : public QWidget
 public:
     explicit CWE_Parameters(QWidget *parent = 0);
     ~CWE_Parameters();
-    void setName(const QString &s);
-    void setType(const QString &s);
-    void setLocation(const QString &s);
-    int  setTemplate(CFDanalysisType * theTemplate);
+
+    void linkWithDriver(VWTinterfaceDriver * newDriver);
+    void resetViewInfo();
 
 private slots:
-    //void on_pbtn_saveAllParameters_clicked();
-    //void on_pBtn_simulation_run_clicked();
-    //void on_pBtn_simulation_cancel_clicked();
-    //void on_pBtn_simulation_results_clicked();
-    //void on_pBtn_simulation_rollback_clicked();
-    //void on_pBtn_model_run_clicked();
-    //void on_pBtn_model_cancel_clicked();
-    //void on_pBtn_model_results_clicked();
-    //void on_pBtn_model_rollback_clicked();
+    void on_pbtn_saveAllParameters_clicked();
+
+    void newCaseGiven();
+    void newCaseState(CaseState oldState, CaseState newState);
 
 private:
+    void saveAllParams();
+
     Ui::CWE_Parameters *ui;
 
-    QMap<QString, int> parameterTabs;
+    bool viewIsValid = false;
+    VWTinterfaceDriver * myDriver;
 
-    int meshIdx;
-    int simuIdx;
-    int postIdx;
+    QMap<QString, int> parameterTabs;
 };
 
 #endif // CWE_PARAMETERS_H
