@@ -142,5 +142,27 @@ CFDcaseInstance * VWTinterfaceDriver::getCurrentCase()
 
 void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
 {
+    CFDcaseInstance * oldCase = currentCFDCase;
     currentCFDCase = newCase;
+
+    if (oldCase != NULL)
+    {
+        QObject::disconnect(oldCase,0,0,0);
+        if (!oldCase->isDefunct())
+        {
+            oldCase->killCaseConnection();
+        }
+    }
+
+    if (newCase != NULL)
+    {
+        QObject::connect(newCase, SIGNAL(detachCase()),
+                         this, SLOT(currentCaseInvalidated()));
+        mainWindow->attachCaseSignals(newCase);
+    }
+}
+
+void VWTinterfaceDriver::currentCaseInvalidated()
+{
+    setCurrentCase(NULL);
 }

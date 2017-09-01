@@ -57,6 +57,8 @@ namespace Ui {
 class CWE_MainWindow;
 }
 
+class CFDcaseInstance;
+
 class CWE_MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -67,8 +69,11 @@ public:
 
     void runSetupSteps();
 
+    void attachCaseSignals(CFDcaseInstance * newCase);
+
 private slots:
-    void tabChanged(int newIndex);
+    void tabChanged(int);
+    void newActiveCase();
 
     void menuExit();
     void menuCopyInfo();
@@ -93,15 +98,6 @@ private:
     Ui::CWE_MainWindow *ui;
 
     VWTinterfaceDriver     *myDriver;
-
-    CWE_create_simulation  *taskCreateSimulation = NULL;
-    CWE_file_manager       *taskFileManager = NULL;
-    CWE_landing            *taskLanding = NULL;
-    CWE_manage_simulation  *taskManageSimulation = NULL;
-    CWE_simulation_details *taskSimulationDetail = NULL;
-    CWE_task_list          *taskTaskList = NULL;
-    CWE_help               *taskHelp = NULL;
-
     RemoteDataInterface    *dataLink;
 };
 

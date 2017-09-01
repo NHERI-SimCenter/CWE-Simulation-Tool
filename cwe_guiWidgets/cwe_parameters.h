@@ -4,9 +4,11 @@
 #include <QWidget>
 #include <QMap>
 
-class CFDagaveApps;
+class CFDcaseInstance;
 class CFDanalysisType;
 class VWTinterfaceDriver;
+
+enum class CaseState;
 
 namespace Ui {
 class CWE_Parameters;
@@ -25,6 +27,9 @@ public:
 
 private slots:
     void on_pbtn_saveAllParameters_clicked();
+
+    void newCaseGiven();
+    void newCaseState(CaseState oldState, CaseState newState);
 
 private:
     void saveAllParams();

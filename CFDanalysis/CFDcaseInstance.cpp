@@ -54,12 +54,7 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
 
-    /* PETER S, PLEASE HAVE A LOOK AT THIS ONE ... ~PMH
-    // the following connect needs to be somewhere else, likely MainWindow::MainWindow() ???
-    QObject::connect(thePandPTabWidget__in_CWE_Parameters,
-                     SIGNAL(run_analysis_on_design_safe_pressed(QMap<QString, QString> *)),
-                     theAgaveApp, SLOT(set_parameters_and_run(QMap<QString, QString> *)));
-    */
+    myLock = new EasyBoolLock(this);
 
     underlyingFilesUpdated();
     forceInfoRefresh();
@@ -73,6 +68,14 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
 
     QObject::connect(theDriver->getFileHandler(), SIGNAL(newFileInfo()),
                      this, SLOT(underlyingFilesUpdated()));
+}
+
+CFDcaseInstance::~CFDcaseInstance()
+{
+    if (myLock != NULL)
+    {
+        delete myLock;
+    }
 }
 
 bool CFDcaseInstance::isDefunct()
@@ -181,6 +184,8 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 {
     if (defunct) return;
     if (!myLock->checkAndClaim()) return;
+    //TODO: Clear the cache of var store
+
     //TODO: Invoke change paramters agave app
 
     qDebug("sending ...\n");
@@ -233,6 +238,13 @@ void CFDcaseInstance::postProcess()
     QTimer::singleShot(2500, this, SLOT(agaveAppDone()));
 }
 
+void CFDcaseInstance::killCaseConnection()
+{
+    defunct = true;
+    emit detachCase();
+    this->deleteLater();
+}
+
 void CFDcaseInstance::underlyingFilesUpdated()
 {
     if (defunct) return;
@@ -243,12 +255,13 @@ void CFDcaseInstance::underlyingFilesUpdated()
     //Obtain list of CFDanalysis types from VWT driver to get brandingFile list
     //If case type determined, call: forceInfoRefresh() (To get varStore)
     //If type known call getStageStates(), set a 5 second update timer to run forceInfoRefresh() (unless already set)
-    emit dataStateChange(getCaseState());
+    emitNewState();
 }
 
 void CFDcaseInstance::caseFolderRemoved()
 {
-    defunct = true;
+    killCaseConnection();
+    theDriver->setCurrentCase(NULL);
 }
 
 void CFDcaseInstance::agaveAppDone()
@@ -257,4 +270,13 @@ void CFDcaseInstance::agaveAppDone()
     myLock->release();
     underlyingFilesUpdated();
     forceInfoRefresh();
+}
+
+void CFDcaseInstance::emitNewState()
+{
+    if (defunct == true) return;
+    CaseState newState = getCaseState();
+    if (newState == oldState) return;
+    emit haveNewState(oldState, newState);
+    oldState = newState;
 }

@@ -34,8 +34,10 @@
 
 #include "cwe_mainwindow.h"
 #include "ui_cwe_mainwindow.h"
-#include <QDesktopWidget>
 
+#include "CFDanalysis/CFDcaseInstance.h"
+
+#include <QDesktopWidget>
 #include <QDebug>
 
 CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
@@ -69,13 +71,14 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     int height = this->height()<0.5*rec.height()?this->height():0.5*rec.height();
     int width  = this->width()<0.5*rec.width()?this->width():0.5*rec.width();
     this->resize(width, height);
+
+    ui->tab_parameters->linkWithDriver(myDriver);
 }
 
 void CWE_MainWindow::runSetupSteps()
 {
     ui->tab_files->linkFileHandle(myDriver->getFileHandler());
     ui->tab_landing_page->linkJobHandle(myDriver->getJobHandler());
-    ui->tab_parameters->linkWithDriver(myDriver);
 
     //Note: Adding widget to header will re-parent them
     QLabel * username = new QLabel(myDriver->getDataConnection()->getUserName());
@@ -86,24 +89,29 @@ void CWE_MainWindow::runSetupSteps()
     ui->header->appendWidget(logoutButton);
 }
 
-void CWE_MainWindow::tabChanged(int newIndex)
+void CWE_MainWindow::attachCaseSignals(CFDcaseInstance * newCase)
 {
-    if (newIndex == ui->tabContainer->indexOf(ui->tab_parameters))
-    {
-        ui->tab_parameters->resetViewInfo();
-    }
+    QObject::connect(newCase, SIGNAL(detachCase()),
+                     ui->tab_parameters, SLOT(newCaseGiven()));
+    QObject::connect(newCase, SIGNAL(detachCase()),
+                     this, SLOT(newActiveCase()));
+    QObject::connect(newCase, SIGNAL(haveNewState(CaseState,CaseState)),
+                     ui->tab_parameters, SLOT(newCaseState(CaseState,CaseState)));
+}
+
+void CWE_MainWindow::tabChanged(int)
+{
+
+}
+
+void CWE_MainWindow::newActiveCase()
+{
+
 }
 
 CWE_MainWindow::~CWE_MainWindow()
 {
     delete ui;
-    if (taskCreateSimulation) delete taskCreateSimulation;
-    if (taskFileManager) delete taskFileManager;
-    if (taskLanding) delete taskLanding;
-    if (taskManageSimulation) delete taskManageSimulation;
-    if (taskSimulationDetail) delete taskSimulationDetail;
-    if (taskTaskList) delete taskTaskList;
-    if (taskHelp) delete taskHelp;
 }
 
 void CWE_MainWindow::menuCopyInfo()

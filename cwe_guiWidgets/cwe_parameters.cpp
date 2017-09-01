@@ -36,6 +36,11 @@ CWE_Parameters::~CWE_Parameters()
 void CWE_Parameters::linkWithDriver(VWTinterfaceDriver * newDriver)
 {
     myDriver = newDriver;
+    QObject::connect(myDriver, SIGNAL(currentCaseChanged(CFDcaseInstance*)),
+                     this, SLOT(newCaseGiven(CFDcaseInstance*)));
+    QObject::connect(myDriver, SIGNAL(currentCaseUpdated(CaseState,CaseState)),
+                     this, SLOT(newCaseState(CaseState,CaseState)));
+
 }
 
 void CWE_Parameters::resetViewInfo()
@@ -75,7 +80,7 @@ void CWE_Parameters::resetViewInfo()
         labelText = labelText.append("\nParameters");
 
         // add a stage tab to ui->theTabWidget
-        int idx = ui->theTabWidget->addGroupTab(name, labelText);
+        int idx = ui->theTabWidget->addGroupTab(name, labelText, currentStates[name]);
         parameterTabs.insert(name, idx);
 
         // add varGroub tabs
@@ -105,5 +110,15 @@ void CWE_Parameters::saveAllParams()
     {
         linkedCFDCase->changeParameters(ui->theTabWidget->collectParamData());
     }
+}
+
+void CWE_Parameters::newCaseGiven()
+{
+    resetViewInfo();
+}
+
+void CWE_Parameters::newCaseState(CaseState oldState, CaseState newState)
+{
+    //TODO: implement functions for changes in current params or stage states
 }
 
