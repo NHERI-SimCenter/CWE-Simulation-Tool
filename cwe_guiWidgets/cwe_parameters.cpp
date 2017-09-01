@@ -36,11 +36,8 @@ CWE_Parameters::~CWE_Parameters()
 void CWE_Parameters::linkWithDriver(VWTinterfaceDriver * newDriver)
 {
     myDriver = newDriver;
-    QObject::connect(myDriver, SIGNAL(currentCaseChanged(CFDcaseInstance*)),
-                     this, SLOT(newCaseGiven(CFDcaseInstance*)));
-    QObject::connect(myDriver, SIGNAL(currentCaseUpdated(CaseState,CaseState)),
-                     this, SLOT(newCaseState(CaseState,CaseState)));
-
+    QObject::connect(myDriver, SIGNAL(haveNewCase()),
+                     this, SLOT(newCaseGiven()));
 }
 
 void CWE_Parameters::resetViewInfo()
