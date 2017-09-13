@@ -4,6 +4,8 @@
 #include "cwe_withstatusbutton.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "qdebug.h"
+
 PandPTabWidget::PandPTabWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PandPTabWidget)
@@ -121,6 +123,8 @@ QWidget * PandPTabWidget::addStd(QJsonObject JSONvar, QWidget *parent)
 {
     QVariant defaultOption = JSONvar["default"].toVariant();
     QString unit           = JSONvar["unit"].toString();
+    // QJson fails to convert "1" to int, thus: QString::toInt( QJson::toString() )
+    int precision          = JSONvar["precision"].toString().toInt();
 
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -128,8 +132,17 @@ QWidget * PandPTabWidget::addStd(QJsonObject JSONvar, QWidget *parent)
     theName->setMinimumHeight(16);
     //theName->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding);
 
-    QDoubleSpinBox *theValue = new QDoubleSpinBox(parent);
-    theValue->setValue(defaultOption.toDouble());
+    QWidget * theValue;
+
+    if (precision > 0) {
+        theValue = new QDoubleSpinBox(parent);
+        ((QDoubleSpinBox *)theValue)->setValue(defaultOption.toDouble());
+        ((QDoubleSpinBox *)theValue)->setDecimals(precision);
+    }
+    else {
+        theValue = new QSpinBox(parent);
+        ((QSpinBox *)theValue)->setValue(defaultOption.toInt());
+    }
 
     QLabel *theUnit = new QLabel(parent);
     theUnit->setText(unit);
