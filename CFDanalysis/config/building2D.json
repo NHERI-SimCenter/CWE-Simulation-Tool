@@ -10,8 +10,7 @@
                 "Building Geometry",
                 "Mesh Density",
                 "Subdomains",
-                "Boundaries",
-                "Piles"
+                "Boundaries"
             ],
             "results":[
                 {
@@ -48,10 +47,6 @@
         }
     },
     "varGroups":{
-        "Piles":[
-            "numPiles",
-            "numLayers"
-        ],
         "Building Geometry":[
             "geoFile",
             "slicePlane",
