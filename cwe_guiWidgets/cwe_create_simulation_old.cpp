@@ -32,8 +32,8 @@
 
 // Contributors:
 
-#include "cwe_create_simulation.h"
-#include "ui_cwe_create_simulation.h"
+#include "cwe_create_simulation_old.h"
+#include "ui_cwe_create_simulation_old.h"
 
 CWE_create_simulation::CWE_create_simulation(QWidget *parent) :
     QWidget(parent),
