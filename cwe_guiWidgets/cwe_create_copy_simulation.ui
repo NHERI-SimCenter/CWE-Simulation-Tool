@@ -20,16 +20,6 @@
    <enum>QFrame::Raised</enum>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="1">
-    <widget class="QWidget" name="FileWidget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_selectionType">
      <property name="text">
@@ -46,7 +36,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_NewCase">
       <attribute name="title">
@@ -161,6 +151,27 @@ description</string>
       <attribute name="title">
        <string>Duplicate Case</string>
       </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="RemoteFileTree" name="secondary_remoteFileTree">
+         <attribute name="headerVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -199,8 +210,28 @@ description</string>
      </property>
     </widget>
    </item>
+   <item row="3" column="1">
+    <widget class="RemoteFileTree" name="primary_remoteFileTree">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <attribute name="headerVisible">
+      <bool>true</bool>
+     </attribute>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RemoteFileTree</class>
+   <extends>QTreeWidget</extends>
+   <header>../AgaveExplorer/remoteFileOps/remotefiletree.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../cwe_resources.qrc"/>
  </resources>
