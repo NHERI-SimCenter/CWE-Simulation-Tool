@@ -3,6 +3,8 @@
 
 #include <QFrame>
 
+class FileOperator;
+
 enum class SimulationType { CHANNEL_FLOW, SHAPE_2D, SHAPE_3D };
 
 namespace Ui {
@@ -16,6 +18,8 @@ class CWE_Create_Copy_Simulation : public QFrame
 public:
     explicit CWE_Create_Copy_Simulation(QWidget *parent = 0);
     ~CWE_Create_Copy_Simulation();
+
+    void linkFileHandle(FileOperator * theJobhandle);
 
 private slots:
     void on_lineEdit_newCaseName_editingFinished();
