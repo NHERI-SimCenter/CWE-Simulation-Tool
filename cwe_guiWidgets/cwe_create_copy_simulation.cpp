@@ -1,6 +1,9 @@
 #include "cwe_create_copy_simulation.h"
 #include "ui_cwe_create_copy_simulation.h"
 
+#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
+#include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
+
 CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::CWE_Create_Copy_Simulation)
@@ -14,6 +17,14 @@ CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
 CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
 {
     delete ui;
+}
+
+void CWE_Create_Copy_Simulation::linkFileHandle(FileOperator * theJobhandle)
+{
+    ui->primary_remoteFileTree->setFileOperator(theJobhandle);
+    ui->primary_remoteFileTree->setupFileView();
+    ui->secondary_remoteFileTree->setFileOperator(theJobhandle);
+    ui->secondary_remoteFileTree->setupFileView();
 }
 
 void CWE_Create_Copy_Simulation::on_lineEdit_newCaseName_editingFinished()

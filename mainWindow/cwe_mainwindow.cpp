@@ -82,6 +82,7 @@ void CWE_MainWindow::runSetupSteps()
 {
     ui->tab_files->linkFileHandle(myDriver->getFileHandler());
     ui->tab_landing_page->linkJobHandle(myDriver->getJobHandler());
+    ui->tab_create_new->linkFileHandle(myDriver->getFileHandler());
 
     //Note: Adding widget to header will re-parent them
     QLabel * username = new QLabel(myDriver->getDataConnection()->getUserName());
