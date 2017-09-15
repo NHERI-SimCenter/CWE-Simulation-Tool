@@ -113,3 +113,4 @@ void CWE_landing::addDummyDataRow(void)
     /* set some dummy contents */
     this->addDataRow("some URL", CWE_STATE_CLEAR, QTime::currentTime().toString(), "007", "SimCenter super app");
 }
+

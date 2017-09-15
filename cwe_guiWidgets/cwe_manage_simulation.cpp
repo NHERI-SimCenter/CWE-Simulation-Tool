@@ -48,7 +48,12 @@ CWE_manage_simulation::~CWE_manage_simulation()
     delete ui;
 }
 
-void CWE_manage_simulation::on_btn_viewRun_clicked()
+void CWE_manage_simulation::on_pb_viewParameters_clicked()
 {
+    // switch main window to parameters tab
+}
 
+void CWE_manage_simulation::on_pb_viewResults_clicked()
+{
+    // switch main window to results tab
 }
