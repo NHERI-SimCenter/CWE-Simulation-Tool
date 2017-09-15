@@ -48,17 +48,17 @@ void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
 
 void CWE_Create_Copy_Simulation::on_radioButton_2Dshape_clicked()
 {
-
+    this->setSimulationType(SimulationType::SHAPE_2D);
 }
 
 void CWE_Create_Copy_Simulation::on_radioButton_3Dshape_clicked()
 {
-
+    this->setSimulationType(SimulationType::SHAPE_3D);
 }
 
 void CWE_Create_Copy_Simulation::on_radioButton_channelFlow_clicked()
 {
-
+    this->setSimulationType(SimulationType::CHANNEL_FLOW);
 }
 
 SimulationType CWE_Create_Copy_Simulation::setSimulationType(SimulationType type)
@@ -85,4 +85,19 @@ SimulationType CWE_Create_Copy_Simulation::setSimulationType(SimulationType type
     }
 
     return retType;
+}
+
+void CWE_Create_Copy_Simulation::on_pb_image_channelFlow_clicked()
+{
+    this->setSimulationType(SimulationType::CHANNEL_FLOW);
+}
+
+void CWE_Create_Copy_Simulation::on_pb_image_2Dshape_clicked()
+{
+    this->setSimulationType(SimulationType::SHAPE_2D);
+}
+
+void CWE_Create_Copy_Simulation::on_pb_image_3Dshape_clicked()
+{
+    this->setSimulationType(SimulationType::SHAPE_3D);
 }

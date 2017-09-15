@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>568</width>
-    <height>448</height>
+    <width>648</width>
+    <height>566</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,12 +20,40 @@
    <enum>QFrame::Raised</enum>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_selectionType">
+   <item row="4" column="2">
+    <widget class="QPushButton" name="pBtn_create_copy">
      <property name="text">
-      <string>Case Selection Type:</string>
+      <string>Create New Simulation</string>
      </property>
     </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QPushButton" name="pBtn_cancel">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="label_location">
+     <property name="text">
+      <string>Location:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="caseName_layout">
+     <item>
+      <widget class="QLabel" name="label_newCaseName">
+       <property name="text">
+        <string>New Case Name:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdit_newCaseName"/>
+     </item>
+    </layout>
    </item>
    <item row="3" column="0">
     <widget class="QTabWidget" name="tabWidget">
@@ -43,34 +71,23 @@
        <string>New Case</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_image_2Dshape">
-         <property name="maximumSize">
-          <size>
-           <width>150</width>
-           <height>100</height>
-          </size>
-         </property>
+       <item row="5" column="3">
+        <widget class="QLabel" name="label_3Dflow_description">
          <property name="text">
-          <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap resource="../cwe_resources.qrc">:/temporaryImages/images/Loaned Images/2DshapeB.jpg</pixmap>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
+          <string>3D Shape
+description</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="4" column="1">
         <widget class="QRadioButton" name="radioButton_3Dshape">
          <property name="text">
           <string>3D Shape</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_image_3Dshape">
+       <item row="3" column="1">
+        <widget class="QPushButton" name="pb_image_2Dshape">
          <property name="maximumSize">
           <size>
            <width>150</width>
@@ -80,30 +97,29 @@
          <property name="text">
           <string/>
          </property>
-         <property name="pixmap">
-          <pixmap resource="../cwe_resources.qrc">:/temporaryImages/images/Loaned Images/3Dshape.jpg</pixmap>
+         <property name="icon">
+          <iconset resource="../cwe_resources.qrc">
+           <normaloff>:/temporaryImages/images/Loaned Images/2DshapeB.jpg</normaloff>:/temporaryImages/images/Loaned Images/2DshapeB.jpg</iconset>
          </property>
-         <property name="scaledContents">
+         <property name="iconSize">
+          <size>
+           <width>150</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="flat">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QRadioButton" name="radioButton_2Dshape">
-         <property name="text">
-          <string>2D Shape</string>
+       <item row="5" column="1">
+        <widget class="QPushButton" name="pb_image_3Dshape">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QRadioButton" name="radioButton_channelFlow">
-         <property name="text">
-          <string>Channel Flow</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_image_channelFlow">
          <property name="maximumSize">
           <size>
            <width>150</width>
@@ -111,17 +127,30 @@
           </size>
          </property>
          <property name="text">
-          <string/>
+          <string>PushButton</string>
          </property>
-         <property name="pixmap">
-          <pixmap resource="../cwe_resources.qrc">:/temporaryImages/images/Loaned Images/channel_flow.png</pixmap>
+         <property name="icon">
+          <iconset resource="../cwe_resources.qrc">
+           <normaloff>:/temporaryImages/images/Loaned Images/3Dshape.jpg</normaloff>:/temporaryImages/images/Loaned Images/3Dshape.jpg</iconset>
          </property>
-         <property name="scaledContents">
-          <bool>true</bool>
+         <property name="iconSize">
+          <size>
+           <width>150</width>
+           <height>100</height>
+          </size>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="3" column="3">
+        <widget class="QLabel" name="label_2Dflow_description">
+         <property name="text">
+          <string>2D Shape
+description
+...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
         <widget class="QLabel" name="label_channelFlow_description">
          <property name="text">
           <string>Channel Flow
@@ -129,19 +158,49 @@ description</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QLabel" name="label_2Dflow_description">
+       <item row="1" column="1">
+        <widget class="QPushButton" name="pb_image_channelFlow">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>100</height>
+          </size>
+         </property>
          <property name="text">
-          <string>2D Shape
-description</string>
+          <string>PushButton</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../cwe_resources.qrc">
+           <normaloff>:/temporaryImages/images/Loaned Images/channel_flow.png</normaloff>:/temporaryImages/images/Loaned Images/channel_flow.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>150</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
-        <widget class="QLabel" name="label_3Dflow_description">
+       <item row="0" column="1">
+        <widget class="QRadioButton" name="radioButton_channelFlow">
          <property name="text">
-          <string>3D Shape
-description</string>
+          <string>Channel Flow</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QRadioButton" name="radioButton_2Dshape">
+         <property name="text">
+          <string>2D Shape</string>
          </property>
         </widget>
        </item>
@@ -165,62 +224,27 @@ description</string>
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <widget class="RemoteFileTree" name="secondary_remoteFileTree">
-         <attribute name="headerVisible">
-          <bool>false</bool>
-         </attribute>
-        </widget>
+        <widget class="RemoteFileTree" name="secondary_remoteFileTree" native="true"/>
        </item>
       </layout>
      </widget>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="caseName_layout">
-     <item>
-      <widget class="QLabel" name="label_newCaseName">
-       <property name="text">
-        <string>New Case Name:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEdit_newCaseName"/>
-     </item>
-    </layout>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLabel" name="label_location">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_selectionType">
      <property name="text">
-      <string>Location:</string>
+      <string>Case Selection Type:</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QPushButton" name="pBtn_cancel">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QPushButton" name="pBtn_create_copy">
-     <property name="text">
-      <string>Create New Simulation</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="RemoteFileTree" name="primary_remoteFileTree">
+   <item row="3" column="2">
+    <widget class="RemoteFileTree" name="primary_remoteFileTree" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <attribute name="headerVisible">
-      <bool>true</bool>
-     </attribute>
     </widget>
    </item>
   </layout>
@@ -228,8 +252,9 @@ description</string>
  <customwidgets>
   <customwidget>
    <class>RemoteFileTree</class>
-   <extends>QTreeWidget</extends>
+   <extends>QWidget</extends>
    <header>../AgaveExplorer/remoteFileOps/remotefiletree.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
