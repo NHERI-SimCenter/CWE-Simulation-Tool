@@ -15,4 +15,12 @@
         <file>copyText.txt</file>
         <file>cweStyle.qss</file>
     </qresource>
+    <qresource prefix="/temporaryImages">
+        <file>images/Loaned Images/2DshapeA.jpg</file>
+        <file>images/Loaned Images/2DshapeB.jpg</file>
+        <file>images/Loaned Images/3Dshape.jpg</file>
+        <file>images/Loaned Images/3DshapeB.jpg</file>
+        <file>images/Loaned Images/3DshapeC.png</file>
+        <file>images/Loaned Images/channel_flow.png</file>
+    </qresource>
 </RCC>

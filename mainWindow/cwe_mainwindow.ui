@@ -85,7 +85,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>4</number>
           </property>
           <widget class="CWE_welcome_screen" name="tab_welcome_screen">
            <attribute name="title">
@@ -107,7 +107,7 @@
             <string>Dashboard</string>
            </attribute>
           </widget>
-          <widget class="CWE_create_simulation" name="tab_create_new">
+          <widget class="CWE_Create_Copy_Simulation" name="tab_create_new">
            <attribute name="title">
             <string>Create Job</string>
            </attribute>
@@ -190,7 +190,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -322,12 +322,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_create_simulation</class>
-   <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_create_simulation.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>CWE_file_manager</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_file_manager.h</header>
@@ -355,6 +349,12 @@
    <class>CWE_Parameters</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_parameters.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_Create_Copy_Simulation</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_create_copy_simulation.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
