@@ -57,6 +57,8 @@ public:
 
     void linkJobHandle(JobOperator * theOperator);
 
+private slots:
+
 private:
     Ui::CWE_landing    *ui;
     QStandardItemModel *model;

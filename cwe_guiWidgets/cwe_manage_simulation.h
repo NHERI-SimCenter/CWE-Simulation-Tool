@@ -51,7 +51,9 @@ public:
     ~CWE_manage_simulation();
 
 private slots:
-    void on_btn_viewRun_clicked();
+    void on_pb_viewParameters_clicked();
+
+    void on_pb_viewResults_clicked();
 
 private:
     Ui::CWE_manage_simulation *ui;
