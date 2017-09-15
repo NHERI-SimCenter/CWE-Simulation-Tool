@@ -32,6 +32,12 @@ private slots:
 
     void on_radioButton_channelFlow_clicked();
 
+    void on_pb_image_2Dshape_clicked();
+
+    void on_pb_image_3Dshape_clicked();
+
+    void on_pb_image_channelFlow_clicked();
+
 private:
     Ui::CWE_Create_Copy_Simulation *ui;
     SimulationType setSimulationType(SimulationType);
