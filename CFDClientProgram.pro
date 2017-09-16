@@ -33,7 +33,8 @@
 # Contributors:
 # Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-QT       += core gui network
+QT += core gui network
+QT += quickwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -89,7 +90,9 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_withstatusbutton.cpp \
     CFDanalysis/CFDcaseInstance.cpp \
     cwe_guiWidgets/cwe_create_simulation_old.cpp \
-    cwe_guiWidgets/cwe_create_copy_simulation.cpp
+    cwe_guiWidgets/cwe_create_copy_simulation.cpp \
+    cwe_guiWidgets/cwe_busyindicator.cpp \
+    cwe_guiWidgets/cwe_debug_widget.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -132,7 +135,9 @@ HEADERS  += \
     cwe_guiWidgets/cwe_withstatusbutton.h \
     CFDanalysis/CFDcaseInstance.h \
     cwe_guiWidgets/cwe_create_simulation_old.h \
-    cwe_guiWidgets/cwe_create_copy_simulation.h
+    cwe_guiWidgets/cwe_create_copy_simulation.h \
+    cwe_guiWidgets/cwe_busyindicator.h \
+    cwe_guiWidgets/cwe_debug_widget.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -152,11 +157,14 @@ FORMS    += \
     cwe_guiWidgets/pandptabwidget.ui \
     cwe_guiWidgets/cwe_withstatusbutton.ui \
     cwe_guiWidgets/cwe_create_simulation_old.ui \
-    cwe_guiWidgets/cwe_create_copy_simulation.ui
+    cwe_guiWidgets/cwe_create_copy_simulation.ui \
+    cwe_guiWidgets/cwe_busyindicator.ui \
+    cwe_guiWidgets/cwe_debug_widget.ui
 
 RESOURCES += \
     cwe_resources.qrc \
     ../AgaveExplorer/SimCenterCommon/commonResources.qrc \
     CFDanalysis/config/cfdconfig.qrc
 
-DISTFILES +=
+DISTFILES += \
+    QML/BusyIndicatorDef.qml

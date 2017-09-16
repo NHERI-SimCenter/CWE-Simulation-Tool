@@ -62,6 +62,9 @@
     </item>
     <item>
      <widget class="QStackedWidget" name="stackedPageContainer">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <widget class="QWidget" name="page_1">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="leftMargin">
@@ -85,7 +88,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>10</number>
           </property>
           <widget class="CWE_welcome_screen" name="tab_welcome_screen">
            <attribute name="title">
@@ -135,6 +138,11 @@
           <widget class="CWE_Results" name="tab_results">
            <attribute name="title">
             <string>Results</string>
+           </attribute>
+          </widget>
+          <widget class="CWE_Debug_Widget" name="tab_debug">
+           <attribute name="title">
+            <string>Debug</string>
            </attribute>
           </widget>
          </widget>
@@ -355,6 +363,12 @@
    <class>CWE_Create_Copy_Simulation</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_create_copy_simulation.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_Debug_Widget</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_debug_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

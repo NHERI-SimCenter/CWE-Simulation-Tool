@@ -23,4 +23,7 @@
         <file>images/Loaned Images/3DshapeC.png</file>
         <file>images/Loaned Images/channel_flow.png</file>
     </qresource>
+    <qresource prefix="/qml">
+        <file>QML/BusyIndicatorDef.qml</file>
+    </qresource>
 </RCC>
