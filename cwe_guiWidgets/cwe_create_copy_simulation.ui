@@ -99,7 +99,7 @@ description</string>
          </property>
          <property name="icon">
           <iconset resource="../cwe_resources.qrc">
-           <normaloff>:/temporaryImages/images/Loaned Images/2DshapeB.jpg</normaloff>:/temporaryImages/images/Loaned Images/2DshapeB.jpg</iconset>
+           <normaloff>:/buttons/images/placeholderIcon.png</normaloff>:/buttons/images/placeholderIcon.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -115,7 +115,7 @@ description</string>
        <item row="5" column="1">
         <widget class="QPushButton" name="pb_image_3Dshape">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -127,11 +127,11 @@ description</string>
           </size>
          </property>
          <property name="text">
-          <string>PushButton</string>
+          <string/>
          </property>
          <property name="icon">
           <iconset resource="../cwe_resources.qrc">
-           <normaloff>:/temporaryImages/images/Loaned Images/3Dshape.jpg</normaloff>:/temporaryImages/images/Loaned Images/3Dshape.jpg</iconset>
+           <normaloff>:/buttons/images/placeholderIcon.png</normaloff>:/buttons/images/placeholderIcon.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -161,7 +161,7 @@ description</string>
        <item row="1" column="1">
         <widget class="QPushButton" name="pb_image_channelFlow">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -173,11 +173,11 @@ description</string>
           </size>
          </property>
          <property name="text">
-          <string>PushButton</string>
+          <string/>
          </property>
          <property name="icon">
           <iconset resource="../cwe_resources.qrc">
-           <normaloff>:/temporaryImages/images/Loaned Images/channel_flow.png</normaloff>:/temporaryImages/images/Loaned Images/channel_flow.png</iconset>
+           <normaloff>:/buttons/images/placeholderIcon.png</normaloff>:/buttons/images/placeholderIcon.png</iconset>
          </property>
          <property name="iconSize">
           <size>
