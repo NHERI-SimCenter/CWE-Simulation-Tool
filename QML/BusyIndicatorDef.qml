@@ -1,10 +1,13 @@
 import QtQuick 2.0
-import QtGraphicalEffects 1.0
+//import QtGraphicalEffects 1.0
 
-Item {
-    id: item1
+Rectangle {
+    id: main
+    color: "#00000000"
+    width: 300; height: 60
+
     Text {
-        id: text1
+        id: theMessage
         color: "#2e72ea"
         text: qsTr("waiting for Design-Safe")
         anchors.fill: parent
@@ -16,60 +19,16 @@ Item {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.WordWrap
-        font.pixelSize: 28
+        font.pixelSize: 20
     }
 
-    Text {
-        id: text2
-        x: -3
-        y: 4
-        color: "#2eea2e"
-        text: qsTr("waiting for Design-Safe")
-        clip: false
-        font.bold: true
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
-        renderType: Text.QtRendering
-        wrapMode: Text.WordWrap
-        rotation: 0
-        font.pixelSize: 28
-        anchors.fill: parent
-        font.family: "Tahoma"
+    SequentialAnimation {
+        running: true
+        loops: Animation.Infinite
+        PropertyAnimation { target: theMessage; property: "color"; to: "#2e72ea"; duration: 1000 }
+        PropertyAnimation { target: theMessage; property: "color"; to: "#2eea2e"; duration: 1000 }
+        PropertyAnimation { target: theMessage; property: "color"; to: "#eae02e"; duration: 1000 }
+        PropertyAnimation { target: theMessage; property: "color"; to: "#eb4d2e"; duration: 1000 }
     }
 
-    Text {
-        id: text3
-        x: -6
-        y: 0
-        color: "#eae02e"
-        text: qsTr("waiting for Design-Safe")
-        clip: false
-        verticalAlignment: Text.AlignVCenter
-        font.bold: true
-        horizontalAlignment: Text.AlignHCenter
-        renderType: Text.QtRendering
-        wrapMode: Text.WordWrap
-        rotation: 0
-        font.pixelSize: 28
-        anchors.fill: parent
-        font.family: "Tahoma"
-    }
-
-    Text {
-        id: text4
-        x: 3
-        y: 12
-        color: "#eb4d2e"
-        text: qsTr("waiting for Design-Safe")
-        clip: false
-        verticalAlignment: Text.AlignVCenter
-        font.bold: true
-        horizontalAlignment: Text.AlignHCenter
-        renderType: Text.QtRendering
-        wrapMode: Text.WordWrap
-        rotation: 0
-        font.pixelSize: 28
-        anchors.fill: parent
-        font.family: "Tahoma"
-    }
 }
