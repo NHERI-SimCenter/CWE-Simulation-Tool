@@ -36,5 +36,5 @@ void CWE_Debug_Widget::on_pb_timedBusy_clicked()
 {
     if (theBusy == NULL) { theBusy = new CWE_BusyIndicator(); }
     theBusy->show();
-    QTimer::singleShot(3000, this, SLOT(on_pb_stopBusy_clicked()));
+    QTimer::singleShot(2000, this, SLOT(on_pb_stopBusy_clicked()));
 }
