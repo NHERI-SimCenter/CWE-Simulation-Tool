@@ -88,7 +88,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>10</number>
+           <number>0</number>
           </property>
           <widget class="CWE_welcome_screen" name="tab_welcome_screen">
            <attribute name="title">
@@ -142,7 +142,7 @@
           </widget>
           <widget class="CWE_Debug_Widget" name="tab_debug">
            <attribute name="title">
-            <string>Debug</string>
+            <string>.</string>
            </attribute>
           </widget>
          </widget>

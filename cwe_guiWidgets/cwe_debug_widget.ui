@@ -100,7 +100,7 @@
    <item row="2" column="2">
     <widget class="QPushButton" name="pb_timedBusy">
      <property name="text">
-      <string>3 second busy state</string>
+      <string>2 second busy state</string>
      </property>
     </widget>
    </item>
