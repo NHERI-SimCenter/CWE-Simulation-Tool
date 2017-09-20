@@ -51,7 +51,19 @@ class JobOperator;
 class VWTinterfaceDriver;
 
 enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
+//Stages:
+//UNRUN: Parameters changeable, RUN button active
+//LOADING: Parameters frozen(visible), no buttons
+//RUNNING: Parameters frozen(visible), CANCEL button active
+//FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
+//ERROR: ROLLBACK/RESET only thing available
+//TODO: Need a SAFE cleanup and repaint for parameters screen
+
 enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_INVOKE};
+//TODO: 3 things to wait for:
+//1) Waiting on file loading - WAIT_LOADING
+//2) Waiting on Agave actions - WAIT_AGAVE
+//3) Waiting on Agave apps - WAIT_AGAVE_APP
 
 class CFDcaseInstance : public QObject
 {
