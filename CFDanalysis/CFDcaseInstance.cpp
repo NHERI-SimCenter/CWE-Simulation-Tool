@@ -68,6 +68,10 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
 
     QObject::connect(theDriver->getFileHandler(), SIGNAL(newFileInfo()),
                      this, SLOT(underlyingFilesUpdated()));
+
+    myLock = new EasyBoolLock(this);
+    // PETER S.: TODO:
+    // when later given, caseFolder needs to check the connected node.
 }
 
 bool CFDcaseInstance::isDefunct()
