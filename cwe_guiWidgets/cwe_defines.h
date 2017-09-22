@@ -60,6 +60,15 @@
 #define CWE_STATE_RESULTS    0x00040000
 #define CWE_STATE_CLEAR      0x00080000
 
+/* define active buttons */
+#define CWE_BTN_RUN          0x01000000
+#define CWE_BTN_CANCEL       0x02000000
+#define CWE_BTN_RESULTS      0x04000000
+#define CWE_BTN_ROLLBACK     0x08000000
+#define CWE_BTN_SAVE_ALL     0x10000000
+#define CWE_BTN_ALL          0xff000000
+#define CWE_BTN_NONE         0x00000000
+
 struct InputDataType {
     QString      name;
     QString      displayName;

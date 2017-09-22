@@ -75,6 +75,8 @@ protected:
     QWidget * addUnknown(QJsonObject, QWidget *parent );
     void addType(const QString &, const QString &, QJsonObject, QWidget *parent );
 
+    void setButtonMode(uint mode);
+
 private:
     static QString getStateText(StageState theState);
 
