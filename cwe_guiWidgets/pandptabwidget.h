@@ -63,6 +63,13 @@ private slots:
     void on_pbtn_rollback_clicked();
     void on_groupTabSelected(int);
 
+signals:
+    void switchToResultsTab();
+    void switchToFileTab();
+    void switchToCreateTab();
+    void switchToParameterTab();
+    void switchToHelpTab();
+
 protected:
     QWidget * addStd(QJsonObject, QWidget *parent );
     QWidget * addBool(QJsonObject, QWidget *parent );
@@ -74,6 +81,8 @@ protected:
     QWidget * addTensor2D(QJsonObject, QWidget *parent );
     QWidget * addUnknown(QJsonObject, QWidget *parent );
     void addType(const QString &, const QString &, QJsonObject, QWidget *parent );
+
+    void setButtonMode(uint mode);
 
 private:
     static QString getStateText(StageState theState);
