@@ -16,6 +16,8 @@ PandPTabWidget::PandPTabWidget(QWidget *parent) :
     groupTabList    = new QMap<QString, QTabWidget *>();
     varTabWidgets   = new QMap<QString, QMap<QString, QWidget *> *>();
     variableWidgets = new QMap<QString, InputDataType *>();
+
+    this->setButtonMode(CWE_BTN_NONE);
 }
 
 PandPTabWidget::~PandPTabWidget()
@@ -420,4 +422,22 @@ QString PandPTabWidget::getStateText(StageState theState)
     if (theState == StageState::UNRUN)
         return "Not Yet Run";
     return "*** TOTAL ERROR ***";
+}
+
+void PandPTabWidget::setButtonMode(uint mode)
+{
+    bool btnState;
+
+    btnState = (mode & CWE_BTN_RUN)?true:false;
+    ui->pbtn_run->setEnabled(btnState);
+
+    btnState = (mode & CWE_BTN_CANCEL)?true:false;
+    ui->pbtn_cancel->setEnabled(btnState);
+
+    btnState = (mode & CWE_BTN_RESULTS)?true:false;
+    ui->pbtn_results->setEnabled(btnState);
+
+    btnState = (mode & CWE_BTN_ROLLBACK)?true:false;
+    ui->pbtn_rollback->setEnabled(btnState);
+
 }
