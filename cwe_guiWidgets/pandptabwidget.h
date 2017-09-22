@@ -63,6 +63,13 @@ private slots:
     void on_pbtn_rollback_clicked();
     void on_groupTabSelected(int);
 
+signals:
+    void switchToResultsTab();
+    void switchToFileTab();
+    void switchToCreateTab();
+    void switchToParameterTab();
+    void switchToHelpTab();
+
 protected:
     QWidget * addStd(QJsonObject, QWidget *parent );
     QWidget * addBool(QJsonObject, QWidget *parent );
