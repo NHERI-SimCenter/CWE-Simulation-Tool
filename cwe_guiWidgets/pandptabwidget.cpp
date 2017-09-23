@@ -17,7 +17,8 @@ PandPTabWidget::PandPTabWidget(QWidget *parent) :
     varTabWidgets   = new QMap<QString, QMap<QString, QWidget *> *>();
     variableWidgets = new QMap<QString, InputDataType *>();
 
-    this->setButtonMode(CWE_BTN_NONE);
+    this->setButtonMode(CWE_BTN_ALL);
+    //this->setButtonMode(CWE_BTN_NONE);
 }
 
 PandPTabWidget::~PandPTabWidget()
