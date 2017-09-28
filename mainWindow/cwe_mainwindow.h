@@ -74,6 +74,9 @@ public:
 private slots:
     void tabChanged(int);
     void newActiveCase();
+    void switchToParameterTab();
+    void switchToResultsTab();
+    void switchToCreateTab();
 
     void menuExit();
     void menuCopyInfo();
@@ -96,6 +99,7 @@ private slots:
 
 private:
     Ui::CWE_MainWindow *ui;
+    int switchToTab(int idx);
 
     VWTinterfaceDriver     *myDriver;
     RemoteDataInterface    *dataLink;
