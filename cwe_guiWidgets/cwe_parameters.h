@@ -31,8 +31,18 @@ private slots:
     void newCaseGiven();
     void newCaseState(CaseState oldState, CaseState newState);
 
+    void switchToResultsSlot();
+    void switchToParameterSlot();
+    void switchToCreateSlot();
+
+signals:
+    void switchToResultsTab();
+    void switchToParameterTab();
+    void switchToCreateTab();
+
 private:
     void saveAllParams();
+    int switchToTab(int index);
 
     Ui::CWE_Parameters *ui;
 

@@ -16,6 +16,9 @@ PandPTabWidget::PandPTabWidget(QWidget *parent) :
     groupTabList    = new QMap<QString, QTabWidget *>();
     varTabWidgets   = new QMap<QString, QMap<QString, QWidget *> *>();
     variableWidgets = new QMap<QString, InputDataType *>();
+
+    this->setButtonMode(CWE_BTN_ALL);
+    //this->setButtonMode(CWE_BTN_NONE);
 }
 
 PandPTabWidget::~PandPTabWidget()
@@ -342,7 +345,8 @@ void PandPTabWidget::setWidget(QWidget *w)
 
 void PandPTabWidget::on_pbtn_run_clicked()
 {
-
+    // enable the cancel button
+    this->setButtonMode(CWE_BTN_CANCEL);
 }
 
 QMap<QString, QString> PandPTabWidget::collectParamData()
@@ -389,22 +393,37 @@ QMap<QString, QString> PandPTabWidget::collectParamData()
 
 void PandPTabWidget::on_pbtn_cancel_clicked()
 {
+    // initiate job cancellation
 
+    // enable the run button
+    this->setButtonMode(CWE_BTN_RUN);
 }
 
 void PandPTabWidget::on_pbtn_results_clicked()
 {
+    // set run and rollback button active
+    this->setButtonMode(CWE_BTN_RESULTS|CWE_BTN_ROLLBACK);
 
+    // switch to the results tab
+    emit switchToResultsTab();
 }
 
 void PandPTabWidget::on_pbtn_rollback_clicked()
 {
+    // reset the interface
 
+    // set run button active
+    this->setButtonMode(CWE_BTN_RUN);
 }
 
 void PandPTabWidget::on_groupTabSelected(int idx)
 {
     this->setIndex(idx);
+
+    // check for status of tab #idx
+
+    // set button state accordingly
+    this->setButtonMode(CWE_BTN_RUN);
 }
 
 QString PandPTabWidget::getStateText(StageState theState)
@@ -420,4 +439,22 @@ QString PandPTabWidget::getStateText(StageState theState)
     if (theState == StageState::UNRUN)
         return "Not Yet Run";
     return "*** TOTAL ERROR ***";
+}
+
+void PandPTabWidget::setButtonMode(uint mode)
+{
+    bool btnState;
+
+    btnState = (mode & CWE_BTN_RUN)?true:false;
+    ui->pbtn_run->setEnabled(btnState);
+
+    btnState = (mode & CWE_BTN_CANCEL)?true:false;
+    ui->pbtn_cancel->setEnabled(btnState);
+
+    btnState = (mode & CWE_BTN_RESULTS)?true:false;
+    ui->pbtn_results->setEnabled(btnState);
+
+    btnState = (mode & CWE_BTN_ROLLBACK)?true:false;
+    ui->pbtn_rollback->setEnabled(btnState);
+
 }
