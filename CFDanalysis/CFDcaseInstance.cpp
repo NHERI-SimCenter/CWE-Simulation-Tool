@@ -170,7 +170,7 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
     //Check job handler for running tasks on this folder
     QMap<QString, RemoteJobData> jobs = theDriver->getJobHandler()->getRunningJobs();
 
-    for (auto itr = jobs.cbegin(); itr != jobs.cend(); itr++)
+    for (auto itr = jobs.begin(); itr != jobs.end(); itr++)
     {
         QString appName = (*itr).getApp();
         QMap<QString, QString> appParams = (*itr).getParams();
@@ -178,7 +178,7 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
         if (appParams.contains("directory"))
         {
             QString appFolder = appParams.value("directory");
-            if (caseFolder->folderNameMatches(appFolder))
+            if (caseFolder->fileNameMatches(appFolder))
             {
                 if (appName.contains("cwe-sim"))
                 {
@@ -225,10 +225,10 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
             }
             else
             {
-                QList<FileTreeNode *> childList = caseFolder->getChildList();
+                QList<FileTreeNode *> * childList = caseFolder->getChildList();
 
                 bool hasNumber = false;
-                for (auto itr = childList.cbegin(); (itr != childList.cend()) && (hasNumber == false); itr++)
+                for (auto itr = childList->begin(); (itr != childList->end()) && (hasNumber == false); itr++)
                 {
                     QString nameToCheck = (*itr)->getFileData().getFileName();
                     bool ok = false;
@@ -330,7 +330,7 @@ void CFDcaseInstance::forceInfoRefresh()
     }
 
     //Enact buffer download of .varStore
-    FileTreeNode varNode = caseFolder->getChildNodeWithName(".varStore");
+    FileTreeNode * varNode = caseFolder->getChildNodeWithName(".varStore");
     if (varNode != NULL)
     {
         fileHandle->sendDownloadBuffReq(varNode);
@@ -534,13 +534,13 @@ void CFDcaseInstance::underlyingFilesUpdated(bool forceRefresh)
         if (myType == NULL)
         {
             //If caseFolder exists, try to determine myType from varStore
-            FileTreeNode varFile = caseFolder->getChildNodeWithName(".varStore");
+            FileTreeNode * varFile = caseFolder->getChildNodeWithName(".varStore");
             if (varFile != NULL)
             {
-                QByteArray * varStore = varFile.getFileBuffer();
+                QByteArray * varStore = varFile->getFileBuffer();
                 if (varStore != NULL)
                 {
-                    QJsonDocument varDoc = QJsonDocument::fromJson(varDoc);
+                    QJsonDocument varDoc = QJsonDocument::fromJson(*varStore);
                     QString templateName = varDoc.object().value("type").toString();
                     if (!templateName.isEmpty())
                     {
