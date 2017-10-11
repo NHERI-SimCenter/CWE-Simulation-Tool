@@ -37,6 +37,8 @@
 
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "cwe_guiWidgets/cwe_state_label.h"
+
 #include <QDesktopWidget>
 #include <QDebug>
 
@@ -75,6 +77,9 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     QObject::connect(ui->tab_parameters, SIGNAL(switchToResultsTab()),   this, SLOT(switchToResultsTab())  );
     QObject::connect(ui->tab_parameters, SIGNAL(switchToCreateTab()),    this, SLOT(switchToCreateTab())   );
 
+    QObject::connect(ui->tab_create_new, SIGNAL(needParamTab()), this, SLOT(switchToParameterTab()));
+    QObject::connect(ui->tab_manage_and_run, SIGNAL(needParamTab()), this, SLOT(switchToParameterTab()));
+
     // adjust application size to display
     QRect rec = QApplication::desktop()->screenGeometry();
     int height = this->height()<0.5*rec.height()?this->height():0.5*rec.height();
@@ -84,11 +89,16 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
 void CWE_MainWindow::runSetupSteps()
 {
+    //TODO: Link driver should be a virtual function for a tab superclass
     ui->tab_files->linkFileHandle(myDriver->getFileHandler());
     ui->tab_landing_page->linkJobHandle(myDriver->getJobHandler());
-    ui->tab_create_new->linkFileHandle(myDriver->getFileHandler());
+    ui->tab_create_new->linkDriver(myDriver);
+    ui->tab_manage_and_run->linkDriver(myDriver);
 
     //Note: Adding widget to header will re-parent them
+    stateLabel = new cwe_state_label(this);
+    ui->header->appendWidget(stateLabel);
+
     QLabel * username = new QLabel(myDriver->getDataConnection()->getUserName());
     ui->header->appendWidget(username);
 
@@ -101,6 +111,10 @@ void CWE_MainWindow::attachCaseSignals(CFDcaseInstance * newCase)
 {
     QObject::connect(newCase, SIGNAL(haveNewState(CaseState,CaseState)),
                      ui->tab_parameters, SLOT(newCaseState(CaseState,CaseState)));
+    if (stateLabel != NULL)
+    {
+        stateLabel->setCurrentCase(newCase);
+    }
     //It is expected that this list will grow
 }
 
