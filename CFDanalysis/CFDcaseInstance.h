@@ -50,6 +50,7 @@ class FileTreeNode;
 class CFDanalysisType;
 class EasyBoolLock;
 class JobOperator;
+class RemoteJobData;
 
 class VWTinterfaceDriver;
 
@@ -62,11 +63,11 @@ enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 //ERROR: ROLLBACK/RESET only thing available
 //TODO: Need a SAFE cleanup and repaint for parameters screen
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_INVOKE};
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_INVOKE, AGAVE_RUN};
 //3 things to wait for:
-//1) Waiting on file loading - WAIT_LOADING
-//2) Waiting on Agave actions - WAIT_AGAVE
-//3) Waiting on Agave apps - WAIT_AGAVE_APP
+//1) Waiting on file loading - LOADING
+//2) Waiting on Agave actions - AGAVE_INVOKE
+//3) Waiting on Agave apps - AGAVE_RUN
 
 class CFDcaseInstance : public QObject
 {
@@ -109,6 +110,7 @@ private slots:
     void remoteAppDone();
 
 private:
+    QMap<QString, RemoteJobData * > getRelevantJobs();
     void emitNewState();
 
     bool defunct = false;
