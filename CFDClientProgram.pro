@@ -92,7 +92,8 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_create_simulation_old.cpp \
     cwe_guiWidgets/cwe_create_copy_simulation.cpp \
     cwe_guiWidgets/cwe_busyindicator.cpp \
-    cwe_guiWidgets/cwe_debug_widget.cpp
+    cwe_guiWidgets/cwe_debug_widget.cpp \
+    ../AgaveExplorer/remoteFileOps/remotejobentry.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -137,7 +138,8 @@ HEADERS  += \
     cwe_guiWidgets/cwe_create_simulation_old.h \
     cwe_guiWidgets/cwe_create_copy_simulation.h \
     cwe_guiWidgets/cwe_busyindicator.h \
-    cwe_guiWidgets/cwe_debug_widget.h
+    cwe_guiWidgets/cwe_debug_widget.h \
+    ../AgaveExplorer/remoteFileOps/remotejobentry.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \

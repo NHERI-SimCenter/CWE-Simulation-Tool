@@ -49,7 +49,6 @@ public:
     CFDanalysisType(QString configFile);
 
     QJsonDocument * getRawConfig();
-    QString getBrandingFile();
     QString getInternalName();
     QString getName();
 

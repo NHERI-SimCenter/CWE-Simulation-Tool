@@ -99,7 +99,7 @@ description</string>
          </property>
          <property name="icon">
           <iconset resource="../cwe_resources.qrc">
-           <normaloff>:/buttons/images/placeholderIcon.png</normaloff>:/buttons/images/placeholderIcon.png</iconset>
+           <normaloff>:/buttons/images/defaultCaseImage.png</normaloff>:/buttons/images/defaultCaseImage.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -131,7 +131,7 @@ description</string>
          </property>
          <property name="icon">
           <iconset resource="../cwe_resources.qrc">
-           <normaloff>:/buttons/images/placeholderIcon.png</normaloff>:/buttons/images/placeholderIcon.png</iconset>
+           <normaloff>:/buttons/images/defaultCaseImage.png</normaloff>:/buttons/images/defaultCaseImage.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -177,7 +177,7 @@ description</string>
          </property>
          <property name="icon">
           <iconset resource="../cwe_resources.qrc">
-           <normaloff>:/buttons/images/placeholderIcon.png</normaloff>:/buttons/images/placeholderIcon.png</iconset>
+           <normaloff>:/buttons/images/defaultCaseImage.png</normaloff>:/buttons/images/defaultCaseImage.png</iconset>
          </property>
          <property name="iconSize">
           <size>
