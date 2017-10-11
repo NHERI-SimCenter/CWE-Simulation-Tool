@@ -4,11 +4,30 @@
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
 
+#include <QDir>
+#include <QString>
+#include <QStringList>
+#include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QPixmap>
+#include <QRadioButton>
+#include <QLabel>
+
 CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::CWE_Create_Copy_Simulation)
 {
     ui->setupUi(this);
+
+    /* populate tab_NewCase with available cases */
+    QDir confDir(":/config");
+    QStringList filters;
+    filters << "*.json" << "*.JSON";
+    QStringList caseTypeFiles = confDir.entryList(filters);
+
+    this->populateCaseTypes(caseTypeFiles);
 
     ui->tabWidget->setCurrentIndex(0);
     this->setSimulationType(SimulationType::CHANNEL_FLOW);
@@ -76,22 +95,22 @@ SimulationType CWE_Create_Copy_Simulation::setSimulationType(SimulationType type
 {
     SimulationType retType = type;
 
-    ui->radioButton_channelFlow->setChecked(false);
-    ui->radioButton_2Dshape->setChecked(false);
-    ui->radioButton_3Dshape->setChecked(false);
+    //ui->radioButton_channelFlow->setChecked(false);
+    //ui->radioButton_2Dshape->setChecked(false);
+    //ui->radioButton_3Dshape->setChecked(false);
 
     switch (type) {
     case SimulationType::CHANNEL_FLOW:
-        ui->radioButton_channelFlow->setChecked(true);
+      //  ui->radioButton_channelFlow->setChecked(true);
         break;
     case SimulationType::SHAPE_2D:
-        ui->radioButton_2Dshape->setChecked(true);
+      //  ui->radioButton_2Dshape->setChecked(true);
         break;
     case SimulationType::SHAPE_3D:
-        ui->radioButton_3Dshape->setChecked(true);
+      //  ui->radioButton_3Dshape->setChecked(true);
         break;
     default:
-        ui->radioButton_channelFlow->setChecked(true);
+      //  ui->radioButton_channelFlow->setChecked(true);
         retType = SimulationType::CHANNEL_FLOW;
     }
 
@@ -111,4 +130,55 @@ void CWE_Create_Copy_Simulation::on_pb_image_2Dshape_clicked()
 void CWE_Create_Copy_Simulation::on_pb_image_3Dshape_clicked()
 {
     this->setSimulationType(SimulationType::SHAPE_3D);
+}
+
+void CWE_Create_Copy_Simulation::populateCaseTypes(QStringList &caseTypeFiles)
+{
+    QGridLayout *layout = new QGridLayout(this);
+
+    foreach (QString caseType, caseTypeFiles) {
+        /* read JSON info from file */
+        QString configFile = ":/config/" + caseType;
+
+        QFile inFile(configFile);
+        if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) continue;
+        QByteArray val = inFile.readAll();
+        inFile.close();
+
+        /* get analysis type and name info from JSON */
+        QJsonDocument configuration = QJsonDocument::fromJson(val);
+
+        QJsonObject confObj = configuration.object();
+        QString theName = confObj["name"].toString();
+        QString theDescription = confObj["description"].toString();
+        QString theIcon = confObj["icon"].toString();
+        QString theIconPath = ":/config/" + theIcon;
+
+        /* create UI selection block */
+        QRadioButton *radioBtn = new QRadioButton(theName, ui->scroll_NewCase);
+        QLabel *labelIcon = new QLabel(ui->scroll_NewCase);
+        if (theIcon == "") {
+            labelIcon->setPixmap(QPixmap(":/buttons/images/defaultCaseImage.png"));
+        }
+        else {
+            labelIcon->setPixmap(QPixmap(theIconPath));
+        }
+        labelIcon->setMinimumSize(150, 100);
+        labelIcon->setMaximumSize(150, 100);
+        QLabel *labelDescription = new QLabel(ui->scroll_NewCase);
+        if (theDescription == "") {
+            theDescription = "some\ndescription\nof this\ncase.";
+        }
+        labelDescription->setText(theDescription);
+
+        int cnt = layout->rowCount();
+        layout->addWidget(labelIcon,cnt+1,1,1,1);
+        layout->addWidget(labelDescription,cnt+1,2,1,1);
+        layout->addWidget(radioBtn,cnt,1,1,2);
+
+        /* create appropriate connection between signals and slots */
+
+    }
+
+    ui->scroll_NewCase->setLayout(layout);
 }
