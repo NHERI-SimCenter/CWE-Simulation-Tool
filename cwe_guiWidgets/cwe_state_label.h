@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,44 +31,30 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_MANAGE_SIMULATION_H
-#define CWE_MANAGE_SIMULATION_H
+#ifndef CWE_STATE_LABEL_H
+#define CWE_STATE_LABEL_H
 
+#include <QObject>
 #include <QWidget>
-#include "cwe_defines.h"
+#include <QLabel>
 
-class FileTreeNode;
-class VWTinterfaceDriver;
+enum class CaseState;
+class CFDcaseInstance;
 
-namespace Ui {
-class CWE_manage_simulation;
-}
-
-class CWE_manage_simulation : public QWidget
+class cwe_state_label : public QLabel
 {
     Q_OBJECT
-
 public:
-    explicit CWE_manage_simulation(QWidget *parent = 0);
-    ~CWE_manage_simulation();
+    cwe_state_label(QWidget *parent);
+    void setCurrentCase(CFDcaseInstance * newCase);
 
-    void linkDriver(VWTinterfaceDriver * theDriver);
-
-private slots:
-    void newFileSelected(FileTreeNode * newFile);
-
-    void on_pb_viewParameters_clicked();
-
-    void on_pb_viewResults_clicked();
-
-signals:
-    void needParamTab();
+public slots:
+    void setNewState(CaseState, CaseState newState);
 
 private:
-    Ui::CWE_manage_simulation *ui;
-
-    VWTinterfaceDriver * driverLink = NULL;
+    CFDcaseInstance * currentCase = NULL;
 };
 
-#endif // CWE_MANAGE_SIMULATION_H
+#endif // CWE_STATE_LABEL_H

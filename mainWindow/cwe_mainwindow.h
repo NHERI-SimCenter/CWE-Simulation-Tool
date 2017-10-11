@@ -58,6 +58,7 @@ class CWE_MainWindow;
 }
 
 class CFDcaseInstance;
+class cwe_state_label;
 
 class CWE_MainWindow : public QMainWindow
 {
@@ -103,6 +104,7 @@ private:
 
     VWTinterfaceDriver     *myDriver;
     RemoteDataInterface    *dataLink;
+    cwe_state_label        *stateLabel = NULL;
 };
 
 #endif // CWE_MAINWINDOW_H
