@@ -4,6 +4,11 @@
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
 
+#include "CFDanalysis/CFDanalysisType.h"
+#include "CFDanalysis/CFDcaseInstance.h"
+
+#include "vwtinterfacedriver.h"
+
 #include <QDir>
 #include <QString>
 #include <QStringList>
@@ -38,11 +43,12 @@ CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
     delete ui;
 }
 
-void CWE_Create_Copy_Simulation::linkFileHandle(FileOperator * theJobhandle)
+void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
 {
-    ui->primary_remoteFileTree->setFileOperator(theJobhandle);
+    driverLink = theDriver;
+    ui->primary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
     ui->primary_remoteFileTree->setupFileView();
-    ui->secondary_remoteFileTree->setFileOperator(theJobhandle);
+    ui->secondary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
     ui->secondary_remoteFileTree->setupFileView();
 }
 
@@ -58,7 +64,18 @@ void CWE_Create_Copy_Simulation::on_pBtn_cancel_clicked()
 
 void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 {
+    //Note: some of this will be parsed to other methods
+    //TODO: This is a first debug pass
 
+    CFDanalysisType * debugType = driverLink->getTemplateList()->at(0);
+
+    CFDcaseInstance * newCase = new CFDcaseInstance(debugType, driverLink);
+    driverLink->setCurrentCase(newCase);
+
+    //TODO: VERY IMPORTANT: NEED INPUT FILTERING
+    newCase->createCase(ui->lineEdit_newCaseName->text(), ui->primary_remoteFileTree->getSelectedNode());
+
+    emit needParamTab();
 }
 
 void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)

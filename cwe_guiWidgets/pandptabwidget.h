@@ -38,7 +38,7 @@ public:
     int  addGroupTab(QString key, const QString &label, StageState currentState);
 
     void setCurrentWidget(QWidget *);
-    bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label );
+    bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label , QString *setVal = NULL);
 
     int  index() { return activeIndex;};
     void setIndex(int );
@@ -48,8 +48,8 @@ public:
     QWidget * widget(int);
 
     int addVarTab(QString key, const QString &label);
-    int addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo);
-    void addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo);
+    int addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString, QString> *setVars);
+    void addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> *setVars);
     void addVSpacer(const QString &key, const QString &label);
 
     void addVarsData(QJsonObject , QJsonObject );
@@ -71,16 +71,16 @@ signals:
     void switchToHelpTab();
 
 protected:
-    QWidget * addStd(QJsonObject, QWidget *parent );
-    QWidget * addBool(QJsonObject, QWidget *parent );
-    QWidget * addFile(QJsonObject, QWidget *parent );
-    QWidget * addChoice(QJsonObject, QWidget *parent );
-    QWidget * addVector3D(QJsonObject, QWidget *parent );
-    QWidget * addVector2D(QJsonObject, QWidget *parent );
-    QWidget * addTensor3D(QJsonObject, QWidget *parent );
-    QWidget * addTensor2D(QJsonObject, QWidget *parent );
-    QWidget * addUnknown(QJsonObject, QWidget *parent );
-    void addType(const QString &, const QString &, QJsonObject, QWidget *parent );
+    QWidget * addStd(QJsonObject, QWidget *parent, QString *setVal = NULL );
+    QWidget * addBool(QJsonObject, QWidget *parent, QString *setVal = NULL );
+    QWidget * addFile(QJsonObject, QWidget *parent, QString *setVal = NULL );
+    QWidget * addChoice(QJsonObject, QWidget *parent, QString *setVal = NULL);
+    QWidget * addVector3D(QJsonObject, QWidget *parent, QString *setVal = NULL );
+    QWidget * addVector2D(QJsonObject, QWidget *parent, QString *setVal = NULL );
+    QWidget * addTensor3D(QJsonObject, QWidget *parent, QString *setVal = NULL );
+    QWidget * addTensor2D(QJsonObject, QWidget *parent, QString *setVal = NULL );
+    QWidget * addUnknown(QJsonObject, QWidget *parent, QString *setVal = NULL );
+    void addType(const QString &, const QString &, QJsonObject, QWidget *parent , QString * setVal);
 
     void setButtonMode(uint mode);
 
