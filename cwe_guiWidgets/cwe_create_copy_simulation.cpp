@@ -178,7 +178,16 @@ void CWE_Create_Copy_Simulation::populateCaseTypes(QStringList &caseTypeFiles)
 
         /* create appropriate connection between signals and slots */
 
+        connect(labelIcon, SIGNAL(clicked()),        this, SLOT(selectCaseTemplate()));
+        connect(labelDescription, SIGNAL(clicked()), this, SLOT(selectCaseTemplate()));
+        connect(radioBtn, SIGNAL(toggled(bool)),     this, SLOT(selectCaseTemplate()));
+
     }
 
     ui->scroll_NewCase->setLayout(layout);
+}
+
+void CWE_Create_Copy_Simulation::selectCaseTemplate()
+{
+    QObject *sender = QObject::sender();
 }
