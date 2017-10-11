@@ -63,11 +63,12 @@ enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 //ERROR: ROLLBACK/RESET only thing available
 //TODO: Need a SAFE cleanup and repaint for parameters screen
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_INVOKE, AGAVE_RUN};
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_INVOKE, AGAVE_RELOAD, AGAVE_RUN};
 //3 things to wait for:
 //1) Waiting on file loading - LOADING
 //2) Waiting on Agave actions - AGAVE_INVOKE
-//3) Waiting on Agave apps - AGAVE_RUN
+//3) Waiting on Agave apps list to reload - AGAVE_RELOAD
+//4) Waiting on Agave apps - AGAVE_RUN
 
 class CFDcaseInstance : public QObject
 {
@@ -101,17 +102,19 @@ signals:
     void detachCase();
     void haveNewState(CaseState oldState, CaseState newState);
 
-public slots:
-    void forceInfoRefresh();
-
 private slots:
-    void underlyingFilesUpdated(bool forceRefresh = false);
+    void underlyingFilesUpdated();
+    void jobListUpdated();
+    void remoteCommandDone();
+
     void caseFolderRemoved();
-    void remoteAppDone();
 
 private:
+    void emitNewState(CaseState newState);
+
+    void demandFolderSearch();
+
     QMap<QString, RemoteJobData * > getRelevantJobs();
-    void emitNewState();
 
     bool defunct = false;
     CaseState oldState = CaseState::LOADING;
