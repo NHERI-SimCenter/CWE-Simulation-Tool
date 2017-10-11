@@ -67,6 +67,8 @@ void CWE_Parameters::resetViewInfo()
     QJsonObject    varGroups  = obj["varGroups"].toObject();
     QJsonObject    vars       = obj["vars"].toObject();
 
+    QMap<QString,QString> setVars = currentCase->getCurrentParams();
+
     //QJsonArray    results    = obj["results"].toArray();
 
     //qDebug() << stageNames;
@@ -91,7 +93,7 @@ void CWE_Parameters::resetViewInfo()
         {
             QString subTitle = item.toString();
             QJsonArray varList = varGroups[subTitle].toArray();
-            ui->theTabWidget->addVarTab(name, subTitle, &varList, &vars);
+            ui->theTabWidget->addVarTab(name, subTitle, &varList, &vars, &setVars);
         }
 
         cnt++;

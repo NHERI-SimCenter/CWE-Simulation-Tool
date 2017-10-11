@@ -1,6 +1,6 @@
 {
     "name":"2D Building Slice",
-    "internalName":"buildingSlice",
+    "internalName":"building",
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{

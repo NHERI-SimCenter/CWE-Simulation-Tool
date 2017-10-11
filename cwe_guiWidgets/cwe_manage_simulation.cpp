@@ -36,16 +36,39 @@
 #include "ui_cwe_manage_simulation.h"
 #include "cwe_defines.h"
 
+#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+
+#include "CFDanalysis/CFDanalysisType.h"
+#include "CFDanalysis/CFDcaseInstance.h"
+
+#include "vwtinterfacedriver.h"
+
 CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CWE_manage_simulation)
 {
     ui->setupUi(this);
+
+    QObject::connect(ui->treeView, SIGNAL(newFileSelected(FileTreeNode*)),
+                             this, SLOT(newFileSelected(FileTreeNode*)));
 }
 
 CWE_manage_simulation::~CWE_manage_simulation()
 {
     delete ui;
+}
+
+void CWE_manage_simulation::linkDriver(VWTinterfaceDriver * theDriver)
+{
+    driverLink = theDriver;
+}
+
+void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
+{
+    CFDcaseInstance * newCase = new CFDcaseInstance(newFile, driverLink);
+    driverLink->setCurrentCase(newCase);
+
+    emit needParamTab();
 }
 
 void CWE_manage_simulation::on_pb_viewParameters_clicked()
