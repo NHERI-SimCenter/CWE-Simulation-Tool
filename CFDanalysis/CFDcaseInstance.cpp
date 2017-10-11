@@ -52,8 +52,9 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
     caseFolder = newCaseFolder;
     theDriver = mainDriver;
 
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(newFileInfo()),
-                     this, SLOT(underlyingFilesUpdated()));
+    //TODO: Need to way to know of file change
+    //QObject::connect(theDriver->getFileHandler(), SIGNAL(newFileInfo()),
+    //                 this, SLOT(underlyingFilesUpdated()));
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
 
@@ -68,8 +69,9 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
     myType = caseType;
     theDriver = mainDriver;
 
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(newFileInfo()),
-                     this, SLOT(underlyingFilesUpdated()));
+    //TODO: Need to way to know of file change
+    //QObject::connect(theDriver->getFileHandler(), SIGNAL(newFileInfo()),
+    //                 this, SLOT(underlyingFilesUpdated()));
 
     myLock = new EasyBoolLock(this);
 }
@@ -83,6 +85,7 @@ CaseState CFDcaseInstance::getCaseState()
 {
     if (defunct) return CaseState::DEFUNCT;
     if (myLock->lockClosed()) return CaseState::AGAVE_INVOKE;
+    if (!getRelevantJobs().isEmpty()) return CaseState::AGAVE_RUN;
 
     if (caseFolder == NULL) return CaseState::LOADING;
     if (myType == NULL) return CaseState::LOADING;
@@ -153,6 +156,29 @@ QMap<QString, QString> CFDcaseInstance::getCurrentParams()
     return ret;
 }
 
+QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
+{
+    QMap<QString, RemoteJobData> jobs = theDriver->getJobHandler()->getRunningJobs();
+
+    QMap<QString, RemoteJobData * > ret;
+
+    for (auto itr = jobs.begin(); itr != jobs.end(); itr++)
+    {
+        QString appName = (*itr).getApp();
+        QMap<QString, QString> appParams = (*itr).getParams();
+        if (appName.contains("cwe") && appParams.contains("directory"))
+        {
+            QString appFolder = appParams.value("directory");
+            if (caseFolder->fileNameMatches(appFolder))
+            {
+                ret.insert(appName, &(*itr));
+            }
+        }
+    }
+
+    return ret;
+}
+
 QMap<QString, StageState> CFDcaseInstance::getStageStates()
 {
     QMap<QString, StageState> ret;
@@ -168,43 +194,35 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
     }
 
     //Check job handler for running tasks on this folder
-    QMap<QString, RemoteJobData> jobs = theDriver->getJobHandler()->getRunningJobs();
+    QMap<QString, RemoteJobData * > relevantJobs = getRelevantJobs();
 
-    for (auto itr = jobs.begin(); itr != jobs.end(); itr++)
+    for (auto itr = relevantJobs.begin(); itr != relevantJobs.end(); itr++)
     {
-        QString appName = (*itr).getApp();
-        QMap<QString, QString> appParams = (*itr).getParams();
+        QString appName = itr.key();
 
-        if (appParams.contains("directory"))
+        if (appName.contains("cwe-sim"))
         {
-            QString appFolder = appParams.value("directory");
-            if (caseFolder->fileNameMatches(appFolder))
-            {
-                if (appName.contains("cwe-sim"))
-                {
-                    ret.insert("mesh", StageState::FINISHED);
-                    ret.insert("sim", StageState::RUNNING);
-                    return ret;
-                }
-                if (appName.contains("cwe-exec-serial"))
-                {
-                    ret.insert("mesh", StageState::RUNNING);
-                    ret.insert("sim", StageState::UNRUN);
-                    return ret;
-                }
-                if (appName.contains("cwe-update"))
-                {
-                    ret.insert("mesh", StageState::LOADING);
-                    ret.insert("sim", StageState::LOADING);
-                    return ret;
-                }
-                if (appName.contains("cwe-delete"))
-                {
-                    ret.insert("mesh", StageState::LOADING);
-                    ret.insert("sim", StageState::LOADING);
-                    return ret;
-                }
-            }
+            ret.insert("mesh", StageState::FINISHED);
+            ret.insert("sim", StageState::RUNNING);
+            return ret;
+        }
+        if (appName.contains("cwe-exec-serial"))
+        {
+            ret.insert("mesh", StageState::RUNNING);
+            ret.insert("sim", StageState::UNRUN);
+            return ret;
+        }
+        if (appName.contains("cwe-update"))
+        {
+            ret.insert("mesh", StageState::LOADING);
+            ret.insert("sim", StageState::LOADING);
+            return ret;
+        }
+        if (appName.contains("cwe-delete"))
+        {
+            ret.insert("mesh", StageState::LOADING);
+            ret.insert("sim", StageState::LOADING);
+            return ret;
         }
     }
 
@@ -289,6 +307,8 @@ void CFDcaseInstance::forceInfoRefresh()
 
     if (caseFolder == NULL) return;
 
+    if (!getRelevantJobs().isEmpty()) return;
+
     //Enact LS of case folder itself
     FileOperator * fileHandle = theDriver->getFileHandler();
     fileHandle->enactFolderRefresh(caseFolder);
@@ -299,8 +319,6 @@ void CFDcaseInstance::forceInfoRefresh()
 
     for (auto itr = stages.constBegin(); itr != stages.constEnd(); itr++)
     {
-        QString stageKey = itr.key();
-
         QString stageExpect = (*itr).toObject().value("expected").toString();
 
         if (stageExpect == "<NUMERICAL>")
@@ -335,6 +353,8 @@ void CFDcaseInstance::forceInfoRefresh()
     {
         fileHandle->sendDownloadBuffReq(varNode);
     }
+
+    theDriver->getJobHandler()->demandJobDataRefresh();
 }
 
 void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolder)
@@ -361,7 +381,7 @@ void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolde
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(agaveAppDone()));
+                     this, SLOT(remoteAppDone()));
 }
 
 void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
@@ -398,7 +418,7 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(agaveAppDone()));
+                     this, SLOT(remoteAppDone()));
 }
 
 void CFDcaseInstance::mesh(FileTreeNode * geoFile)
@@ -419,7 +439,7 @@ void CFDcaseInstance::mesh(FileTreeNode * geoFile)
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(agaveAppDone()));
+                     this, SLOT(remoteAppDone()));
 }
 
 void CFDcaseInstance::rollBack(QString stageToDelete)
@@ -439,7 +459,7 @@ void CFDcaseInstance::rollBack(QString stageToDelete)
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(agaveAppDone()));
+                     this, SLOT(remoteAppDone()));
 }
 
 void CFDcaseInstance::openFOAM()
@@ -469,7 +489,7 @@ void CFDcaseInstance::openFOAM()
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(agaveAppDone()));
+                     this, SLOT(remoteAppDone()));
 }
 
 void CFDcaseInstance::postProcess()
@@ -489,7 +509,7 @@ void CFDcaseInstance::postProcess()
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(agaveAppDone()));
+                     this, SLOT(remoteAppDone()));
 }
 
 void CFDcaseInstance::killCaseConnection()

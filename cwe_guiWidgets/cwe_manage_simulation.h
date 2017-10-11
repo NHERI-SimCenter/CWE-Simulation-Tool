@@ -38,6 +38,9 @@
 #include <QWidget>
 #include "cwe_defines.h"
 
+class FileTreeNode;
+class VWTinterfaceDriver;
+
 namespace Ui {
 class CWE_manage_simulation;
 }
@@ -50,13 +53,22 @@ public:
     explicit CWE_manage_simulation(QWidget *parent = 0);
     ~CWE_manage_simulation();
 
+    void linkDriver(VWTinterfaceDriver * theDriver);
+
 private slots:
+    void newFileSelected(FileTreeNode * newFile);
+
     void on_pb_viewParameters_clicked();
 
     void on_pb_viewResults_clicked();
 
+signals:
+    void needParamTab();
+
 private:
     Ui::CWE_manage_simulation *ui;
+
+    VWTinterfaceDriver * driverLink = NULL;
 };
 
 #endif // CWE_MANAGE_SIMULATION_H
