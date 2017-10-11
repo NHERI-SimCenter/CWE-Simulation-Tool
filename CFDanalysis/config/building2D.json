@@ -1,6 +1,5 @@
 {
     "name":"2D Building Slice",
-    "brandingFile":".cwe_2d_u",
     "internalName":"buildingSlice",
     "sequence":["mesh","sim"],
     "stages":{
@@ -17,7 +16,8 @@
                     "name":"Mesh View",
                     "type":"GLmesh"
                 }
-            ]
+            ],
+            "expected":"constant/polyMesh/boundary.gz"
         },
         "sim":{
             "name":"Simulation",
@@ -43,7 +43,8 @@
                     "type":"text",
                     "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat"
                 }
-            ]
+            ],
+            "expected":"<NUMERICAL>"
         }
     },
     "varGroups":{
@@ -98,22 +99,6 @@
         ]
     },
     "vars":{
-        "numPiles":{
-            "displayname":"Number of Piles",
-            "type":"std",
-            "default":"1",
-            "unit":"",
-            "precision":"int",
-            "sign":"+"
-        },
-        "numLayers":{
-            "displayname":"Number of soil layers",
-            "type":"std",
-            "default":"3",
-            "unit":"",
-            "precision":"int",
-            "sign":"+"
-        },
         "geoFile":{
             "displayname":"Geometry File",
             "type":"file"

@@ -52,12 +52,6 @@ QJsonDocument * CFDanalysisType::getRawConfig()
     return &myConfiguration;
 }
 
-QString CFDanalysisType::getBrandingFile()
-{
-    QJsonObject obj = myConfiguration.object();
-    return obj["brandingFile"].toString();
-}
-
 QString CFDanalysisType::getInternalName()
 {
     QJsonObject obj = myConfiguration.object();

@@ -40,7 +40,10 @@
 #include <QMap>
 #include <QStringList>
 
-//For debug:
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+
 #include <QTimer>
 
 class FileTreeNode;
@@ -60,7 +63,7 @@ enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 //TODO: Need a SAFE cleanup and repaint for parameters screen
 
 enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_INVOKE};
-//TODO: 3 things to wait for:
+//3 things to wait for:
 //1) Waiting on file loading - WAIT_LOADING
 //2) Waiting on Agave actions - WAIT_AGAVE
 //3) Waiting on Agave apps - WAIT_AGAVE_APP
@@ -87,7 +90,7 @@ public:
     void createCase(QString newName, FileTreeNode * containingFolder);
     void changeParameters(QMap<QString, QString> paramList);
     void mesh(FileTreeNode * geoFile = NULL); //Leave NULL if not used
-    void rollBack(QStringList stagesToDelete);
+    void rollBack(QString stageToDelete);
     void openFOAM();
     void postProcess();
 
@@ -101,9 +104,9 @@ public slots:
     void forceInfoRefresh();
 
 private slots:
-    void underlyingFilesUpdated();
+    void underlyingFilesUpdated(bool forceRefresh = false);
     void caseFolderRemoved();
-    void agaveAppDone();
+    void remoteAppDone();
 
 private:
     void emitNewState();
