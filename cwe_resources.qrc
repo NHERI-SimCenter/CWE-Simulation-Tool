@@ -11,6 +11,7 @@
         <file>images/CWE_eye.png</file>
         <file>images/CWE_empty.png</file>
         <file>images/placeholderIcon.png</file>
+        <file>images/defaultCaseImage.png</file>
     </qresource>
     <qresource prefix="/">
         <file>copyText.txt</file>
