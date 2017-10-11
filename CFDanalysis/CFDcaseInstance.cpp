@@ -52,15 +52,12 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
     caseFolder = newCaseFolder;
     theDriver = mainDriver;
 
-    //TODO: Need to way to know of file change
-    //QObject::connect(theDriver->getFileHandler(), SIGNAL(newFileInfo()),
-    //                 this, SLOT(underlyingFilesUpdated()));
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
+    QObject::connect(theDriver->getFileHandler(), SIGNAL(fileSystemChange()),
+                     this, SLOT(underlyingFilesUpdated()));
 
     myLock = new EasyBoolLock(this);
-
-    underlyingFilesUpdated(true);
 }
 
 CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver *mainDriver):
@@ -69,9 +66,8 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
     myType = caseType;
     theDriver = mainDriver;
 
-    //TODO: Need to way to know of file change
-    //QObject::connect(theDriver->getFileHandler(), SIGNAL(newFileInfo()),
-    //                 this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(theDriver->getFileHandler(), SIGNAL(fileSystemChange()),
+                     this, SLOT(underlyingFilesUpdated()));
 
     myLock = new EasyBoolLock(this);
 }
@@ -84,30 +80,7 @@ bool CFDcaseInstance::isDefunct()
 CaseState CFDcaseInstance::getCaseState()
 {
     if (defunct) return CaseState::DEFUNCT;
-    if (myLock->lockClosed()) return CaseState::AGAVE_INVOKE;
-    if (!getRelevantJobs().isEmpty()) return CaseState::AGAVE_RUN;
-
-    if (caseFolder == NULL) return CaseState::LOADING;
-    if (myType == NULL) return CaseState::LOADING;
-    if (caseFolder->childIsUnloaded()) return CaseState::LOADING;
-
-    if (caseFolder->getChildNodeWithName(".varStore") == NULL) return CaseState::INVALID;
-    if (caseFolder->getChildNodeWithName(".varStore")->getFileBuffer() == NULL) return CaseState::LOADING;
-    if (myType == NULL) return CaseState::INVALID;
-
-    QMap<QString, StageState> stages = getStageStates();
-    for (auto itr = stages.cbegin(); itr != stages.cend(); itr++)
-    {
-        if ((*itr) == StageState::LOADING)
-        {
-            return CaseState::LOADING;
-        }
-        if ((*itr) == StageState::ERROR)
-        {
-            return CaseState::ERROR;
-        }
-    }
-    return CaseState::READY;
+    return oldState;
 }
 
 QString CFDcaseInstance::getCaseFolder()
@@ -301,62 +274,6 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
     return ret;
 }
 
-void CFDcaseInstance::forceInfoRefresh()
-{
-    if (defunct) return;
-
-    if (caseFolder == NULL) return;
-
-    if (!getRelevantJobs().isEmpty()) return;
-
-    //Enact LS of case folder itself
-    FileOperator * fileHandle = theDriver->getFileHandler();
-    fileHandle->enactFolderRefresh(caseFolder);
-
-    //If case type known:
-    //Enact LS of folders from list of check files in configuration
-    QJsonObject stages = myType->getRawConfig()->object().value("stages").toObject();
-
-    for (auto itr = stages.constBegin(); itr != stages.constEnd(); itr++)
-    {
-        QString stageExpect = (*itr).toObject().value("expected").toString();
-
-        if (stageExpect == "<NUMERICAL>")
-        {
-            continue;
-        }
-
-        QStringList foldersToSearch = stageExpect.split('/');
-        FileTreeNode * currentNode = caseFolder;
-        for (auto itr = foldersToSearch.cbegin(); (itr != foldersToSearch.cend()) && (currentNode != NULL); itr++)
-        {
-            QString folderName = (*itr);
-            if (currentNode->childIsUnloaded())
-            {
-                currentNode = NULL;
-            }
-            else
-            {
-                currentNode = currentNode->getChildNodeWithName(folderName);
-            }
-
-            if (currentNode != NULL)
-            {
-                fileHandle->enactFolderRefresh(currentNode);
-            }
-        }
-    }
-
-    //Enact buffer download of .varStore
-    FileTreeNode * varNode = caseFolder->getChildNodeWithName(".varStore");
-    if (varNode != NULL)
-    {
-        fileHandle->sendDownloadBuffReq(varNode);
-    }
-
-    theDriver->getJobHandler()->demandJobDataRefresh();
-}
-
 void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolder)
 {
     if (defunct) return;
@@ -381,7 +298,8 @@ void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolde
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(remoteAppDone()));
+                     this, SLOT(remoteCommandDone()));
+    emitNewState(CaseState::AGAVE_INVOKE);
 }
 
 void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
@@ -418,7 +336,8 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(remoteAppDone()));
+                     this, SLOT(remoteCommandDone()));
+    emitNewState(CaseState::AGAVE_INVOKE);
 }
 
 void CFDcaseInstance::mesh(FileTreeNode * geoFile)
@@ -439,7 +358,8 @@ void CFDcaseInstance::mesh(FileTreeNode * geoFile)
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(remoteAppDone()));
+                     this, SLOT(remoteCommandDone()));
+    emitNewState(CaseState::AGAVE_INVOKE);
 }
 
 void CFDcaseInstance::rollBack(QString stageToDelete)
@@ -459,7 +379,8 @@ void CFDcaseInstance::rollBack(QString stageToDelete)
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(remoteAppDone()));
+                     this, SLOT(remoteCommandDone()));
+    emitNewState(CaseState::AGAVE_INVOKE);
 }
 
 void CFDcaseInstance::openFOAM()
@@ -489,7 +410,8 @@ void CFDcaseInstance::openFOAM()
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(remoteAppDone()));
+                     this, SLOT(remoteCommandDone()));
+    emitNewState(CaseState::AGAVE_INVOKE);
 }
 
 void CFDcaseInstance::postProcess()
@@ -509,7 +431,8 @@ void CFDcaseInstance::postProcess()
         defunct = true;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(remoteAppDone()));
+                     this, SLOT(remoteCommandDone()));
+    emitNewState(CaseState::AGAVE_INVOKE);
 }
 
 void CFDcaseInstance::killCaseConnection()
@@ -519,76 +442,163 @@ void CFDcaseInstance::killCaseConnection()
     this->deleteLater();
 }
 
-void CFDcaseInstance::underlyingFilesUpdated(bool forceRefresh)
+void CFDcaseInstance::underlyingFilesUpdated()
 {
     if (defunct) return;
 
-    bool needRefresh = forceRefresh;
+    if (caseFolder == NULL)
+    {
+        if (expectedNewCaseFolder.isEmpty())
+        {
+            emitNewState(CaseState::ERROR);
+            return;
+        }
+
+        demandFolderSearch();
+
+        if (caseFolder != NULL)
+        {
+            theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+        }
+        emitNewState(CaseState::LOADING);
+        return;
+    }
+
+    if (caseFolder->childIsUnloaded())
+    {
+        theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+        emitNewState(CaseState::LOADING);
+        return;
+    }
+
+    FileTreeNode * varFile = caseFolder->getChildNodeWithName(".varStore");
+
+    if (varFile == NULL)
+    {
+        emitNewState(CaseState::INVALID);
+        return;
+    }
+
+    QByteArray * varStore = varFile->getFileBuffer();
+    if (varStore == NULL)
+    {
+        theDriver->getFileHandler()->sendDownloadBuffReq(varFile);
+        emitNewState(CaseState::LOADING);
+        return;
+    }
+
+    if (myType == NULL)
+    {
+        QJsonDocument varDoc = QJsonDocument::fromJson(*varStore);
+        QString templateName = varDoc.object().value("type").toString();
+        if (templateName.isEmpty())
+        {
+            emitNewState(CaseState::ERROR);
+            return;
+        }
+
+        QList<CFDanalysisType *> * templates = theDriver->getTemplateList();
+        for (auto itr = templates->cbegin(); (itr != templates->cend()) && (myType == NULL); itr++)
+        {
+            if (templateName == (*itr)->getInternalName())
+            {
+                myType = (*itr);
+            }
+        }
+
+        if (myType == NULL)
+        {
+            emitNewState(CaseState::ERROR);
+            return;
+        }
+    }
+
+    //Enact LS of folders from list of check files in configuration
+    QJsonObject stages = myType->getRawConfig()->object().value("stages").toObject();
+
+    for (auto itr = stages.constBegin(); itr != stages.constEnd(); itr++)
+    {
+        QString stageExpect = (*itr).toObject().value("expected").toString();
+
+        if (stageExpect == "<NUMERICAL>")
+        {
+            continue;
+        }
+
+        QString searchPath = caseFolder->getFileData().getFullPath();
+        searchPath = searchPath.append("/");
+        searchPath = searchPath.append(stageExpect);
+        FileTreeNode * toFind = theDriver->getFileHandler()->getClosestNodeFromName(searchPath);
+
+        if (!toFind->fileNameMatches(searchPath))
+        {
+            if (toFind->childIsUnloaded())
+            {
+                theDriver->getFileHandler()->enactFolderRefresh(toFind);
+                emitNewState(CaseState::LOADING);
+                return;
+            }
+        }
+    }
+
+    emitNewState(CaseState::READY);
+}
+
+void CFDcaseInstance::jobListUpdated()
+{
+    if (defunct) return;
+
+    if (!getRelevantJobs().isEmpty())
+    {
+        emitNewState(CaseState::AGAVE_RUN);
+        return;
+    }
 
     if (caseFolder == NULL)
     {
-        if (!expectedNewCaseFolder.isEmpty())
+        if (expectedNewCaseFolder.isEmpty())
         {
-            //If caseFolder is null, try to find expectedNewCaseFolder as file node
-
-            FileOperator * fileHandle = theDriver->getFileHandler();
-            caseFolder = fileHandle->getNodeFromName(expectedNewCaseFolder);
-
-            if (caseFolder == NULL)
-            {
-                fileHandle->lsClosestNode(expectedNewCaseFolder);
-            }
-            else
-            {
-                //If setting file node, connect caseFolderRemoved slot
-                expectedNewCaseFolder.clear();
-                QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
-                                 this, SLOT(caseFolderRemoved()));
-                needRefresh = true;
-            }
+            emitNewState(CaseState::ERROR);
+            return;
         }
+
+        demandFolderSearch();
     }
 
     if (caseFolder != NULL)
     {
-        if (myType == NULL)
-        {
-            //If caseFolder exists, try to determine myType from varStore
-            FileTreeNode * varFile = caseFolder->getChildNodeWithName(".varStore");
-            if (varFile != NULL)
-            {
-                QByteArray * varStore = varFile->getFileBuffer();
-                if (varStore != NULL)
-                {
-                    QJsonDocument varDoc = QJsonDocument::fromJson(*varStore);
-                    QString templateName = varDoc.object().value("type").toString();
-                    if (!templateName.isEmpty())
-                    {
-                        QList<CFDanalysisType *> * templates = theDriver->getTemplateList();
-                        for (auto itr = templates->cbegin(); (itr != templates->cend()) && (myType == NULL); itr++)
-                        {
-                            if (templateName == (*itr)->getInternalName())
-                            {
-                                myType = (*itr);
-                                needRefresh = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
     }
 
-    emitNewState();
+    emitNewState(CaseState::LOADING);
+}
 
-    if (oldState == CaseState::LOADING)
+void CFDcaseInstance::remoteCommandDone()
+{
+    if (defunct) return;
+    myLock->release();
+
+    theDriver->getJobHandler()->demandJobDataRefresh();
+
+    emitNewState(CaseState::AGAVE_RELOAD);
+}
+
+void CFDcaseInstance::demandFolderSearch()
+{
+    FileOperator * fileHandle = theDriver->getFileHandler();
+    caseFolder = fileHandle->getNodeFromName(expectedNewCaseFolder);
+
+    if (caseFolder == NULL)
     {
-        needRefresh = true;
+        fileHandle->lsClosestNode(expectedNewCaseFolder);
+        return;
     }
-
-    if (needRefresh)
+    else
     {
-        forceInfoRefresh();
+        //If setting file node, connect caseFolderRemoved slot
+        expectedNewCaseFolder.clear();
+        QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
+                         this, SLOT(caseFolderRemoved()));
     }
 }
 
@@ -598,19 +608,10 @@ void CFDcaseInstance::caseFolderRemoved()
     theDriver->setCurrentCase(NULL);
 }
 
-void CFDcaseInstance::remoteAppDone()
+void CFDcaseInstance::emitNewState(CaseState newState)
 {
-    if (defunct) return;
-    myLock->release();
-
-    underlyingFilesUpdated(true);
-}
-
-void CFDcaseInstance::emitNewState()
-{
-    if (defunct == true) return;
-    CaseState newState = getCaseState();
     if (newState == oldState) return;
-    emit haveNewState(oldState, newState);
+    CaseState oldoldState = oldState;
     oldState = newState;
+    emit haveNewState(oldoldState, oldState);
 }

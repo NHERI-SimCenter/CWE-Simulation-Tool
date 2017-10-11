@@ -37,6 +37,8 @@
 
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "cwe_guiWidgets/cwe_state_label.h"
+
 #include <QDesktopWidget>
 #include <QDebug>
 
@@ -94,6 +96,9 @@ void CWE_MainWindow::runSetupSteps()
     ui->tab_manage_and_run->linkDriver(myDriver);
 
     //Note: Adding widget to header will re-parent them
+    stateLabel = new cwe_state_label(this);
+    ui->header->appendWidget(stateLabel);
+
     QLabel * username = new QLabel(myDriver->getDataConnection()->getUserName());
     ui->header->appendWidget(username);
 
@@ -106,6 +111,10 @@ void CWE_MainWindow::attachCaseSignals(CFDcaseInstance * newCase)
 {
     QObject::connect(newCase, SIGNAL(haveNewState(CaseState,CaseState)),
                      ui->tab_parameters, SLOT(newCaseState(CaseState,CaseState)));
+    if (stateLabel != NULL)
+    {
+        stateLabel->setCurrentCase(newCase);
+    }
     //It is expected that this list will grow
 }
 
