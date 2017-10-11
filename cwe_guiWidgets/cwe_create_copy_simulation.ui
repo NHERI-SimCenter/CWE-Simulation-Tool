@@ -71,137 +71,36 @@
        <string>New Case</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="5" column="3">
-        <widget class="QLabel" name="label_3Dflow_description">
-         <property name="text">
-          <string>3D Shape
-description</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QRadioButton" name="radioButton_3Dshape">
-         <property name="text">
-          <string>3D Shape</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QPushButton" name="pb_image_2Dshape">
-         <property name="maximumSize">
-          <size>
-           <width>150</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../cwe_resources.qrc">
-           <normaloff>:/buttons/images/defaultCaseImage.png</normaloff>:/buttons/images/defaultCaseImage.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>150</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="flat">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QScrollArea" name="scrollArea">
+         <property name="widgetResizable">
           <bool>true</bool>
          </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QPushButton" name="pb_image_3Dshape">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>150</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../cwe_resources.qrc">
-           <normaloff>:/buttons/images/defaultCaseImage.png</normaloff>:/buttons/images/defaultCaseImage.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>150</width>
-           <height>100</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="3">
-        <widget class="QLabel" name="label_2Dflow_description">
-         <property name="text">
-          <string>2D Shape
-description
-...</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="3">
-        <widget class="QLabel" name="label_channelFlow_description">
-         <property name="text">
-          <string>Channel Flow
-description</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QPushButton" name="pb_image_channelFlow">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>150</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="../cwe_resources.qrc">
-           <normaloff>:/buttons/images/defaultCaseImage.png</normaloff>:/buttons/images/defaultCaseImage.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>150</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QRadioButton" name="radioButton_channelFlow">
-         <property name="text">
-          <string>Channel Flow</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QRadioButton" name="radioButton_2Dshape">
-         <property name="text">
-          <string>2D Shape</string>
-         </property>
+         <widget class="QWidget" name="scroll_NewCase">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>289</width>
+            <height>422</height>
+           </rect>
+          </property>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -257,8 +156,6 @@ description</string>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../cwe_resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

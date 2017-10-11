@@ -48,6 +48,7 @@ signals:
 
 private:
     Ui::CWE_Create_Copy_Simulation *ui;
+    void populateCaseTypes(QStringList &caseTypeFiles);
     SimulationType setSimulationType(SimulationType);
 
     VWTinterfaceDriver * driverLink = NULL;
