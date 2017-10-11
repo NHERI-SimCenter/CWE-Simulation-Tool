@@ -56,6 +56,8 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
                      this, SLOT(caseFolderRemoved()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileSystemChange()),
                      this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
+                     this, SLOT(jobListUpdated()));
 
     myLock = new EasyBoolLock(this);
 }
@@ -68,6 +70,8 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
 
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileSystemChange()),
                      this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
+                     this, SLOT(jobListUpdated()));
 
     myLock = new EasyBoolLock(this);
 }
@@ -135,20 +139,32 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
 
     QMap<QString, RemoteJobData * > ret;
 
-    for (auto itr = jobs.begin(); itr != jobs.end(); itr++)
+    if (caseFolder == NULL)
     {
-        QString appName = (*itr).getApp();
-        QMap<QString, QString> appParams = (*itr).getParams();
-        if (appName.contains("cwe") && appParams.contains("directory"))
+        if (expectedNewCaseFolder.isEmpty())
         {
-            QString appFolder = appParams.value("directory");
-            if (caseFolder->fileNameMatches(appFolder))
-            {
-                ret.insert(appName, &(*itr));
-            }
+            return ret;
         }
     }
 
+    for (auto itr = jobs.begin(); itr != jobs.end(); itr++)
+    {
+        QString appName = (*itr).getApp();
+        if (!appName.contains("cwe-create") && !appName.contains("cwe-dup"))
+        {
+            continue;
+        }
+
+        if (!(*itr).detailsLoaded())
+        {
+            ret.insert(appName, &(*itr));
+            theDriver->getJobHandler()->requestJobDetails(&(*itr));
+            continue;
+        }
+
+        //TODO: Procedure for more precise relevance
+        ret.insert(appName, &(*itr));
+    }
     return ret;
 }
 
