@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/config">
         <file>building2D.json</file>
+        <file>dummy1.json</file>
+        <file>dummy2.json</file>
     </qresource>
 </RCC>
