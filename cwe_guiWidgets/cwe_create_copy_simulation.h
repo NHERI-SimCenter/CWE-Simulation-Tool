@@ -6,6 +6,7 @@
 #include <QList>
 
 class FileOperator;
+class VWTinterfaceDriver;
 
 enum class SimulationType { CHANNEL_FLOW, SHAPE_2D, SHAPE_3D };
 
@@ -21,7 +22,7 @@ public:
     explicit CWE_Create_Copy_Simulation(QWidget *parent = 0);
     ~CWE_Create_Copy_Simulation();
 
-    void linkFileHandle(FileOperator * theJobhandle);
+    void linkDriver(VWTinterfaceDriver * theDriver);
 
 private slots:
     void on_lineEdit_newCaseName_editingFinished();
@@ -36,12 +37,16 @@ private slots:
     void on_pb_image_channelFlow_clicked();
     void selectCaseTemplate();
 
+signals:
+    void needParamTab();
+
 private:
     Ui::CWE_Create_Copy_Simulation *ui;
     void populateCaseTypes(QStringList &caseTypeFiles);
     SimulationType setSimulationType(SimulationType);
 
     QMap<int, QList<QWidget *> > templateListMap;
+    VWTinterfaceDriver * driverLink = NULL;
 };
 
 #endif // CWE_CREATE_COPY_SIMULATION_H
