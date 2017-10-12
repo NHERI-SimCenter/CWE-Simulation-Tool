@@ -4,11 +4,19 @@
 #include <QFrame>
 #include <QMap>
 #include <QList>
+#include <QPushButton>
+#include <QRadioButton>
 
 class FileOperator;
 class VWTinterfaceDriver;
 
-enum class SimulationType { CHANNEL_FLOW, SHAPE_2D, SHAPE_3D };
+//enum class SimulationType { CHANNEL_FLOW, SHAPE_2D, SHAPE_3D };
+
+typedef struct CASE_TYPE_DATA {
+    QRadioButton *radioBtn;
+    QPushButton  *pbtn;
+    QString      caseFile;
+};
 
 namespace Ui {
 class CWE_Create_Copy_Simulation;
@@ -29,12 +37,6 @@ private slots:
     void on_pBtn_cancel_clicked();
     void on_pBtn_create_copy_clicked();
     void on_tabWidget_currentChanged(int index);
-    void on_radioButton_2Dshape_clicked();
-    void on_radioButton_3Dshape_clicked();
-    void on_radioButton_channelFlow_clicked();
-    void on_pb_image_2Dshape_clicked();
-    void on_pb_image_3Dshape_clicked();
-    void on_pb_image_channelFlow_clicked();
     void selectCaseTemplate();
 
 signals:
@@ -43,9 +45,12 @@ signals:
 private:
     Ui::CWE_Create_Copy_Simulation *ui;
     void populateCaseTypes(QStringList &caseTypeFiles);
-    SimulationType setSimulationType(SimulationType);
+    void create_new_case_from_template(QString filename);
 
-    QMap<int, QList<QWidget *> > templateListMap;
+    //SimulationType setSimulationType(SimulationType);
+
+    //QVector<QList<QWidget *> > *templateListMap;
+    QVector<CASE_TYPE_DATA> *caseTypeDataList;
     VWTinterfaceDriver * driverLink = NULL;
 };
 
