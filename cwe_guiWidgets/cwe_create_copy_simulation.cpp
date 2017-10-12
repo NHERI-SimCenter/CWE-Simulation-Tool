@@ -28,19 +28,7 @@ CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //templateListMap = new QVector<QList<QWidget *> >;  // maps case idx to list of case widget*
-    caseTypeDataList = new QVector<CASE_TYPE_DATA>;
-
-    /* populate tab_NewCase with available cases */
-    QDir confDir(":/config");
-    QStringList filters;
-    filters << "*.json" << "*.JSON";
-    QStringList caseTypeFiles = confDir.entryList(filters);
-
-    this->populateCaseTypes(caseTypeFiles);
-
     ui->tabWidget->setCurrentIndex(0);
-    //this->setSimulationType(SimulationType::CHANNEL_FLOW);
 }
 
 CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
@@ -51,6 +39,12 @@ CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
 void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
 {
     driverLink = theDriver;
+    this->populateCaseTypes();
+}
+
+void CWE_Create_Copy_Simulation::linkDriverConnected(VWTinterfaceDriver * theDriver)
+{
+    linkDriver(theDriver);
     ui->primary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
     ui->primary_remoteFileTree->setupFileView();
     ui->secondary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
@@ -69,12 +63,9 @@ void CWE_Create_Copy_Simulation::on_pBtn_cancel_clicked()
 
 void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 {
-    //Note: some of this will be parsed to other methods
-    //TODO: This is a first debug pass
+    if (selectedTemplate == NULL) return;
 
-    CFDanalysisType * debugType = driverLink->getTemplateList()->at(0);
-
-    CFDcaseInstance * newCase = new CFDcaseInstance(debugType, driverLink);
+    CFDcaseInstance * newCase = new CFDcaseInstance(selectedTemplate, driverLink);
     driverLink->setCurrentCase(newCase);
 
     //TODO: VERY IMPORTANT: NEED INPUT FILTERING
@@ -82,6 +73,7 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 
     emit needParamTab();
 }
+
 void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
 {
     switch (index) {
@@ -97,25 +89,18 @@ void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
     }
 }
 
-void CWE_Create_Copy_Simulation::populateCaseTypes(QStringList &caseTypeFiles)
+void CWE_Create_Copy_Simulation::populateCaseTypes()
 {
+    QList<CFDanalysisType *> * templateList = driverLink->getTemplateList();
     QGridLayout *layout = new QGridLayout(this);
 
     int idx = 0;
 
-    foreach (QString caseType, caseTypeFiles) {
-        /* read JSON info from file */
-        QString configFile = ":/config/" + caseType;
-
-        QFile inFile(configFile);
-        if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) continue;
-        QByteArray val = inFile.readAll();
-        inFile.close();
-
+    foreach (CFDanalysisType * caseType, *templateList) {
         /* get analysis type and name info from JSON */
-        QJsonDocument configuration = QJsonDocument::fromJson(val);
+        QJsonDocument * configuration = caseType->getRawConfig();
 
-        QJsonObject confObj = configuration.object();
+        QJsonObject confObj = configuration->object();
         QString theName = confObj["name"].toString();
         QString theDescription = confObj["description"].toString();
         QString theIcon = confObj["icon"].toString();
@@ -150,9 +135,8 @@ void CWE_Create_Copy_Simulation::populateCaseTypes(QStringList &caseTypeFiles)
         CASE_TYPE_DATA list;
         list.radioBtn = radioBtn;
         list.pbtn     = buttonIcon;
-        list.caseFile = configFile;
-        caseTypeDataList->append(list);
-
+        list.templateData = caseType;
+        caseTypeDataList.append(list);
 
         /* create appropriate connection between signals and slots */
 
@@ -170,12 +154,11 @@ void CWE_Create_Copy_Simulation::selectCaseTemplate()
     QObject *sender = QObject::sender();
     QVector<CASE_TYPE_DATA>::iterator i;
 
-    for (i = caseTypeDataList->begin(); i != caseTypeDataList->end(); i++) {
+    for (i = caseTypeDataList.begin(); i != caseTypeDataList.end(); i++) {
         if  (i->pbtn == (QPushButton *)sender) {
             i->radioBtn->setChecked(true);
 
-            /* initiate case */
-            this->create_new_case_from_template(i->caseFile);
+            selectedTemplate = i->templateData;
 
             break;
         }
@@ -184,43 +167,14 @@ void CWE_Create_Copy_Simulation::selectCaseTemplate()
             //i->radioBtn->setChecked(true);
 
             /* initiate case */
-            this->create_new_case_from_template(i->caseFile);
+            selectedTemplate = i->templateData;
 
             break;
         }
         else {
             /* turn off not selected QRadioButton -- Qt is taking care of this */
             //((QRadioButton *)(*i)[0])->setChecked(false);
+            selectedTemplate = NULL;
         }
     }
 }
-
-void CWE_Create_Copy_Simulation::create_new_case_from_template(QString filename)
-{
-    /*
-     * PETER S.:
-     *
-     * We just selected the analysis case type.
-     * filename is the configuration file for the case.
-     *
-     * How do I properly initiate the driver/agave tool
-     */
-
-    /*
-
-    //Note: some of this will be parsed to other methods
-    //TODO: This is a first debug pass
-
-    CFDanalysisType * debugType = driverLink->getTemplateList()->at(0);
-
-    CFDcaseInstance * newCase = new CFDcaseInstance(debugType, driverLink);
-    driverLink->setCurrentCase(newCase);
-
-    //TODO: VERY IMPORTANT: NEED INPUT FILTERING
-    newCase->createCase(ui->lineEdit_newCaseName->text(), ui->primary_remoteFileTree->getSelectedNode());
-
-    */
-
-    emit needParamTab();
-}
-

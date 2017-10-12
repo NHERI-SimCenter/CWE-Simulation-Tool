@@ -68,6 +68,7 @@ public:
     explicit CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
     ~CWE_MainWindow();
 
+    void runOfflineSetupSteps();
     void runSetupSteps();
 
     void attachCaseSignals(CFDcaseInstance * newCase);

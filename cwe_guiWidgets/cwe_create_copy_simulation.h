@@ -9,13 +9,12 @@
 
 class FileOperator;
 class VWTinterfaceDriver;
+class CFDanalysisType;
 
-//enum class SimulationType { CHANNEL_FLOW, SHAPE_2D, SHAPE_3D };
-
-typedef struct CASE_TYPE_DATA {
-    QRadioButton *radioBtn;
-    QPushButton  *pbtn;
-    QString      caseFile;
+struct CASE_TYPE_DATA {
+    QRadioButton         *radioBtn;
+    QPushButton          *pbtn;
+    CFDanalysisType      *templateData;
 };
 
 namespace Ui {
@@ -31,6 +30,7 @@ public:
     ~CWE_Create_Copy_Simulation();
 
     void linkDriver(VWTinterfaceDriver * theDriver);
+    void linkDriverConnected(VWTinterfaceDriver * theDriver);
 
 private slots:
     void on_lineEdit_newCaseName_editingFinished();
@@ -44,14 +44,13 @@ signals:
 
 private:
     Ui::CWE_Create_Copy_Simulation *ui;
-    void populateCaseTypes(QStringList &caseTypeFiles);
+    void populateCaseTypes();
     void create_new_case_from_template(QString filename);
 
-    //SimulationType setSimulationType(SimulationType);
-
-    //QVector<QList<QWidget *> > *templateListMap;
-    QVector<CASE_TYPE_DATA> *caseTypeDataList;
     VWTinterfaceDriver * driverLink = NULL;
+    CFDanalysisType * selectedTemplate = NULL;
+
+    QVector<CASE_TYPE_DATA> caseTypeDataList;
 };
 
 #endif // CWE_CREATE_COPY_SIMULATION_H
