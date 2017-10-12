@@ -72,11 +72,9 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(paren
     QStringList caseTypeFiles = confDir.entryList(filters);
 
     foreach (QString caseConfigFile, caseTypeFiles) {
-        CFDanalysisType * newTemplate = new CFDanalysisType(caseConfigFile);
-        templateList.append(newTemplate);
-    }
-    if (templateList.size() < 1) {
-        CFDanalysisType * newTemplate = new CFDanalysisType(":/config/building2D.json");
+        QString confPath = ":/config/";
+        confPath = confPath.append(caseConfigFile);
+        CFDanalysisType * newTemplate = new CFDanalysisType(confPath);
         templateList.append(newTemplate);
     }
 }
@@ -105,7 +103,6 @@ void VWTinterfaceDriver::closeAuthScreen()
     mainWindow->runSetupSteps();
     mainWindow->show();
 
-    //The dynamics of this are different in windows. TODO: Find a more cross-platform solution
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
     if (authWindow != NULL)
@@ -126,6 +123,7 @@ void VWTinterfaceDriver::startOffline()
 
     setCurrentCase(new CFDcaseInstance(templateList.at(0),this));
 
+    mainWindow->runOfflineSetupSteps();
     mainWindow->show();
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
