@@ -65,8 +65,20 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(paren
     theConnector = (RemoteDataInterface *) tmpHandle;
     QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(fatalInterfaceError(QString)));
 
-    CFDanalysisType * newTemplate = new CFDanalysisType(":/config/building2D.json");
-    templateList.append(newTemplate);
+    /* populate tab_NewCase with available cases */
+    QDir confDir(":/config");
+    QStringList filters;
+    filters << "*.json" << "*.JSON";
+    QStringList caseTypeFiles = confDir.entryList(filters);
+
+    foreach (QString caseConfigFile, caseTypeFiles) {
+        CFDanalysisType * newTemplate = new CFDanalysisType(caseConfigFile);
+        templateList.append(newTemplate);
+    }
+    if (templateList.size() < 1) {
+        CFDanalysisType * newTemplate = new CFDanalysisType(":/config/building2D.json");
+        templateList.append(newTemplate);
+    }
 }
 
 void VWTinterfaceDriver::startup()
