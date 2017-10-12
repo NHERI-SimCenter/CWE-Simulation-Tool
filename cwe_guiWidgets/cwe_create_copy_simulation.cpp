@@ -19,12 +19,17 @@
 #include <QPixmap>
 #include <QRadioButton>
 #include <QLabel>
+#include <QPushButton>
+#include <QIcon>
 
 CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::CWE_Create_Copy_Simulation)
 {
     ui->setupUi(this);
+
+    //templateListMap = new QVector<QList<QWidget *> >;  // maps case idx to list of case widget*
+    caseTypeDataList = new QVector<CASE_TYPE_DATA>;
 
     /* populate tab_NewCase with available cases */
     QDir confDir(":/config");
@@ -35,7 +40,7 @@ CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
     this->populateCaseTypes(caseTypeFiles);
 
     ui->tabWidget->setCurrentIndex(0);
-    this->setSimulationType(SimulationType::CHANNEL_FLOW);
+    //this->setSimulationType(SimulationType::CHANNEL_FLOW);
 }
 
 CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
@@ -77,7 +82,6 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 
     emit needParamTab();
 }
-
 void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
 {
     switch (index) {
@@ -93,65 +97,11 @@ void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
     }
 }
 
-void CWE_Create_Copy_Simulation::on_radioButton_2Dshape_clicked()
-{
-    this->setSimulationType(SimulationType::SHAPE_2D);
-}
-
-void CWE_Create_Copy_Simulation::on_radioButton_3Dshape_clicked()
-{
-    this->setSimulationType(SimulationType::SHAPE_3D);
-}
-
-void CWE_Create_Copy_Simulation::on_radioButton_channelFlow_clicked()
-{
-    this->setSimulationType(SimulationType::CHANNEL_FLOW);
-}
-
-SimulationType CWE_Create_Copy_Simulation::setSimulationType(SimulationType type)
-{
-    SimulationType retType = type;
-
-    //ui->radioButton_channelFlow->setChecked(false);
-    //ui->radioButton_2Dshape->setChecked(false);
-    //ui->radioButton_3Dshape->setChecked(false);
-
-    switch (type) {
-    case SimulationType::CHANNEL_FLOW:
-      //  ui->radioButton_channelFlow->setChecked(true);
-        break;
-    case SimulationType::SHAPE_2D:
-      //  ui->radioButton_2Dshape->setChecked(true);
-        break;
-    case SimulationType::SHAPE_3D:
-      //  ui->radioButton_3Dshape->setChecked(true);
-        break;
-    default:
-      //  ui->radioButton_channelFlow->setChecked(true);
-        retType = SimulationType::CHANNEL_FLOW;
-    }
-
-    return retType;
-}
-
-void CWE_Create_Copy_Simulation::on_pb_image_channelFlow_clicked()
-{
-    this->setSimulationType(SimulationType::CHANNEL_FLOW);
-}
-
-void CWE_Create_Copy_Simulation::on_pb_image_2Dshape_clicked()
-{
-    this->setSimulationType(SimulationType::SHAPE_2D);
-}
-
-void CWE_Create_Copy_Simulation::on_pb_image_3Dshape_clicked()
-{
-    this->setSimulationType(SimulationType::SHAPE_3D);
-}
-
 void CWE_Create_Copy_Simulation::populateCaseTypes(QStringList &caseTypeFiles)
 {
     QGridLayout *layout = new QGridLayout(this);
+
+    int idx = 0;
 
     foreach (QString caseType, caseTypeFiles) {
         /* read JSON info from file */
@@ -169,19 +119,23 @@ void CWE_Create_Copy_Simulation::populateCaseTypes(QStringList &caseTypeFiles)
         QString theName = confObj["name"].toString();
         QString theDescription = confObj["description"].toString();
         QString theIcon = confObj["icon"].toString();
-        QString theIconPath = ":/config/" + theIcon;
 
         /* create UI selection block */
         QRadioButton *radioBtn = new QRadioButton(theName, ui->scroll_NewCase);
-        QLabel *labelIcon = new QLabel(ui->scroll_NewCase);
+        QPushButton *buttonIcon = new QPushButton(ui->scroll_NewCase);
+
+        QString theIconPath;
         if (theIcon == "") {
-            labelIcon->setPixmap(QPixmap(":/buttons/images/defaultCaseImage.png"));
+            theIconPath = ":/buttons/images/defaultCaseImage.png";
         }
         else {
-            labelIcon->setPixmap(QPixmap(theIconPath));
+            theIconPath = ":/buttons/images/" + theIcon;
         }
-        labelIcon->setMinimumSize(150, 100);
-        labelIcon->setMaximumSize(150, 100);
+        QIcon theBtnIcon = QIcon(theIconPath);
+        buttonIcon->setIcon(theBtnIcon);
+        buttonIcon->setIconSize(QSize(150,100));
+        buttonIcon->setMinimumSize(150, 100);
+        buttonIcon->setMaximumSize(150, 100);
         QLabel *labelDescription = new QLabel(ui->scroll_NewCase);
         if (theDescription == "") {
             theDescription = "some\ndescription\nof this\ncase.";
@@ -189,13 +143,84 @@ void CWE_Create_Copy_Simulation::populateCaseTypes(QStringList &caseTypeFiles)
         labelDescription->setText(theDescription);
 
         int cnt = layout->rowCount();
-        layout->addWidget(labelIcon,cnt+1,1,1,1);
+        layout->addWidget(buttonIcon,cnt+1,1,1,1);
         layout->addWidget(labelDescription,cnt+1,2,1,1);
         layout->addWidget(radioBtn,cnt,1,1,2);
 
+        CASE_TYPE_DATA list;
+        list.radioBtn = radioBtn;
+        list.pbtn     = buttonIcon;
+        list.caseFile = configFile;
+        caseTypeDataList->append(list);
+
+
         /* create appropriate connection between signals and slots */
 
+        connect(buttonIcon, SIGNAL(pressed()),       this, SLOT(selectCaseTemplate()));
+        connect(radioBtn, SIGNAL(toggled(bool)),     this, SLOT(selectCaseTemplate()));
+
+        idx++;
     }
 
     ui->scroll_NewCase->setLayout(layout);
 }
+
+void CWE_Create_Copy_Simulation::selectCaseTemplate()
+{
+    QObject *sender = QObject::sender();
+    QVector<CASE_TYPE_DATA>::iterator i;
+
+    for (i = caseTypeDataList->begin(); i != caseTypeDataList->end(); i++) {
+        if  (i->pbtn == (QPushButton *)sender) {
+            i->radioBtn->setChecked(true);
+
+            /* initiate case */
+            this->create_new_case_from_template(i->caseFile);
+
+            break;
+        }
+        else if  (i->radioBtn == (void *)sender ) {
+            /* QRadioButton toggled -- Qt is taking care of this */
+            //i->radioBtn->setChecked(true);
+
+            /* initiate case */
+            this->create_new_case_from_template(i->caseFile);
+
+            break;
+        }
+        else {
+            /* turn off not selected QRadioButton -- Qt is taking care of this */
+            //((QRadioButton *)(*i)[0])->setChecked(false);
+        }
+    }
+}
+
+void CWE_Create_Copy_Simulation::create_new_case_from_template(QString filename)
+{
+    /*
+     * PETER S.:
+     *
+     * We just selected the analysis case type.
+     * filename is the configuration file for the case.
+     *
+     * How do I properly initiate the driver/agave tool
+     */
+
+    /*
+
+    //Note: some of this will be parsed to other methods
+    //TODO: This is a first debug pass
+
+    CFDanalysisType * debugType = driverLink->getTemplateList()->at(0);
+
+    CFDcaseInstance * newCase = new CFDcaseInstance(debugType, driverLink);
+    driverLink->setCurrentCase(newCase);
+
+    //TODO: VERY IMPORTANT: NEED INPUT FILTERING
+    newCase->createCase(ui->lineEdit_newCaseName->text(), ui->primary_remoteFileTree->getSelectedNode());
+
+    */
+
+    emit needParamTab();
+}
+

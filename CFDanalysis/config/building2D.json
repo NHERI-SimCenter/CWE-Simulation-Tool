@@ -1,6 +1,8 @@
 {
     "name":"2D Building Slice",
     "internalName":"building",
+    "description":"This model describes \nthe air flow around a building\n using a 2D horizontal slice.",
+    "icon":"placeholderIcon.png",
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{
