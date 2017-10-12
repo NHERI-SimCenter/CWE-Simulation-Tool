@@ -87,12 +87,18 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     this->resize(width, height);
 }
 
+void CWE_MainWindow::runOfflineSetupSteps()
+{
+    //TODO: Link driver offline should be a virtual function for a tab superclass
+    ui->tab_create_new->linkDriver(myDriver);
+}
+
 void CWE_MainWindow::runSetupSteps()
 {
     //TODO: Link driver should be a virtual function for a tab superclass
     ui->tab_files->linkFileHandle(myDriver->getFileHandler());
     ui->tab_landing_page->linkJobHandle(myDriver->getJobHandler());
-    ui->tab_create_new->linkDriver(myDriver);
+    ui->tab_create_new->linkDriverConnected(myDriver);
     ui->tab_manage_and_run->linkDriver(myDriver);
 
     //Note: Adding widget to header will re-parent them
