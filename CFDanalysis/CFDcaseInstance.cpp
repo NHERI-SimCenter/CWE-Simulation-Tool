@@ -60,6 +60,8 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
                      this, SLOT(jobListUpdated()));
 
     myLock = new EasyBoolLock(this);
+
+    underlyingFilesUpdated();
 }
 
 CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver *mainDriver):

@@ -174,7 +174,6 @@ void CWE_Create_Copy_Simulation::selectCaseTemplate()
         else {
             /* turn off not selected QRadioButton -- Qt is taking care of this */
             //((QRadioButton *)(*i)[0])->setChecked(false);
-            selectedTemplate = NULL;
         }
     }
 }
