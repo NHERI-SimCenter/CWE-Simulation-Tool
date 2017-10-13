@@ -65,7 +65,7 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(paren
     theConnector = (RemoteDataInterface *) tmpHandle;
     QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(fatalInterfaceError(QString)));
 
-    /* populate tab_NewCase with available cases */
+    /* populate with available cases */
     QDir confDir(":/config");
     QStringList filters;
     filters << "*.json" << "*.JSON";
