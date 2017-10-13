@@ -42,11 +42,9 @@
 
 #include "cwe_guiWidgets/cwe_defines.h"
 #include "cwe_guiWidgets/cwe_landing.h"
-#include "cwe_guiWidgets/cwe_create_simulation_old.h"
 #include "cwe_guiWidgets/cwe_file_manager.h"
 #include "cwe_guiWidgets/cwe_manage_simulation.h"
 #include "cwe_guiWidgets/cwe_simulation_details.h"
-#include "cwe_guiWidgets/cwe_task_list.h"
 #include "cwe_guiWidgets/cwe_help.h"
 
 #include "../AgaveExplorer/utilFuncs/copyrightdialog.h"

@@ -61,22 +61,47 @@ CWE_manage_simulation::~CWE_manage_simulation()
 void CWE_manage_simulation::linkDriver(VWTinterfaceDriver * theDriver)
 {
     driverLink = theDriver;
+    ui->treeView->setFileOperator(driverLink->getFileHandler());
 }
 
 void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
 {
-    CFDcaseInstance * newCase = new CFDcaseInstance(newFile, driverLink);
-    driverLink->setCurrentCase(newCase);
-
-    emit needParamTab();
+    if (tempCase != NULL)
+    {
+        tempCase->deleteLater();
+    }
+    tempCase = new CFDcaseInstance(newFile, driverLink);
+    ui->label_caseStatus->setCurrentCase(tempCase);
 }
 
 void CWE_manage_simulation::on_pb_viewParameters_clicked()
 {
+    if (!verifyCaseAndSelect()) return;
+
     // switch main window to parameters tab
+    emit needParamTab();
 }
 
 void CWE_manage_simulation::on_pb_viewResults_clicked()
 {
+    if (!verifyCaseAndSelect()) return;
+
     // switch main window to results tab
+    emit needResultsTab();
+}
+
+bool CWE_manage_simulation::verifyCaseAndSelect()
+{
+    if (tempCase->getCaseState() == CaseState::AGAVE_RUN)
+    {
+        driverLink->setCurrentCase(tempCase);
+        return true;
+    }
+    if (tempCase->getCaseState() == CaseState::READY)
+    {
+        driverLink->setCurrentCase(tempCase);
+        return true;
+    }
+
+    return false;
 }
