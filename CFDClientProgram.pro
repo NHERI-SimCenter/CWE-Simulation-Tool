@@ -67,7 +67,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_landing.cpp \
     cwe_guiWidgets/cwe_manage_simulation.cpp \
     cwe_guiWidgets/cwe_simulation_details.cpp \
-    cwe_guiWidgets/cwe_task_list.cpp \
     cwe_guiWidgets/cwe_welcome_screen.cpp \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
@@ -89,7 +88,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/pandptabwidget.cpp \
     cwe_guiWidgets/cwe_withstatusbutton.cpp \
     CFDanalysis/CFDcaseInstance.cpp \
-    cwe_guiWidgets/cwe_create_simulation_old.cpp \
     cwe_guiWidgets/cwe_create_copy_simulation.cpp \
     cwe_guiWidgets/cwe_busyindicator.cpp \
     cwe_guiWidgets/cwe_debug_widget.cpp \
@@ -114,7 +112,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_landing.h \
     cwe_guiWidgets/cwe_manage_simulation.h \
     cwe_guiWidgets/cwe_simulation_details.h \
-    cwe_guiWidgets/cwe_task_list.h \
     cwe_guiWidgets/cwe_welcome_screen.h \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
@@ -136,7 +133,6 @@ HEADERS  += \
     cwe_guiWidgets/pandptabwidget.h \
     cwe_guiWidgets/cwe_withstatusbutton.h \
     CFDanalysis/CFDcaseInstance.h \
-    cwe_guiWidgets/cwe_create_simulation_old.h \
     cwe_guiWidgets/cwe_create_copy_simulation.h \
     cwe_guiWidgets/cwe_busyindicator.h \
     cwe_guiWidgets/cwe_debug_widget.h \

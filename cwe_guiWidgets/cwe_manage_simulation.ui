@@ -94,6 +94,55 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_CaseTypeIcon">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../cwe_resources.qrc">:/buttons/images/defaultCaseImage.png</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_caseTypeTag">
+        <property name="text">
+         <string>Case type:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_stageListTag">
+        <property name="text">
+         <string>Stage list:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="3" column="1" rowspan="2">
+       <widget class="QTableView" name="stageListView"/>
+      </item>
       <item row="0" column="0" colspan="2">
        <widget class="QFrame" name="frame">
         <property name="minimumSize">
@@ -135,7 +184,21 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_caseNameText">
+          <widget class="QLabel" name="label_caseName">
+           <property name="text">
+            <string>N/A</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_statusTag">
+           <property name="text">
+            <string>Status:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="cwe_state_label" name="label_caseStatus">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -146,61 +209,12 @@
             <number>1</number>
            </property>
            <property name="text">
-            <string>this-&gt;setCaseName(QString s)</string>
+            <string>No Case Selected</string>
            </property>
           </widget>
          </item>
         </layout>
        </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_CaseTypeIcon">
-        <property name="maximumSize">
-         <size>
-          <width>150</width>
-          <height>100</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../cwe_resources.qrc">:/buttons/images/defaultCaseImage.png</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_caseTypeTag">
-        <property name="text">
-         <string>Case type:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="label_stageListTag">
-        <property name="text">
-         <string>Stage list &amp; status:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="3" column="1" rowspan="2">
-       <widget class="QTableView" name="stageListView"/>
       </item>
      </layout>
     </widget>
@@ -213,6 +227,11 @@
    <extends>QTreeView</extends>
    <header>../AgaveExplorer/remoteFileOps/remotefiletree.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cwe_state_label</class>
+   <extends>QLabel</extends>
+   <header>cwe_guiWidgets/cwe_state_label.h</header>
   </customwidget>
  </customwidgets>
  <resources>
