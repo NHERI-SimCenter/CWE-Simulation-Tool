@@ -112,12 +112,12 @@
           </widget>
           <widget class="CWE_Create_Copy_Simulation" name="tab_create_new">
            <attribute name="title">
-            <string>Create Job</string>
+            <string>Create Case</string>
            </attribute>
           </widget>
           <widget class="CWE_manage_simulation" name="tab_manage_and_run">
            <attribute name="title">
-            <string>Case Select</string>
+            <string>Select Case</string>
            </attribute>
           </widget>
           <widget class="CWE_file_manager" name="tab_files">
