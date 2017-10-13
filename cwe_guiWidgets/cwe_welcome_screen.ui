@@ -83,8 +83,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>INFO PAGE 1
-This is some information for the inexperienced user on how to get started</string>
+          <string/>
          </property>
         </widget>
        </item>
