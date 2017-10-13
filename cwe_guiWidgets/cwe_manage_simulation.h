@@ -40,6 +40,7 @@
 
 class FileTreeNode;
 class VWTinterfaceDriver;
+class CFDcaseInstance;
 
 namespace Ui {
 class CWE_manage_simulation;
@@ -64,11 +65,15 @@ private slots:
 
 signals:
     void needParamTab();
+    void needResultsTab();
 
 private:
+    bool verifyCaseAndSelect();
+
     Ui::CWE_manage_simulation *ui;
 
     VWTinterfaceDriver * driverLink = NULL;
+    CFDcaseInstance * tempCase = NULL;
 };
 
 #endif // CWE_MANAGE_SIMULATION_H
