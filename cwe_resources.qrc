@@ -16,6 +16,8 @@
     <qresource prefix="/">
         <file>copyText.txt</file>
         <file>cweStyle.qss</file>
+        <file>images/Overview/CWEFlow1.png</file>
+        <file>images/Overview/CWEFlow2.png</file>
     </qresource>
     <qresource prefix="/qml">
         <file>QML/BusyIndicatorDef.qml</file>
