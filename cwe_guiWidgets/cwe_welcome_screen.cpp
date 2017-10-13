@@ -35,6 +35,7 @@
 
 #include "cwe_welcome_screen.h"
 #include "ui_cwe_welcome_screen.h"
+#include <QScreen>
 
 CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
     QFrame(parent),
@@ -42,6 +43,29 @@ CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->WelcomeStackedWidget->setCurrentIndex(0);
+
+    /* set page 1 of help screen */
+
+    ui->text_label_1->setBackgroundRole(QPalette::Base);
+    ui->text_label_1->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    ui->text_label_1->setScaledContents(true);
+
+    ui->text_label_2->setBackgroundRole(QPalette::Base);
+    ui->text_label_2->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    ui->text_label_2->setScaledContents(true);
+
+    ui->text_label_3->setBackgroundRole(QPalette::Base);
+    ui->text_label_3->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    ui->text_label_3->setScaledContents(true);
+
+    ui->text_label_4->setBackgroundRole(QPalette::Base);
+    ui->text_label_4->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    ui->text_label_4->setScaledContents(true);
+
+    ui->text_label_1->setPixmap(QPixmap(":/images/Overview/CWEFlow1.png"));
+    ui->text_label_2->setPixmap(QPixmap(":/images/Overview/CWEFlow2.png"));
+    ui->text_label_3->setPixmap(QPixmap(":/images/Overview/CWEFlow1.png"));
+    ui->text_label_4->setPixmap(QPixmap(":/images/Overview/CWEFlow2.png"));
 
 }
 
