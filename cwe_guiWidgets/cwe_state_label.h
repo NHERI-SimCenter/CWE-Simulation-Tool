@@ -51,7 +51,7 @@ public:
     void setCurrentCase(CFDcaseInstance * newCase);
 
 public slots:
-    void setNewState(CaseState, CaseState newState);
+    void setNewState(CaseState newState);
 
 private:
     CFDcaseInstance * currentCase = NULL;

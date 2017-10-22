@@ -56,21 +56,11 @@ void cwe_state_label::setCurrentCase(CFDcaseInstance * newCase)
     QObject::connect(currentCase, SIGNAL(haveNewState(CaseState,CaseState)),
                     this, SLOT(setNewState(CaseState,CaseState)));
     CaseState currentState = currentCase->getCaseState();
-    setNewState(currentState, currentState);
+    setNewState(currentState);
 }
 
-void cwe_state_label::setNewState(CaseState, CaseState newState)
+void cwe_state_label::setNewState(CaseState newState)
 {
-    if (newState == CaseState::AGAVE_INVOKE)
-    {
-        this->setText("Connecting to Agave . . .");
-        return;
-    }
-    if (newState == CaseState::AGAVE_RELOAD)
-    {
-        this->setText("Running Remote Task . . .");
-        return;
-    }
     if (newState == CaseState::AGAVE_RUN)
     {
         this->setText("Running Remote Task . . .");
