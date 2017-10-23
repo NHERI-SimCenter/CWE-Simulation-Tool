@@ -62,7 +62,6 @@ enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 //RUNNING: Parameters frozen(visible), CANCEL button active
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
-//TODO: Need a SAFE cleanup and repaint for parameters screen
 
 enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_RUN};
 //LOADING: Reloading file info to determine case stats
@@ -83,8 +82,10 @@ public:
     CaseState getCaseState();
     QString getCaseFolder();
     QString getCaseName();
+    QString currentAgaveRequest();
 
     //Note: For these, it can always answer "I don't know"
+    //But that should only happen in the LOADING state
     CFDanalysisType * getMyType();
     QMap<QString, QString> getCurrentParams();
     QMap<QString, StageState> getStageStates();
@@ -116,9 +117,7 @@ private slots:
 
 private:
     void emitNewState(CaseState newState);
-
     void demandFolderSearch();
-
     void displayNetError(QString infoText);
 
     QMap<QString, RemoteJobData * > getRelevantJobs();
