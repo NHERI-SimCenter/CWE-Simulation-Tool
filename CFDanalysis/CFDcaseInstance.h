@@ -122,6 +122,8 @@ private:
 
     QMap<QString, RemoteJobData * > getRelevantJobs();
 
+    QByteArray produceJSONparams(QMap<QString, QString> paramList);
+
     bool defunct = false;
     CaseState myState = CaseState::LOADING;
     PendingCFDrequest currentReq = PendingCFDrequest::NONE;
