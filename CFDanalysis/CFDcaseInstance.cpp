@@ -1,4 +1,4 @@
-/*********************************************************************************
+﻿/*********************************************************************************
 **
 ** Copyright (c) 2017 The Regents of the University of California
 **
@@ -228,10 +228,7 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
 
     if (caseFolder == NULL)
     {
-        if (expectedNewCaseFolder.isEmpty())
-        {
-            return ret;
-        }
+        return ret;
     }
 
     for (auto itr = jobs.begin(); itr != jobs.end(); itr++)
@@ -251,8 +248,12 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
             continue;
         }
 
-        //TODO: Procedure for more precise relevance
-        ret.insert(appName, &(*itr));
+        QString jobDir = (*itr).getParams().value("directory");
+
+        if (caseFolder->fileNameMatches(jobDir))
+        {
+            ret.insert(appName, &(*itr));
+        }
     }
     return ret;
 }
@@ -289,7 +290,7 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
     {
         for (auto itr = stateList.begin(); itr != stateList.cend(); itr++)
         {
-            ret[*itr] = StageState::ERROR;
+            ret[*itr] = StageState::LOADING;
         }
         return ret;
     }
@@ -423,8 +424,6 @@ void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFo
     requestDataBeingRefreshed = false;
 }
 
-//DOLINE
-
 void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 {
     if (defunct) return;
@@ -434,97 +433,153 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
     if (theDriver->getFileHandler()->operationIsPending()) return;
 
     FileTreeNode * varStore = caseFolder->getChildNodeWithName(".caseParams");
-    //TODO: Need to read old params and merge them with new ones
+    QByteArray * fileData = varStore->getFileBuffer();
+
+    QMap<QString, QString> allVars;
+
+    if (fileData != NULL)
+    {
+        QJsonDocument varDoc = QJsonDocument::fromJson(*fileData);
+        if (!varDoc.isNull())
+        {
+            QJsonObject varsList = varDoc.object().value("vars").toObject();
+
+            for (auto itr = varsList.constBegin(); itr != varsList.constEnd(); itr++)
+            {
+                allVars.insert(itr.key(),(*itr).toString());
+            }
+        }
+    }
+
+    for (auto itr = paramList.constBegin(); itr != paramList.constEnd(); itr++)
+    {
+        if (allVars.contains(itr.key()))
+        {
+            allVars[itr.key()] = (*itr);
+        }
+        else
+        {
+            allVars.insert(itr.key(),(*itr));
+        }
+    }
+
     varStore->setFileBuffer(NULL);
 
-    QByteArray newFile = produceJSONparams(paramList);
+    QByteArray newFile = produceJSONparams(allVars);
+
+    theDriver->getFileHandler()->sendUploadBuffReq(caseFolder, newFile, "newCaseParams");
+
+    if (!theDriver->getFileHandler()->operationIsPending())
+    {
+        displayNetError("Unable to contact design safe. Please wait and try again.");
+        return;
+    }
+
+    currentReq = PendingCFDrequest::PARAM_UPLOAD;
+    emitNewState(CaseState::AGAVE_RUN);
+    requestDataBeingRefreshed = false;
 }
 
 void CFDcaseInstance::mesh(FileTreeNode * geoFile)
 {
     if (defunct) return;
+    if (caseFolder == NULL) return;
+
+    if (currentReq != PendingCFDrequest::NONE) return;
 
     QMultiMap<QString, QString> rawParams;
-    rawParams.insert("action", "mesh");
     rawParams.insert("inFile", geoFile->getFileData().getFullPath());
 
     RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob("cwe-exec-serial", rawParams, caseFolder->getFileData().getFullPath());
+    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob("cwe-mesh", rawParams, caseFolder->getFileData().getFullPath());
 
     if (jobHandle == NULL)
     {
-        defunct = true;
+        displayNetError("Unable to contact design safe. Please wait and try again.");
+        return;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(remoteCommandDone()));
+    currentReq = PendingCFDrequest::MESH_INVOKE;
     emitNewState(CaseState::AGAVE_RUN);
-}
-
-void CFDcaseInstance::rollBack(QString stageToDelete)
-{
-    if (defunct) return;
-
-    QMultiMap<QString, QString> rawParams;
-    rawParams.insert("step", stageToDelete);
-
-    RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob("cwe-delete", rawParams, caseFolder->getFileData().getFullPath());
-
-    if (jobHandle == NULL)
-    {
-        defunct = true;
-    }
-    QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(remoteCommandDone()));
-    emitNewState(CaseState::AGAVE_RUN);
+    requestDataBeingRefreshed = false;
 }
 
 void CFDcaseInstance::openFOAM()
 {
     if (defunct) return;
+    if (caseFolder == NULL) return;
+
+    if (currentReq != PendingCFDrequest::NONE) return;
 
     QMultiMap<QString, QString> rawParams;
-    QMap<QString, QString> caseParams = getCurrentParams();
-
-    //TODO: When new Agave app available, let backend determine solver
-    if (caseParams.contains("turbModel") && (caseParams.value("turbModel") != "Laminar"))
-    {
-        rawParams.insert("solver", "icoFoam");
-    }
-    else
-    {
-        rawParams.insert("solver", "pisoFoam");
-    }
 
     RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
     RemoteDataReply * jobHandle = remoteConnect->runRemoteJob("cwe-sim", rawParams, caseFolder->getFileData().getFullPath());
 
     if (jobHandle == NULL)
     {
-        defunct = true;
+        displayNetError("Unable to contact design safe. Please wait and try again.");
+        return;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(remoteCommandDone()));
+    currentReq = PendingCFDrequest::SIM_INVOKE;
     emitNewState(CaseState::AGAVE_RUN);
+    requestDataBeingRefreshed = false;
 }
 
 void CFDcaseInstance::postProcess()
 {
     if (defunct) return;
+    if (caseFolder == NULL) return;
+
+    if (currentReq != PendingCFDrequest::NONE) return;
 
     QMultiMap<QString, QString> rawParams;
-    rawParams.insert("action", "post");
 
     RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob("cwe-exec-serial", rawParams, caseFolder->getFileData().getFullPath());
+    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob("cwe-post", rawParams, caseFolder->getFileData().getFullPath());
 
     if (jobHandle == NULL)
     {
-        defunct = true;
+        displayNetError("Unable to contact design safe. Please wait and try again.");
+        return;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(remoteCommandDone()));
+    currentReq = PendingCFDrequest::POST_INVOKE;
     emitNewState(CaseState::AGAVE_RUN);
+    requestDataBeingRefreshed = false;
+}
+
+void CFDcaseInstance::rollBack(QString stageToDelete)
+{
+    if (defunct) return;
+    if (caseFolder == NULL) return;
+
+    if (currentReq != PendingCFDrequest::NONE) return;
+    if (theDriver->getFileHandler()->operationIsPending()) return;
+
+    FileTreeNode * folderToRemove = caseFolder->getChildNodeWithName(stageToDelete);
+
+    if (folderToRemove == NULL)
+    {
+        displayNetError("Unable to remove stage not yet done.");
+        return;
+    }
+
+    theDriver->getFileHandler()->sendDeleteReq(folderToRemove);
+
+    if (!theDriver->getFileHandler()->operationIsPending())
+    {
+        displayNetError("Unable to contact design safe. Please wait and try again.");
+        return;
+    }
+
+    currentReq = PendingCFDrequest::ROLLBACK_DEL;
+    emitNewState(CaseState::AGAVE_RUN);
+    requestDataBeingRefreshed = false;
 }
 
 void CFDcaseInstance::killCaseConnection()
@@ -538,21 +593,141 @@ void CFDcaseInstance::underlyingFilesUpdated()
 {
     if (defunct) return;
 
-    if (caseFolder == NULL)
+    if (currentReq != PendingCFDrequest::NONE)
     {
-        if (expectedNewCaseFolder.isEmpty())
+        if (requestDataBeingRefreshed == false)
         {
-            emitNewState(CaseState::ERROR);
             return;
         }
 
-        demandFolderSearch();
-
-        if (caseFolder != NULL)
+        if ((currentReq == PendingCFDrequest::CREATE_MKDIR) ||
+                 (currentReq == PendingCFDrequest::DUP_COPY))
         {
-            theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+            if ((caseFolder != NULL) || (expectedNewCaseFolder.isEmpty()))
+            {
+                emitNewState(CaseState::ERROR);
+                displayNetError("Cannot create new case folder if case already has a folder.");
+                return;
+            }
+
+            caseFolder = theDriver->getFileHandler()->getNodeFromName(expectedNewCaseFolder);
+
+            if (caseFolder == NULL)
+            {
+                theDriver->getFileHandler()->lsClosestNode(expectedNewCaseFolder);
+                return;
+            }
+            else
+            {
+                //If setting file node, connect caseFolderRemoved slot
+                expectedNewCaseFolder.clear();
+                QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
+                                 this, SLOT(caseFolderRemoved()));
+                if (currentReq == PendingCFDrequest::DUP_COPY)
+                {
+                    currentReq = PendingCFDrequest::NONE;
+                    theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+                    emitNewState(CaseState::LOADING);
+                    return;
+                }
+
+                QMap<QString, QString> allVars;
+                QByteArray newFile = produceJSONparams(allVars);
+
+                theDriver->getFileHandler()->sendUploadBuffReq(caseFolder, newFile, ".caseParams");
+
+                if (!theDriver->getFileHandler()->operationIsPending())
+                {
+                    displayNetError("Unable to contact design safe. Please wait and try again.");
+                    return;
+                }
+
+                currentReq = PendingCFDrequest::CREATE_UPLOAD;
+                emitNewState(CaseState::AGAVE_RUN);
+                requestDataBeingRefreshed = false;
+            }
         }
-        emitNewState(CaseState::LOADING);
+        else if (currentReq == PendingCFDrequest::PARAM_UPLOAD)
+        {
+            if (caseFolder->childIsUnloaded())
+            {
+                theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+                return;
+            }
+
+            FileTreeNode * paramFile = caseFolder->getChildNodeWithName("newCaseParams");
+            if (paramFile == NULL)
+            {
+                emitNewState(CaseState::ERROR);
+                displayNetError("Unable to contact design safe. Please wait and try again.");
+                return;
+            }
+
+            paramFile = caseFolder->getChildNodeWithName(".caseParams");
+            if (paramFile == NULL)
+            {
+                emitNewState(CaseState::ERROR);
+                displayNetError("Unable to contact design safe. Please wait and try again.");
+                return;
+            }
+
+            theDriver->getFileHandler()->sendDeleteReq(paramFile);
+
+            if (!theDriver->getFileHandler()->operationIsPending())
+            {
+                displayNetError("Unable to contact design safe. Please wait and try again.");
+                return;
+            }
+
+            currentReq = PendingCFDrequest::PARAM_DEL;
+            emitNewState(CaseState::AGAVE_RUN);
+            requestDataBeingRefreshed = false;
+        }
+        else if (currentReq == PendingCFDrequest::PARAM_DEL)
+        {
+            if (caseFolder->childIsUnloaded())
+            {
+                theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+                return;
+            }
+
+            FileTreeNode * paramFile = caseFolder->getChildNodeWithName(".caseParams");
+            if (paramFile != NULL)
+            {
+                emitNewState(CaseState::ERROR);
+                displayNetError("Unable to contact design safe. Please wait and try again.");
+                return;
+            }
+
+            paramFile = caseFolder->getChildNodeWithName("newCaseParams");
+            if (paramFile == NULL)
+            {
+                emitNewState(CaseState::ERROR);
+                displayNetError("Unable to contact design safe. Please wait and try again.");
+                return;
+            }
+
+            QString toStr = caseFolder->getFileData().getFullPath();
+            toStr = toStr.append("/.caseParams");
+
+            theDriver->getFileHandler()->sendMoveReq(paramFile, toStr);
+
+            if (!theDriver->getFileHandler()->operationIsPending())
+            {
+                displayNetError("Unable to contact design safe. Please wait and try again.");
+                return;
+            }
+
+            currentReq = PendingCFDrequest::PARAM_MOV;
+            emitNewState(CaseState::AGAVE_RUN);
+            requestDataBeingRefreshed = false;
+        }
+
+        return;
+    }
+
+    if (caseFolder == NULL)
+    {
         return;
     }
 
@@ -605,97 +780,108 @@ void CFDcaseInstance::underlyingFilesUpdated()
         }
     }
 
-    //Enact LS of folders from list of check files in configuration
-    QJsonObject stages = myType->getRawConfig()->object().value("stages").toObject();
-
-    for (auto itr = stages.constBegin(); itr != stages.constEnd(); itr++)
-    {
-        QString stageExpect = (*itr).toObject().value("expected").toString();
-
-        if (stageExpect == "<NUMERICAL>")
-        {
-            continue;
-        }
-
-        QString searchPath = caseFolder->getFileData().getFullPath();
-        searchPath = searchPath.append("/");
-        searchPath = searchPath.append(stageExpect);
-        FileTreeNode * toFind = theDriver->getFileHandler()->getClosestNodeFromName(searchPath);
-
-        if (!toFind->fileNameMatches(searchPath))
-        {
-            if (toFind->childIsUnloaded())
-            {
-                theDriver->getFileHandler()->enactFolderRefresh(toFind);
-                emitNewState(CaseState::LOADING);
-                return;
-            }
-        }
-    }
-
     emitNewState(CaseState::READY);
 }
 
 void CFDcaseInstance::jobListUpdated()
 {
     if (defunct) return;
+    if (caseFolder == NULL) return;
 
-    if (!getRelevantJobs().isEmpty())
+    QMap<QString, RemoteJobData * > jobList = getRelevantJobs();
+
+    if (jobList.size() >= 1)
     {
+        RemoteJobData * theJob = jobList.first();
+
+        QString appName = theJob->getApp();
+
+        if (appName.contains("cwe-mesh"))
+        {
+            currentReq = PendingCFDrequest::MESH_RUN;
+        }
+        else if (appName.contains("cwe-sim"))
+        {
+            currentReq = PendingCFDrequest::SIM_RUN;
+        }
+        else if (appName.contains("cwe-post"))
+        {
+            currentReq = PendingCFDrequest::POST_RUN;
+        }
+        else
+        {
+            emitNewState(CaseState::ERROR);
+            displayNetError("Case has unrecognized app. Tasks may have been started without this program.");
+            return;
+        }
         emitNewState(CaseState::AGAVE_RUN);
         return;
     }
 
-    if (caseFolder == NULL)
+    if ((currentReq == PendingCFDrequest::MESH_INVOKE) ||
+            (currentReq == PendingCFDrequest::MESH_RUN) ||
+            (currentReq == PendingCFDrequest::SIM_INVOKE) ||
+            (currentReq == PendingCFDrequest::SIM_RUN) ||
+            (currentReq == PendingCFDrequest::POST_INVOKE) ||
+            (currentReq == PendingCFDrequest::POST_RUN))
     {
-        if (expectedNewCaseFolder.isEmpty())
-        {
-            emitNewState(CaseState::ERROR);
-            return;
-        }
-
-        demandFolderSearch();
-    }
-
-    if (caseFolder != NULL)
-    {
+        currentReq = PendingCFDrequest::NONE;
         theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
-    }
 
-    emitNewState(CaseState::LOADING);
+        emitNewState(CaseState::LOADING);
+    }
 }
 
 void CFDcaseInstance::appInvokeDone(RequestState invokeStatus)
 {
     if (defunct) return;
 
-    theDriver->getJobHandler()->demandJobDataRefresh();
+    if (invokeStatus != RequestState::GOOD)
+    {
+        emitNewState(CaseState::ERROR);
+        displayNetError("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.");
+        return;
+    }
 
-    emitNewState(CaseState::LOADING);
+    theDriver->getJobHandler()->demandJobDataRefresh();
 }
 
 void CFDcaseInstance::agaveTaskDone(RequestState invokeStatus)
 {
+    if (defunct) return;
 
-}
-
-void CFDcaseInstance::demandFolderSearch()
-{
-    FileOperator * fileHandle = theDriver->getFileHandler();
-    caseFolder = fileHandle->getNodeFromName(expectedNewCaseFolder);
-
-    if (caseFolder == NULL)
+    if (invokeStatus != RequestState::GOOD)
     {
-        fileHandle->lsClosestNode(expectedNewCaseFolder);
+        emitNewState(CaseState::ERROR);
+        displayNetError("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.");
         return;
+    }
+
+    CaseState newState = CaseState::AGAVE_RUN;
+
+    if ((currentReq == PendingCFDrequest::CREATE_MKDIR) || (currentReq == PendingCFDrequest::DUP_COPY))
+    {
+        requestDataBeingRefreshed = true;
+        theDriver->getFileHandler()->lsClosestNode(expectedNewCaseFolder);
+    }
+    else if (currentReq == PendingCFDrequest::PARAM_UPLOAD)
+    {
+        requestDataBeingRefreshed = true;
+        theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+    }
+    else if (currentReq == PendingCFDrequest::PARAM_DEL)
+    {
+        requestDataBeingRefreshed = true;
+        theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
     }
     else
     {
-        //If setting file node, connect caseFolderRemoved slot
-        expectedNewCaseFolder.clear();
-        QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
-                         this, SLOT(caseFolderRemoved()));
+        currentReq = PendingCFDrequest::NONE;
+        theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+
+        newState = CaseState::LOADING;
     }
+    emitNewState(newState);
 }
 
 void CFDcaseInstance::caseFolderRemoved()
@@ -706,12 +892,29 @@ void CFDcaseInstance::caseFolderRemoved()
 
 QByteArray CFDcaseInstance::produceJSONparams(QMap<QString, QString> paramList)
 {
+    QJsonDocument ret;
+    QJsonObject mainObject;
+    ret.setObject(mainObject);
 
+    QJsonValue typeStr(myType->getInternalName());
+
+    ret.object().insert("type",typeStr);
+
+    QJsonObject params;
+
+    for (auto itr = paramList.begin(); itr != paramList.end(); itr++)
+    {
+        params.insert(itr.key(), (*itr));
+    }
+
+    ret.object().insert("vars",params);
+
+    return ret.toJson();
 }
 
 void CFDcaseInstance::emitNewState(CaseState newState)
 {
-    if (currentReq != PendingCFDrequest::NONE)
+    if ((currentReq != PendingCFDrequest::NONE) && (newState != CaseState::ERROR))
     {
         newState = CaseState::AGAVE_RUN;
     }

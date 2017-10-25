@@ -117,7 +117,6 @@ private slots:
 
 private:
     void emitNewState(CaseState newState);
-    void demandFolderSearch();
     void displayNetError(QString infoText);
 
     QMap<QString, RemoteJobData * > getRelevantJobs();
