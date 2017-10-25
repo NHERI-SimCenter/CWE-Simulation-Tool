@@ -13,7 +13,7 @@ class CWE_WithStatusButton : public QFrame
     Q_OBJECT
 
 public:
-    explicit CWE_WithStatusButton(QWidget *parent = 0);
+    explicit CWE_WithStatusButton(QString stageName, QWidget *parent = 0);
     ~CWE_WithStatusButton();
     void setStatus(QString);
     void setText(QString);
@@ -27,7 +27,7 @@ public:
     void setInActive(bool b=true);
 
 signals:
-    void btn_pressed(int);
+    void btn_pressed(int, QString);
     void btn_released(int);
 
 private slots:
@@ -39,6 +39,8 @@ protected:
 private:
     Ui::CWE_WithStatusButton *ui;
     //void paintEvent(QPaintEvent*);
+
+    QString internal_name;
 
     QString m_text;
     QString m_status = "unknown";

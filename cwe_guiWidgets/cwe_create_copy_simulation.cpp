@@ -69,7 +69,14 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
     driverLink->setCurrentCase(newCase);
 
     //TODO: VERY IMPORTANT: NEED INPUT FILTERING
-    newCase->createCase(ui->lineEdit_newCaseName->text(), ui->primary_remoteFileTree->getSelectedNode());
+    if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
+    {
+        newCase->createCase(ui->lineEdit_newCaseName->text(), ui->primary_remoteFileTree->getSelectedNode());
+    }
+    else
+    {
+        newCase->duplicateCase(ui->lineEdit_newCaseName->text(), ui->primary_remoteFileTree->getSelectedNode(), ui->secondary_remoteFileTree->getSelectedNode());
+    }
 
     emit needParamTab();
 }

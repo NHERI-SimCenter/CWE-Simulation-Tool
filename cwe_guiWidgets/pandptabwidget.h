@@ -23,6 +23,7 @@
 
 class CWE_WithStatusButton;
 enum class StageState;
+class VWTinterfaceDriver;
 
 namespace Ui {
 class PandPTabWidget;
@@ -33,7 +34,7 @@ class PandPTabWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit PandPTabWidget(QWidget *parent = 0);
+    explicit PandPTabWidget(VWTinterfaceDriver * theDriver, QWidget *parent = 0);
     ~PandPTabWidget();
     int  addGroupTab(QString key, const QString &label, StageState currentState);
 
@@ -61,7 +62,7 @@ private slots:
     void on_pbtn_cancel_clicked();
     void on_pbtn_results_clicked();
     void on_pbtn_rollback_clicked();
-    void on_groupTabSelected(int);
+    void on_groupTabSelected(int, QString selectedStage);
 
 signals:
     void switchToResultsTab();
@@ -86,6 +87,10 @@ protected:
 
 private:
     static QString getStateText(StageState theState);
+
+    //TODO: This is a mess. Need to seriously reconsider interaction between UI state and UI elements.
+    VWTinterfaceDriver * myDriver;
+    QString currentSelectedStage;
 
     Ui::PandPTabWidget *ui;
     int activeIndex;
