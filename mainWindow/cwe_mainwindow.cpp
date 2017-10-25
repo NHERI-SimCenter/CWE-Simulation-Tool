@@ -115,8 +115,8 @@ void CWE_MainWindow::runSetupSteps()
 
 void CWE_MainWindow::attachCaseSignals(CFDcaseInstance * newCase)
 {
-    QObject::connect(newCase, SIGNAL(haveNewState(CaseState,CaseState)),
-                     ui->tab_parameters, SLOT(newCaseState(CaseState,CaseState)));
+    QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
+                     ui->tab_parameters, SLOT(newCaseState(CaseState)));
     if (stateLabel != NULL)
     {
         stateLabel->setCurrentCase(newCase);

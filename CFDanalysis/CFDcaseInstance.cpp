@@ -555,6 +555,7 @@ void CFDcaseInstance::postProcess()
 
 void CFDcaseInstance::rollBack(QString stageToDelete)
 {
+    //TODO: Also need to rollback subsequent stages eventually.
     if (defunct) return;
     if (caseFolder == NULL) return;
 
