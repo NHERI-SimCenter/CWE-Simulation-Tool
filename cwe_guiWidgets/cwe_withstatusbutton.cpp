@@ -3,11 +3,12 @@
 //#include <QPainter>
 #include <QMouseEvent>
 
-CWE_WithStatusButton::CWE_WithStatusButton(QWidget *parent) :
+CWE_WithStatusButton::CWE_WithStatusButton(QString stageName, QWidget *parent) :
     QFrame(parent),
     ui(new Ui::CWE_WithStatusButton)
 {
     //m_active = true;
+    internal_name = stageName;
     ui->setupUi(this);
     this->setInActive();
 }
@@ -34,7 +35,7 @@ void CWE_WithStatusButton::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         this->setActive(true);
         this->setStyleSheet("QFrame {background: #B0BEC5;}");
-        emit btn_pressed(m_index);
+        emit btn_pressed(m_index, internal_name);
     }
 }
 
@@ -59,33 +60,3 @@ void CWE_WithStatusButton::setInActive(bool b)
     if (!b) this->setActive();
     m_active = !b;
 }
-
-
-#if 0
-void CWE_WithStatusButton::paintEvent(QPaintEvent* evt)
-{
-    QPainter painter(this);
-    QPen myPen;
-    myPen.setWidth(2);
-
-    if(isChecked())
-    {
-        myPen.setColor(Qt::black);
-        painter.setPen(myPen);
-        painter.drawLine(20,29,50,20);
-        int a = 1;
-        emit valueChanged(a);
-    }
-    else
-    {
-        myPen.setColor(Qt::darkGray);
-        painter.setPen(myPen);
-        painter.drawLine(20,29,30,0);
-        int b = 0;
-        emit valueChanged(b);
-    }
-    painter.drawLine(0,30,20,30);
-    painter.drawLine(50,30,70,30);
-    painter.drawLine(50,30,50,20);
-}
-#endif

@@ -18,8 +18,7 @@
                     "name":"Mesh View",
                     "type":"GLmesh"
                 }
-            ],
-            "expected":"constant/polyMesh/boundary.gz"
+            ]
         },
         "sim":{
             "name":"Simulation",
@@ -45,8 +44,7 @@
                     "type":"text",
                     "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat"
                 }
-            ],
-            "expected":"<NUMERICAL>"
+            ]
         }
     },
     "varGroups":{
