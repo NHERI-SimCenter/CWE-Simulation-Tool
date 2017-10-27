@@ -121,7 +121,7 @@ void CWE_Parameters::newCaseGiven()
     resetViewInfo();
 }
 
-void CWE_Parameters::newCaseState(CaseState oldState, CaseState newState)
+void CWE_Parameters::newCaseState(CaseState newState)
 {
     //TODO: implement functions for changes in current params or stage states
 }

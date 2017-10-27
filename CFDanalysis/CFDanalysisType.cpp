@@ -64,4 +64,12 @@ QString CFDanalysisType::getName()
     return obj["name"].toString();
 }
 
+QStringList CFDanalysisType::getStageNames()
+{
+    QJsonObject obj = myConfiguration.object();
+    QJsonObject stageList = obj["stages"].toObject();
+
+    return stageList.keys();
+}
+
 

@@ -29,7 +29,7 @@ private slots:
     void on_pbtn_saveAllParameters_clicked();
 
     void newCaseGiven();
-    void newCaseState(CaseState oldState, CaseState newState);
+    void newCaseState(CaseState newState);
 
     void switchToResultsSlot();
     void switchToParameterSlot();

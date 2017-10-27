@@ -6,11 +6,15 @@
 
 #include "qdebug.h"
 
-PandPTabWidget::PandPTabWidget(QWidget *parent) :
+#include "../CFDClientProgram/vwtinterfacedriver.h"
+
+PandPTabWidget::PandPTabWidget(VWTinterfaceDriver * theDriver, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PandPTabWidget)
 {
     ui->setupUi(this);
+
+    myDriver = theDriver;
 
     groupWidget     = new QMap<QString, CWE_WithStatusButton *>();
     groupTabList    = new QMap<QString, QTabWidget *>();
@@ -46,7 +50,7 @@ int PandPTabWidget::addGroupTab(QString key, const QString &label, StageState cu
     varTabWidgets->insert(key, new QMap<QString, QWidget *>());
 
     // create the tab
-    CWE_WithStatusButton *newTab = new CWE_WithStatusButton();
+    CWE_WithStatusButton *newTab = new CWE_WithStatusButton(key);
     newTab->setText(label);
 
     newTab->setStatus(getStateText(currentState));
@@ -56,7 +60,7 @@ int PandPTabWidget::addGroupTab(QString key, const QString &label, StageState cu
 
     groupWidget->insert(key, newTab);
 
-    connect(newTab,SIGNAL(btn_pressed(int)),this,SLOT(on_groupTabSelected(int)));
+    connect(newTab,SIGNAL(btn_pressed(int,QString)),this,SLOT(on_groupTabSelected(int, QString)));
     //connect(newTab,SIGNAL(btn_released(int)),this,SLOT(on_groupTabSelected(int)));
 
     // create the widget to hold the parameter input
@@ -64,10 +68,6 @@ int PandPTabWidget::addGroupTab(QString key, const QString &label, StageState cu
     ui->stackedWidget->insertWidget(index, pWidget);
 
     groupTabList->insert(key, pWidget);
-
-    // EXAMPLES: how to add tabs ...
-    //this->addVarTab(key, tr("%1 game").arg(key));
-    //this->addVarTab(key, tr("%1 on!").arg(key));
 
     return index;
 }
@@ -368,8 +368,21 @@ void PandPTabWidget::setWidget(QWidget *w)
 
 void PandPTabWidget::on_pbtn_run_clicked()
 {
+    if (currentSelectedStage == "mesh")
+    {//TODO: need to find and get geometry file
+        myDriver->getCurrentCase()->mesh();
+    }
+    else if (currentSelectedStage == "sim")
+    {
+        myDriver->getCurrentCase()->openFOAM();
+    }
+    else if (currentSelectedStage == "post")
+    {
+        myDriver->getCurrentCase()->postProcess();
+    }
+
     // enable the cancel button
-    this->setButtonMode(CWE_BTN_CANCEL);
+    //this->setButtonMode(CWE_BTN_CANCEL);
 }
 
 QMap<QString, QString> PandPTabWidget::collectParamData()
@@ -433,20 +446,21 @@ void PandPTabWidget::on_pbtn_results_clicked()
 
 void PandPTabWidget::on_pbtn_rollback_clicked()
 {
-    // reset the interface
+    myDriver->getCurrentCase()->rollBack(currentSelectedStage);
 
     // set run button active
-    this->setButtonMode(CWE_BTN_RUN);
+    //TODO: ???? Remove? this->setButtonMode(CWE_BTN_RUN);
 }
 
-void PandPTabWidget::on_groupTabSelected(int idx)
+void PandPTabWidget::on_groupTabSelected(int idx, QString selectedStage)
 {
+    currentSelectedStage = selectedStage;
     this->setIndex(idx);
 
     // check for status of tab #idx
 
     // set button state accordingly
-    this->setButtonMode(CWE_BTN_RUN);
+    //this->setButtonMode(CWE_BTN_RUN);
 }
 
 QString PandPTabWidget::getStateText(StageState theState)

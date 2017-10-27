@@ -40,6 +40,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QStringList>
 
 #include <QFile>
 
@@ -51,6 +52,8 @@ public:
     QJsonDocument * getRawConfig();
     QString getInternalName();
     QString getName();
+
+    QStringList getStageNames();
 
 private:
     QString myName;
