@@ -51,6 +51,7 @@ class CFDanalysisType;
 class EasyBoolLock;
 class JobOperator;
 class RemoteJobData;
+enum class RequestState;
 
 class VWTinterfaceDriver;
 
@@ -61,14 +62,13 @@ enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 //RUNNING: Parameters frozen(visible), CANCEL button active
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
-//TODO: Need a SAFE cleanup and repaint for parameters screen
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_INVOKE, AGAVE_RELOAD, AGAVE_RUN};
-//3 things to wait for:
-//1) Waiting on file loading - LOADING
-//2) Waiting on Agave actions - AGAVE_INVOKE
-//3) Waiting on Agave apps list to reload - AGAVE_RELOAD
-//4) Waiting on Agave apps - AGAVE_RUN
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_RUN};
+//LOADING: Reloading file info to determine case stats
+//AGAVE_RUN: Running agave tasks to change file state
+
+enum class PendingCFDrequest {NONE, CREATE_MKDIR, CREATE_UPLOAD, DUP_COPY, PARAM_UPLOAD, PARAM_DEL, PARAM_MOV,
+                             MESH_INVOKE, MESH_RUN, SIM_INVOKE, SIM_RUN, POST_INVOKE, POST_RUN, ROLLBACK_DEL};
 
 class CFDcaseInstance : public QObject
 {
@@ -82,49 +82,56 @@ public:
     CaseState getCaseState();
     QString getCaseFolder();
     QString getCaseName();
+    QString currentAgaveRequest();
 
     //Note: For these, it can always answer "I don't know"
+    //But that should only happen in the LOADING state
     CFDanalysisType * getMyType();
     QMap<QString, QString> getCurrentParams();
     QMap<QString, StageState> getStageStates();
 
     //Of the following, only one enacted at a time
     void createCase(QString newName, FileTreeNode * containingFolder);
+    void duplicateCase(QString newName, FileTreeNode * containingFolder, FileTreeNode * oldCase);
     void changeParameters(QMap<QString, QString> paramList);
     void mesh(FileTreeNode * geoFile = NULL); //Leave NULL if not used
-    void rollBack(QString stageToDelete);
     void openFOAM();
     void postProcess();
+    void rollBack(QString stageToDelete);
 
     void killCaseConnection();
 
+    void downloadCase(QString destLocalFile);
+
 signals:
     void detachCase();
-    void haveNewState(CaseState oldState, CaseState newState);
+    void haveNewState(CaseState newState);
 
 private slots:
     void underlyingFilesUpdated();
     void jobListUpdated();
-    void remoteCommandDone();
+    void appInvokeDone(RequestState invokeStatus);
+    void agaveTaskDone(RequestState invokeStatus);
 
     void caseFolderRemoved();
 
 private:
     void emitNewState(CaseState newState);
-
-    void demandFolderSearch();
+    void displayNetError(QString infoText);
 
     QMap<QString, RemoteJobData * > getRelevantJobs();
 
+    QByteArray produceJSONparams(QMap<QString, QString> paramList);
+
     bool defunct = false;
-    CaseState oldState = CaseState::LOADING;
+    CaseState myState = CaseState::LOADING;
+    PendingCFDrequest currentReq = PendingCFDrequest::NONE;
+    bool requestDataBeingRefreshed = false;
 
     VWTinterfaceDriver * theDriver;
 
     FileTreeNode * caseFolder = NULL;
     CFDanalysisType * myType = NULL;
-
-    EasyBoolLock * myLock;
 
     QString expectedNewCaseFolder;
 };
