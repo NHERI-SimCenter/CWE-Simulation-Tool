@@ -136,29 +136,13 @@ QString CFDcaseInstance::currentAgaveRequest()
     {
         return "Setting new parameter file";
     }
-    if (currentReq == PendingCFDrequest::MESH_INVOKE)
+    if (currentReq == PendingCFDrequest::APP_INVOKE)
     {
-        return "Invoking mesh app";
+        return "Invoking stage app";
     }
-    if (currentReq == PendingCFDrequest::MESH_RUN)
+    if (currentReq == PendingCFDrequest::APP_RUN)
     {
-        return "Running mesh app";
-    }
-    if (currentReq == PendingCFDrequest::SIM_INVOKE)
-    {
-        return "Invoking sim app";
-    }
-    if (currentReq == PendingCFDrequest::SIM_RUN)
-    {
-        return "Running sim app";
-    }
-    if (currentReq == PendingCFDrequest::POST_INVOKE)
-    {
-        return "Invoking post-process app";
-    }
-    if (currentReq == PendingCFDrequest::POST_RUN)
-    {
-        return "Running post-process app";
+        return "Running stage app";
     }
     if (currentReq == PendingCFDrequest::ROLLBACK_DEL)
     {
@@ -480,18 +464,24 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
     requestDataBeingRefreshed = false;
 }
 
-void CFDcaseInstance::mesh(FileTreeNode * geoFile)
+void CFDcaseInstance::startStageApp(QString stageID, FileTreeNode * geoFile)
 {
     if (defunct) return;
     if (caseFolder == NULL) return;
 
     if (currentReq != PendingCFDrequest::NONE) return;
 
+    QString appName = "cwe-";
+    appName = appName.append(stageID);
+
     QMultiMap<QString, QString> rawParams;
-    rawParams.insert("inFile", geoFile->getFileData().getFullPath());
+    if (geoFile != NULL)
+    {
+        rawParams.insert("inFile", geoFile->getFileData().getFullPath());
+    }
 
     RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob("cwe-mesh", rawParams, caseFolder->getFileData().getFullPath());
+    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder->getFileData().getFullPath());
 
     if (jobHandle == NULL)
     {
@@ -500,55 +490,7 @@ void CFDcaseInstance::mesh(FileTreeNode * geoFile)
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(remoteCommandDone()));
-    currentReq = PendingCFDrequest::MESH_INVOKE;
-    emitNewState(CaseState::AGAVE_RUN);
-    requestDataBeingRefreshed = false;
-}
-
-void CFDcaseInstance::openFOAM()
-{
-    if (defunct) return;
-    if (caseFolder == NULL) return;
-
-    if (currentReq != PendingCFDrequest::NONE) return;
-
-    QMultiMap<QString, QString> rawParams;
-
-    RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob("cwe-sim", rawParams, caseFolder->getFileData().getFullPath());
-
-    if (jobHandle == NULL)
-    {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
-        return;
-    }
-    QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(remoteCommandDone()));
-    currentReq = PendingCFDrequest::SIM_INVOKE;
-    emitNewState(CaseState::AGAVE_RUN);
-    requestDataBeingRefreshed = false;
-}
-
-void CFDcaseInstance::postProcess()
-{
-    if (defunct) return;
-    if (caseFolder == NULL) return;
-
-    if (currentReq != PendingCFDrequest::NONE) return;
-
-    QMultiMap<QString, QString> rawParams;
-
-    RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob("cwe-post", rawParams, caseFolder->getFileData().getFullPath());
-
-    if (jobHandle == NULL)
-    {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
-        return;
-    }
-    QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(remoteCommandDone()));
-    currentReq = PendingCFDrequest::POST_INVOKE;
+    currentReq = PendingCFDrequest::APP_INVOKE;
     emitNewState(CaseState::AGAVE_RUN);
     requestDataBeingRefreshed = false;
 }
@@ -797,17 +739,11 @@ void CFDcaseInstance::jobListUpdated()
 
         QString appName = theJob->getApp();
 
-        if (appName.contains("cwe-mesh"))
+        if (appName.contains("cwe-mesh") ||
+                appName.contains("cwe-sim") ||
+                appName.contains("cwe-post"))
         {
-            currentReq = PendingCFDrequest::MESH_RUN;
-        }
-        else if (appName.contains("cwe-sim"))
-        {
-            currentReq = PendingCFDrequest::SIM_RUN;
-        }
-        else if (appName.contains("cwe-post"))
-        {
-            currentReq = PendingCFDrequest::POST_RUN;
+            currentReq = PendingCFDrequest::APP_RUN;
         }
         else
         {
@@ -819,12 +755,8 @@ void CFDcaseInstance::jobListUpdated()
         return;
     }
 
-    if ((currentReq == PendingCFDrequest::MESH_INVOKE) ||
-            (currentReq == PendingCFDrequest::MESH_RUN) ||
-            (currentReq == PendingCFDrequest::SIM_INVOKE) ||
-            (currentReq == PendingCFDrequest::SIM_RUN) ||
-            (currentReq == PendingCFDrequest::POST_INVOKE) ||
-            (currentReq == PendingCFDrequest::POST_RUN))
+    if ((currentReq == PendingCFDrequest::APP_INVOKE) ||
+            (currentReq == PendingCFDrequest::APP_RUN))
     {
         currentReq = PendingCFDrequest::NONE;
         theDriver->getFileHandler()->enactFolderRefresh(caseFolder);

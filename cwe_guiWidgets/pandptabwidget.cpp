@@ -8,13 +8,11 @@
 
 #include "../CFDClientProgram/vwtinterfacedriver.h"
 
-PandPTabWidget::PandPTabWidget(VWTinterfaceDriver * theDriver, QWidget *parent) :
+PandPTabWidget::PandPTabWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PandPTabWidget)
 {
     ui->setupUi(this);
-
-    myDriver = theDriver;
 
     groupWidget     = new QMap<QString, CWE_WithStatusButton *>();
     groupTabList    = new QMap<QString, QTabWidget *>();
@@ -28,6 +26,11 @@ PandPTabWidget::PandPTabWidget(VWTinterfaceDriver * theDriver, QWidget *parent) 
 PandPTabWidget::~PandPTabWidget()
 {
     delete ui;
+}
+
+void PandPTabWidget::setupDriver(VWTinterfaceDriver * theDriver)
+{
+    myDriver = theDriver;
 }
 
 QWidget *PandPTabWidget::currentWidget()
@@ -368,18 +371,8 @@ void PandPTabWidget::setWidget(QWidget *w)
 
 void PandPTabWidget::on_pbtn_run_clicked()
 {
-    if (currentSelectedStage == "mesh")
-    {//TODO: need to find and get geometry file
-        myDriver->getCurrentCase()->mesh();
-    }
-    else if (currentSelectedStage == "sim")
-    {
-        myDriver->getCurrentCase()->openFOAM();
-    }
-    else if (currentSelectedStage == "post")
-    {
-        myDriver->getCurrentCase()->postProcess();
-    }
+    //TODO: need to find and get geometry file for mesh
+    myDriver->getCurrentCase()->startStageApp(currentSelectedStage);
 
     // enable the cancel button
     //this->setButtonMode(CWE_BTN_CANCEL);

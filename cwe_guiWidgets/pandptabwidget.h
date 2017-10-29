@@ -34,8 +34,10 @@ class PandPTabWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit PandPTabWidget(VWTinterfaceDriver * theDriver, QWidget *parent = 0);
+    explicit PandPTabWidget(QWidget *parent = 0);
     ~PandPTabWidget();
+    void setupDriver(VWTinterfaceDriver * theDriver);
+
     int  addGroupTab(QString key, const QString &label, StageState currentState);
 
     void setCurrentWidget(QWidget *);

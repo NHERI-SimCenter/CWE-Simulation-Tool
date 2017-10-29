@@ -43,6 +43,7 @@ void CWE_Parameters::linkWithDriver(VWTinterfaceDriver * newDriver)
     myDriver = newDriver;
     QObject::connect(myDriver, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
+    ui->theTabWidget->setupDriver(myDriver);
 }
 
 void CWE_Parameters::resetViewInfo()
