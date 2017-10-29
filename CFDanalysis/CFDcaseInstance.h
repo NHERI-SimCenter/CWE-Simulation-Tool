@@ -94,7 +94,7 @@ public:
     void createCase(QString newName, FileTreeNode * containingFolder);
     void duplicateCase(QString newName, FileTreeNode * containingFolder, FileTreeNode * oldCase);
     void changeParameters(QMap<QString, QString> paramList);
-    void startStageApp(QString stageID, FileTreeNode * geoFile = NULL );//Leave NULL if not used
+    void startStageApp(QString stageID);
     void rollBack(QString stageToDelete);
 
     void killCaseConnection();

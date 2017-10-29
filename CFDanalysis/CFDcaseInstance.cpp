@@ -464,7 +464,7 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
     requestDataBeingRefreshed = false;
 }
 
-void CFDcaseInstance::startStageApp(QString stageID, FileTreeNode * geoFile)
+void CFDcaseInstance::startStageApp(QString stageID)
 {
     if (defunct) return;
     if (caseFolder == NULL) return;
@@ -475,10 +475,6 @@ void CFDcaseInstance::startStageApp(QString stageID, FileTreeNode * geoFile)
     appName = appName.append(stageID);
 
     QMultiMap<QString, QString> rawParams;
-    if (geoFile != NULL)
-    {
-        rawParams.insert("inFile", geoFile->getFileData().getFullPath());
-    }
 
     RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
     RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder->getFileData().getFullPath());
