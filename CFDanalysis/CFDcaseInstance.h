@@ -68,7 +68,7 @@ enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_RUN};
 //AGAVE_RUN: Running agave tasks to change file state
 
 enum class PendingCFDrequest {NONE, CREATE_MKDIR, CREATE_UPLOAD, DUP_COPY, PARAM_UPLOAD, PARAM_DEL, PARAM_MOV,
-                             MESH_INVOKE, MESH_RUN, SIM_INVOKE, SIM_RUN, POST_INVOKE, POST_RUN, ROLLBACK_DEL};
+                             APP_INVOKE, APP_RUN, ROLLBACK_DEL};
 
 class CFDcaseInstance : public QObject
 {
@@ -94,9 +94,7 @@ public:
     void createCase(QString newName, FileTreeNode * containingFolder);
     void duplicateCase(QString newName, FileTreeNode * containingFolder, FileTreeNode * oldCase);
     void changeParameters(QMap<QString, QString> paramList);
-    void mesh(FileTreeNode * geoFile = NULL); //Leave NULL if not used
-    void openFOAM();
-    void postProcess();
+    void startStageApp(QString stageID, FileTreeNode * geoFile = NULL );//Leave NULL if not used
     void rollBack(QString stageToDelete);
 
     void killCaseConnection();
