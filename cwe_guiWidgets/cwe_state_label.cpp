@@ -53,8 +53,8 @@ void cwe_state_label::setCurrentCase(CFDcaseInstance * newCase)
         this->setText("No Case Selected");
         return;
     }
-    QObject::connect(currentCase, SIGNAL(haveNewState(CaseState,CaseState)),
-                    this, SLOT(setNewState(CaseState,CaseState)));
+    QObject::connect(currentCase, SIGNAL(haveNewState(CaseState)),
+                    this, SLOT(setNewState(CaseState)));
     CaseState currentState = currentCase->getCaseState();
     setNewState(currentState);
 }
