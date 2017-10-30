@@ -128,14 +128,6 @@ QString CFDcaseInstance::currentAgaveRequest()
     {
         return "Uploading new parameter file";
     }
-    if (currentReq == PendingCFDrequest::PARAM_DEL)
-    {
-        return "Deleting old parameter file";
-    }
-    if (currentReq == PendingCFDrequest::PARAM_MOV)
-    {
-        return "Setting new parameter file";
-    }
     if (currentReq == PendingCFDrequest::APP_INVOKE)
     {
         return "Invoking stage app";
@@ -451,7 +443,7 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 
     QByteArray newFile = produceJSONparams(allVars);
 
-    theDriver->getFileHandler()->sendUploadBuffReq(caseFolder, newFile, "newCaseParams");
+    theDriver->getFileHandler()->sendUploadBuffReq(caseFolder, newFile, ".caseParams");
 
     if (!theDriver->getFileHandler()->operationIsPending())
     {
@@ -464,7 +456,7 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
     requestDataBeingRefreshed = false;
 }
 
-void CFDcaseInstance::startStageApp(QString stageID, FileTreeNode * geoFile)
+void CFDcaseInstance::startStageApp(QString stageID)
 {
     if (defunct) return;
     if (caseFolder == NULL) return;
@@ -475,10 +467,6 @@ void CFDcaseInstance::startStageApp(QString stageID, FileTreeNode * geoFile)
     appName = appName.append(stageID);
 
     QMultiMap<QString, QString> rawParams;
-    if (geoFile != NULL)
-    {
-        rawParams.insert("inFile", geoFile->getFileData().getFullPath());
-    }
 
     RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
     RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder->getFileData().getFullPath());
@@ -489,7 +477,7 @@ void CFDcaseInstance::startStageApp(QString stageID, FileTreeNode * geoFile)
         return;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(remoteCommandDone()));
+                     this, SLOT(appInvokeDone(RequestState)));
     currentReq = PendingCFDrequest::APP_INVOKE;
     emitNewState(CaseState::AGAVE_RUN);
     requestDataBeingRefreshed = false;
@@ -589,81 +577,6 @@ void CFDcaseInstance::underlyingFilesUpdated()
                 emitNewState(CaseState::AGAVE_RUN);
                 requestDataBeingRefreshed = false;
             }
-        }
-        else if (currentReq == PendingCFDrequest::PARAM_UPLOAD)
-        {
-            if (caseFolder->childIsUnloaded())
-            {
-                theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
-                return;
-            }
-
-            FileTreeNode * paramFile = caseFolder->getChildNodeWithName("newCaseParams");
-            if (paramFile == NULL)
-            {
-                emitNewState(CaseState::ERROR);
-                displayNetError("Unable to contact design safe. Please wait and try again.");
-                return;
-            }
-
-            paramFile = caseFolder->getChildNodeWithName(".caseParams");
-            if (paramFile == NULL)
-            {
-                emitNewState(CaseState::ERROR);
-                displayNetError("Unable to contact design safe. Please wait and try again.");
-                return;
-            }
-
-            theDriver->getFileHandler()->sendDeleteReq(paramFile);
-
-            if (!theDriver->getFileHandler()->operationIsPending())
-            {
-                displayNetError("Unable to contact design safe. Please wait and try again.");
-                return;
-            }
-
-            currentReq = PendingCFDrequest::PARAM_DEL;
-            emitNewState(CaseState::AGAVE_RUN);
-            requestDataBeingRefreshed = false;
-        }
-        else if (currentReq == PendingCFDrequest::PARAM_DEL)
-        {
-            if (caseFolder->childIsUnloaded())
-            {
-                theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
-                return;
-            }
-
-            FileTreeNode * paramFile = caseFolder->getChildNodeWithName(".caseParams");
-            if (paramFile != NULL)
-            {
-                emitNewState(CaseState::ERROR);
-                displayNetError("Unable to contact design safe. Please wait and try again.");
-                return;
-            }
-
-            paramFile = caseFolder->getChildNodeWithName("newCaseParams");
-            if (paramFile == NULL)
-            {
-                emitNewState(CaseState::ERROR);
-                displayNetError("Unable to contact design safe. Please wait and try again.");
-                return;
-            }
-
-            QString toStr = caseFolder->getFileData().getFullPath();
-            toStr = toStr.append("/.caseParams");
-
-            theDriver->getFileHandler()->sendMoveReq(paramFile, toStr);
-
-            if (!theDriver->getFileHandler()->operationIsPending())
-            {
-                displayNetError("Unable to contact design safe. Please wait and try again.");
-                return;
-            }
-
-            currentReq = PendingCFDrequest::PARAM_MOV;
-            emitNewState(CaseState::AGAVE_RUN);
-            requestDataBeingRefreshed = false;
         }
 
         return;
@@ -797,16 +710,6 @@ void CFDcaseInstance::agaveTaskDone(RequestState invokeStatus)
         requestDataBeingRefreshed = true;
         theDriver->getFileHandler()->lsClosestNode(expectedNewCaseFolder);
     }
-    else if (currentReq == PendingCFDrequest::PARAM_UPLOAD)
-    {
-        requestDataBeingRefreshed = true;
-        theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
-    }
-    else if (currentReq == PendingCFDrequest::PARAM_DEL)
-    {
-        requestDataBeingRefreshed = true;
-        theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
-    }
     else
     {
         currentReq = PendingCFDrequest::NONE;
@@ -831,7 +734,7 @@ QByteArray CFDcaseInstance::produceJSONparams(QMap<QString, QString> paramList)
 
     QJsonValue typeStr(myType->getInternalName());
 
-    ret.object().insert("type",typeStr);
+    mainObject.insert("type",typeStr);
 
     QJsonObject params;
 
@@ -840,7 +743,9 @@ QByteArray CFDcaseInstance::produceJSONparams(QMap<QString, QString> paramList)
         params.insert(itr.key(), (*itr));
     }
 
-    ret.object().insert("vars",params);
+    mainObject.insert("vars",params);
+
+    ret.setObject(mainObject);
 
     return ret.toJson();
 }
