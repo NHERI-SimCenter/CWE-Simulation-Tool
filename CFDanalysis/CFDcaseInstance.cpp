@@ -86,7 +86,6 @@ bool CFDcaseInstance::isDefunct()
 CaseState CFDcaseInstance::getCaseState()
 {
     if (defunct) return CaseState::DEFUNCT;
-    if (currentReq != PendingCFDrequest::NONE) return CaseState::AGAVE_RUN;
     return myState;
 }
 
@@ -370,7 +369,7 @@ void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolde
     }
 
     currentReq = PendingCFDrequest::CREATE_MKDIR;
-    emitNewState(CaseState::AGAVE_RUN);
+    emitNewState(CaseState::OP_INVOKE);
     requestDataBeingRefreshed = false;
 }
 
@@ -396,7 +395,7 @@ void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFo
     }
 
     currentReq = PendingCFDrequest::DUP_COPY;
-    emitNewState(CaseState::AGAVE_RUN);
+    emitNewState(CaseState::OP_INVOKE);
     requestDataBeingRefreshed = false;
 }
 
@@ -452,7 +451,7 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
     }
 
     currentReq = PendingCFDrequest::PARAM_UPLOAD;
-    emitNewState(CaseState::AGAVE_RUN);
+    emitNewState(CaseState::OP_INVOKE);
     requestDataBeingRefreshed = false;
 }
 
@@ -479,7 +478,7 @@ void CFDcaseInstance::startStageApp(QString stageID)
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(appInvokeDone(RequestState)));
     currentReq = PendingCFDrequest::APP_INVOKE;
-    emitNewState(CaseState::AGAVE_RUN);
+    emitNewState(CaseState::JOB_RUN);
     requestDataBeingRefreshed = false;
 }
 
@@ -509,7 +508,7 @@ void CFDcaseInstance::rollBack(QString stageToDelete)
     }
 
     currentReq = PendingCFDrequest::ROLLBACK_DEL;
-    emitNewState(CaseState::AGAVE_RUN);
+    emitNewState(CaseState::OP_INVOKE);
     requestDataBeingRefreshed = false;
 }
 
@@ -574,7 +573,7 @@ void CFDcaseInstance::underlyingFilesUpdated()
                 }
 
                 currentReq = PendingCFDrequest::CREATE_UPLOAD;
-                emitNewState(CaseState::AGAVE_RUN);
+                emitNewState(CaseState::OP_INVOKE);
                 requestDataBeingRefreshed = false;
             }
         }
@@ -664,7 +663,7 @@ void CFDcaseInstance::jobListUpdated()
             displayNetError("Case has unrecognized app. Tasks may have been started without this program.");
             return;
         }
-        emitNewState(CaseState::AGAVE_RUN);
+        emitNewState(CaseState::JOB_RUN);
         return;
     }
 
@@ -703,7 +702,7 @@ void CFDcaseInstance::agaveTaskDone(RequestState invokeStatus)
         return;
     }
 
-    CaseState newState = CaseState::AGAVE_RUN;
+    CaseState newState = CaseState::OP_INVOKE;
 
     if ((currentReq == PendingCFDrequest::CREATE_MKDIR) || (currentReq == PendingCFDrequest::DUP_COPY))
     {
@@ -752,11 +751,6 @@ QByteArray CFDcaseInstance::produceJSONparams(QMap<QString, QString> paramList)
 
 void CFDcaseInstance::emitNewState(CaseState newState)
 {
-    if ((currentReq != PendingCFDrequest::NONE) && (newState != CaseState::ERROR))
-    {
-        newState = CaseState::AGAVE_RUN;
-    }
-
     if (newState == myState) return;
     myState = newState;
     emit haveNewState(newState);
