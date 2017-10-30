@@ -1,6 +1,8 @@
 {
-    "name":"dummy test case 2",
-    "internalName":"buildingSlice2",
+    "name":"Triangle Cylinder (3D)",
+    "internalName":"triangle3D",
+    "description":"This model describes \nthe air flow around a triangle\n cylinder in 3D.",
+    "icon":"placeholderIcon.png",
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{
@@ -16,8 +18,7 @@
                     "name":"Mesh View",
                     "type":"GLmesh"
                 }
-            ],
-            "expected":"constant/polyMesh/boundary.gz"
+            ]
         },
         "sim":{
             "name":"Simulation",
@@ -43,8 +44,7 @@
                     "type":"text",
                     "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat"
                 }
-            ],
-            "expected":"<NUMERICAL>"
+            ]
         }
     },
     "varGroups":{
