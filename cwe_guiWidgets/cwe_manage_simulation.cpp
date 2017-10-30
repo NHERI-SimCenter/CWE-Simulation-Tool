@@ -92,7 +92,7 @@ void CWE_manage_simulation::on_pb_viewResults_clicked()
 
 bool CWE_manage_simulation::verifyCaseAndSelect()
 {
-    if (tempCase->getCaseState() == CaseState::AGAVE_RUN)
+    if (tempCase->getCaseState() == CaseState::JOB_RUN)
     {
         driverLink->setCurrentCase(tempCase);
         return true;
