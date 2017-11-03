@@ -63,11 +63,12 @@ enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, AGAVE_RUN};
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, JOB_RUN, OP_INVOKE};
 //LOADING: Reloading file info to determine case stats
-//AGAVE_RUN: Running agave tasks to change file state
+//JOB_RUN: Running long-running tasks
+//OP_INVOKE: Running short file operations
 
-enum class PendingCFDrequest {NONE, CREATE_MKDIR, CREATE_UPLOAD, DUP_COPY, PARAM_UPLOAD, PARAM_DEL, PARAM_MOV,
+enum class PendingCFDrequest {NONE, CREATE_MKDIR, CREATE_UPLOAD, DUP_COPY, PARAM_UPLOAD,
                              APP_INVOKE, APP_RUN, ROLLBACK_DEL};
 
 class CFDcaseInstance : public QObject
@@ -94,7 +95,7 @@ public:
     void createCase(QString newName, FileTreeNode * containingFolder);
     void duplicateCase(QString newName, FileTreeNode * containingFolder, FileTreeNode * oldCase);
     void changeParameters(QMap<QString, QString> paramList);
-    void startStageApp(QString stageID, FileTreeNode * geoFile = NULL );//Leave NULL if not used
+    void startStageApp(QString stageID);
     void rollBack(QString stageToDelete);
 
     void killCaseConnection();

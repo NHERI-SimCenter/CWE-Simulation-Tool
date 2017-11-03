@@ -53,17 +53,22 @@ void cwe_state_label::setCurrentCase(CFDcaseInstance * newCase)
         this->setText("No Case Selected");
         return;
     }
-    QObject::connect(currentCase, SIGNAL(haveNewState(CaseState,CaseState)),
-                    this, SLOT(setNewState(CaseState,CaseState)));
+    QObject::connect(currentCase, SIGNAL(haveNewState(CaseState)),
+                    this, SLOT(setNewState(CaseState)));
     CaseState currentState = currentCase->getCaseState();
     setNewState(currentState);
 }
 
 void cwe_state_label::setNewState(CaseState newState)
 {
-    if (newState == CaseState::AGAVE_RUN)
+    if (newState == CaseState::JOB_RUN)
     {
-        this->setText("Running Remote Task . . .");
+        this->setText("Running Remote Task . . . Please Wait");
+        return;
+    }
+    if (newState == CaseState::OP_INVOKE)
+    {
+        this->setText("Updating remote files . . . Please Wait");
         return;
     }
     if (newState == CaseState::DEFUNCT)
@@ -83,7 +88,7 @@ void cwe_state_label::setNewState(CaseState newState)
     }
     if (newState == CaseState::LOADING)
     {
-        this->setText("Getting remote data");
+        this->setText("Getting remote data  . . . Please Wait");
         return;
     }
     if (newState == CaseState::READY)

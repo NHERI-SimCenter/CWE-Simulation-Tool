@@ -371,7 +371,6 @@ void PandPTabWidget::setWidget(QWidget *w)
 
 void PandPTabWidget::on_pbtn_run_clicked()
 {
-    //TODO: need to find and get geometry file for mesh
     myDriver->getCurrentCase()->startStageApp(currentSelectedStage);
 
     // enable the cancel button
