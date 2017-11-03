@@ -1,7 +1,15 @@
 <RCC>
     <qresource prefix="/config">
-        <file>building2D.json</file>
-        <file>dummy1.json</file>
-        <file>dummy2.json</file>
+        <file>upload2D.json</file>
+        <file>upload3D.json</file>
+        <file>channel3D.json</file>
+        <file>triangle3D.json</file>
+        <file>cylinder2D.json</file>
+        <file>cylinder3D.json</file>
+        <file>extrusion3D.json</file>
+        <file>pointList2D.json</file>
+        <file>rectangle2D.json</file>
+        <file>rectangle3D.json</file>
+        <file>triangle2D.json</file>
     </qresource>
 </RCC>
