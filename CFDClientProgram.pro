@@ -92,7 +92,8 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_busyindicator.cpp \
     cwe_guiWidgets/cwe_debug_widget.cpp \
     ../AgaveExplorer/remoteFileOps/remotejobentry.cpp \
-    cwe_guiWidgets/cwe_state_label.cpp
+    cwe_guiWidgets/cwe_state_label.cpp \
+    SimCenter_widgets/sctrdatawidget.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -137,7 +138,8 @@ HEADERS  += \
     cwe_guiWidgets/cwe_busyindicator.h \
     cwe_guiWidgets/cwe_debug_widget.h \
     ../AgaveExplorer/remoteFileOps/remotejobentry.h \
-    cwe_guiWidgets/cwe_state_label.h
+    cwe_guiWidgets/cwe_state_label.h \
+    SimCenter_widgets/sctrdatawidget.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -159,7 +161,8 @@ FORMS    += \
     cwe_guiWidgets/cwe_create_simulation_old.ui \
     cwe_guiWidgets/cwe_create_copy_simulation.ui \
     cwe_guiWidgets/cwe_busyindicator.ui \
-    cwe_guiWidgets/cwe_debug_widget.ui
+    cwe_guiWidgets/cwe_debug_widget.ui \
+    SimCenter_widgets/sctrdatawidget.ui
 
 RESOURCES += \
     cwe_resources.qrc \

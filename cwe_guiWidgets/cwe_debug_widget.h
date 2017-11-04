@@ -19,8 +19,10 @@ public:
 private slots:
     void on_pb_setBusy_clicked();
     void on_pb_stopBusy_clicked();
-
     void on_pb_timedBusy_clicked();
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
 
 private:
     Ui::CWE_Debug_Widget *ui;
