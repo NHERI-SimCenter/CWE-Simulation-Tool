@@ -14,29 +14,10 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="pb_setBusy">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>3</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="pb_timedBusy">
      <property name="text">
-      <string>set busy state</string>
+      <string>2 second busy state</string>
      </property>
     </widget>
    </item>
@@ -53,10 +34,10 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="QPushButton" name="pb_stopBusy">
+   <item row="2" column="1">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>stop busy state</string>
+      <string>Timed busy state ...</string>
      </property>
     </widget>
    </item>
@@ -64,6 +45,13 @@
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Stop busy indicator ...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPushButton" name="pb_stopBusy">
+     <property name="text">
+      <string>stop busy state</string>
      </property>
     </widget>
    </item>
@@ -90,19 +78,52 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="label">
+   <item row="1" column="2">
+    <widget class="QPushButton" name="pb_setBusy">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>3</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
-      <string>Timed busy state ...</string>
+      <string>set busy state</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="pb_timedBusy">
-     <property name="text">
-      <string>2 second busy state</string>
+   <item row="4" column="2">
+    <widget class="SCtrDataWidget" name="DataWidget" native="true"/>
+   </item>
+   <item row="6" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-    </widget>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>toggle view</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>hide</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -111,6 +132,12 @@
    <class>SectionTitle</class>
    <extends>QLabel</extends>
    <header>../widgets/Common/sectiontitle.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SCtrDataWidget</class>
+   <extends>QWidget</extends>
+   <header>SimCenter_widgets/sctrdatawidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
