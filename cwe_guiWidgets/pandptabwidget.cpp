@@ -113,10 +113,11 @@ int PandPTabWidget::addVarTab(QString key, const QString &label)
 {
     // create the widget to hold the parameter input
 
-    QScrollArea *itm = new QScrollArea();
-    itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    //itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    //itm->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::MinimumExpanding);
+    //QScrollArea *itm = new QScrollArea();
+    //itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    // //itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    // //itm->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::MinimumExpanding);
+    CWE_ParameterTab *itm = new CWE_ParameterTab(this);
 
     QGridLayout *lyt = new QGridLayout();
     itm->setLayout(lyt);
@@ -134,6 +135,8 @@ void PandPTabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
 {
 
 }
+
+/* *** moved to SCtrDataWidget ***
 
 QWidget * PandPTabWidget::addStd(QJsonObject JSONvar, QWidget *parent, QString *setVal)
 {
@@ -313,6 +316,8 @@ void PandPTabWidget::addType(const QString &varName, const QString &type, QJsonO
     variableWidgets->insert(varName, varData);
 }
 
+*/
+
 bool PandPTabWidget::addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString * setVal)
 {
     QString type = JSONvar["type"].toString();
@@ -324,7 +329,8 @@ bool PandPTabWidget::addVariable(QString varName, QJsonObject JSONvar, const QSt
         QWidget *parent = varTabWidgets->value(key)->value(label);
         if (parent != NULL)
         {
-            this->addType(varName, type, JSONvar, parent, setVal);
+            /* temporary disabled */
+            //this->addType(varName, type, JSONvar, parent, setVal);
             return true;
         }
         else { return false; }
