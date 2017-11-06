@@ -83,7 +83,6 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/copyrightdialog.cpp \
     ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
     CFDanalysis/CFDanalysisType.cpp \
-    ../widgets/Common/sectiontitle.cpp \
     cwe_guiWidgets/cwe_parametertab.cpp \
     cwe_guiWidgets/pandptabwidget.cpp \
     cwe_guiWidgets/cwe_withstatusbutton.cpp \
@@ -128,7 +127,6 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/copyrightdialog.h \
     ../AgaveExplorer/utilFuncs/singlelinedialog.h \
     CFDanalysis/CFDanalysisType.h \
-    ../widgets/Common/sectiontitle.h \
     cwe_guiWidgets/cwe_parametertab.h \
     cwe_guiWidgets/pandptabwidget.h \
     cwe_guiWidgets/cwe_withstatusbutton.h \

@@ -89,6 +89,7 @@ signals:
 
 private slots:
     void currentCaseInvalidated();
+    void checkAppList(RequestState replyState, QJsonArray * appList);
 
 private:
     CWE_MainWindow * mainWindow;
