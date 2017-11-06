@@ -49,24 +49,35 @@
     </widget>
    </item>
    <item>
-    <widget class="QTextEdit" name="txted_theValue">
+    <widget class="QLineEdit" name="theValue">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>3</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="theCheckBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>3</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>24</height>
-      </size>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="theComboBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>3</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
     </widget>
    </item>
@@ -86,24 +97,7 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>txted_theValue</sender>
-   <signal>textChanged()</signal>
-   <receiver>SCtrDataWidget</receiver>
-   <slot>on_txted_theValue_textChanged()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>260</x>
-     <y>39</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>124</x>
-     <y>71</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>on_txted_theValue_textChanged()</slot>
  </slots>
