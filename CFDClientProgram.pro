@@ -94,7 +94,8 @@ SOURCES += main.cpp \
     ../AgaveExplorer/remoteFileOps/remotejobentry.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
     SimCenter_widgets/sctrdatawidget.cpp \
-    SimCenter_widgets/sctrvalidators.cpp
+    SimCenter_widgets/sctrvalidators.cpp \
+    SimCenter_widgets/sctrmasterdatawidget.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -141,7 +142,8 @@ HEADERS  += \
     ../AgaveExplorer/remoteFileOps/remotejobentry.h \
     cwe_guiWidgets/cwe_state_label.h \
     SimCenter_widgets/sctrdatawidget.h \
-    SimCenter_widgets/sctrvalidators.h
+    SimCenter_widgets/sctrvalidators.h \
+    SimCenter_widgets/sctrmasterdatawidget.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
