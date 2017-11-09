@@ -18,6 +18,7 @@ SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
     QFrame(parent)
 {
     // set up the UI for the widget
+    this->initUI();
 
     this->setViewState(SimCenterViewState::visible);
 
@@ -38,7 +39,33 @@ SCtrMasterDataWidget::~SCtrMasterDataWidget()
 
 void SCtrMasterDataWidget::initUI()
 {
+    if (label_unit == NULL) {
+        label_unit = new QLabel(this);
+    }
+    if (label_varName == NULL) {
+        label_varName = new QLabel(this);
+    }
+    QBoxLayout *layout = new QHBoxLayout();
+    layout->addWidget(label_varName, 3);
+    layout->addWidget(label_unit, 1);
+    this->setLayout(layout);
+}
 
+void SCtrMasterDataWidget::refresh()
+{
+    QString s = m_obj["displayname"].toString();
+    if (s != "") this->setVariableName(s);
+
+    QString u = m_obj["unit"].toString();
+    if (u != "") this->setUnit(u);
+
+    if (theInputWidget != NULL ) {
+        QString currentValue = ((QLineEdit *)theInputWidget)->text();
+        if (currentValue == "") {
+            currentValue = m_obj["default"].toString();
+            ((QLineEdit *)theInputWidget)->setText(currentValue);
+        }
+    }
 }
 
 SimCenterViewState SCtrMasterDataWidget::ViewState()
@@ -433,6 +460,15 @@ void SCtrMasterDataWidget::showComboBox()
     theComboBox->show();
 }
 
+void SCtrMasterDataWidget::setVariableName(QString s)
+{
+    if (label_varName != NULL) label_varName->setText(s);
+}
+
+void SCtrMasterDataWidget::setUnit(QString u)
+{
+    if (label_unit != NULL) label_unit->setText(u);
+}
 
 /* ********** SLOTS ********** */
 void SCtrMasterDataWidget::on_theValue_editingFinished()

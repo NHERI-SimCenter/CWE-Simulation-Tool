@@ -95,7 +95,8 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
     SimCenter_widgets/sctrdatawidget.cpp \
     SimCenter_widgets/sctrvalidators.cpp \
-    SimCenter_widgets/sctrmasterdatawidget.cpp
+    SimCenter_widgets/sctrmasterdatawidget.cpp \
+    SimCenter_widgets/sctrstddatawidget.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -143,7 +144,8 @@ HEADERS  += \
     cwe_guiWidgets/cwe_state_label.h \
     SimCenter_widgets/sctrdatawidget.h \
     SimCenter_widgets/sctrvalidators.h \
-    SimCenter_widgets/sctrmasterdatawidget.h
+    SimCenter_widgets/sctrmasterdatawidget.h \
+    SimCenter_widgets/sctrstddatawidget.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
