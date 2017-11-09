@@ -8,6 +8,7 @@
 #include <QComboBox>
 #include <QJsonObject>
 #include <QValidator>
+#include <QObject>
 
 #include "cwe_guiWidgets/cwe_defines.h"
 
@@ -37,13 +38,14 @@ public:
     ~SCtrMasterDataWidget();
     SimCenterViewState ViewState();
     void setViewState(SimCenterViewState);
-    void setData(QJsonObject &);
+    virtual void setData(QJsonObject &);
     virtual void initUI();
     virtual void setValue(QString);
     virtual void setValue(float);
     virtual void setValue(int);
     virtual void setValue(bool);
     virtual QString Value();
+    void refresh();
 
 protected:
     QFrame * addStd(QJsonObject, QWidget *parent, QString *setVal = NULL );
@@ -60,7 +62,13 @@ protected:
 private slots:
     void on_theValue_editingFinished();
 
+protected:
+    QWidget *theInputWidget;
+
 private:
+    void setVariableName(QString s);
+    void setUnit(QString u);
+
     void showLineEdit();
     void showCheckBox();
     void showComboBox();
@@ -68,8 +76,8 @@ private:
     QLineEdit *theValue;
     QCheckBox *theCheckBox;
     QComboBox *theComboBox;
-    QLabel *label_varName;
-    QLabel *label_unit;
+    QLabel *label_varName = NULL;
+    QLabel *label_unit = NULL;
 
     SimCenterViewState m_ViewState;
 
