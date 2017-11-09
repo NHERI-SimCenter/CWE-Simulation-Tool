@@ -37,8 +37,11 @@
 
 #include <QWidget>
 #include <QFileSystemModel>
+#include <QModelIndexList>
+#include <QFileInfo>
 
-class FileOperator;
+class VWTinterfaceDriver;
+class FileTreeNode;
 
 namespace Ui {
 class CWE_file_manager;
@@ -52,15 +55,30 @@ public:
     explicit CWE_file_manager(QWidget *parent = 0);
     ~CWE_file_manager();
 
-    void linkFileHandle(FileOperator * theJobhandle);
+    void linkDriver(VWTinterfaceDriver * theDriver);
 
 private slots:
     void on_pb_upload_clicked();
     void on_pb_download_clicked();
 
+    void customFileMenu(QPoint pos);
+    void copyMenuItem();
+    void moveMenuItem();
+    void renameMenuItem();
+    void deleteMenuItem();
+    void createFolderMenuItem();
+
+    void compressMenuItem();
+    void decompressMenuItem();
+    void refreshMenuItem();
+
 private:
     Ui::CWE_file_manager *ui;
     QFileSystemModel *localFileModel;
+
+    VWTinterfaceDriver * myDriver;
+
+    FileTreeNode * targetNode = NULL;
 };
 
 #endif // CWE_FILE_MANAGER_H

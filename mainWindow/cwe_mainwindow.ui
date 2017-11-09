@@ -61,122 +61,70 @@
      </widget>
     </item>
     <item>
-     <widget class="QStackedWidget" name="stackedPageContainer">
+     <widget class="QTabWidget" name="tabContainer">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="page_1">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QTabWidget" name="tabContainer">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="tabPosition">
-           <enum>QTabWidget::North</enum>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="CWE_welcome_screen" name="tab_welcome_screen">
-           <attribute name="title">
-            <string>Welcome</string>
-           </attribute>
-          </widget>
-          <widget class="CWE_help" name="tab_help">
-           <attribute name="title">
-            <string>Help</string>
-           </attribute>
-          </widget>
-          <widget class="QWidget" name="tab_spacer_1">
-           <attribute name="title">
-            <string>Page text space</string>
-           </attribute>
-          </widget>
-          <widget class="CWE_landing" name="tab_landing_page">
-           <attribute name="title">
-            <string>Dashboard</string>
-           </attribute>
-          </widget>
-          <widget class="CWE_Create_Copy_Simulation" name="tab_create_new">
-           <attribute name="title">
-            <string>Create Case</string>
-           </attribute>
-          </widget>
-          <widget class="CWE_manage_simulation" name="tab_manage_and_run">
-           <attribute name="title">
-            <string>Select Case</string>
-           </attribute>
-          </widget>
-          <widget class="CWE_file_manager" name="tab_files">
-           <attribute name="title">
-            <string>Files</string>
-           </attribute>
-          </widget>
-          <widget class="QWidget" name="tab_spacer_2">
-           <attribute name="title">
-            <string>some text for size</string>
-           </attribute>
-          </widget>
-          <widget class="CWE_Parameters" name="tab_parameters">
-           <attribute name="title">
-            <string>Parameters</string>
-           </attribute>
-          </widget>
-          <widget class="CWE_Results" name="tab_results">
-           <attribute name="title">
-            <string>Results</string>
-           </attribute>
-          </widget>
-          <widget class="CWE_Debug_Widget" name="tab_debug">
-           <attribute name="title">
-            <string>.</string>
-           </attribute>
-          </widget>
-         </widget>
-        </item>
-       </layout>
+      <widget class="CWE_welcome_screen" name="tab_welcome_screen">
+       <attribute name="title">
+        <string>Welcome</string>
+       </attribute>
       </widget>
-      <widget class="QWidget" name="page">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QWidget" name="SideBar" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>200</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>250</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QWidget" name="stackContainer" native="true"/>
-        </item>
-       </layout>
+      <widget class="CWE_help" name="tab_help">
+       <attribute name="title">
+        <string>Help</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_spacer_1">
+       <attribute name="title">
+        <string>Page text space</string>
+       </attribute>
+      </widget>
+      <widget class="CWE_landing" name="tab_landing_page">
+       <attribute name="title">
+        <string>Dashboard</string>
+       </attribute>
+      </widget>
+      <widget class="CWE_Create_Copy_Simulation" name="tab_create_new">
+       <attribute name="title">
+        <string>Create Case</string>
+       </attribute>
+      </widget>
+      <widget class="CWE_manage_simulation" name="tab_manage_and_run">
+       <attribute name="title">
+        <string>Select Case</string>
+       </attribute>
+      </widget>
+      <widget class="CWE_file_manager" name="tab_files">
+       <attribute name="title">
+        <string>Files</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_spacer_2">
+       <attribute name="title">
+        <string>some text for size</string>
+       </attribute>
+      </widget>
+      <widget class="CWE_Parameters" name="tab_parameters">
+       <attribute name="title">
+        <string>Parameters</string>
+       </attribute>
+      </widget>
+      <widget class="CWE_Results" name="tab_results">
+       <attribute name="title">
+        <string>Results</string>
+       </attribute>
+      </widget>
+      <widget class="CWE_Debug_Widget" name="tab_debug">
+       <attribute name="title">
+        <string>.</string>
+       </attribute>
       </widget>
      </widget>
     </item>
@@ -198,7 +146,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
