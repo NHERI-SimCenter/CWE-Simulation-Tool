@@ -1,0 +1,16 @@
+#!/bin/sh
+
+APP_DIR=`dirname $0`
+
+if [ `expr substr $APP_DIR 1 1` != "/" ]
+then
+    APP_DIR=$PWD/$APP_DIR
+fi
+
+LD_LIBRARY_PATH=$APP_DIR/lib
+export LD_LIBRARY_PATH
+export QT_PLUGIN_PATH=$APP_DIR/plugins
+
+export QT_LOGGING_RULES="qt.network.ssl.warning=false"
+
+$APP_DIR/exec/CFDClientProgram "$@"
