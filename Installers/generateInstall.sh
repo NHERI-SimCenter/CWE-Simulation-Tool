@@ -7,7 +7,6 @@
 MADE_EXEC_DIR=$1
 GENERATOR_DIR=$(dirname "$0")
 
-
 #----- adjust user settings -----------------------------
 
 QT_HOME=~/Qt/5.9.2/gcc_64/lib
