@@ -76,29 +76,22 @@ SimCenterViewState SCtrMasterDataWidget::ViewState()
 void SCtrMasterDataWidget::setViewState(SimCenterViewState state)
 {
     switch (state) {
-    case SimCenterViewState::visible:
-        theValue->setEnabled(false);
-        theCheckBox->setEnabled(false);
-        theComboBox->setEnabled(false);
-        this->show();
-        m_ViewState = state;
-        break;
     case SimCenterViewState::editable:
-        theValue->setEnabled(true);
-        theCheckBox->setEnabled(true);
-        theComboBox->setEnabled(true);
+        theInputWidget->setEnabled(false);
         this->show();
-        m_ViewState = state;
+        m_ViewState = SimCenterViewState::editable;
         break;
     case SimCenterViewState::hidden:
-        theValue->setEnabled(false);
-        theCheckBox->setEnabled(false);
-        theComboBox->setEnabled(false);
+        theInputWidget->setEnabled(true);
         this->hide();
-        m_ViewState = state;
+        m_ViewState = SimCenterViewState::hidden;
         break;
+    case SimCenterViewState::visible:
     default:
+        theInputWidget->setEnabled(true);
+        this->show();
         m_ViewState = SimCenterViewState::visible;
+        break;
     }
 }
 
@@ -253,9 +246,6 @@ QString SCtrMasterDataWidget::Value()
 {
     return theValue->text();
 }
-
-
-
 
 /* ********** various input data types ********** */
 
