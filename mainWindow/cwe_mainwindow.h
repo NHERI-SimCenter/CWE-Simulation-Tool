@@ -72,8 +72,6 @@ public:
     void attachCaseSignals(CFDcaseInstance * newCase);
 
 private slots:
-    void tabChanged(int);
-    void newActiveCase();
     void switchToParameterTab();
     void switchToResultsTab();
     void switchToCreateTab();
@@ -99,7 +97,6 @@ private slots:
 
 private:
     Ui::CWE_MainWindow *ui;
-    int switchToTab(int idx);
 
     VWTinterfaceDriver     *myDriver;
     RemoteDataInterface    *dataLink;

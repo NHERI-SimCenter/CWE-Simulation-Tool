@@ -218,3 +218,11 @@ void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appL
         fatalInterfaceError("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
     }
 }
+
+void VWTinterfaceDriver::displayMessagePopup(QString infoText)
+{
+    QMessageBox infoMessage;
+    infoMessage.setText(infoText);
+    infoMessage.setIcon(QMessageBox::Information);
+    infoMessage.exec();
+}

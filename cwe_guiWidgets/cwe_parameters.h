@@ -42,7 +42,6 @@ signals:
 
 private:
     void saveAllParams();
-    int switchToTab(int index);
 
     Ui::CWE_Parameters *ui;
 

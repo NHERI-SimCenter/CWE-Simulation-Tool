@@ -84,6 +84,8 @@ public:
     CFDcaseInstance * getCurrentCase();
     void setCurrentCase(CFDcaseInstance * newCase);
 
+    void displayMessagePopup(QString infoText);
+
 signals:
     void haveNewCase();
 
