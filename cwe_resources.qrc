@@ -22,7 +22,4 @@
         <file>images/Overview/CWEFlow4.png</file>
         <file>images/Overview/CWEFlow5.png</file>
     </qresource>
-    <qresource prefix="/qml">
-        <file>QML/BusyIndicatorDef.qml</file>
-    </qresource>
 </RCC>

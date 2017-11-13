@@ -14,31 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="5" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QPushButton" name="pushButton_4">
-       <property name="text">
-        <string>toggle view</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>hide</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="5" column="2">
-    <widget class="SCtrDataWidget" name="BoolWidget" native="true"/>
-   </item>
-   <item row="7" column="1">
+   <item row="4" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <property name="topMargin">
       <number>0</number>
@@ -60,72 +36,40 @@
     </layout>
    </item>
    <item row="2" column="2">
-    <widget class="QPushButton" name="pb_timedBusy">
-     <property name="text">
-      <string>2 second busy state</string>
-     </property>
-    </widget>
+    <widget class="SCtrDataWidget" name="BoolWidget" native="true"/>
    </item>
-   <item row="1" column="1">
-    <widget class="QLabel" name="label_1">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="2" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="topMargin">
+      <number>0</number>
      </property>
-     <property name="text">
-      <string>Test busy indicator ...</string>
-     </property>
-    </widget>
+     <item>
+      <widget class="QPushButton" name="pushButton_4">
+       <property name="text">
+        <string>toggle view</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_3">
+       <property name="text">
+        <string>hide</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item row="1" column="2">
-    <widget class="QPushButton" name="pb_setBusy">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>3</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>set busy state</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
     <widget class="SCtrDataWidget" name="DataWidget" native="true"/>
    </item>
-   <item row="1" column="0">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Preferred</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="2">
-    <widget class="QPushButton" name="pb_stopBusy">
-     <property name="text">
-      <string>stop busy state</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0" colspan="3">
-    <widget class="SectionTitle" name="label_3">
+    <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Developer Test Procedures</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="1" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pushButton">
@@ -143,7 +87,7 @@
      </item>
     </layout>
    </item>
-   <item row="10" column="1">
+   <item row="7" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -156,31 +100,12 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Timed busy state ...</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Stop busy indicator ...</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="2">
+   <item row="4" column="2">
     <widget class="SCtrDataWidget" name="ChooseWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>SectionTitle</class>
-   <extends>QLabel</extends>
-   <header>../widgets/Common/sectiontitle.h</header>
-  </customwidget>
   <customwidget>
    <class>SCtrDataWidget</class>
    <extends>QWidget</extends>

@@ -2,7 +2,8 @@
 #define CWE_DEBUG_WIDGET_H
 
 #include <QWidget>
-#include "cwe_busyindicator.h"
+#include <QJsonObject>
+#include <QJsonArray>
 
 namespace Ui {
 class CWE_Debug_Widget;
@@ -17,24 +18,15 @@ public:
     ~CWE_Debug_Widget();
 
 private slots:
-    void on_pb_setBusy_clicked();
-    void on_pb_stopBusy_clicked();
-    void on_pb_timedBusy_clicked();
     void on_pushButton_clicked();
-
     void on_pushButton_2_clicked();
-
     void on_pushButton_4_clicked();
-
     void on_pushButton_3_clicked();
-
     void on_pushButton_5_clicked();
-
     void on_pushButton_6_clicked();
 
 private:
     Ui::CWE_Debug_Widget *ui;
-    CWE_BusyIndicator *theBusy;
 };
 
 #endif // CWE_DEBUG_WIDGET_H

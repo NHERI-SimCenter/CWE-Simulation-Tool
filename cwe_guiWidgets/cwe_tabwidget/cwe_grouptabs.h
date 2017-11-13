@@ -3,8 +3,10 @@
 
 #include <QJsonObject>
 #include <QTabWidget>
-#include <SimCenter_widgets/sctrstates.h>
-#include <cwe_guiWidgets/cwe_withstatusbutton.h>
+
+#include "SimCenter_widgets/sctrstates.h"
+
+class CWE_WithStatusButton;
 
 class CWE_GroupTabs
 {

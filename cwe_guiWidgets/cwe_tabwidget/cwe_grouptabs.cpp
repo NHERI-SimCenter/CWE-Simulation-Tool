@@ -1,5 +1,7 @@
 #include "cwe_grouptabs.h"
 
+#include "cwe_withstatusbutton.h"
+
 CWE_GroupTabs::CWE_GroupTabs()
 {
     this->setViewState(SimCenterViewState::visible);
