@@ -9,8 +9,14 @@ CWE_GroupTabs::CWE_GroupTabs()
 
 CWE_GroupTabs::~CWE_GroupTabs()
 {
-    if (m_tabWidget != NULL) delete m_tabWidget;
-    if (m_statusButton != NULL) delete m_statusButton;
+    if (m_tabWidget != NULL) {
+        delete m_tabWidget;
+        m_tabWidget = NULL;
+    }
+    if (m_statusButton != NULL) {
+        delete m_statusButton;
+        m_statusButton = NULL;
+    }
 }
 
 // set the group definitions as a JSon file
