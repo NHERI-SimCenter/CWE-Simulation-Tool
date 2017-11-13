@@ -74,19 +74,6 @@ signals:
     void switchToHelpTab();
 
 protected:
-/* *** moved to SCtrDataWidget ***
-    QWidget * addStd(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    QWidget * addBool(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    QWidget * addFile(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    QWidget * addChoice(QJsonObject, QWidget *parent, QString *setVal = NULL);
-    QWidget * addVector3D(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    QWidget * addVector2D(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    QWidget * addTensor3D(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    QWidget * addTensor2D(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    QWidget * addUnknown(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    void addType(const QString &, const QString &, QJsonObject, QWidget *parent , QString * setVal);
-*/
-
     void setButtonMode(uint mode);
 
 private:
