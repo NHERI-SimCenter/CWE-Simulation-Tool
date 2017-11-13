@@ -1,5 +1,5 @@
-#ifndef PANDPTABWIDGET_H
-#define PANDPTABWIDGET_H
+#ifndef CWE_TABWIDGET_H
+#define CWE_TABWIDGET_H
 
 #include <QWidget>
 #include <QFrame>
@@ -19,23 +19,23 @@
 #include <QStandardItemModel>
 #include <QLayout>
 
-#include "cwe_defines.h"
+#include "../cwe_defines.h"
 
 class CWE_WithStatusButton;
 enum class StageState;
 class VWTinterfaceDriver;
 
 namespace Ui {
-class PandPTabWidget;
+class CWE_TabWidget;
 }
 
-class PandPTabWidget : public QWidget
+class CWE_TabWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PandPTabWidget(QWidget *parent = 0);
-    ~PandPTabWidget();
+    explicit CWE_TabWidget(QWidget *parent = 0);
+    ~CWE_TabWidget();
     void setupDriver(VWTinterfaceDriver * theDriver);
 
     int  addGroupTab(QString key, const QString &label, StageState currentState);
@@ -96,7 +96,7 @@ private:
     VWTinterfaceDriver * myDriver;
     QString currentSelectedStage;
 
-    Ui::PandPTabWidget *ui;
+    Ui::CWE_TabWidget *ui;
     int activeIndex;
     QWidget *displayWidget;
     QMap<QString, CWE_WithStatusButton *> *groupWidget;
@@ -105,4 +105,4 @@ private:
     QMap<QString, InputDataType *> *variableWidgets;
 };
 
-#endif // PANDPTABWIDGET_H
+#endif // CWE_TABWIDGET_H

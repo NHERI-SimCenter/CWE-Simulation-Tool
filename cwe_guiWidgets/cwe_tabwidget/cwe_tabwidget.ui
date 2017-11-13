@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PandPTabWidget</class>
- <widget class="QWidget" name="PandPTabWidget">
+ <class>CWE_TabWidget</class>
+ <widget class="QWidget" name="CWE_TabWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
