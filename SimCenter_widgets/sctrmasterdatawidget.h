@@ -11,23 +11,7 @@
 #include <QObject>
 
 #include "cwe_guiWidgets/cwe_defines.h"
-
-enum class SimCenterViewState { visible,
-                                editable,
-                                hidden };
-
-enum class SimCenterDataType { integer,
-                               floatingpoint,
-                               boolean,
-                               string,
-                               selection,
-                               file,
-                               tensor2D,
-                               tensor3D,
-                               vector2D,
-                               vector3D,
-                               unknown};
-
+#include <SimCenter_widgets/sctrstates.h>
 
 class SCtrMasterDataWidget : public QFrame
 {

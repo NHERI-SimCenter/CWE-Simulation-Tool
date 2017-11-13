@@ -1,5 +1,5 @@
-#include "pandptabwidget.h"
-#include "ui_pandptabwidget.h"
+#include "cwe_tabwidget.h"
+#include "ui_cwe_tabwidget.h"
 #include "cwe_parametertab.h"
 #include "cwe_withstatusbutton.h"
 #include "CFDanalysis/CFDcaseInstance.h"
@@ -8,9 +8,9 @@
 
 #include "../CFDClientProgram/vwtinterfacedriver.h"
 
-PandPTabWidget::PandPTabWidget(QWidget *parent) :
+CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::PandPTabWidget)
+    ui(new Ui::CWE_TabWidget)
 {
     ui->setupUi(this);
 
@@ -23,32 +23,32 @@ PandPTabWidget::PandPTabWidget(QWidget *parent) :
     //this->setButtonMode(CWE_BTN_NONE);
 }
 
-PandPTabWidget::~PandPTabWidget()
+CWE_TabWidget::~CWE_TabWidget()
 {
     delete ui;
 }
 
-void PandPTabWidget::setupDriver(VWTinterfaceDriver * theDriver)
+void CWE_TabWidget::setupDriver(VWTinterfaceDriver * theDriver)
 {
     myDriver = theDriver;
 }
 
-QWidget *PandPTabWidget::currentWidget()
+QWidget *CWE_TabWidget::currentWidget()
 {
     return ui->stackedWidget->currentWidget();
 }
 
-void PandPTabWidget::setCurrentWidget(QWidget *w)
+void CWE_TabWidget::setCurrentWidget(QWidget *w)
 {
     ui->stackedWidget->setCurrentWidget(w);
 }
 
-QWidget *PandPTabWidget::widget(int idx)
+QWidget *CWE_TabWidget::widget(int idx)
 {
     return ui->stackedWidget->widget(idx);
 }
 
-int PandPTabWidget::addGroupTab(QString key, const QString &label, StageState currentState)
+int CWE_TabWidget::addGroupTab(QString key, const QString &label, StageState currentState)
 {
     varTabWidgets->insert(key, new QMap<QString, QWidget *>());
 
@@ -75,7 +75,7 @@ int PandPTabWidget::addGroupTab(QString key, const QString &label, StageState cu
     return index;
 }
 
-int PandPTabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
+int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
 {
     int index = addVarTab(key, label);
     if (index >= 0)
@@ -85,7 +85,7 @@ int PandPTabWidget::addVarTab(QString key, const QString &label, QJsonArray *var
     return index;
 }
 
-void PandPTabWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
+void CWE_TabWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
 {
     //QTabWidget *groupTab = groupTabList->value(key);
     //QWidget    *varTab   = varTabWidgets->value(key)->value(label);
@@ -109,21 +109,19 @@ void PandPTabWidget::addVarsToTab(QString key, const QString &label, QJsonArray 
     this->addVSpacer(key, label);
 }
 
-int PandPTabWidget::addVarTab(QString key, const QString &label)
+int CWE_TabWidget::addVarTab(QString key, const QString &label)
 {
     // create the widget to hold the parameter input
 
-    //QScrollArea *itm = new QScrollArea();
-    //itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    // //itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    // //itm->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::MinimumExpanding);
     CWE_ParameterTab *itm = new CWE_ParameterTab(this);
+    itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    itm->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::MinimumExpanding);
 
     QGridLayout *lyt = new QGridLayout();
     itm->setLayout(lyt);
 
     varTabWidgets->value(key)->insert(label, itm);
-    //itm->setStyleSheet("QFrame {background: lightblue}");  // this works, so why doesn't the style sheet work?
 
     QTabWidget * qf = groupTabList->value(key);
     int index = qf->addTab(itm, label);
@@ -131,14 +129,14 @@ int PandPTabWidget::addVarTab(QString key, const QString &label)
     return index;
 }
 
-void PandPTabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
+void CWE_TabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
 {
 
 }
 
 /* *** moved to SCtrDataWidget ***
 
-QWidget * PandPTabWidget::addStd(QJsonObject JSONvar, QWidget *parent, QString *setVal)
+QWidget * CWE_TabWidget::addStd(QJsonObject JSONvar, QWidget *parent, QString *setVal)
 {
     QVariant defaultOption = JSONvar["default"].toVariant();
     QString unit           = JSONvar["unit"].toString();
@@ -175,7 +173,7 @@ QWidget * PandPTabWidget::addStd(QJsonObject JSONvar, QWidget *parent, QString *
     return theValue;
 }
 
-QWidget * PandPTabWidget::addBool(QJsonObject JSONvar, QWidget *parent, QString * setVal)
+QWidget * CWE_TabWidget::addBool(QJsonObject JSONvar, QWidget *parent, QString * setVal)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -199,7 +197,7 @@ QWidget * PandPTabWidget::addBool(QJsonObject JSONvar, QWidget *parent, QString 
     return theBox;
 }
 
-QWidget * PandPTabWidget::addFile(QJsonObject JSONvar, QWidget *parent, QString * setVal)
+QWidget * CWE_TabWidget::addFile(QJsonObject JSONvar, QWidget *parent, QString * setVal)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -216,7 +214,7 @@ QWidget * PandPTabWidget::addFile(QJsonObject JSONvar, QWidget *parent, QString 
     return theFileName;
 }
 
-QWidget * PandPTabWidget::addChoice(QJsonObject JSONvar, QWidget *parent, QString * setVal)
+QWidget * CWE_TabWidget::addChoice(QJsonObject JSONvar, QWidget *parent, QString * setVal)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -251,27 +249,27 @@ QWidget * PandPTabWidget::addChoice(QJsonObject JSONvar, QWidget *parent, QStrin
 }
 
 
-QWidget * PandPTabWidget::addVector3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QWidget * CWE_TabWidget::addVector3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
 {
     return NULL;
 }
 
-QWidget * PandPTabWidget::addVector2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QWidget * CWE_TabWidget::addVector2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
 {
     return NULL;
 }
 
-QWidget * PandPTabWidget::addTensor3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QWidget * CWE_TabWidget::addTensor3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
 {
     return NULL;
 }
 
-QWidget * PandPTabWidget::addTensor2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QWidget * CWE_TabWidget::addTensor2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
 {
     return NULL;
 }
 
-QWidget * PandPTabWidget::addUnknown(QJsonObject JSONvar, QWidget *parent, QString *setVal)
+QWidget * CWE_TabWidget::addUnknown(QJsonObject JSONvar, QWidget *parent, QString *setVal)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -284,7 +282,7 @@ QWidget * PandPTabWidget::addUnknown(QJsonObject JSONvar, QWidget *parent, QStri
     return NULL;
 }
 
-void PandPTabWidget::addType(const QString &varName, const QString &type, QJsonObject JSONvar, QWidget *parent, QString *setVal)
+void CWE_TabWidget::addType(const QString &varName, const QString &type, QJsonObject JSONvar, QWidget *parent, QString *setVal)
 {
     QWidget *widget;
 
@@ -318,7 +316,7 @@ void PandPTabWidget::addType(const QString &varName, const QString &type, QJsonO
 
 */
 
-bool PandPTabWidget::addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString * setVal)
+bool CWE_TabWidget::addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString * setVal)
 {
     QString type = JSONvar["type"].toString();
     if (type == "") {
@@ -337,7 +335,7 @@ bool PandPTabWidget::addVariable(QString varName, QJsonObject JSONvar, const QSt
     }
 }
 
-void PandPTabWidget::addVSpacer(const QString &key, const QString &label)
+void CWE_TabWidget::addVSpacer(const QString &key, const QString &label)
 {
     QWidget *parent = varTabWidgets->value(key)->value(label);
     if (parent != NULL)
@@ -347,7 +345,7 @@ void PandPTabWidget::addVSpacer(const QString &key, const QString &label)
     }
 }
 
-void PandPTabWidget::setIndex(int idx)
+void CWE_TabWidget::setIndex(int idx)
 {
     // set active tab to idx
     ui->stackedWidget->setCurrentIndex(idx);
@@ -367,7 +365,7 @@ void PandPTabWidget::setIndex(int idx)
     }
 }
 
-void PandPTabWidget::setWidget(QWidget *w)
+void CWE_TabWidget::setWidget(QWidget *w)
 {
     // set active tab to idx
     ui->stackedWidget->setCurrentWidget(w);
@@ -375,7 +373,7 @@ void PandPTabWidget::setWidget(QWidget *w)
     displayWidget = ui->stackedWidget->currentWidget();
 }
 
-void PandPTabWidget::on_pbtn_run_clicked()
+void CWE_TabWidget::on_pbtn_run_clicked()
 {
     myDriver->getCurrentCase()->startStageApp(currentSelectedStage);
 
@@ -383,7 +381,7 @@ void PandPTabWidget::on_pbtn_run_clicked()
     //this->setButtonMode(CWE_BTN_CANCEL);
 }
 
-QMap<QString, QString> PandPTabWidget::collectParamData()
+QMap<QString, QString> CWE_TabWidget::collectParamData()
 {
     QString val;
     QMap<QString, QString> currentParameters;
@@ -425,7 +423,7 @@ QMap<QString, QString> PandPTabWidget::collectParamData()
     return currentParameters;
 }
 
-void PandPTabWidget::on_pbtn_cancel_clicked()
+void CWE_TabWidget::on_pbtn_cancel_clicked()
 {
     // initiate job cancellation
 
@@ -433,7 +431,7 @@ void PandPTabWidget::on_pbtn_cancel_clicked()
     this->setButtonMode(CWE_BTN_RUN);
 }
 
-void PandPTabWidget::on_pbtn_results_clicked()
+void CWE_TabWidget::on_pbtn_results_clicked()
 {
     // set run and rollback button active
     this->setButtonMode(CWE_BTN_RESULTS|CWE_BTN_ROLLBACK);
@@ -442,7 +440,7 @@ void PandPTabWidget::on_pbtn_results_clicked()
     emit switchToResultsTab();
 }
 
-void PandPTabWidget::on_pbtn_rollback_clicked()
+void CWE_TabWidget::on_pbtn_rollback_clicked()
 {
     myDriver->getCurrentCase()->rollBack(currentSelectedStage);
 
@@ -450,7 +448,7 @@ void PandPTabWidget::on_pbtn_rollback_clicked()
     //TODO: ???? Remove? this->setButtonMode(CWE_BTN_RUN);
 }
 
-void PandPTabWidget::on_groupTabSelected(int idx, QString selectedStage)
+void CWE_TabWidget::on_groupTabSelected(int idx, QString selectedStage)
 {
     currentSelectedStage = selectedStage;
     this->setIndex(idx);
@@ -461,7 +459,7 @@ void PandPTabWidget::on_groupTabSelected(int idx, QString selectedStage)
     //this->setButtonMode(CWE_BTN_RUN);
 }
 
-QString PandPTabWidget::getStateText(StageState theState)
+QString CWE_TabWidget::getStateText(StageState theState)
 {
     if (theState == StageState::ERROR)
         return "*** ERROR ***";
@@ -476,7 +474,7 @@ QString PandPTabWidget::getStateText(StageState theState)
     return "*** TOTAL ERROR ***";
 }
 
-void PandPTabWidget::setButtonMode(uint mode)
+void CWE_TabWidget::setButtonMode(uint mode)
 {
     bool btnState;
 
