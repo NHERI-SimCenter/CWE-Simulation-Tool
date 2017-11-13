@@ -36,6 +36,7 @@
 #include "vwtinterfacedriver.h"
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
+#include "../AgaveClientInterface/agaveInterfaces/agavetaskreply.h"
 
 #include "../AgaveExplorer/utilFuncs/authform.h"
 
@@ -102,6 +103,17 @@ void VWTinterfaceDriver::closeAuthScreen()
     mainWindow->show();
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
+
+    AgaveHandler * tmpHandle = (AgaveHandler *) theConnector;
+    AgaveTaskReply * getAppList = tmpHandle->getAgaveAppList();
+
+    if (getAppList == NULL)
+    {
+        fatalInterfaceError("Unable to get app list from DesignSafe");
+        return;
+    }
+    QObject::connect(getAppList, SIGNAL(haveAgaveAppList(RequestState,QJsonArray*)),
+                     this, SLOT(checkAppList(RequestState,QJsonArray*)));
 
     if (authWindow != NULL)
     {
@@ -175,4 +187,42 @@ void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
 void VWTinterfaceDriver::currentCaseInvalidated()
 {
     setCurrentCase(NULL);
+}
+
+void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appList)
+{
+    if (replyState != RequestState::GOOD)
+    {
+        fatalInterfaceError("Unable to connect to Agave to get app info.");
+        return;
+    }
+
+    QList<QString> neededApps = {"cwe-mesh", "cwe-sim", "cwe-post"};
+
+    for (auto itr = appList->constBegin(); itr != appList->constEnd(); itr++)
+    {
+        QString appName = (*itr).toObject().value("name").toString();
+
+        if (appName.isEmpty())
+        {
+            continue;
+        }
+        if (neededApps.contains(appName))
+        {
+            neededApps.removeAll(appName);
+        }
+    }
+
+    if (!neededApps.isEmpty())
+    {
+        fatalInterfaceError("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
+    }
+}
+
+void VWTinterfaceDriver::displayMessagePopup(QString infoText)
+{
+    QMessageBox infoMessage;
+    infoMessage.setText(infoText);
+    infoMessage.setIcon(QMessageBox::Information);
+    infoMessage.exec();
 }

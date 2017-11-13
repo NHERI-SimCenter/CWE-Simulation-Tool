@@ -1,6 +1,6 @@
 #include "cwe_parameters.h"
 #include "ui_cwe_parameters.h"
-#include "cwe_parametertab.h"
+#include "cwe_tabwidget/cwe_parametertab.h"
 
 #include <QFile>
 #include <QJsonDocument>

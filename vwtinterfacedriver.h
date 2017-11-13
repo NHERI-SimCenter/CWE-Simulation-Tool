@@ -84,11 +84,14 @@ public:
     CFDcaseInstance * getCurrentCase();
     void setCurrentCase(CFDcaseInstance * newCase);
 
+    void displayMessagePopup(QString infoText);
+
 signals:
     void haveNewCase();
 
 private slots:
     void currentCaseInvalidated();
+    void checkAppList(RequestState replyState, QJsonArray * appList);
 
 private:
     CWE_MainWindow * mainWindow;

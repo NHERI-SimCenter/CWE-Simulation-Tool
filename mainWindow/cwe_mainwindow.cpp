@@ -52,26 +52,11 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     myDriver = newDriver;
     dataLink = myDriver->getDataConnection();
 
-    ui->tab_parameters->linkWithDriver(myDriver);
-    QObject::connect(myDriver, SIGNAL(haveNewCase()),
-                     this, SLOT(newActiveCase()));
-
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
 
-    ui->SideBar->hide();
-    ui->stackContainer->hide();
-
-    int idx;
-
-    idx = ui->tabContainer->indexOf(ui->tab_spacer_1);
-    ui->tabContainer->setTabEnabled(idx,false);
-
-    idx = ui->tabContainer->indexOf(ui->tab_spacer_2);
-    ui->tabContainer->setTabEnabled(idx,false);
-
-    //QObject::connect(ui->tabContainer, SIGNAL(currentChanged(int)),
-    //                 this, SLOT(tabChanged(int)));
+    ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(ui->tab_spacer_1),false);
+    ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(ui->tab_spacer_2),false);
 
     QObject::connect(ui->tab_parameters, SIGNAL(switchToParameterTab()), this, SLOT(switchToParameterTab()));
     QObject::connect(ui->tab_parameters, SIGNAL(switchToResultsTab()),   this, SLOT(switchToResultsTab())  );
@@ -87,6 +72,11 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     this->resize(width, height);
 }
 
+CWE_MainWindow::~CWE_MainWindow()
+{
+    delete ui;
+}
+
 void CWE_MainWindow::runOfflineSetupSteps()
 {
     //TODO: Link driver offline should be a virtual function for a tab superclass
@@ -96,7 +86,8 @@ void CWE_MainWindow::runOfflineSetupSteps()
 void CWE_MainWindow::runSetupSteps()
 {
     //TODO: Link driver should be a virtual function for a tab superclass
-    ui->tab_files->linkFileHandle(myDriver->getFileHandler());
+    ui->tab_files->linkDriver(myDriver);
+    ui->tab_parameters->linkWithDriver(myDriver);
     ui->tab_landing_page->linkJobHandle(myDriver->getJobHandler());
     ui->tab_create_new->linkDriverConnected(myDriver);
     ui->tab_manage_and_run->linkDriver(myDriver);
@@ -122,21 +113,6 @@ void CWE_MainWindow::attachCaseSignals(CFDcaseInstance * newCase)
         stateLabel->setCurrentCase(newCase);
     }
     //It is expected that this list will grow
-}
-
-void CWE_MainWindow::tabChanged(int)
-{
-
-}
-
-void CWE_MainWindow::newActiveCase()
-{
-
-}
-
-CWE_MainWindow::~CWE_MainWindow()
-{
-    delete ui;
 }
 
 void CWE_MainWindow::menuCopyInfo()
@@ -215,36 +191,17 @@ void CWE_MainWindow::on_actionManage_and_Download_Files_triggered()
 
 }
 
-int CWE_MainWindow::switchToTab(int idx)
-{
-    switch (idx) {
-    case 0: /* welcome page        */
-    case 1: /* help page           */
-    case 3: /* dashboard page      */
-    case 4: /* create/copy page    */
-    case 5: /* select case page    */
-    case 6: /* files page          */
-    case 8: /* parameters page     */
-    case 9: /* results page        */
-        ui->tabContainer->setCurrentIndex(idx);
-        return idx;
-        break;
-    default:
-        return -1;
-    }
-}
-
 void CWE_MainWindow::switchToResultsTab()
 {
-    this->switchToTab(9);
+    ui->tabContainer->setCurrentWidget(ui->tab_results);
 }
 
 void CWE_MainWindow::switchToParameterTab()
 {
-    this->switchToTab(8);
+    ui->tabContainer->setCurrentWidget(ui->tab_parameters);
 }
 
 void CWE_MainWindow::switchToCreateTab()
 {
-    this->switchToTab(3);
+    ui->tabContainer->setCurrentWidget(ui->tab_create_new);
 }

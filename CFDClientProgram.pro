@@ -34,7 +34,6 @@
 # Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 QT += core gui network
-QT += quickwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -65,7 +64,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
     cwe_guiWidgets/cwe_create_copy_simulation.cpp \
-    cwe_guiWidgets/cwe_busyindicator.cpp \
     cwe_guiWidgets/cwe_debug_widget.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
     cwe_guiWidgets/cwe_tabwidget/cwe_parametertab.cpp \
@@ -97,7 +95,6 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/copyrightdialog.cpp \
     ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
     ../AgaveExplorer/remoteFileOps/remotejobentry.cpp \
-    ../widgets/Common/sectiontitle.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -121,7 +118,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_tabwidget/cwe_grouptabs.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h \
     cwe_guiWidgets/cwe_create_copy_simulation.h \
-    cwe_guiWidgets/cwe_busyindicator.h \
     cwe_guiWidgets/cwe_debug_widget.h \
     cwe_guiWidgets/cwe_state_label.h \
     SimCenter_widgets/sctrdatawidget.h \
@@ -148,7 +144,6 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/copyrightdialog.h \
     ../AgaveExplorer/utilFuncs/singlelinedialog.h \
     ../AgaveExplorer/remoteFileOps/remotejobentry.h \
-    ../widgets/Common/sectiontitle.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -163,7 +158,6 @@ FORMS    += \
     cwe_guiWidgets/cwe_parameters.ui \
     cwe_guiWidgets/cwe_create_simulation_old.ui \
     cwe_guiWidgets/cwe_create_copy_simulation.ui \
-    cwe_guiWidgets/cwe_busyindicator.ui \
     cwe_guiWidgets/cwe_debug_widget.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_parametertab.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_withstatusbutton.ui \
@@ -178,5 +172,4 @@ RESOURCES += \
     ../AgaveExplorer/SimCenterCommon/commonResources.qrc \
     CFDanalysis/config/cfdconfig.qrc
 
-DISTFILES += \
-    QML/BusyIndicatorDef.qml
+DISTFILES +=
