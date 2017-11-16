@@ -12,6 +12,7 @@ CWE_ParameterTab::CWE_ParameterTab(QWidget *parent) :
 CWE_ParameterTab::~CWE_ParameterTab()
 {
     delete ui;
+    if (m_stageTabs != NULL) delete m_stageTabs;
 }
 
 QWidget * CWE_ParameterTab::getParameterSpace()

@@ -7,6 +7,7 @@
 class CFDcaseInstance;
 class CFDanalysisType;
 class VWTinterfaceDriver;
+class CWE_StageTab;
 
 enum class CaseState;
 
@@ -24,6 +25,7 @@ public:
 
     void linkWithDriver(VWTinterfaceDriver * newDriver);
     void resetViewInfo();
+    void initStateTabs();
 
 private slots:
     void on_pbtn_saveAllParameters_clicked();
@@ -48,7 +50,7 @@ private:
     bool viewIsValid = false;
     VWTinterfaceDriver * myDriver;
 
-    QMap<QString, int> parameterTabs;
+    QMap<QString, int> stageTabsIndex;
 };
 
 #endif // CWE_PARAMETERS_H

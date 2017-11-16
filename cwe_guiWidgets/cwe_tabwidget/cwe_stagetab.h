@@ -1,32 +1,31 @@
-#ifndef CWE_TAB_H
-#define CWE_TAB_H
+#ifndef CWE_STAGETAB_H
+#define CWE_STAGETAB_H
 
-#include <QJsonObject>
-#include <QTabWidget>
-
-#include "SimCenter_widgets/sctrstates.h"
+#include <QJsonObject>;
+class QTabWidget;
+enum class SimCenterViewState;
 
 class CWE_WithStatusButton;
 
-class CWE_GroupTabs
+class CWE_StageTab
 {
 public:
-    CWE_GroupTabs();
-    ~CWE_GroupTabs();
+    CWE_StageTab();
+    ~CWE_StageTab();
     void setData(QJsonObject &obj);         // set the group definitions as a JSon file
     QJsonObject getData(QJsonObject &obj);  // set the group definitions as a JSon file
     void setViewState(SimCenterViewState);  // set the view state
     SimCenterViewState viewState();         // return current view state
 
 protected:
-    CWE_GroupTabs *theGroupTabs();  // returns pointer to group tab widget
+    CWE_StageTab *getGroupTab();  // returns pointer to group tab widget
 
 private:
-    QTabWidget *m_tabWidget = NULL;
-    CWE_WithStatusButton *m_statusButton = NULL;
+    QTabWidget *m_tabWidget;
+    CWE_WithStatusButton *m_statusButton;
 
     SimCenterViewState m_viewState;
     QJsonObject m_obj;
 };
 
-#endif // CWE_TAB_H
+#endif // CWE_STAGETAB_H

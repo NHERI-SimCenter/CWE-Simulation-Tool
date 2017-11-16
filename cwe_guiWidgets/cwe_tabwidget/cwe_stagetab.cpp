@@ -1,13 +1,18 @@
-#include "cwe_grouptabs.h"
+#include "cwe_stagetab.h"
 
 #include "cwe_withstatusbutton.h"
+#include "SimCenter_widgets/sctrstates.h"
+#include <QJsonObject>
 
-CWE_GroupTabs::CWE_GroupTabs()
+CWE_StageTab::CWE_StageTab()
 {
+
+    m_tabWidget = NULL;
+    m_statusButton = NULL;
     this->setViewState(SimCenterViewState::visible);
 }
 
-CWE_GroupTabs::~CWE_GroupTabs()
+CWE_StageTab::~CWE_StageTab()
 {
     if (m_tabWidget != NULL) {
         delete m_tabWidget;
@@ -20,19 +25,19 @@ CWE_GroupTabs::~CWE_GroupTabs()
 }
 
 // set the group definitions as a JSon file
-void CWE_GroupTabs::setData(QJsonObject &obj)
+void CWE_StageTab::setData(QJsonObject &obj)
 {
     m_obj = obj;
 }
 
 // set the group definitions as a JSon file
-QJsonObject CWE_GroupTabs::getData(QJsonObject &obj)
+QJsonObject CWE_StageTab::getData(QJsonObject &obj)
 {
 
 }
 
 // set the view state
-void CWE_GroupTabs::setViewState(SimCenterViewState state)
+void CWE_StageTab::setViewState(SimCenterViewState state)
 {
     switch (state) {
     case SimCenterViewState::hidden:
@@ -49,7 +54,7 @@ void CWE_GroupTabs::setViewState(SimCenterViewState state)
 }
 
 // return current view state
-SimCenterViewState CWE_GroupTabs::viewState()
+SimCenterViewState CWE_StageTab::viewState()
 {
     return m_viewState;
 }

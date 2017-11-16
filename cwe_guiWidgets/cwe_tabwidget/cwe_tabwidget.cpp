@@ -14,13 +14,17 @@ CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    groupWidget     = new QMap<QString, CWE_WithStatusButton *>();
-    groupTabList    = new QMap<QString, QTabWidget *>();
-    varTabWidgets   = new QMap<QString, QMap<QString, QWidget *> *>();
-    variableWidgets = new QMap<QString, InputDataType *>();
+    m_stageTabs = new QMap<QString, CWE_StageTab *>();
+
+    //groupWidget     = new QMap<QString, CWE_WithStatusButton *>();
+    //groupTabList    = new QMap<QString, QTabWidget *>();
+    //varTabWidgets   = new QMap<QString, QMap<QString, QWidget *> *>();
+    //variableWidgets = new QMap<QString, InputDataType *>();
 
     this->setButtonMode(CWE_BTN_ALL);
     //this->setButtonMode(CWE_BTN_NONE);
+
+    this->setViewState(SimCenterViewState::visible);
 }
 
 CWE_TabWidget::~CWE_TabWidget()
@@ -46,6 +50,39 @@ void CWE_TabWidget::setCurrentWidget(QWidget *w)
 QWidget *CWE_TabWidget::widget(int idx)
 {
     return ui->stackedWidget->widget(idx);
+}
+
+
+
+void CWE_TabWidget::setViewState(SimCenterViewState state)
+{
+    switch (state)
+    {
+    case SimCenterViewState::editable:
+        m_viewState = SimCenterViewState::editable;
+        break;
+    case SimCenterViewState::hidden:
+        m_viewState = SimCenterViewState::hidden;
+        break;
+    case SimCenterViewState::visible:
+    default:
+        m_viewState = SimCenterViewState::visible;
+    }
+}
+
+SimCenterViewState CWE_TabWidget::rviewState()
+{
+    return m_viewState;
+}
+
+void CWE_TabWidget::resetView()
+{
+    // delete all stage tabs and everything within
+    for (auto stageItr = stageWidgets->begin(); stageItr != stageWidgets->end();)
+    {
+        delete stageItr.value();                    // delete the CWE_GroupTab for the stage
+        stageItr = stageWidgets->erase(stageItr);   // erase the stage from the map
+    }
 }
 
 int CWE_TabWidget::addGroupTab(QString key, const QString &label, StageState currentState)
@@ -490,4 +527,19 @@ void CWE_TabWidget::setButtonMode(uint mode)
     btnState = (mode & CWE_BTN_ROLLBACK)?true:false;
     ui->pbtn_rollback->setEnabled(btnState);
 
+}
+
+
+
+void CWE_TabWidget::addStageTab(QString key, QJsonObject &obj)
+{
+    /*
+     * create a stage tab for a stage identified by key
+     *
+     * the stage tab will add a pointer to itself to the m_stageTabs QMap
+     */
+
+    CWE_StageTab *newTab = new CWE_StageTab();
+
+    m_stageTabs->insert(key, newTab);
 }
