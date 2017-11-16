@@ -20,10 +20,20 @@
    <enum>QFrame::Raised</enum>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="2">
-    <widget class="QPushButton" name="pBtn_create_copy">
+   <item row="3" column="1">
+    <widget class="RemoteFileTree" name="primary_remoteFileTree">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="label_location">
      <property name="text">
-      <string>Create New Simulation</string>
+      <string>Location:</string>
      </property>
     </widget>
    </item>
@@ -34,26 +44,12 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="QLabel" name="label_location">
+   <item row="4" column="1">
+    <widget class="QPushButton" name="pBtn_create_copy">
      <property name="text">
-      <string>Location:</string>
+      <string>Create New Simulation</string>
      </property>
     </widget>
-   </item>
-   <item row="0" column="0" colspan="3">
-    <layout class="QHBoxLayout" name="caseName_layout">
-     <item>
-      <widget class="QLabel" name="label_newCaseName">
-       <property name="text">
-        <string>New Case Name:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEdit_newCaseName"/>
-     </item>
-    </layout>
    </item>
    <item row="3" column="0">
     <widget class="QTabWidget" name="tabWidget">
@@ -96,8 +92,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>289</width>
-            <height>422</height>
+            <width>296</width>
+            <height>420</height>
            </rect>
           </property>
          </widget>
@@ -136,14 +132,47 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="RemoteFileTree" name="primary_remoteFileTree">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="0" column="0" colspan="2">
+    <widget class="QFrame" name="frame">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
      </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_newCaseName">
+        <property name="text">
+         <string>New Case Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_newCaseName"/>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

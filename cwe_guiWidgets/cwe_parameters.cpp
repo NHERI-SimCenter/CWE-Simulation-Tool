@@ -21,6 +21,8 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "cwe_guiWidgets/cwe_tabwidget/cwe_stagetab.h"
+
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CWE_Parameters)
@@ -46,34 +48,49 @@ void CWE_Parameters::linkWithDriver(VWTinterfaceDriver * newDriver)
     ui->theTabWidget->setupDriver(myDriver);
 }
 
-void CWE_Parameters::resetViewInfo()
+void CWE_Parameters::initStateTabs()
 {
-    viewIsValid = false;
     CFDcaseInstance * currentCase = myDriver->getCurrentCase();
     if (currentCase == NULL) return;
     CFDanalysisType * theTemplate = currentCase->getMyType();
     if (theTemplate == NULL) return;
     QMap<QString, StageState> currentStates = currentCase->getStageStates();
 
-    viewIsValid = true;
-
     ui->label_theName->setText(currentCase->getCaseName());
     ui->label_theType->setText(theTemplate->getName());
     ui->label_theLocation->setText(currentCase->getCaseFolder());
 
+
+    // get the current configuration file
     QJsonObject   obj    = theTemplate->getRawConfig()->object();
 
+    // read stage list for the current problem
     QJsonObject    stages     = obj["stages"].toObject();
     QList<QString> stageNames = stages.keys();
-    QJsonObject    varGroups  = obj["varGroups"].toObject();
-    QJsonObject    vars       = obj["vars"].toObject();
 
-    QMap<QString,QString> setVars = currentCase->getCurrentParams();
+    // create stage tabs
+    foreach (QString name, stageNames)
+    {
+        // create the stage tab
+        /* not sure about that yet ... */
 
-    //QJsonArray    results    = obj["results"].toArray();
+        //m_stageTabs[name] = new CWE_StageTab(parent=this);
 
-    //qDebug() << stageNames;
+        QJsonObject stageInfo = stages[name].toObject();
+        QString labelText;
 
+        labelText = stageInfo["name"].toString();
+        labelText = labelText.append("\nParameters");
+
+        ///ui->theTabWidget-> ... m_stageTabs[name]->setData(currentStates[name]);
+
+        // add a stage tab to ui->theTabWidget
+        int idx = ui->theTabWidget->addGroupTab(name, labelText, StageState::UNRUN);
+        stageTabsIndex.insert(name, idx);
+
+    }
+
+#if 0
     int cnt = 0;
 
     foreach (QString name, stageNames)
@@ -86,7 +103,7 @@ void CWE_Parameters::resetViewInfo()
 
         // add a stage tab to ui->theTabWidget
         int idx = ui->theTabWidget->addGroupTab(name, labelText, currentStates[name]);
-        parameterTabs.insert(name, idx);
+        stageTabsIndex.insert(name, idx);
 
         // add varGroub tabs
         QJsonArray theGroups = stageInfo["groups"].toArray();
@@ -101,6 +118,22 @@ void CWE_Parameters::resetViewInfo()
     }
 
     if (cnt>0) {ui->theTabWidget->setIndex(0);}
+    // ----
+#endif
+
+    viewIsValid = true;
+
+    //??? ui->theTabWidget->
+}
+
+void CWE_Parameters::resetViewInfo()
+{
+    viewIsValid = false;
+
+    // erase all stage tabs
+    ui->theTabWidget->resetView();
+
+    this->initStateTabs();
 }
 
 void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
