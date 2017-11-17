@@ -6,6 +6,9 @@
 #include <QJsonObject>
 #include <SimCenter_widgets/sctrstates.h>
 
+class CWE_StageTab;
+class SCtr_MasterDataWidget;
+
 namespace Ui {
 class CWE_ParameterTab;
 }
@@ -27,6 +30,7 @@ private:
 
     SimCenterViewState m_viewState;
     QJsonObject m_obj;
+    QMap<QString, SCtr_MasterDataWidget *> *variableWidgets;
 };
 
 #endif // CWE_PARAMETERTAB_H

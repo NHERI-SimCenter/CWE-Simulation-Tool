@@ -1,18 +1,21 @@
 #include "cwe_parametertab.h"
 #include "ui_cwe_parametertab.h"
+#include "cwe_guiWidgets/cwe_tabwidget/cwe_stagetab.h"
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 CWE_ParameterTab::CWE_ParameterTab(QWidget *parent) :
     QScrollArea(parent),
     ui(new Ui::CWE_ParameterTab)
 {
     ui->setupUi(this);
+    variableWidgets = new QMap<QString, SCtr_MasterDataWidget *>();
     this->setViewState(SimCenterViewState::visible);
 }
 
 CWE_ParameterTab::~CWE_ParameterTab()
 {
     delete ui;
-    if (m_stageTabs != NULL) delete m_stageTabs;
+    if (variableWidgets != NULL) delete variableWidgets;
 }
 
 QWidget * CWE_ParameterTab::getParameterSpace()

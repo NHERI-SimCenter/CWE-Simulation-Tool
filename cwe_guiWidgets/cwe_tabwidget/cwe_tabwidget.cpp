@@ -70,7 +70,7 @@ void CWE_TabWidget::setViewState(SimCenterViewState state)
     }
 }
 
-SimCenterViewState CWE_TabWidget::rviewState()
+SimCenterViewState CWE_TabWidget::viewState()
 {
     return m_viewState;
 }
@@ -78,10 +78,10 @@ SimCenterViewState CWE_TabWidget::rviewState()
 void CWE_TabWidget::resetView()
 {
     // delete all stage tabs and everything within
-    for (auto stageItr = stageWidgets->begin(); stageItr != stageWidgets->end();)
+    for (auto stageItr = m_stageTabs->begin(); stageItr != m_stageTabs->end();)
     {
         delete stageItr.value();                    // delete the CWE_GroupTab for the stage
-        stageItr = stageWidgets->erase(stageItr);   // erase the stage from the map
+        stageItr = m_stageTabs->erase(stageItr);   // erase the stage from the map
     }
 }
 
