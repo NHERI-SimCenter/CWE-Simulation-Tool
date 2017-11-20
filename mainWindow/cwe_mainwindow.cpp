@@ -52,11 +52,16 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     myDriver = newDriver;
     dataLink = myDriver->getDataConnection();
 
+    if (!myDriver->inDebugMode())
+    {
+        ui->tab_debug->deleteLater();
+    }
+
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
 
-    ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(ui->tab_spacer_1),false);
-    ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(ui->tab_spacer_2),false);
+    changeTabVisible((QTabWidget *)ui->tab_spacer_1, false);
+    changeTabVisible((QTabWidget *)ui->tab_spacer_2, false);
 
     QObject::connect(ui->tab_parameters, SIGNAL(switchToParameterTab()), this, SLOT(switchToParameterTab()));
     QObject::connect(ui->tab_parameters, SIGNAL(switchToResultsTab()),   this, SLOT(switchToResultsTab())  );
@@ -204,4 +209,9 @@ void CWE_MainWindow::switchToParameterTab()
 void CWE_MainWindow::switchToCreateTab()
 {
     ui->tabContainer->setCurrentWidget(ui->tab_create_new);
+}
+
+void CWE_MainWindow::changeTabVisible(QTabWidget * theTab, bool newSetting)
+{
+    ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(theTab),newSetting);
 }
