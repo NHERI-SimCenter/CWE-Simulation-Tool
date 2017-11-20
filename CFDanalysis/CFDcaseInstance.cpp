@@ -78,6 +78,19 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
                      this, SLOT(agaveTaskDone(RequestState)));
 }
 
+CFDcaseInstance::CFDcaseInstance(VWTinterfaceDriver *mainDriver):
+    QObject((QObject *) mainDriver)
+{
+    theDriver = mainDriver;
+
+    QObject::connect(theDriver->getFileHandler(), SIGNAL(fileSystemChange()),
+                     this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
+                     this, SLOT(jobListUpdated()));
+    QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
+                     this, SLOT(agaveTaskDone(RequestState)));
+}
+
 bool CFDcaseInstance::isDefunct()
 {
     return defunct;
@@ -377,6 +390,8 @@ void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFo
 {
     if (defunct) return;
 
+    if (containingFolder == NULL) return;
+    if (oldCase == NULL) return;
     if (currentReq != PendingCFDrequest::NONE) return;
     if (theDriver->getFileHandler()->operationIsPending()) return;
     if (caseFolder != NULL) return;
