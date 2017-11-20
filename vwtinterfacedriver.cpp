@@ -48,7 +48,7 @@
 
 #include "mainWindow/cwe_mainwindow.h"
 
-VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent)
+VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent, debug)
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
     tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");

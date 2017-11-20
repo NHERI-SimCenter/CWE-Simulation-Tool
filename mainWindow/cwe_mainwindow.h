@@ -96,6 +96,8 @@ private slots:
     void on_actionManage_and_Download_Files_triggered();
 
 private:
+    void changeTabVisible(QTabWidget * theTab, bool newSetting);
+
     Ui::CWE_MainWindow *ui;
 
     VWTinterfaceDriver     *myDriver;
