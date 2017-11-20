@@ -1,11 +1,10 @@
 #include "cwe_results.h"
 #include "ui_cwe_results.h"
-//#include "mytablemodel.h"
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QFileDialog>
-#include "qdebug.h"
-#include <QPixmap>
+
+#include "vwtinterfacedriver.h"
+
+#include "CFDanalysis/CFDanalysisType.h"
+#include "CFDanalysis/CFDcaseInstance.h"
 
 CWE_Results::CWE_Results(QWidget *parent) :
     QWidget(parent),
@@ -28,8 +27,6 @@ CWE_Results::CWE_Results(QWidget *parent) :
     ui->resultsTableView->horizontalHeader()->setSectionResizeMode(3,QHeaderView::Stretch);
     ui->resultsTableView->horizontalHeader()->setSectionResizeMode(4,QHeaderView::Stretch);
     ui->resultsTableView->horizontalHeader()->setSectionResizeMode(5,QHeaderView::Stretch);
-
-    this->addDummyResult();
 }
 
 CWE_Results::~CWE_Results()
@@ -37,9 +34,61 @@ CWE_Results::~CWE_Results()
     delete ui;
 }
 
-void CWE_Results::setName(const QString &s)     {ui->label_theName->setText(s);}
-void CWE_Results::setType(const QString &s)     {ui->label_theType->setText(s);}
-void CWE_Results::setLocation(const QString &s) {ui->label_theLocation->setText(s);}
+void CWE_Results::linkWithDriver(VWTinterfaceDriver * newDriver)
+{
+    myDriver = newDriver;
+    QObject::connect(myDriver, SIGNAL(haveNewCase()),
+                     this, SLOT(newCaseGiven()));
+}
+
+void CWE_Results::resetViewInfo()
+{
+    model->clear();
+    viewIsValid = false;
+    CFDcaseInstance * currentCase = myDriver->getCurrentCase();
+    if (currentCase == NULL) return;
+    CFDanalysisType * theTemplate = currentCase->getMyType();
+    if (theTemplate == NULL) return;
+    QJsonObject configobj    = theTemplate->getRawConfig()->object();
+    QJsonObject stagesobj = configobj.value("stages").toObject();
+
+    QMap<QString, StageState> currentStates = currentCase->getStageStates();
+
+    viewIsValid = true;
+
+    ui->label_theName->setText(currentCase->getCaseName());
+    ui->label_theType->setText(theTemplate->getName());
+    ui->label_theLocation->setText(currentCase->getCaseFolder());
+
+    for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
+    {
+        //QString stageName = itr.key();
+        QJsonArray resultArray = (*itr).toObject().value("results").toArray();
+        for (auto itr2 = resultArray.constBegin(); itr2 != resultArray.constEnd(); itr2++)
+        {
+            QJsonObject aResult = (*itr2).toObject();
+            //addResult(aResult.value("name"), true, false, aResult.value("type"),"N/a", "N/a");
+        }
+    }
+}
+
+void CWE_Results::on_downloadEntireCaseButton_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, "Select Destination Folder:");
+
+
+    //TODO: Enact compression and download
+}
+
+void CWE_Results::newCaseGiven()
+{
+    resetViewInfo();
+}
+
+void CWE_Results::newCaseState(CaseState newState)
+{
+    //TODO
+}
 
 
 void CWE_Results::addResult(QString name, bool showeye, bool download, QString type, QString description, QString filesize)
@@ -76,19 +125,4 @@ void CWE_Results::addResult(QString name, bool showeye, bool download, QString t
 
     // Populate our model
     model->appendRow(List);
-}
-
-void CWE_Results::addDummyResult(void)
-{
-    this->addResult( "your job name", true, true, "some type", "some description",  "huge");
-}
-
-void CWE_Results::on_downloadEntireCaseButton_clicked()
-{
-    /* download the entire case TODO*/
-    QFileDialog *saveDialog = new QFileDialog();
-
-    QString foldername = "unknown";
-
-    qDebug() << "don't know where to find stuff to download to " << foldername;
 }

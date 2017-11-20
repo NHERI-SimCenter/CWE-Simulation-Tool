@@ -64,20 +64,32 @@ void CWE_Create_Copy_Simulation::on_pBtn_cancel_clicked()
 void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 {
     if (selectedTemplate == NULL) return;
+    FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
+    if (selectedNode == NULL)
+    {
+        return;
+    }
 
-    CFDcaseInstance * newCase = new CFDcaseInstance(selectedTemplate, driverLink);
-    driverLink->setCurrentCase(newCase);
+    CFDcaseInstance * newCase;
 
     //TODO: VERY IMPORTANT: NEED INPUT FILTERING
     if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
     {
-        newCase->createCase(ui->lineEdit_newCaseName->text(), ui->primary_remoteFileTree->getSelectedNode());
+        newCase = new CFDcaseInstance(selectedTemplate, driverLink);
+        newCase->createCase(ui->lineEdit_newCaseName->text(), selectedNode);
     }
     else
     {
-        newCase->duplicateCase(ui->lineEdit_newCaseName->text(), ui->primary_remoteFileTree->getSelectedNode(), ui->secondary_remoteFileTree->getSelectedNode());
+        FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
+        if (secondNode == NULL)
+        {
+            return;
+        }
+        newCase = new CFDcaseInstance(driverLink);
+        newCase->duplicateCase(ui->lineEdit_newCaseName->text(), selectedNode, secondNode);
     }
 
+    driverLink->setCurrentCase(newCase);
     emit needParamTab();
 }
 

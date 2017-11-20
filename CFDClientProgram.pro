@@ -94,7 +94,7 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/authform.cpp \
     ../AgaveExplorer/utilFuncs/copyrightdialog.cpp \
     ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
-    ../AgaveExplorer/remoteFileOps/remotejobentry.cpp \
+    ../AgaveExplorer/remoteFileOps/remotejobentry.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -143,7 +143,7 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/authform.h \
     ../AgaveExplorer/utilFuncs/copyrightdialog.h \
     ../AgaveExplorer/utilFuncs/singlelinedialog.h \
-    ../AgaveExplorer/remoteFileOps/remotejobentry.h \
+    ../AgaveExplorer/remoteFileOps/remotejobentry.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
