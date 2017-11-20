@@ -55,6 +55,8 @@ public:
 
     QStringList getStageNames();
 
+    bool isDebugOnly();
+
 private:
     QString myName;
     QJsonDocument myConfiguration;

@@ -72,4 +72,22 @@ QStringList CFDanalysisType::getStageNames()
     return stageList.keys();
 }
 
+bool CFDanalysisType::isDebugOnly()
+{
+    QJsonObject obj = myConfiguration.object();
+    if (!obj.contains("debugOnly"))
+    {
+        return false;
+    }
+    if (!obj["debugOnly"].isBool())
+    {
+        return false;
+    }
+    if (obj["debugOnly"].toBool() == true)
+    {
+        return true;
+    }
+    return false;
+}
+
 

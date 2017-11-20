@@ -47,16 +47,6 @@ void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &)
 int main(int argc, char *argv[])
 {
     QApplication mainRunLoop(argc, argv);
-    VWTinterfaceDriver programDriver;
-
-    QFile styleFile(":/cweStyle.qss");
-
-    if (!styleFile.open(QFile::ReadOnly))
-    {
-        programDriver.fatalInterfaceError("Unable to open style file. Install may be corrupted.");
-    }
-    QString styleText(styleFile.readAll());
-    mainRunLoop.setStyleSheet(styleText);
 
     bool debugLoggingEnabled = false;
     bool runOffline = false;
@@ -86,15 +76,24 @@ int main(int argc, char *argv[])
         qInstallMessageHandler(emptyMessageHandler);
     }
 
-    mainRunLoop.setQuitOnLastWindowClosed(false);
-    //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
-    //Note: Might consider a better way of implementing this.
-
+    VWTinterfaceDriver programDriver(nullptr, debugLoggingEnabled);
     if (QSslSocket::supportsSsl() == false)
     {
         programDriver.fatalInterfaceError("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
     }
 
+    QFile styleFile(":/cweStyle.qss");
+
+    if (!styleFile.open(QFile::ReadOnly))
+    {
+        programDriver.fatalInterfaceError("Unable to open style file. Install may be corrupted.");
+    }
+    QString styleText(styleFile.readAll());
+    mainRunLoop.setStyleSheet(styleText);
+
+    mainRunLoop.setQuitOnLastWindowClosed(false);
+    //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
+    //Note: Might consider a better way of implementing this.
 
     if (runOffline)
     {

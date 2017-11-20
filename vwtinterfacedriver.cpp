@@ -48,7 +48,7 @@
 
 #include "mainWindow/cwe_mainwindow.h"
 
-VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(parent)
+VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent)
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
     tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
@@ -74,7 +74,17 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(paren
         QString confPath = ":/config/";
         confPath = confPath.append(caseConfigFile);
         CFDanalysisType * newTemplate = new CFDanalysisType(confPath);
-        templateList.append(newTemplate);
+        if (debug == false)
+        {
+            if (newTemplate->isDebugOnly() == false)
+            {
+                templateList.append(newTemplate);
+            }
+        }
+        else
+        {
+            templateList.append(newTemplate);
+        }
     }
 }
 
