@@ -59,7 +59,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_help.cpp \
     cwe_guiWidgets/cwe_landing.cpp \
     cwe_guiWidgets/cwe_manage_simulation.cpp \
-    cwe_guiWidgets/cwe_simulation_details.cpp \
     cwe_guiWidgets/cwe_welcome_screen.cpp \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
@@ -109,7 +108,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_help.h \
     cwe_guiWidgets/cwe_landing.h \
     cwe_guiWidgets/cwe_manage_simulation.h \
-    cwe_guiWidgets/cwe_simulation_details.h \
     cwe_guiWidgets/cwe_welcome_screen.h \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
@@ -151,12 +149,9 @@ FORMS    += \
     cwe_guiWidgets/cwe_help.ui \
     cwe_guiWidgets/cwe_landing.ui \
     cwe_guiWidgets/cwe_manage_simulation.ui \
-    cwe_guiWidgets/cwe_simulation_details.ui \
-    cwe_guiWidgets/cwe_task_list.ui \
     cwe_guiWidgets/cwe_welcome_screen.ui \
     cwe_guiWidgets/cwe_results.ui \
     cwe_guiWidgets/cwe_parameters.ui \
-    cwe_guiWidgets/cwe_create_simulation_old.ui \
     cwe_guiWidgets/cwe_create_copy_simulation.ui \
     cwe_guiWidgets/cwe_debug_widget.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_parametertab.ui \
