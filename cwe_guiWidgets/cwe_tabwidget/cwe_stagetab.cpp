@@ -36,9 +36,9 @@ void CWE_StageTab::setData(QJsonObject &obj)
 }
 
 // set the group definitions as a JSon file
-QJsonObject CWE_StageTab::getData(QJsonObject &obj)
+QJsonObject CWE_StageTab::getData()
 {
-
+    return QJsonObject(m_obj);
 }
 
 // set the view state

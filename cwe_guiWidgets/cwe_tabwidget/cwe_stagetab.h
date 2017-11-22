@@ -14,7 +14,7 @@ public:
     CWE_StageTab();
     ~CWE_StageTab();
     void setData(QJsonObject &obj);         // set the group definitions as a JSon file
-    QJsonObject getData(QJsonObject &obj);  // set the group definitions as a JSon file
+    QJsonObject getData();                  // set the group definitions as a JSon file
     void setViewState(SimCenterViewState);  // set the view state
     SimCenterViewState viewState();         // return current view state
     int  addGroupTab(QString key, const QString &label, StageState currentState);

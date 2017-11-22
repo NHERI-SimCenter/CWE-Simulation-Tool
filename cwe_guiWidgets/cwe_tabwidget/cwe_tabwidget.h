@@ -99,7 +99,6 @@ private:
     //QMap<QString, CWE_WithStatusButton *> *groupWidget;
     //QMap<QString, QTabWidget *> *groupTabList;
     //QMap<QString, QMap<QString, QWidget *> *> *varTabWidgets;
-    //QMap<QString, InputDataType *> *variableWidgets;
 };
 
 #endif // CWE_TABWIDGET_H
