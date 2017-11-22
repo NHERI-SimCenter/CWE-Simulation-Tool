@@ -5,11 +5,13 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+#include "cwe_super.h"
+
 namespace Ui {
 class CWE_Debug_Widget;
 }
 
-class CWE_Debug_Widget : public QWidget
+class CWE_Debug_Widget : public CWE_Super
 {
     Q_OBJECT
 

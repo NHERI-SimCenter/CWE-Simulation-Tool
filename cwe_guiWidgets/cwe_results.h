@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QPixmap>
 
+#include "cwe_super.h"
+
 class VWTinterfaceDriver;
 enum class CaseState;
 
@@ -14,7 +16,7 @@ namespace Ui {
 class CWE_Results;
 }
 
-class CWE_Results : public QWidget
+class CWE_Results : public CWE_Super
 {
     Q_OBJECT
 
@@ -22,7 +24,7 @@ public:
     explicit CWE_Results(QWidget *parent = 0);
     ~CWE_Results();
 
-    void linkWithDriver(VWTinterfaceDriver * newDriver);
+    virtual void linkDriver(VWTinterfaceDriver * newDriver);
     void resetViewInfo();
 
 private slots:
@@ -34,7 +36,6 @@ private slots:
 private:
     Ui::CWE_Results    *ui;
     QStandardItemModel *model;
-    VWTinterfaceDriver *myDriver;
 
     bool viewIsValid = false;
 

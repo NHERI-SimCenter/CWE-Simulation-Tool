@@ -46,7 +46,7 @@
 #include <QFileDialog>
 
 CWE_file_manager::CWE_file_manager(QWidget *parent) :
-    QWidget(parent),
+    CWE_Super(parent),
     ui(new Ui::CWE_file_manager)
 {
     ui->setupUi(this);
@@ -73,11 +73,14 @@ CWE_file_manager::~CWE_file_manager()
 
 void CWE_file_manager::linkDriver(VWTinterfaceDriver * theDriver)
 {
-    myDriver = theDriver;
-    ui->remoteTreeView->setFileOperator(myDriver->getFileHandler());
-    ui->remoteTreeView->setupFileView();
-    QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
+    CWE_Super::linkDriver(theDriver);
+    if (!myDriver->inOfflineMode())
+    {
+        ui->remoteTreeView->setFileOperator(myDriver->getFileHandler());
+        ui->remoteTreeView->setupFileView();
+        QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
+    }
 }
 
 void CWE_file_manager::on_pb_upload_clicked()

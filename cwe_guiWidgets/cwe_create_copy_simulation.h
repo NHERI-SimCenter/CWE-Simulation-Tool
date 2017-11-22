@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QRadioButton>
 
+#include "cwe_super.h"
+
 class FileOperator;
 class VWTinterfaceDriver;
 class CFDanalysisType;
@@ -21,7 +23,7 @@ namespace Ui {
 class CWE_Create_Copy_Simulation;
 }
 
-class CWE_Create_Copy_Simulation : public QFrame
+class CWE_Create_Copy_Simulation : public CWE_Super
 {
     Q_OBJECT
 
@@ -29,8 +31,7 @@ public:
     explicit CWE_Create_Copy_Simulation(QWidget *parent = 0);
     ~CWE_Create_Copy_Simulation();
 
-    void linkDriver(VWTinterfaceDriver * theDriver);
-    void linkDriverConnected(VWTinterfaceDriver * theDriver);
+    virtual void linkDriver(VWTinterfaceDriver * theDriver);
 
 private slots:
     void on_lineEdit_newCaseName_editingFinished();
@@ -47,7 +48,6 @@ private:
     void populateCaseTypes();
     void create_new_case_from_template(QString filename);
 
-    VWTinterfaceDriver * driverLink = NULL;
     CFDanalysisType * selectedTemplate = NULL;
 
     QVector<CASE_TYPE_DATA> caseTypeDataList;

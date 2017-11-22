@@ -86,6 +86,8 @@ public:
 
     void displayMessagePopup(QString infoText);
 
+    bool inOfflineMode();
+
 signals:
     void haveNewCase();
 
@@ -95,10 +97,11 @@ private slots:
 
 private:
     CWE_MainWindow * mainWindow;
-
     QList<CFDanalysisType *> templateList;
 
     CFDcaseInstance * currentCFDCase = NULL;
+
+    bool offlineMode = false;
 };
 
 #endif // VWTINTERFACEDRIVER_H

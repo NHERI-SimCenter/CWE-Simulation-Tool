@@ -22,7 +22,7 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
-    QWidget(parent),
+    CWE_Super(parent),
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
@@ -38,9 +38,9 @@ CWE_Parameters::~CWE_Parameters()
     delete ui;
 }
 
-void CWE_Parameters::linkWithDriver(VWTinterfaceDriver * newDriver)
+void CWE_Parameters::linkDriver(VWTinterfaceDriver * newDriver)
 {
-    myDriver = newDriver;
+    CWE_Super::linkDriver(newDriver);
     QObject::connect(myDriver, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
     ui->theTabWidget->setupDriver(myDriver);

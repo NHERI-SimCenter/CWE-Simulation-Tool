@@ -44,7 +44,7 @@
 #include "vwtinterfacedriver.h"
 
 CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
-    QWidget(parent),
+    CWE_Super(parent),
     ui(new Ui::CWE_manage_simulation)
 {
     ui->setupUi(this);
@@ -60,8 +60,11 @@ CWE_manage_simulation::~CWE_manage_simulation()
 
 void CWE_manage_simulation::linkDriver(VWTinterfaceDriver * theDriver)
 {
-    driverLink = theDriver;
-    ui->treeView->setFileOperator(driverLink->getFileHandler());
+    CWE_Super::linkDriver(theDriver);
+    if (!theDriver->inOfflineMode())
+    {
+        ui->treeView->setFileOperator(theDriver->getFileHandler());
+    }
 }
 
 void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
@@ -70,7 +73,7 @@ void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
     {
         tempCase->deleteLater();
     }
-    tempCase = new CFDcaseInstance(newFile, driverLink);
+    tempCase = new CFDcaseInstance(newFile, myDriver);
     ui->label_caseStatus->setCurrentCase(tempCase);
 }
 
@@ -94,12 +97,12 @@ bool CWE_manage_simulation::verifyCaseAndSelect()
 {
     if (tempCase->getCaseState() == CaseState::JOB_RUN)
     {
-        driverLink->setCurrentCase(tempCase);
+        myDriver->setCurrentCase(tempCase);
         return true;
     }
     if (tempCase->getCaseState() == CaseState::READY)
     {
-        driverLink->setCurrentCase(tempCase);
+        myDriver->setCurrentCase(tempCase);
         return true;
     }
 

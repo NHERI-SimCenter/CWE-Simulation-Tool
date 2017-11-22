@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QMap>
 
+#include "cwe_super.h"
+
 class CFDcaseInstance;
 class CFDanalysisType;
 class VWTinterfaceDriver;
@@ -14,7 +16,7 @@ namespace Ui {
 class CWE_Parameters;
 }
 
-class CWE_Parameters : public QWidget
+class CWE_Parameters : public CWE_Super
 {
     Q_OBJECT
 
@@ -22,7 +24,7 @@ public:
     explicit CWE_Parameters(QWidget *parent = 0);
     ~CWE_Parameters();
 
-    void linkWithDriver(VWTinterfaceDriver * newDriver);
+    virtual void linkDriver(VWTinterfaceDriver * newDriver);
     void resetViewInfo();
 
 private slots:
@@ -46,7 +48,6 @@ private:
     Ui::CWE_Parameters *ui;
 
     bool viewIsValid = false;
-    VWTinterfaceDriver * myDriver;
 
     QMap<QString, int> parameterTabs;
 };
