@@ -1,12 +1,11 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
 ** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,50 +30,16 @@
 ***********************************************************************************/
 
 // Contributors:
-
-#ifndef CWE_MANAGE_SIMULATION_H
-#define CWE_MANAGE_SIMULATION_H
-
-#include <QWidget>
-#include "cwe_defines.h"
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 #include "cwe_super.h"
 
-class FileTreeNode;
-class VWTinterfaceDriver;
-class CFDcaseInstance;
+CWE_Super::CWE_Super(QWidget *parent) : QFrame(parent)
+{
 
-namespace Ui {
-class CWE_manage_simulation;
 }
 
-class CWE_manage_simulation : public CWE_Super
+void CWE_Super::linkDriver(VWTinterfaceDriver * theDriver)
 {
-    Q_OBJECT
-
-public:
-    explicit CWE_manage_simulation(QWidget *parent = 0);
-    ~CWE_manage_simulation();
-
-    virtual void linkDriver(VWTinterfaceDriver * theDriver);
-
-private slots:
-    void newFileSelected(FileTreeNode * newFile);
-
-    void on_pb_viewParameters_clicked();
-
-    void on_pb_viewResults_clicked();
-
-signals:
-    void needParamTab();
-    void needResultsTab();
-
-private:
-    bool verifyCaseAndSelect();
-
-    Ui::CWE_manage_simulation *ui;
-
-    CFDcaseInstance * tempCase = NULL;
-};
-
-#endif // CWE_MANAGE_SIMULATION_H
+    myDriver = theDriver;
+}

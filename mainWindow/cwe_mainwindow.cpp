@@ -50,7 +50,6 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
     //Esablish connections with driver
     myDriver = newDriver;
-    dataLink = myDriver->getDataConnection();
 
     if (!myDriver->inDebugMode())
     {
@@ -82,21 +81,8 @@ CWE_MainWindow::~CWE_MainWindow()
     delete ui;
 }
 
-void CWE_MainWindow::runOfflineSetupSteps()
-{
-    //TODO: Link driver offline should be a virtual function for a tab superclass
-    ui->tab_create_new->linkDriver(myDriver);
-}
-
 void CWE_MainWindow::runSetupSteps()
 {
-    //TODO: Link driver should be a virtual function for a tab superclass
-    ui->tab_files->linkDriver(myDriver);
-    ui->tab_parameters->linkWithDriver(myDriver);
-    ui->tab_landing_page->linkJobHandle(myDriver->getJobHandler());
-    ui->tab_create_new->linkDriverConnected(myDriver);
-    ui->tab_manage_and_run->linkDriver(myDriver);
-
     //Note: Adding widget to header will re-parent them
     stateLabel = new cwe_state_label(this);
     ui->header->appendWidget(stateLabel);
@@ -107,6 +93,17 @@ void CWE_MainWindow::runSetupSteps()
     QPushButton * logoutButton = new QPushButton("Logout");
     QObject::connect(logoutButton, SIGNAL(clicked(bool)), myDriver, SLOT(shutdown()));
     ui->header->appendWidget(logoutButton);
+
+    for (int i = 0; i < ui->tabContainer->count(); i++)
+    {
+        QWidget * rawWidget = ui->tabContainer->widget(i);
+        if (!rawWidget->inherits("CWE_Super"))
+        {
+            continue;
+        }
+        CWE_Super * aWidget = (CWE_Super *) rawWidget;
+        aWidget->linkDriver(myDriver);
+    }
 }
 
 void CWE_MainWindow::attachCaseSignals(CFDcaseInstance * newCase)

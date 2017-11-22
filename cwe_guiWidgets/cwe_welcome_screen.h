@@ -37,11 +37,13 @@
 
 #include <QFrame>
 
+#include "cwe_super.h"
+
 namespace Ui {
 class CWE_welcome_screen;
 }
 
-class CWE_welcome_screen : public QFrame
+class CWE_welcome_screen : public CWE_Super
 {
     Q_OBJECT
 

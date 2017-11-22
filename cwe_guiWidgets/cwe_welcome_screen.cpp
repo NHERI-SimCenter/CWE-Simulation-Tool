@@ -38,7 +38,7 @@
 #include <QScreen>
 
 CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
-    QFrame(parent),
+    CWE_Super(parent),
     ui(new Ui::CWE_welcome_screen)
 {
     ui->setupUi(this);

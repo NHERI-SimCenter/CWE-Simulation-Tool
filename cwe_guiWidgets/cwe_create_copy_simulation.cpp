@@ -23,7 +23,7 @@
 #include <QIcon>
 
 CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
-    QFrame(parent),
+    CWE_Super(parent),
     ui(new Ui::CWE_Create_Copy_Simulation)
 {
     ui->setupUi(this);
@@ -38,17 +38,15 @@ CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
 
 void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
 {
-    driverLink = theDriver;
+    CWE_Super::linkDriver(theDriver);
     this->populateCaseTypes();
-}
-
-void CWE_Create_Copy_Simulation::linkDriverConnected(VWTinterfaceDriver * theDriver)
-{
-    linkDriver(theDriver);
-    ui->primary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
-    ui->primary_remoteFileTree->setupFileView();
-    ui->secondary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
-    ui->secondary_remoteFileTree->setupFileView();
+    if (!theDriver->inOfflineMode())
+    {
+        ui->primary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
+        ui->primary_remoteFileTree->setupFileView();
+        ui->secondary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
+        ui->secondary_remoteFileTree->setupFileView();
+    }
 }
 
 void CWE_Create_Copy_Simulation::on_lineEdit_newCaseName_editingFinished()
@@ -75,7 +73,7 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
     //TODO: VERY IMPORTANT: NEED INPUT FILTERING
     if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
     {
-        newCase = new CFDcaseInstance(selectedTemplate, driverLink);
+        newCase = new CFDcaseInstance(selectedTemplate, myDriver);
         newCase->createCase(ui->lineEdit_newCaseName->text(), selectedNode);
     }
     else
@@ -85,11 +83,11 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
         {
             return;
         }
-        newCase = new CFDcaseInstance(driverLink);
+        newCase = new CFDcaseInstance(myDriver);
         newCase->duplicateCase(ui->lineEdit_newCaseName->text(), selectedNode, secondNode);
     }
 
-    driverLink->setCurrentCase(newCase);
+    myDriver->setCurrentCase(newCase);
     emit needParamTab();
 }
 
@@ -110,7 +108,7 @@ void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
 
 void CWE_Create_Copy_Simulation::populateCaseTypes()
 {
-    QList<CFDanalysisType *> * templateList = driverLink->getTemplateList();
+    QList<CFDanalysisType *> * templateList = myDriver->getTemplateList();
     QGridLayout *layout = new QGridLayout(this);
 
     int idx = 0;

@@ -105,8 +105,9 @@ void VWTinterfaceDriver::closeAuthScreen()
     }
 
     myJobHandle = new JobOperator(theConnector,this);
-    myJobHandle->demandJobDataRefresh();
     myFileHandle = new FileOperator(theConnector,this);
+
+    myJobHandle->demandJobDataRefresh();
     myFileHandle->resetFileData();
 
     mainWindow->runSetupSteps();
@@ -136,6 +137,8 @@ void VWTinterfaceDriver::closeAuthScreen()
 
 void VWTinterfaceDriver::startOffline()
 {
+    offlineMode = true;
+
     mainWindow = new CWE_MainWindow(this);
 
     myJobHandle = new JobOperator(theConnector,this);
@@ -143,7 +146,7 @@ void VWTinterfaceDriver::startOffline()
 
     setCurrentCase(new CFDcaseInstance(templateList.at(0),this));
 
-    mainWindow->runOfflineSetupSteps();
+    mainWindow->runSetupSteps();
     mainWindow->show();
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
@@ -156,7 +159,7 @@ QString VWTinterfaceDriver::getBanner()
 
 QString VWTinterfaceDriver::getVersion()
 {
-    return "Version: 0.1";
+    return "Version: 0.1.1";
 }
 
 QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()
@@ -235,4 +238,9 @@ void VWTinterfaceDriver::displayMessagePopup(QString infoText)
     infoMessage.setText(infoText);
     infoMessage.setIcon(QMessageBox::Information);
     infoMessage.exec();
+}
+
+bool VWTinterfaceDriver::inOfflineMode()
+{
+    return offlineMode;
 }

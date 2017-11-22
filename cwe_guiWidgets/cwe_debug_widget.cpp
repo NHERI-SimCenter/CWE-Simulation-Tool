@@ -4,7 +4,7 @@
 #include "SimCenter_widgets/sctrdatawidget.h"
 
 CWE_Debug_Widget::CWE_Debug_Widget(QWidget *parent) :
-    QWidget(parent),
+    CWE_Super(parent),
     ui(new Ui::CWE_Debug_Widget)
 {
     ui->setupUi(this);
