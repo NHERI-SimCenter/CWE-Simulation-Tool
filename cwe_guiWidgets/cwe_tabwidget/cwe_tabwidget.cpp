@@ -508,8 +508,6 @@ void CWE_TabWidget::setButtonMode(uint mode)
 
 }
 
-
-
 void CWE_TabWidget::addStageTab(QString key, QJsonObject &obj)
 {
     /*
