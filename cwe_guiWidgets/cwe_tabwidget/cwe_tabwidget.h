@@ -45,8 +45,6 @@ public:
 
     void addStageTab(QString s, QJsonObject &obj);
 
-    int  addGroupTab(QString key, const QString &label, StageState currentState);
-
     void setCurrentWidget(QWidget *);
     bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label , QString *setVal = NULL);
 

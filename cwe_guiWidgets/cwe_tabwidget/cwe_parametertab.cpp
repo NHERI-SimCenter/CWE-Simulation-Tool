@@ -1,3 +1,8 @@
+/*
+ * the CWE_ParameterTab is a scoll area that holds the individual
+ * variable input/display objects (SCtr_MasterDataWidget and its derivates)
+ */
+
 #include "cwe_parametertab.h"
 #include "ui_cwe_parametertab.h"
 
@@ -12,7 +17,6 @@ CWE_ParameterTab::CWE_ParameterTab(QWidget *parent) :
 CWE_ParameterTab::~CWE_ParameterTab()
 {
     delete ui;
-    if (m_stageTabs != NULL) delete m_stageTabs;
 }
 
 QWidget * CWE_ParameterTab::getParameterSpace()
