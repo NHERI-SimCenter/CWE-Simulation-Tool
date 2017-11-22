@@ -4,6 +4,7 @@
 #include <QJsonObject>;
 class QTabWidget;
 enum class SimCenterViewState;
+enum class StageState;
 
 class CWE_WithStatusButton;
 
@@ -16,6 +17,7 @@ public:
     QJsonObject getData(QJsonObject &obj);  // set the group definitions as a JSon file
     void setViewState(SimCenterViewState);  // set the view state
     SimCenterViewState viewState();         // return current view state
+    int  addGroupTab(QString key, const QString &label, StageState currentState);
 
 protected:
     CWE_StageTab *getGroupTab();  // returns pointer to group tab widget

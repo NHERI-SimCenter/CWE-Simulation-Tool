@@ -1,3 +1,8 @@
+/*
+ * the CWE_StageTab represents a single tab and data field within
+ * the CWE_TabWidget.
+ */
+
 #include "cwe_stagetab.h"
 
 #include "cwe_withstatusbutton.h"
@@ -57,4 +62,33 @@ void CWE_StageTab::setViewState(SimCenterViewState state)
 SimCenterViewState CWE_StageTab::viewState()
 {
     return m_viewState;
+}
+
+
+
+int CWE_StageTab::addGroupTab(QString key, const QString &label, StageState currentState)
+{
+    varTabWidgets->insert(key, new QMap<QString, QWidget *>());
+
+    // create the tab
+    CWE_WithStatusButton *newTab = new CWE_WithStatusButton(key);
+    newTab->setText(label);
+
+    newTab->setStatus(getStateText(currentState));
+    int index = ui->verticalTabLayout->count()-1;
+    newTab->setIndex(index);
+    ui->verticalTabLayout->insertWidget(index, newTab);
+
+    groupWidget->insert(key, newTab);
+
+    connect(newTab,SIGNAL(btn_pressed(int,QString)),this,SLOT(on_groupTabSelected(int, QString)));
+    //connect(newTab,SIGNAL(btn_released(int)),this,SLOT(on_groupTabSelected(int)));
+
+    // create the widget to hold the parameter input
+    QTabWidget *pWidget = new QTabWidget();
+    ui->stackedWidget->insertWidget(index, pWidget);
+
+    groupTabList->insert(key, pWidget);
+
+    return index;
 }

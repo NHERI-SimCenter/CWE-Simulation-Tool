@@ -1,3 +1,10 @@
+/*
+ * the CWE_TabWidget is an extended version of a tab widget where
+ * Tabs display a label AND a state
+ * the data display area itself hold a standard QTabWidget, one tab per
+ * variable group (as defined in the JSon config file)
+ */
+
 #include "cwe_tabwidget.h"
 #include "ui_cwe_tabwidget.h"
 #include "cwe_parametertab.h"
@@ -70,7 +77,7 @@ void CWE_TabWidget::setViewState(SimCenterViewState state)
     }
 }
 
-SimCenterViewState CWE_TabWidget::rviewState()
+SimCenterViewState CWE_TabWidget::viewState()
 {
     return m_viewState;
 }
@@ -78,40 +85,12 @@ SimCenterViewState CWE_TabWidget::rviewState()
 void CWE_TabWidget::resetView()
 {
     // delete all stage tabs and everything within
-    for (auto stageItr = stageWidgets->begin(); stageItr != stageWidgets->end();)
+    for (auto stageItr = m_stageTabs->begin(); stageItr != m_stageTabs->end();)
     {
         delete stageItr.value();                    // delete the CWE_GroupTab for the stage
-        stageItr = stageWidgets->erase(stageItr);   // erase the stage from the map
+        stageItr = m_stageTabs->erase(stageItr);   // erase the stage from the map
     }
 }
-
-int CWE_TabWidget::addGroupTab(QString key, const QString &label, StageState currentState)
-{
-    varTabWidgets->insert(key, new QMap<QString, QWidget *>());
-
-    // create the tab
-    CWE_WithStatusButton *newTab = new CWE_WithStatusButton(key);
-    newTab->setText(label);
-
-    newTab->setStatus(getStateText(currentState));
-    int index = ui->verticalTabLayout->count()-1;
-    newTab->setIndex(index);
-    ui->verticalTabLayout->insertWidget(index, newTab);
-
-    groupWidget->insert(key, newTab);
-
-    connect(newTab,SIGNAL(btn_pressed(int,QString)),this,SLOT(on_groupTabSelected(int, QString)));
-    //connect(newTab,SIGNAL(btn_released(int)),this,SLOT(on_groupTabSelected(int)));
-
-    // create the widget to hold the parameter input
-    QTabWidget *pWidget = new QTabWidget();
-    ui->stackedWidget->insertWidget(index, pWidget);
-
-    groupTabList->insert(key, pWidget);
-
-    return index;
-}
-
 int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
 {
     int index = addVarTab(key, label);
