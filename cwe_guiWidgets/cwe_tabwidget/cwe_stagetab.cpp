@@ -33,6 +33,16 @@ CWE_StageTab::~CWE_StageTab()
 void CWE_StageTab::setData(QJsonObject &obj)
 {
     m_obj = obj;
+
+    QJsonObject stageInfo = m_obj[name].toObject();
+    QString labelText;
+
+    labelText = stageInfo["name"].toString();
+    labelText = labelText.append("\nParameters");
+
+    // add a stage tab to ui->theTabWidget
+    int idx = ui->theTabWidget->addGroupTab(name, labelText, StageState::UNRUN);
+    stageTabsIndex.insert(name, idx);
 }
 
 // set the group definitions as a JSon file
