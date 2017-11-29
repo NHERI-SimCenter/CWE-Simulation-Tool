@@ -40,7 +40,6 @@ void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
 
 void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 {
-    if (selectedTemplate == NULL) return;
     FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
     if (selectedNode == NULL)
     {
@@ -52,6 +51,7 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
     //TODO: VERY IMPORTANT: NEED INPUT FILTERING
     if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
     {
+        if (selectedTemplate == NULL) return;
         newCase = new CFDcaseInstance(selectedTemplate, myDriver);
         newCase->createCase(ui->lineEdit_newCaseName->text(), selectedNode);
     }
@@ -64,6 +64,10 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
         }
         newCase = new CFDcaseInstance(myDriver);
         newCase->duplicateCase(ui->lineEdit_newCaseName->text(), selectedNode, secondNode);
+        if (newCase->getCaseState() != CaseState::OP_INVOKE)
+        {
+            return;
+        }
     }
 
     myDriver->setCurrentCase(newCase);

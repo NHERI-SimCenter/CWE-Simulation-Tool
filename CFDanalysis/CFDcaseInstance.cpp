@@ -411,7 +411,7 @@ void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFo
 
     currentReq = PendingCFDrequest::DUP_COPY;
     emitNewState(CaseState::OP_INVOKE);
-    requestDataBeingRefreshed = false;
+    requestDataBeingRefreshed = true;
 }
 
 void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
