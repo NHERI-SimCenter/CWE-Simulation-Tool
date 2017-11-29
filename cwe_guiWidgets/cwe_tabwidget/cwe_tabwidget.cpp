@@ -7,8 +7,9 @@
 
 #include "cwe_tabwidget.h"
 #include "ui_cwe_tabwidget.h"
-#include "cwe_parametertab.h"
-#include "cwe_withstatusbutton.h"
+#include "cwe_parampanel.h"
+#include "cwe_stagestatustab.h"
+#include "cwe_groupswidget.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "qdebug.h"
@@ -21,10 +22,8 @@ CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_stageTabs = new QMap<QString, CWE_StageTab *>();
-
-    //groupWidget     = new QMap<QString, CWE_WithStatusButton *>();
-    //groupTabList    = new QMap<QString, QTabWidget *>();
+    groupWidgetList = new QMap<QString, CWE_GroupsWidget *>();
+    stageTabList    = new QMap<QString, CWE_StageStatusTab *>();
     //varTabWidgets   = new QMap<QString, QMap<QString, QWidget *> *>();
     //variableWidgets = new QMap<QString, InputDataType *>();
 
@@ -85,10 +84,16 @@ SimCenterViewState CWE_TabWidget::viewState()
 void CWE_TabWidget::resetView()
 {
     // delete all stage tabs and everything within
-    for (auto stageItr = m_stageTabs->begin(); stageItr != m_stageTabs->end();)
+    for (auto stageItr = stageTabList->begin(); stageItr != stageTabList->end();)
     {
         delete stageItr.value();                    // delete the CWE_GroupTab for the stage
-        stageItr = m_stageTabs->erase(stageItr);   // erase the stage from the map
+        stageItr = stageTabList->erase(stageItr);   // erase the stage from the map
+    }
+    // delete all groupsWidgets and everything within
+    for (auto groupItr = groupWidgetList->begin(); groupItr != groupWidgetList->end();)
+    {
+        delete groupItr.value();                    // delete the CWE_GroupTab for the stage
+        groupItr = groupWidgetList->erase(groupItr);   // erase the stage from the map
     }
 }
 int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
@@ -125,25 +130,6 @@ void CWE_TabWidget::addVarsToTab(QString key, const QString &label, QJsonArray *
     this->addVSpacer(key, label);
 }
 
-int CWE_TabWidget::addVarTab(QString key, const QString &label)
-{
-    // create the widget to hold the parameter input
-
-    CWE_ParameterTab *itm = new CWE_ParameterTab(this);
-    itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    itm->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::MinimumExpanding);
-
-    QGridLayout *lyt = new QGridLayout();
-    itm->setLayout(lyt);
-
-    varTabWidgets->value(key)->insert(label, itm);
-
-    QTabWidget * qf = groupTabList->value(key);
-    int index = qf->addTab(itm, label);
-
-    return index;
-}
 
 void CWE_TabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
 {
@@ -332,24 +318,6 @@ void CWE_TabWidget::addType(const QString &varName, const QString &type, QJsonOb
 
 */
 
-bool CWE_TabWidget::addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString * setVal)
-{
-    QString type = JSONvar["type"].toString();
-    if (type == "") {
-        return false;
-    }
-    else
-    {
-        QWidget *parent = varTabWidgets->value(key)->value(label);
-        if (parent != NULL)
-        {
-            /* temporary disabled */
-            //this->addType(varName, type, JSONvar, parent, setVal);
-            return true;
-        }
-        else { return false; }
-    }
-}
 
 void CWE_TabWidget::addVSpacer(const QString &key, const QString &label)
 {
@@ -371,7 +339,7 @@ void CWE_TabWidget::setIndex(int idx)
     // set stylesheet for buttons
     foreach (const QString &key, groupWidget->keys())
     {
-        CWE_WithStatusButton *btn = groupWidget->value(key);
+        CWE_StageStatusTab *btn = groupWidget->value(key);
         //qDebug() << idx << "<>" << btn->index();
 
         if (btn->index() == idx)
@@ -399,6 +367,11 @@ void CWE_TabWidget::on_pbtn_run_clicked()
 
 QMap<QString, QString> CWE_TabWidget::collectParamData()
 {
+    /*
+     * TODO:
+     * -- loop through groupsWidgetList and collect information fromCWE_GroupsWidgets
+     */
+
     QString val;
     QMap<QString, QString> currentParameters;
 

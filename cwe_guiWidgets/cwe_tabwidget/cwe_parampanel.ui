@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CWE_ParameterTab</class>
- <widget class="QScrollArea" name="CWE_ParameterTab">
+ <class>CWE_ParamPanel</class>
+ <widget class="QScrollArea" name="CWE_ParamPanel">
   <property name="geometry">
    <rect>
     <x>0</x>
