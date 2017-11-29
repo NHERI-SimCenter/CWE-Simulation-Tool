@@ -3,6 +3,17 @@
 
 #include <QWidget>
 #include <QMap>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QDoubleSpinBox>
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QLineEdit>
 
 #include "cwe_super.h"
 
@@ -36,11 +47,6 @@ private slots:
     void switchToResultsSlot();
     void switchToParameterSlot();
     void switchToCreateSlot();
-
-signals:
-    void switchToResultsTab();
-    void switchToParameterTab();
-    void switchToCreateTab();
 
 private:
     void saveAllParams();

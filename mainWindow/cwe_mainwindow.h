@@ -69,11 +69,11 @@ public:
 
     void attachCaseSignals(CFDcaseInstance * newCase);
 
-private slots:
     void switchToParameterTab();
     void switchToResultsTab();
     void switchToCreateTab();
 
+private slots:
     void menuExit();
     void menuCopyInfo();
 

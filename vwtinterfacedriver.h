@@ -49,6 +49,17 @@
 #include <QTreeView>
 #include <QStackedWidget>
 #include <QWindow>
+#include <QDir>
+#include <QString>
+#include <QStringList>
+#include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QPixmap>
+#include <QRadioButton>
+#include <QLabel>
+#include <QIcon>
 #include <QThread>
 
 enum class VWTerrorType: unsigned int;
@@ -83,6 +94,7 @@ public:
     QList<CFDanalysisType *> * getTemplateList();
     CFDcaseInstance * getCurrentCase();
     void setCurrentCase(CFDcaseInstance * newCase);
+    CWE_MainWindow * getMainWindow();
 
     void displayMessagePopup(QString infoText);
 

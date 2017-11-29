@@ -62,13 +62,6 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     changeTabVisible((QTabWidget *)ui->tab_spacer_1, false);
     changeTabVisible((QTabWidget *)ui->tab_spacer_2, false);
 
-    QObject::connect(ui->tab_parameters, SIGNAL(switchToParameterTab()), this, SLOT(switchToParameterTab()));
-    QObject::connect(ui->tab_parameters, SIGNAL(switchToResultsTab()),   this, SLOT(switchToResultsTab())  );
-    QObject::connect(ui->tab_parameters, SIGNAL(switchToCreateTab()),    this, SLOT(switchToCreateTab())   );
-
-    QObject::connect(ui->tab_create_new, SIGNAL(needParamTab()), this, SLOT(switchToParameterTab()));
-    QObject::connect(ui->tab_manage_and_run, SIGNAL(needParamTab()), this, SLOT(switchToParameterTab()));
-
     // adjust application size to display
     QRect rec = QApplication::desktop()->screenGeometry();
     int height = this->height()<0.5*rec.height()?this->height():0.5*rec.height();
