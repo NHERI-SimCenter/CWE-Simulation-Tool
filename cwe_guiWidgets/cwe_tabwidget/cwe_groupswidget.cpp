@@ -3,13 +3,14 @@
  * the CWE_TabWidget.
  */
 
-#include "cwe_stagetab.h"
+#include "cwe_groupswidget.h"
 
-#include "cwe_withstatusbutton.h"
+#include "cwe_stagestatustab.h"
 #include "SimCenter_widgets/sctrstates.h"
 #include <QJsonObject>
 
-CWE_StageTab::CWE_StageTab()
+CWE_StageTab::CWE_StageTab(QWidget *parent) :
+    QTabWidget(parent)
 {
 
     m_tabWidget = NULL;
@@ -81,7 +82,7 @@ int CWE_StageTab::addGroupTab(QString key, const QString &label, StageState curr
     varTabWidgets->insert(key, new QMap<QString, QWidget *>());
 
     // create the tab
-    CWE_WithStatusButton *newTab = new CWE_WithStatusButton(key);
+    CWE_StageStatusTab *newTab = new CWE_StageStatusTab(key);
     newTab->setText(label);
 
     newTab->setStatus(getStateText(currentState));
@@ -99,6 +100,26 @@ int CWE_StageTab::addGroupTab(QString key, const QString &label, StageState curr
     ui->stackedWidget->insertWidget(index, pWidget);
 
     groupTabList->insert(key, pWidget);
+
+    return index;
+}
+
+int CWE_StageTab::addVarTab(QString key, const QString &label)
+{
+    // create the widget to hold the parameter input
+
+    CWE_ParameterTab *itm = new CWE_ParameterTab(this);
+    itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    itm->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::MinimumExpanding);
+
+    QGridLayout *lyt = new QGridLayout();
+    itm->setLayout(lyt);
+
+    //varTabWidgets->value(key)->insert(label, itm);
+
+    QTabWidget * qf = groupTabList->value(key);
+    int index = qf->addTab(itm, label);
 
     return index;
 }

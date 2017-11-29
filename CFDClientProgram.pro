@@ -66,8 +66,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_create_copy_simulation.cpp \
     cwe_guiWidgets/cwe_debug_widget.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parametertab.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_withstatusbutton.cpp \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.cpp \
     CFDanalysis/CFDanalysisType.cpp \
     CFDanalysis/CFDcaseInstance.cpp \
@@ -94,7 +92,9 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/copyrightdialog.cpp \
     ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
     ../AgaveExplorer/remoteFileOps/remotejobentry.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_stagetab.cpp
+    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.cpp \
+    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.cpp \
+    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -113,8 +113,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_welcome_screen.h \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parametertab.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_withstatusbutton.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h \
     cwe_guiWidgets/cwe_create_copy_simulation.h \
     cwe_guiWidgets/cwe_debug_widget.h \
@@ -143,7 +141,9 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/copyrightdialog.h \
     ../AgaveExplorer/utilFuncs/singlelinedialog.h \
     ../AgaveExplorer/remoteFileOps/remotejobentry.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_stagetab.h
+    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h \
+    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h \
+    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -159,13 +159,13 @@ FORMS    += \
     cwe_guiWidgets/cwe_create_simulation_old.ui \
     cwe_guiWidgets/cwe_create_copy_simulation.ui \
     cwe_guiWidgets/cwe_debug_widget.ui \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parametertab.ui \
-    cwe_guiWidgets/cwe_tabwidget/cwe_withstatusbutton.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.ui \
     SimCenter_widgets/sctrdatawidget.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
-    ../AgaveExplorer/utilFuncs/singlelinedialog.ui
+    ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
+    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
+    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui
 
 RESOURCES += \
     cwe_resources.qrc \

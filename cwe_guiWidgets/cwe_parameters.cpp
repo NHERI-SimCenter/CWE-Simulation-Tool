@@ -1,6 +1,6 @@
 #include "cwe_parameters.h"
 #include "ui_cwe_parameters.h"
-#include "cwe_tabwidget/cwe_parametertab.h"
+#include "cwe_tabwidget/cwe_parampanel.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -21,7 +21,7 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
-#include "cwe_guiWidgets/cwe_tabwidget/cwe_stagetab.h"
+#include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
 
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
     QWidget(parent),

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CWE_WithStatusButton</class>
- <widget class="QFrame" name="CWE_WithStatusButton">
+ <class>CWE_StageStatusTab</class>
+ <widget class="QFrame" name="CWE_StageStatusTab">
   <property name="geometry">
    <rect>
     <x>0</x>
