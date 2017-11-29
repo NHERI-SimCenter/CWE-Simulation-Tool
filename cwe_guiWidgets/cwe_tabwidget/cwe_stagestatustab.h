@@ -1,20 +1,20 @@
-#ifndef CWE_WITHSTATUSBUTTON_H
-#define CWE_WITHSTATUSBUTTON_H
+#ifndef CWE_STAGESTATUSTAB_H
+#define CWE_STAGESTATUSTAB_H
 
 #include <QFrame>
 //#include <QAbstractButton>
 
 namespace Ui {
-class CWE_WithStatusButton;
+class CWE_StageStatusTab;
 }
 
-class CWE_WithStatusButton : public QFrame
+class CWE_StageStatusTab : public QFrame
 {
     Q_OBJECT
 
 public:
-    explicit CWE_WithStatusButton(QString stageName, QWidget *parent = 0);
-    ~CWE_WithStatusButton();
+    explicit CWE_StageStatusTab(QString stageName, QWidget *parent = 0);
+    ~CWE_StageStatusTab();
     void setStatus(QString);
     void setText(QString);
     void setName(const QString s) {m_name = s;};
@@ -37,7 +37,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
-    Ui::CWE_WithStatusButton *ui;
+    Ui::CWE_StageStatusTab *ui;
     //void paintEvent(QPaintEvent*);
 
     QString internal_name;
@@ -49,4 +49,4 @@ private:
     bool m_active;
 };
 
-#endif // CWE_WITHSTATUSBUTTON_H
+#endif // CWE_STAGESTATUSTAB_H

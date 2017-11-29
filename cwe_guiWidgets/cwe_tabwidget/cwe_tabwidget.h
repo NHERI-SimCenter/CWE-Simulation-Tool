@@ -21,7 +21,9 @@
 
 #include "../cwe_defines.h"
 
-class CWE_WithStatusButton;
+class CWE_StageStatusTab;
+class CWE_GroupsWidget;
+enum class SimCenterViewState;
 enum class StageState;
 class VWTinterfaceDriver;
 
@@ -37,8 +39,12 @@ public:
     explicit CWE_TabWidget(QWidget *parent = 0);
     ~CWE_TabWidget();
     void setupDriver(VWTinterfaceDriver * theDriver);
+    void resetView();
 
-    int  addGroupTab(QString key, const QString &label, StageState currentState);
+    void setViewState(SimCenterViewState);
+    SimCenterViewState viewState();
+
+    void addStageTab(QString s, QJsonObject &obj);
 
     void setCurrentWidget(QWidget *);
     bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label , QString *setVal = NULL);
@@ -86,10 +92,12 @@ private:
     Ui::CWE_TabWidget *ui;
     int activeIndex;
     QWidget *displayWidget;
-    QMap<QString, CWE_WithStatusButton *> *groupWidget;
-    QMap<QString, QTabWidget *> *groupTabList;
-    QMap<QString, QMap<QString, QWidget *> *> *varTabWidgets;
-    QMap<QString, InputDataType *> *variableWidgets;
+
+    SimCenterViewState m_viewState;
+
+    QMap<QString, CWE_StageStatusTab *> *stageTabList;
+    QMap<QString, CWE_GroupsWidget *> *groupWidgetList;
+    // QMap<QString, QMap<QString, QWidget *> *> *varTabWidgets; // should live in CWE_GroupWidget instead
 };
 
 #endif // CWE_TABWIDGET_H
