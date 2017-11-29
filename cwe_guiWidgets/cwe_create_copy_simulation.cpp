@@ -7,20 +7,9 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
-#include "vwtinterfacedriver.h"
+#include "mainWindow/cwe_mainwindow.h"
 
-#include <QDir>
-#include <QString>
-#include <QStringList>
-#include <QDebug>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QPixmap>
-#include <QRadioButton>
-#include <QLabel>
-#include <QPushButton>
-#include <QIcon>
+#include "vwtinterfacedriver.h"
 
 CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
     CWE_Super(parent),
@@ -47,16 +36,6 @@ void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
         ui->secondary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
         ui->secondary_remoteFileTree->setupFileView();
     }
-}
-
-void CWE_Create_Copy_Simulation::on_lineEdit_newCaseName_editingFinished()
-{
-
-}
-
-void CWE_Create_Copy_Simulation::on_pBtn_cancel_clicked()
-{
-
 }
 
 void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
@@ -88,7 +67,7 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
     }
 
     myDriver->setCurrentCase(newCase);
-    emit needParamTab();
+    myDriver->getMainWindow()->switchToParameterTab();
 }
 
 void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
@@ -120,21 +99,12 @@ void CWE_Create_Copy_Simulation::populateCaseTypes()
         QJsonObject confObj = configuration->object();
         QString theName = confObj["name"].toString();
         QString theDescription = confObj["description"].toString();
-        QString theIcon = confObj["icon"].toString();
 
         /* create UI selection block */
         QRadioButton *radioBtn = new QRadioButton(theName, ui->scroll_NewCase);
         QPushButton *buttonIcon = new QPushButton(ui->scroll_NewCase);
 
-        QString theIconPath;
-        if (theIcon == "") {
-            theIconPath = ":/buttons/images/defaultCaseImage.png";
-        }
-        else {
-            theIconPath = ":/buttons/images/" + theIcon;
-        }
-        QIcon theBtnIcon = QIcon(theIconPath);
-        buttonIcon->setIcon(theBtnIcon);
+        buttonIcon->setIcon(*(caseType->getIcon()));
         buttonIcon->setIconSize(QSize(150,100));
         buttonIcon->setMinimumSize(150, 100);
         buttonIcon->setMaximumSize(150, 100);

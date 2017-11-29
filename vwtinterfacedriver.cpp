@@ -197,6 +197,11 @@ void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
     emit haveNewCase();
 }
 
+CWE_MainWindow * VWTinterfaceDriver::getMainWindow()
+{
+    return mainWindow;
+}
+
 void VWTinterfaceDriver::currentCaseInvalidated()
 {
     setCurrentCase(NULL);

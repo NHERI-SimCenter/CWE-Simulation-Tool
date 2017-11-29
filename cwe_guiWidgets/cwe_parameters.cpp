@@ -2,24 +2,13 @@
 #include "ui_cwe_parameters.h"
 #include "cwe_tabwidget/cwe_parametertab.h"
 
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QMap>
-#include <QDoubleSpinBox>
-#include <QSpinBox>
-#include <QCheckBox>
-#include <QComboBox>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QLineEdit>
-
 #include "qdebug.h"
 
 #include "vwtinterfacedriver.h"
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
+
+#include "mainWindow/cwe_mainwindow.h"
 
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
     CWE_Super(parent),
@@ -129,15 +118,15 @@ void CWE_Parameters::newCaseState(CaseState newState)
 
 void CWE_Parameters::switchToResultsSlot()
 {
-    emit switchToResultsTab();
+    myDriver->getMainWindow()->switchToResultsTab();
 }
 
 void CWE_Parameters::switchToParameterSlot()
 {
-    emit switchToParameterTab();
+    myDriver->getMainWindow()->switchToParameterTab();
 }
 
 void CWE_Parameters::switchToCreateSlot()
 {
-    emit switchToCreateTab();
+    myDriver->getMainWindow()->switchToCreateTab();
 }

@@ -53,7 +53,6 @@ public:
 
 private slots:
     void on_commandLinkButton_2_clicked();
-
     void on_commandLinkButton_clicked();
 
 private:

@@ -41,6 +41,7 @@
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QStringList>
+#include <QIcon>
 
 #include <QFile>
 
@@ -54,11 +55,16 @@ public:
     QString getName();
 
     QStringList getStageNames();
+    QString translateStageId(QString stageId);
+
+    QIcon * getIcon();
 
     bool isDebugOnly();
 
 private:
     QString myName;
+    QIcon myIcon;
+
     QJsonDocument myConfiguration;
 
 };
