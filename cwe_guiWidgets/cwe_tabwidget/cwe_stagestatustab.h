@@ -4,6 +4,8 @@
 #include <QFrame>
 //#include <QAbstractButton>
 
+class CWE_GroupsWidget;
+
 namespace Ui {
 class CWE_StageStatusTab;
 }
@@ -15,6 +17,8 @@ class CWE_StageStatusTab : public QFrame
 public:
     explicit CWE_StageStatusTab(QString stageName, QWidget *parent = 0);
     ~CWE_StageStatusTab();
+    void setCorrespondingPanel(CWE_GroupsWidget * newPanel);
+
     void setStatus(QString);
     void setText(QString);
     void setName(const QString s) {m_name = s;};
@@ -39,6 +43,8 @@ protected:
 private:
     Ui::CWE_StageStatusTab *ui;
     //void paintEvent(QPaintEvent*);
+
+    CWE_GroupsWidget * myPanel = NULL;
 
     QString internal_name;
 

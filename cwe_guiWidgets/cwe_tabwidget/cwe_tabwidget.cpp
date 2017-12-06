@@ -25,11 +25,10 @@ CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    groupWidgetList = new QMap<QString, CWE_GroupsWidget *>();
-    stageTabList    = new QMap<QString, CWE_StageStatusTab *>();
+    //groupWidgetList = new QMap<QString, CWE_GroupsWidget *>();
+    //stageTabList    = new QMap<QString, CWE_StageStatusTab *>();
 
     this->setButtonMode(CWE_BTN_NONE);
-
     this->setViewState(SimCenterViewState::visible);
 }
 
@@ -42,23 +41,6 @@ void CWE_TabWidget::setController(CWE_Parameters * newController)
 {
     myController = newController;
 }
-
-QWidget *CWE_TabWidget::currentWidget()
-{
-    return ui->stackedWidget->currentWidget();
-}
-
-void CWE_TabWidget::setCurrentWidget(QWidget *w)
-{
-    ui->stackedWidget->setCurrentWidget(w);
-}
-
-QWidget *CWE_TabWidget::widget(int idx)
-{
-    return ui->stackedWidget->widget(idx);
-}
-
-
 
 void CWE_TabWidget::setViewState(SimCenterViewState state)
 {
@@ -83,18 +65,7 @@ SimCenterViewState CWE_TabWidget::viewState()
 
 void CWE_TabWidget::resetView()
 {
-    // delete all stage tabs and everything within
-    for (auto stageItr = stageTabList->begin(); stageItr != stageTabList->end();)
-    {
-        delete stageItr.value();                    // delete the CWE_GroupTab for the stage
-        stageItr = stageTabList->erase(stageItr);   // erase the stage from the map
-    }
-    // delete all groupsWidgets and everything within
-    for (auto groupItr = groupWidgetList->begin(); groupItr != groupWidgetList->end();)
-    {
-        delete groupItr.value();                    // delete the CWE_GroupTab for the stage
-        groupItr = groupWidgetList->erase(groupItr);   // erase the stage from the map
-    }
+    //TODO: clear underlying widgets
 }
 int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
 {
@@ -321,40 +292,14 @@ void CWE_TabWidget::addType(const QString &varName, const QString &type, QJsonOb
 
 void CWE_TabWidget::addVSpacer(const QString &key, const QString &label)
 {
+    /*
     QWidget *parent = varTabWidgets->value(key)->value(label);
     if (parent != NULL)
     {
         QGridLayout *layout = (QGridLayout*)(parent->layout());
         layout->addItem(new QSpacerItem(10, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), layout->rowCount(), 2);
     }
-}
-
-void CWE_TabWidget::setIndex(int idx)
-{
-    // set active tab to idx
-    ui->stackedWidget->setCurrentIndex(idx);
-    activeIndex   = ui->stackedWidget->currentIndex();
-    displayWidget = ui->stackedWidget->currentWidget();
-
-    // set stylesheet for buttons
-    foreach (const QString &key, groupWidget->keys())
-    {
-        CWE_StageStatusTab *btn = groupWidget->value(key);
-        //qDebug() << idx << "<>" << btn->index();
-
-        if (btn->index() == idx)
-            { btn->setActive(); }
-        else
-            { btn->setInActive(); }
-    }
-}
-
-void CWE_TabWidget::setWidget(QWidget *w)
-{
-    // set active tab to idx
-    ui->stackedWidget->setCurrentWidget(w);
-    activeIndex   = ui->stackedWidget->currentIndex();
-    displayWidget = ui->stackedWidget->currentWidget();
+    */
 }
 
 void CWE_TabWidget::on_pbtn_run_clicked()
@@ -373,6 +318,7 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
     QMap<QString, QString> currentParameters;
 
     // collect all parameter values
+    /*
     foreach (const InputDataType *itm, variableWidgets->values())
     {
         // store information for reset operations, data collection, and validation
@@ -405,6 +351,7 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
         // add to output
         currentParameters.insert(varName, val);
     }
+    */
 
     return currentParameters;
 }
@@ -422,17 +369,6 @@ void CWE_TabWidget::on_pbtn_results_clicked()
 void CWE_TabWidget::on_pbtn_rollback_clicked()
 {
     myController->performCaseCommand(currentSelectedStage, CaseCommand::ROLLBACK);
-}
-
-void CWE_TabWidget::on_groupTabSelected(int idx, QString selectedStage)
-{
-    currentSelectedStage = selectedStage;
-    this->setIndex(idx);
-
-    // check for status of tab #idx
-
-    // set button state accordingly
-    //this->setButtonMode(CWE_BTN_RUN);
 }
 
 QString CWE_TabWidget::getStateText(StageState theState)
@@ -465,18 +401,18 @@ void CWE_TabWidget::setButtonMode(uint mode)
 
     btnState = (mode & CWE_BTN_ROLLBACK)?true:false;
     ui->pbtn_rollback->setEnabled(btnState);
-
 }
 
 void CWE_TabWidget::addStageTab(QString key, QJsonObject &obj)
 {
     /*
      * create a stage tab for a stage identified by key
-     *
-     * the stage tab will add a pointer to itself to the m_stageTabs QMap
-     */
+    */
 
-    CWE_StageTab *newTab = new CWE_StageTab();
-
-    m_stageTabs->insert(key, newTab);
+    CWE_GroupsWidget *newPanel = new CWE_GroupsWidget(ui->stagePanels);
+    CWE_StageStatusTab *newTab = new CWE_StageStatusTab(key, this);
+    newPanel->setCorrespondingTab(newTab);
+    newTab->setCorrespondingPanel(newPanel);
+    ui->tabsBar->layout()->addWidget(newTab);
+    ui->stagePanels->addWidget(newPanel);
 }
