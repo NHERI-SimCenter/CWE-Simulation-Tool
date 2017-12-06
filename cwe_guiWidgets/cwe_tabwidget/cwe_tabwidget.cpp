@@ -77,31 +77,6 @@ int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varL
     return index;
 }
 
-void CWE_TabWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
-{
-    //QTabWidget *groupTab = groupTabList->value(key);
-    //QWidget    *varTab   = varTabWidgets->value(key)->value(label);
-
-    foreach (const QJsonValue &item, *varList)
-    {
-        QString varKey = item.toString();
-        QJsonObject variableObject = (*varsInfo)[varKey].toObject();
-        QString setVal;
-
-        if (setVars->contains(varKey))
-        {
-            setVal = setVars->value(varKey);
-            this->addVariable(varKey, variableObject, key, label, &setVal);
-        }
-        else
-        {
-            this->addVariable(varKey, variableObject, key, label, NULL);
-        }
-    }
-    this->addVSpacer(key, label);
-}
-
-
 void CWE_TabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
 {
 
@@ -289,7 +264,6 @@ void CWE_TabWidget::addType(const QString &varName, const QString &type, QJsonOb
 
 */
 
-
 void CWE_TabWidget::addVSpacer(const QString &key, const QString &label)
 {
     /*
@@ -317,39 +291,18 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
     QString val;
     QMap<QString, QString> currentParameters;
 
-    // collect all parameter values
     /*
-    foreach (const InputDataType *itm, variableWidgets->values())
+    // collect parameter values from all groupWidgets in groupWidgetList
+    foreach (const CWE_GroupsWidget *itm, groupWidgetList->values())
     {
-        // store information for reset operations, data collection, and validation
-        QString varName  = itm->name;
-        QString type     = itm->type;
-        QString defValue = itm->defValue;
-        QWidget *widget  = itm->widget;
-
-        if (type == "std")         {
-            val = tr("%1").arg(((QDoubleSpinBox *)widget)->value(), 0, 'g', 16);
-        }
-        else if (type == "bool")   {
-            val = (((QCheckBox *)widget)->checkState() == Qt::Checked)?"true":"false" ;
-        }
-        else if (type == "file")   {
-            val = ((QLineEdit *)widget)->text() ;
-        }
-        else if (type == "choose") {
-            QString txt = ((QComboBox *)widget)->currentText() ;
-            QJsonObject *options = itm->options;
-            val = txt;
-            foreach (QString key, options->keys()) {
-                if (options->value(key) == txt) { val = key; }
-            }
-        }
-        else {
-            val = "";
-        }
+        QMap<QString, QString> groupParams = itm->collectParamData();
 
         // add to output
-        currentParameters.insert(varName, val);
+        foreach (QString varName, groupParams.keys())
+        {
+            val = groupParams.value(varName);
+            currentParameters.insert(varName, val);
+        }
     }
     */
 
