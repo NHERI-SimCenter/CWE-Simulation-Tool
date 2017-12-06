@@ -9,8 +9,7 @@
 #include "SimCenter_widgets/sctrstates.h"
 #include <QJsonObject>
 
-CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) :
-    QTabWidget(parent)
+CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) : QTabWidget(parent)
 {
     this->setViewState(SimCenterViewState::visible);
 }
@@ -89,3 +88,59 @@ int CWE_GroupsWidget::addGroupTab(QString key, const QString &label, StageState 
 
     return index;
 }
+
+int CWE_GroupsWidget::addVarTab(QString key, const QString &label)
+{
+    // create the widget to hold the parameter input
+
+    CWE_ParameterTab *itm = new CWE_ParameterTab(this);
+    itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    itm->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::MinimumExpanding);
+
+    QGridLayout *lyt = new QGridLayout();
+    itm->setLayout(lyt);
+
+    //varTabWidgets->value(key)->insert(label, itm);
+
+    QTabWidget * qf = groupTabList->value(key);
+    int index = qf->addTab(itm, label);
+
+    return index;
+}
+
+void CWE_GroupsWidget::addVSpacer(const QString &key, const QString &label)
+{
+    QWidget *parent = varTabWidgets->value(key)->value(label);
+    if (parent != NULL)
+    {
+        QGridLayout *layout = (QGridLayout*)(parent->layout());
+        layout->addItem(new QSpacerItem(10, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), layout->rowCount(), 2);
+    }
+}
+
+void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
+{
+    //QTabWidget *groupTab = groupTabList->value(key);
+    //QWidget    *varTab   = varTabWidgets->value(key)->value(label);
+
+    foreach (const QJsonValue &item, *varList)
+    {
+        QString varKey = item.toString();
+        QJsonObject variableObject = (*varsInfo)[varKey].toObject();
+        QString setVal;
+
+        if (setVars->contains(varKey))
+        {
+            setVal = setVars->value(varKey);
+            this->addVariable(varKey, variableObject, key, label, &setVal);
+        }
+        else
+        {
+            this->addVariable(varKey, variableObject, key, label, NULL);
+        }
+    }
+    this->addVSpacer(key, label);
+}
+
+

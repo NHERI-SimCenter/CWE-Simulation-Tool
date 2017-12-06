@@ -19,6 +19,9 @@ public:
     void setData(QJsonObject &obj);         // set the group definitions as a JSon file
     void setViewState(SimCenterViewState);  // set the view state
     int  addGroupTab(QString key, const QString &label, StageState currentState);
+    void addVSpacer(const QString &key, const QString &label);
+    void addVarsToTab(QString key, const QString &label, QJsonArray *, QJsonObject *, QMap<QString,QString> * );
+
 
 protected:
     CWE_ParamTab *getGroupTab();  // returns pointer to group tab widget
