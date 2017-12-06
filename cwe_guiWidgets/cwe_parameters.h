@@ -24,6 +24,8 @@ class CWE_StageTab;
 
 enum class CaseState;
 
+enum class CaseCommand { ROLLBACK, RUN, CANCEL };
+
 namespace Ui {
 class CWE_Parameters;
 }
@@ -40,15 +42,14 @@ public:
     void resetViewInfo();
     void initStateTabs();
 
+    void switchToResults();
+    void performCaseCommand(QString stage, CaseCommand toEnact);
+
 private slots:
     void on_pbtn_saveAllParameters_clicked();
 
     void newCaseGiven();
     void newCaseState(CaseState newState);
-
-    void switchToResultsSlot();
-    void switchToParameterSlot();
-    void switchToCreateSlot();
 
 private:
     void saveAllParams();

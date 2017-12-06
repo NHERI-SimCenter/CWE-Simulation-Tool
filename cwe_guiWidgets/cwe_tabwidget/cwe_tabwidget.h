@@ -23,6 +23,7 @@
 
 class CWE_StageStatusTab;
 class CWE_GroupsWidget;
+class CWE_Parameters;
 enum class SimCenterViewState;
 enum class StageState;
 class VWTinterfaceDriver;
@@ -38,7 +39,7 @@ class CWE_TabWidget : public QWidget
 public:
     explicit CWE_TabWidget(QWidget *parent = 0);
     ~CWE_TabWidget();
-    void setupDriver(VWTinterfaceDriver * theDriver);
+    void setController(CWE_Parameters * newController);
     void resetView();
 
     void setViewState(SimCenterViewState);
@@ -72,21 +73,13 @@ private slots:
     void on_pbtn_rollback_clicked();
     void on_groupTabSelected(int, QString selectedStage);
 
-signals:
-    void switchToResultsTab();
-    void switchToFileTab();
-    void switchToCreateTab();
-    void switchToParameterTab();
-    void switchToHelpTab();
-
 protected:
     void setButtonMode(uint mode);
 
 private:
     static QString getStateText(StageState theState);
 
-    //TODO: This is a mess. Need to seriously reconsider interaction between UI state and UI elements.
-    VWTinterfaceDriver * myDriver;
+    CWE_Parameters * myController = NULL;
     QString currentSelectedStage;
 
     Ui::CWE_TabWidget *ui;
