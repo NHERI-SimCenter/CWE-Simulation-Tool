@@ -74,3 +74,4 @@ bool CWE_ParamPanel::addVariable(QString varName, QJsonObject JSONvar, const QSt
         else { return false; }
     }
 }
+
