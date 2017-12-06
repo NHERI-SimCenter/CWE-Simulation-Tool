@@ -6,7 +6,6 @@
 #include <QJsonObject>
 #include <SimCenter_widgets/sctrstates.h>
 
-class CWE_StageTab;
 class SCtr_MasterDataWidget;
 
 namespace Ui {
@@ -20,6 +19,7 @@ class CWE_ParamPanel : public QScrollArea
 public:
     explicit CWE_ParamPanel(QWidget *parent = 0);
     ~CWE_ParamPanel();
+
     QWidget * getParameterSpace();
     void setViewState(SimCenterViewState);
     SimCenterViewState getViewState();
