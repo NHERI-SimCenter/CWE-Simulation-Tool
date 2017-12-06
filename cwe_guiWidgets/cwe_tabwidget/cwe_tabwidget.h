@@ -59,7 +59,7 @@ public:
     int addVarTab(QString key, const QString &label);
     int addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString, QString> *setVars);
     void addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> *setVars);
-    void addVSpacer(const QString &key, const QString &label);
+
 
     void addVarsData(QJsonObject , QJsonObject );
 
