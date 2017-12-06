@@ -7,10 +7,13 @@
 
 #include "cwe_tabwidget.h"
 #include "ui_cwe_tabwidget.h"
+
 #include "cwe_parampanel.h"
 #include "cwe_stagestatustab.h"
 #include "cwe_groupswidget.h"
 #include "CFDanalysis/CFDcaseInstance.h"
+
+#include "cwe_guiWidgets/cwe_parameters.h"
 
 #include "qdebug.h"
 
@@ -24,11 +27,8 @@ CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
 
     groupWidgetList = new QMap<QString, CWE_GroupsWidget *>();
     stageTabList    = new QMap<QString, CWE_StageStatusTab *>();
-    //varTabWidgets   = new QMap<QString, QMap<QString, QWidget *> *>();
-    //variableWidgets = new QMap<QString, InputDataType *>();
 
-    this->setButtonMode(CWE_BTN_ALL);
-    //this->setButtonMode(CWE_BTN_NONE);
+    this->setButtonMode(CWE_BTN_NONE);
 
     this->setViewState(SimCenterViewState::visible);
 }
@@ -38,9 +38,9 @@ CWE_TabWidget::~CWE_TabWidget()
     delete ui;
 }
 
-void CWE_TabWidget::setupDriver(VWTinterfaceDriver * theDriver)
+void CWE_TabWidget::setController(CWE_Parameters * newController)
 {
-    myDriver = theDriver;
+    myController = newController;
 }
 
 QWidget *CWE_TabWidget::currentWidget()
@@ -359,10 +359,7 @@ void CWE_TabWidget::setWidget(QWidget *w)
 
 void CWE_TabWidget::on_pbtn_run_clicked()
 {
-    myDriver->getCurrentCase()->startStageApp(currentSelectedStage);
-
-    // enable the cancel button
-    //this->setButtonMode(CWE_BTN_CANCEL);
+    myController->performCaseCommand(currentSelectedStage, CaseCommand::RUN);
 }
 
 QMap<QString, QString> CWE_TabWidget::collectParamData()
@@ -414,27 +411,17 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
 
 void CWE_TabWidget::on_pbtn_cancel_clicked()
 {
-    // initiate job cancellation
-
-    // enable the run button
-    this->setButtonMode(CWE_BTN_RUN);
+    myController->performCaseCommand(currentSelectedStage, CaseCommand::CANCEL);
 }
 
 void CWE_TabWidget::on_pbtn_results_clicked()
 {
-    // set run and rollback button active
-    this->setButtonMode(CWE_BTN_RESULTS|CWE_BTN_ROLLBACK);
-
-    // switch to the results tab
-    emit switchToResultsTab();
+    myController->switchToResults();
 }
 
 void CWE_TabWidget::on_pbtn_rollback_clicked()
 {
-    myDriver->getCurrentCase()->rollBack(currentSelectedStage);
-
-    // set run button active
-    //TODO: ???? Remove? this->setButtonMode(CWE_BTN_RUN);
+    myController->performCaseCommand(currentSelectedStage, CaseCommand::ROLLBACK);
 }
 
 void CWE_TabWidget::on_groupTabSelected(int idx, QString selectedStage)
