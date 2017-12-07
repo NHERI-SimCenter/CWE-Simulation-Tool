@@ -93,6 +93,7 @@ int CWE_GroupsWidget::addVarTab(QString key, const QString &label)
 {
     // create the widget to hold the parameter input
 
+    /*
     CWE_ParameterTab *itm = new CWE_ParameterTab(this);
     itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -107,16 +108,20 @@ int CWE_GroupsWidget::addVarTab(QString key, const QString &label)
     int index = qf->addTab(itm, label);
 
     return index;
+    */
+    return -1;
 }
 
 void CWE_GroupsWidget::addVSpacer(const QString &key, const QString &label)
 {
+    /*
     QWidget *parent = varTabWidgets->value(key)->value(label);
     if (parent != NULL)
     {
         QGridLayout *layout = (QGridLayout*)(parent->layout());
         layout->addItem(new QSpacerItem(10, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), layout->rowCount(), 2);
     }
+    */
 }
 
 void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
@@ -124,6 +129,7 @@ void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArra
     //QTabWidget *groupTab = groupTabList->value(key);
     //QWidget    *varTab   = varTabWidgets->value(key)->value(label);
 
+    /*
     foreach (const QJsonValue &item, *varList)
     {
         QString varKey = item.toString();
@@ -141,6 +147,7 @@ void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArra
         }
     }
     this->addVSpacer(key, label);
+    */
 }
 
 

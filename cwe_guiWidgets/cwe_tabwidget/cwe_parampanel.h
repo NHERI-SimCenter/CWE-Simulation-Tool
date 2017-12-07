@@ -12,7 +12,7 @@ namespace Ui {
 class CWE_ParamPanel;
 }
 
-class CWE_ParamPanel : public QScrollArea
+class CWE_ParamPanel : public QFrame
 {
     Q_OBJECT
 
@@ -20,15 +20,12 @@ public:
     explicit CWE_ParamPanel(QWidget *parent = 0);
     ~CWE_ParamPanel();
 
-    QWidget * getParameterSpace();
     void setViewState(SimCenterViewState);
     SimCenterViewState getViewState();
     void setData(QJsonObject &);
     bool addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString * setVal);
 
 private:
-    Ui::CWE_ParamPanel *ui;
-
     SimCenterViewState m_viewState;
     QJsonObject m_obj;
     QMap<QString, SCtr_MasterDataWidget *> *variableWidgets;
