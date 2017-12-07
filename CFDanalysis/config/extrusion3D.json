@@ -3,6 +3,7 @@
     "internalName":"extrusion3D",
     "description":"This model describes \nthe air flow around an arbitrary\n 3D cylinder extruded from a polygon.",
     "icon":"placeholderIcon.png",
+    "debugOnly":true,
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{

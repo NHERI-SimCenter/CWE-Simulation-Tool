@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>739</width>
+    <width>824</width>
     <height>435</height>
    </rect>
   </property>
@@ -93,7 +93,7 @@
     </widget>
    </item>
    <item>
-    <widget class="PandPTabWidget" name="theTabWidget" native="true">
+    <widget class="CWE_TabWidget" name="theTabWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -113,9 +113,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PandPTabWidget</class>
+   <class>CWE_TabWidget</class>
    <extends>QWidget</extends>
-   <header>cwe_guiWidgets/pandptabwidget.h</header>
+   <header>cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

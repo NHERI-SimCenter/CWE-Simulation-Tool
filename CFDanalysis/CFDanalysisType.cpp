@@ -45,6 +45,18 @@ CFDanalysisType::CFDanalysisType(QString configFile)
 
     QJsonObject obj    = myConfiguration.object();
     myName = obj["name"].toString();
+    QString theIcon = obj["icon"].toString();
+
+    QString theIconPath;
+    if (theIcon == "")
+    {
+        theIconPath = ":/buttons/images/defaultCaseImage.png";
+    }
+    else
+    {
+        theIconPath = ":/buttons/images/" + theIcon;
+    }
+    myIcon = QIcon(theIconPath);
 }
 
 QJsonDocument * CFDanalysisType::getRawConfig()
@@ -70,6 +82,42 @@ QStringList CFDanalysisType::getStageNames()
     QJsonObject stageList = obj["stages"].toObject();
 
     return stageList.keys();
+}
+
+QString CFDanalysisType::translateStageId(QString stageId)
+{
+    QJsonObject obj = myConfiguration.object();
+    QJsonObject stageList = obj["stages"].toObject();
+
+    QString aStage = stageList[stageId].toObject()["name"].toString();
+    if (aStage.isEmpty())
+    {
+        return "NULL";
+    }
+    return aStage;
+}
+
+QIcon * CFDanalysisType::getIcon()
+{
+    return &myIcon;
+}
+
+bool CFDanalysisType::isDebugOnly()
+{
+    QJsonObject obj = myConfiguration.object();
+    if (!obj.contains("debugOnly"))
+    {
+        return false;
+    }
+    if (!obj["debugOnly"].isBool())
+    {
+        return false;
+    }
+    if (obj["debugOnly"].toBool() == true)
+    {
+        return true;
+    }
+    return false;
 }
 
 
