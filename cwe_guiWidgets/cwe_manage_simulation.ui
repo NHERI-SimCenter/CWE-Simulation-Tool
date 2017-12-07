@@ -51,6 +51,9 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="4" column="1">
     <widget class="QPushButton" name="pb_viewResults">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>View Results</string>
      </property>
@@ -58,6 +61,9 @@
    </item>
    <item row="4" column="0">
     <widget class="QPushButton" name="pb_viewParameters">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>View Parameters / Details</string>
      </property>
@@ -140,9 +146,6 @@
         </property>
        </spacer>
       </item>
-      <item row="3" column="1" rowspan="2">
-       <widget class="QTableView" name="stageListView"/>
-      </item>
       <item row="0" column="0" colspan="2">
        <widget class="QFrame" name="frame">
         <property name="minimumSize">
@@ -216,6 +219,13 @@
         </layout>
        </widget>
       </item>
+      <item row="3" column="1" rowspan="2">
+       <widget class="QListView" name="stageListView">
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -237,24 +247,7 @@
  <resources>
   <include location="../cwe_resources.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>pb_viewParameters</sender>
-   <signal>clicked()</signal>
-   <receiver>CWE_manage_simulation</receiver>
-   <slot>on_pb_viewParameters_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>142</x>
-     <y>412</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>279</x>
-     <y>217</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>on_pb_viewParameters_clicked()</slot>
  </slots>

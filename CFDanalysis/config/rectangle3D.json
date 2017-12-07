@@ -3,6 +3,7 @@
     "internalName":"rectangle3D",
     "description":"This model describes \nthe air flow around a rectangular\n prisim using 3D simulation.",
     "icon":"placeholderIcon.png",
+    "debugOnly":true,
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{

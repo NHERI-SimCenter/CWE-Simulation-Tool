@@ -3,6 +3,7 @@
     "internalName":"triangle3D",
     "description":"This model describes \nthe air flow around a triangle\n cylinder in 3D.",
     "icon":"placeholderIcon.png",
+    "debugOnly":true,
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{

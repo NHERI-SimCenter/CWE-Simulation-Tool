@@ -1,19 +1,6 @@
 #include "cwe_parameters.h"
 #include "ui_cwe_parameters.h"
-#include "cwe_parametertab.h"
-
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QMap>
-#include <QDoubleSpinBox>
-#include <QSpinBox>
-#include <QCheckBox>
-#include <QComboBox>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QLineEdit>
+#include "cwe_tabwidget/cwe_parampanel.h"
 
 #include "qdebug.h"
 
@@ -21,59 +8,69 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "mainWindow/cwe_mainwindow.h"
+
+#include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
+
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
-    QWidget(parent),
+    CWE_Super(parent),
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
-
-    QObject::connect(ui->theTabWidget, SIGNAL(switchToParameterTab()), this, SLOT(switchToParameterSlot()));
-    QObject::connect(ui->theTabWidget, SIGNAL(switchToCreateTab()),    this, SLOT(switchToCreateSlot())   );
-    QObject::connect(ui->theTabWidget, SIGNAL(switchToResultsTab()),   this, SLOT(switchToResultsSlot())  );
-
-    }
+    ui->theTabWidget->setController(this);
+}
 
 CWE_Parameters::~CWE_Parameters()
 {
     delete ui;
 }
 
-void CWE_Parameters::linkWithDriver(VWTinterfaceDriver * newDriver)
+void CWE_Parameters::linkDriver(VWTinterfaceDriver * newDriver)
 {
-    myDriver = newDriver;
+    CWE_Super::linkDriver(newDriver);
     QObject::connect(myDriver, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
-    ui->theTabWidget->setupDriver(myDriver);
 }
 
-void CWE_Parameters::resetViewInfo()
+void CWE_Parameters::initStateTabs()
 {
-    viewIsValid = false;
     CFDcaseInstance * currentCase = myDriver->getCurrentCase();
     if (currentCase == NULL) return;
     CFDanalysisType * theTemplate = currentCase->getMyType();
     if (theTemplate == NULL) return;
     QMap<QString, StageState> currentStates = currentCase->getStageStates();
 
-    viewIsValid = true;
-
     ui->label_theName->setText(currentCase->getCaseName());
     ui->label_theType->setText(theTemplate->getName());
     ui->label_theLocation->setText(currentCase->getCaseFolder());
 
+
+    // get the current configuration file
     QJsonObject   obj    = theTemplate->getRawConfig()->object();
 
+    // read stage list for the current problem
     QJsonObject    stages     = obj["stages"].toObject();
     QList<QString> stageNames = stages.keys();
-    QJsonObject    varGroups  = obj["varGroups"].toObject();
-    QJsonObject    vars       = obj["vars"].toObject();
 
-    QMap<QString,QString> setVars = currentCase->getCurrentParams();
+    // create stage tabs
+    foreach (QString name, stageNames)
+    {
+        // create the stage tab
+        /* not sure about that yet ... */
 
-    //QJsonArray    results    = obj["results"].toArray();
+        //m_stageTabs[name] = new CWE_StageTab(parent=this);
 
-    //qDebug() << stageNames;
+        QJsonObject stageInfo = stages[name].toObject();
+        QString labelText;
 
+        labelText = stageInfo["name"].toString();
+        labelText = labelText.append("\nParameters");
+
+        ///ui->theTabWidget-> ... m_stageTabs[name]->setData(currentStates[name]);
+
+    }
+
+#if 0
     int cnt = 0;
 
     foreach (QString name, stageNames)
@@ -86,7 +83,7 @@ void CWE_Parameters::resetViewInfo()
 
         // add a stage tab to ui->theTabWidget
         int idx = ui->theTabWidget->addGroupTab(name, labelText, currentStates[name]);
-        parameterTabs.insert(name, idx);
+        stageTabsIndex.insert(name, idx);
 
         // add varGroub tabs
         QJsonArray theGroups = stageInfo["groups"].toArray();
@@ -101,6 +98,22 @@ void CWE_Parameters::resetViewInfo()
     }
 
     if (cnt>0) {ui->theTabWidget->setIndex(0);}
+    // ----
+#endif
+
+    viewIsValid = true;
+
+    //??? ui->theTabWidget->
+}
+
+void CWE_Parameters::resetViewInfo()
+{
+    viewIsValid = false;
+
+    // erase all stage tabs
+    ui->theTabWidget->resetView();
+
+    this->initStateTabs();
 }
 
 void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
@@ -127,17 +140,13 @@ void CWE_Parameters::newCaseState(CaseState newState)
     //TODO: implement functions for changes in current params or stage states
 }
 
-void CWE_Parameters::switchToResultsSlot()
+void CWE_Parameters::switchToResults()
 {
-    emit switchToResultsTab();
+    myDriver->getMainWindow()->switchToResultsTab();
 }
 
-void CWE_Parameters::switchToParameterSlot()
+void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
 {
-    emit switchToParameterTab();
-}
-
-void CWE_Parameters::switchToCreateSlot()
-{
-    emit switchToCreateTab();
+    //TODO: link commands with active case
+    //TODO: Check that commands are valid
 }
