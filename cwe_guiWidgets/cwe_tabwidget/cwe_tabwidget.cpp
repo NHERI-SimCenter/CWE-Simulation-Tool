@@ -20,7 +20,7 @@
 #include "../CFDClientProgram/vwtinterfacedriver.h"
 
 CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
-    QWidget(parent),
+    QFrame(parent),
     ui(new Ui::CWE_TabWidget)
 {
     ui->setupUi(this);
@@ -69,12 +69,15 @@ void CWE_TabWidget::resetView()
 }
 int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
 {
+    /*
     int index = addVarTab(key, label);
     if (index >= 0)
     {
         addVarsToTab(key, label, varList, varsInfo, setVars);
     }
     return index;
+    */
+    return -1;
 }
 
 void CWE_TabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
@@ -263,18 +266,6 @@ void CWE_TabWidget::addType(const QString &varName, const QString &type, QJsonOb
 }
 
 */
-
-void CWE_TabWidget::addVSpacer(const QString &key, const QString &label)
-{
-    /*
-    QWidget *parent = varTabWidgets->value(key)->value(label);
-    if (parent != NULL)
-    {
-        QGridLayout *layout = (QGridLayout*)(parent->layout());
-        layout->addItem(new QSpacerItem(10, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), layout->rowCount(), 2);
-    }
-    */
-}
 
 void CWE_TabWidget::on_pbtn_run_clicked()
 {

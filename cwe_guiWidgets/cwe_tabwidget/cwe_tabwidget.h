@@ -31,7 +31,7 @@ namespace Ui {
 class CWE_TabWidget;
 }
 
-class CWE_TabWidget : public QWidget
+class CWE_TabWidget : public QFrame
 {
     Q_OBJECT
 

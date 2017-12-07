@@ -145,7 +145,7 @@ void CWE_Parameters::switchToResults()
     myDriver->getMainWindow()->switchToResultsTab();
 }
 
-void performCaseCommand(QString stage, CaseCommand toEnact)
+void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
 {
     //TODO: link commands with active case
     //TODO: Check that commands are valid
