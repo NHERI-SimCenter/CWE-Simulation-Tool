@@ -37,13 +37,13 @@
 #include "ui_cwe_landing.h"
 
 #include "cwe_defines.h"
-#include <QTime>
 
 #include "../AgaveExplorer/remoteFileOps/remotejoblister.h"
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
+#include "vwtinterfacedriver.h"
 
 CWE_landing::CWE_landing(QWidget *parent) :
-    QWidget(parent),
+    CWE_Super(parent),
     ui(new Ui::CWE_landing)
 {
     ui->setupUi(this);
@@ -74,9 +74,13 @@ CWE_landing::~CWE_landing()
     delete ui;
 }
 
-void CWE_landing::linkJobHandle(JobOperator * theOperator)
+void CWE_landing::linkDriver(VWTinterfaceDriver * theDriver)
 {
-    ui->tableView_jobs->setJobHandle(theOperator);
+    CWE_Super::linkDriver(theDriver);
+    if (!theDriver->inOfflineMode())
+    {
+        ui->tableView_jobs->setJobHandle(theDriver->getJobHandler());
+    }
 }
 
 void CWE_landing::addDataRow(QString name, uint state, QString time, QString id, QString app)
@@ -113,3 +117,4 @@ void CWE_landing::addDummyDataRow(void)
     /* set some dummy contents */
     this->addDataRow("some URL", CWE_STATE_CLEAR, QTime::currentTime().toString(), "007", "SimCenter super app");
 }
+

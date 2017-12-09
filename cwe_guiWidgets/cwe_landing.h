@@ -38,6 +38,9 @@
 #include <QWidget>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QTime>
+
+#include "cwe_super.h"
 
 class JobOperator;
 
@@ -45,7 +48,7 @@ namespace Ui {
 class CWE_landing;
 }
 
-class CWE_landing : public QWidget
+class CWE_landing : public CWE_Super
 {
     Q_OBJECT
 
@@ -55,7 +58,9 @@ public:
     void addDataRow(QString, uint, QString, QString, QString);
     void addDummyDataRow(void);
 
-    void linkJobHandle(JobOperator * theOperator);
+    virtual void linkDriver(VWTinterfaceDriver * theDriver);
+
+private slots:
 
 private:
     Ui::CWE_landing    *ui;

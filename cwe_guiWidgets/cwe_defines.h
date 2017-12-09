@@ -38,26 +38,6 @@
 #include <QString>
 #include <QWidget>
 
-/* define an enum for all tasks/widgets stacked on the right side of cwe_mainwindow */
-/* note: TASK_MAX_TASKS must always be the last entry.                              *
- *       It will be used for dimensioning a storage array                           */
-typedef enum {
-    TASK_LANDING,
-    TASK_CREATE_NEW_SIMULATION,
-    TASK_MANAGE_SIMULATION,
-    TASK_MANAGE_FILES,
-    TASK_MANAGE_JOBS,
-    TASK_LIST_TASKS,
-    TASK_HELP,
-    TASK_SIMULATION_DETAILS,
-    TASK_MAX_TASKS
-} TASK;
-
-typedef enum {
-    SIM_MODE_2D,
-    SIM_MODE_3D
-} SIM_MODE;
-
 /* define binary mode flags for all pages of the GUI  */
 /* setting mode = CWE_LANDING_TAB|CWE_RESULTS_TAB|... */
 /* testing if (mode & CWE_LANDING_TAB) { ... }        */
@@ -79,6 +59,15 @@ typedef enum {
 #define CWE_STATE_RUNNING    0x00020000
 #define CWE_STATE_RESULTS    0x00040000
 #define CWE_STATE_CLEAR      0x00080000
+
+/* define active buttons */
+#define CWE_BTN_RUN          0x01000000
+#define CWE_BTN_CANCEL       0x02000000
+#define CWE_BTN_RESULTS      0x04000000
+#define CWE_BTN_ROLLBACK     0x08000000
+#define CWE_BTN_SAVE_ALL     0x10000000
+#define CWE_BTN_ALL          0xff000000
+#define CWE_BTN_NONE         0x00000000
 
 struct InputDataType {
     QString      name;

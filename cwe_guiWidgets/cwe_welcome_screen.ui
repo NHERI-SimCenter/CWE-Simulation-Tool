@@ -70,7 +70,7 @@
    <item row="1" column="0" colspan="3">
     <widget class="QStackedWidget" name="WelcomeStackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="welcome_page1">
       <layout class="QGridLayout" name="gridLayout_2">
@@ -83,8 +83,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>INFO PAGE 1
-This is some information for the inexperienced user on how to get started</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -120,6 +119,18 @@ This is some information for the inexperienced user on how to get started</strin
         <widget class="QLabel" name="text_label_4">
          <property name="text">
           <string>INFO PAGE 4
+This is some information for the inexperienced user on how to get started</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="welcome_page5">
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="0" column="0">
+        <widget class="QLabel" name="text_label_5">
+         <property name="text">
+          <string>INFO PAGE 5
 This is some information for the inexperienced user on how to get started</string>
          </property>
         </widget>

@@ -40,6 +40,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QStringList>
+#include <QIcon>
 
 #include <QFile>
 
@@ -49,11 +51,20 @@ public:
     CFDanalysisType(QString configFile);
 
     QJsonDocument * getRawConfig();
-    QString getBrandingFile();
     QString getInternalName();
+    QString getName();
+
+    QStringList getStageNames();
+    QString translateStageId(QString stageId);
+
+    QIcon * getIcon();
+
+    bool isDebugOnly();
 
 private:
     QString myName;
+    QIcon myIcon;
+
     QJsonDocument myConfiguration;
 
 };

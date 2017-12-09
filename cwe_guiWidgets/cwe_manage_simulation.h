@@ -36,13 +36,23 @@
 #define CWE_MANAGE_SIMULATION_H
 
 #include <QWidget>
+#include <QStandardItemModel>
+
 #include "cwe_defines.h"
+
+#include "cwe_super.h"
+
+class FileTreeNode;
+class VWTinterfaceDriver;
+class CFDcaseInstance;
+enum class CaseState;
+enum class StageState;
 
 namespace Ui {
 class CWE_manage_simulation;
 }
 
-class CWE_manage_simulation : public QWidget
+class CWE_manage_simulation : public CWE_Super
 {
     Q_OBJECT
 
@@ -50,14 +60,27 @@ public:
     explicit CWE_manage_simulation(QWidget *parent = 0);
     ~CWE_manage_simulation();
 
-signals:
-    void CWE_manage_simulation_signal(TASK);
+    virtual void linkDriver(VWTinterfaceDriver * theDriver);
 
 private slots:
-    void on_btn_viewRun_clicked();
+    void newFileSelected(FileTreeNode * newFile);
+
+    void on_pb_viewParameters_clicked();
+    void on_pb_viewResults_clicked();
+
+    void clearSelectView();
+    void showSelectView();
+    void provisionalCaseStateChange(CaseState newState);
 
 private:
+    bool verifyCaseAndSelect();
+    QString getStateText(StageState theState);
+
     Ui::CWE_manage_simulation *ui;
+
+    CFDcaseInstance * tempCase = NULL;
+
+    QStandardItemModel stageListModel;
 };
 
 #endif // CWE_MANAGE_SIMULATION_H

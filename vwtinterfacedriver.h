@@ -49,10 +49,22 @@
 #include <QTreeView>
 #include <QStackedWidget>
 #include <QWindow>
+#include <QDir>
+#include <QString>
+#include <QStringList>
+#include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QPixmap>
+#include <QRadioButton>
+#include <QLabel>
+#include <QIcon>
 #include <QThread>
 
 enum class VWTerrorType: unsigned int;
 enum class RequestState;
+enum class CaseState;
 
 class RemoteDataInterface;
 
@@ -63,13 +75,14 @@ class CWE_MainWindow;
 class JobOperator;
 class FileOperator;
 class CFDanalysisType;
+class CFDcaseInstance;
 
 class VWTinterfaceDriver : public AgaveSetupDriver
 {
     Q_OBJECT
 
 public:
-    explicit VWTinterfaceDriver(QObject *parent = nullptr);
+    explicit VWTinterfaceDriver(QObject *parent = nullptr, bool debug = false);
     virtual void startup();
     virtual void closeAuthScreen();
 
@@ -79,11 +92,28 @@ public:
     virtual QString getVersion();
 
     QList<CFDanalysisType *> * getTemplateList();
+    CFDcaseInstance * getCurrentCase();
+    void setCurrentCase(CFDcaseInstance * newCase);
+    CWE_MainWindow * getMainWindow();
+
+    void displayMessagePopup(QString infoText);
+
+    bool inOfflineMode();
+
+signals:
+    void haveNewCase();
+
+private slots:
+    void currentCaseInvalidated();
+    void checkAppList(RequestState replyState, QJsonArray * appList);
 
 private:
     CWE_MainWindow * mainWindow;
-
     QList<CFDanalysisType *> templateList;
+
+    CFDcaseInstance * currentCFDCase = NULL;
+
+    bool offlineMode = false;
 };
 
 #endif // VWTINTERFACEDRIVER_H

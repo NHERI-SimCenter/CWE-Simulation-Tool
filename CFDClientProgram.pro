@@ -33,7 +33,7 @@
 # Contributors:
 # Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-QT       += core gui network
+QT += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -50,109 +50,119 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += main.cpp \
+    mainWindow/cwe_mainwindow.cpp \
     vwtinterfacedriver.cpp \
+    visualUtils/cfdglcanvas.cpp \
+    visualUtils/cfdtoken.cpp \
+    visualUtils/decompresswrapper.cpp \
+    cwe_guiWidgets/cwe_super.cpp \
+    cwe_guiWidgets/cwe_file_manager.cpp \
+    cwe_guiWidgets/cwe_help.cpp \
+    cwe_guiWidgets/cwe_landing.cpp \
+    cwe_guiWidgets/cwe_manage_simulation.cpp \
+    cwe_guiWidgets/cwe_welcome_screen.cpp \
+    cwe_guiWidgets/cwe_results.cpp \
+    cwe_guiWidgets/cwe_parameters.cpp \
+    cwe_guiWidgets/cwe_create_copy_simulation.cpp \
+    cwe_guiWidgets/cwe_debug_widget.cpp \
+    cwe_guiWidgets/cwe_state_label.cpp \
+    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.cpp \
+    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.cpp \
+    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.cpp \
+    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.cpp \
+    CFDanalysis/CFDanalysisType.cpp \
+    CFDanalysis/CFDcaseInstance.cpp \
+    SimCenter_widgets/sctrdatawidget.cpp \
+    SimCenter_widgets/sctrvalidators.cpp \
+    SimCenter_widgets/sctrmasterdatawidget.cpp \
+    SimCenter_widgets/sctrstddatawidget.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.cpp \
     ../AgaveClientInterface/remotedatainterface.cpp \
     ../AgaveClientInterface/filemetadata.cpp \
     ../AgaveClientInterface/remotejobdata.cpp \
-    visualUtils/cfdglcanvas.cpp \
-    visualUtils/cfdtoken.cpp \
-    visualUtils/decompresswrapper.cpp \
-    mainWindow/cwe_mainwindow.cpp \
-    cwe_guiWidgets/cwe_create_simulation.cpp \
-    cwe_guiWidgets/cwe_file_manager.cpp \
-    cwe_guiWidgets/cwe_help.cpp \
-    cwe_guiWidgets/cwe_landing.cpp \
-    cwe_guiWidgets/cwe_manage_simulation.cpp \
-    cwe_guiWidgets/cwe_simulation_details.cpp \
-    cwe_guiWidgets/cwe_task_list.cpp \
-    cwe_guiWidgets/cwe_welcome_screen.cpp \
-    cwe_guiWidgets/cwe_results.cpp \
-    cwe_guiWidgets/cwe_parameters.cpp \
-    cwe_guiWidgets/sidebar.cpp  \
     ../AgaveExplorer/remoteFileOps/easyboollock.cpp \
     ../AgaveExplorer/remoteFileOps/fileoperator.cpp \
     ../AgaveExplorer/remoteFileOps/filetreenode.cpp \
     ../AgaveExplorer/remoteFileOps/joboperator.cpp \
     ../AgaveExplorer/remoteFileOps/remotefiletree.cpp \
     ../AgaveExplorer/remoteFileOps/remotejoblister.cpp \
+    ../AgaveExplorer/remoteFileOps/remotejobentry.cpp \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.cpp \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.cpp \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.cpp \
     ../AgaveExplorer/utilFuncs/authform.cpp \
     ../AgaveExplorer/utilFuncs/copyrightdialog.cpp \
-    ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
-    CFDanalysis/CFDagaveApps.cpp \
-    CFDanalysis/CFDanalysisType.cpp \
-    ../widgets/Common/sectiontitle.cpp \
-    cwe_guiWidgets/cwe_parametertab.cpp \
-    cwe_guiWidgets/pandptabwidget.cpp \
-    cwe_guiWidgets/cwe_withstatusbutton.cpp
+    ../AgaveExplorer/utilFuncs/singlelinedialog.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
+    CFDanalysis/CFDanalysisType.h \
+    CFDanalysis/CFDcaseInstance.h \
+    visualUtils/cfdglcanvas.h \
+    visualUtils/cfdtoken.h \
+    visualUtils/decompresswrapper.h \
+    mainWindow/cwe_mainwindow.h \
+    cwe_guiWidgets/cwe_super.h \
+    cwe_guiWidgets/cwe_defines.h \
+    cwe_guiWidgets/cwe_file_manager.h \
+    cwe_guiWidgets/cwe_help.h \
+    cwe_guiWidgets/cwe_landing.h \
+    cwe_guiWidgets/cwe_manage_simulation.h \
+    cwe_guiWidgets/cwe_welcome_screen.h \
+    cwe_guiWidgets/cwe_results.h \
+    cwe_guiWidgets/cwe_parameters.h \
+    cwe_guiWidgets/cwe_create_copy_simulation.h \
+    cwe_guiWidgets/cwe_debug_widget.h \
+    cwe_guiWidgets/cwe_state_label.h \
+    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h \
+    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h \
+    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h \
+    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h \
+    SimCenter_widgets/sctrdatawidget.h \
+    SimCenter_widgets/sctrvalidators.h \
+    SimCenter_widgets/sctrmasterdatawidget.h \
+    SimCenter_widgets/sctrstddatawidget.h \
+    SimCenter_widgets/sctrstates.h \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
     ../AgaveClientInterface/remotedatainterface.h \
     ../AgaveClientInterface/filemetadata.h \
     ../AgaveClientInterface/remotejobdata.h \
-    visualUtils/cfdglcanvas.h \
-    visualUtils/cfdtoken.h \
-    visualUtils/decompresswrapper.h \
-    mainWindow/cwe_mainwindow.h \
-    cwe_guiWidgets/cwe_create_simulation.h \
-    cwe_guiWidgets/cwe_defines.h \
-    cwe_guiWidgets/cwe_file_manager.h \
-    cwe_guiWidgets/cwe_help.h \
-    cwe_guiWidgets/cwe_landing.h \
-    cwe_guiWidgets/cwe_manage_simulation.h \
-    cwe_guiWidgets/cwe_simulation_details.h \
-    cwe_guiWidgets/cwe_task_list.h \
-    cwe_guiWidgets/cwe_welcome_screen.h \
-    cwe_guiWidgets/cwe_results.h \
-    cwe_guiWidgets/cwe_parameters.h \
-    cwe_guiWidgets/sidebar.h \
     ../AgaveExplorer/remoteFileOps/easyboollock.h \
     ../AgaveExplorer/remoteFileOps/fileoperator.h \
     ../AgaveExplorer/remoteFileOps/filetreenode.h \
     ../AgaveExplorer/remoteFileOps/joboperator.h \
     ../AgaveExplorer/remoteFileOps/remotefiletree.h \
     ../AgaveExplorer/remoteFileOps/remotejoblister.h \
+    ../AgaveExplorer/remoteFileOps/remotejobentry.h \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.h \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.h \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.h \
     ../AgaveExplorer/utilFuncs/authform.h \
     ../AgaveExplorer/utilFuncs/copyrightdialog.h \
-    ../AgaveExplorer/utilFuncs/singlelinedialog.h \
-    CFDanalysis/CFDagaveApps.h \
-    CFDanalysis/CFDanalysisType.h \
-    ../widgets/Common/sectiontitle.h \
-    cwe_guiWidgets/cwe_parametertab.h \
-    cwe_guiWidgets/pandptabwidget.h \
-    cwe_guiWidgets/cwe_withstatusbutton.h
+    ../AgaveExplorer/utilFuncs/singlelinedialog.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
-    cwe_guiWidgets/cwe_create_simulation.ui \
     cwe_guiWidgets/cwe_file_manager.ui \
     cwe_guiWidgets/cwe_help.ui \
     cwe_guiWidgets/cwe_landing.ui \
     cwe_guiWidgets/cwe_manage_simulation.ui \
-    cwe_guiWidgets/cwe_simulation_details.ui \
-    cwe_guiWidgets/cwe_task_list.ui \
     cwe_guiWidgets/cwe_welcome_screen.ui \
     cwe_guiWidgets/cwe_results.ui \
     cwe_guiWidgets/cwe_parameters.ui \
-    cwe_guiWidgets/sidebar.ui \
+    cwe_guiWidgets/cwe_create_copy_simulation.ui \
+    cwe_guiWidgets/cwe_debug_widget.ui \
+    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.ui \
+    SimCenter_widgets/sctrdatawidget.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
-    cwe_guiWidgets/cwe_parametertab.ui \
-    cwe_guiWidgets/pandptabwidget.ui \
-    cwe_guiWidgets/cwe_withstatusbutton.ui
+    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
+    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui
 
 RESOURCES += \
     cwe_resources.qrc \

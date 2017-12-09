@@ -36,17 +36,19 @@
 #include "vwtinterfacedriver.h"
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
+#include "../AgaveClientInterface/agaveInterfaces/agavetaskreply.h"
 
 #include "../AgaveExplorer/utilFuncs/authform.h"
 
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 
+#include "CFDanalysis/CFDcaseInstance.h"
 #include "CFDanalysis/CFDanalysisType.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
-VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(parent)
+VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent, debug)
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
     tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
@@ -55,18 +57,35 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(paren
 
     //The following are being debuged:
     tmpHandle->registerAgaveAppInfo("FileEcho", "fileEcho-0.1.0",{"directory","NewFile", "EchoText"},{},"directory");
-    tmpHandle->registerAgaveAppInfo("PythonTest", "pythonRun-0.1.0",{"directory","NewFile"},{},"directory");
-    tmpHandle->registerAgaveAppInfo("SectionMesh", "sectionMesh-0.1.0",{"SlicePlane"},{"directory","SGFFile","SimParams"},"SGFFile");
-    tmpHandle->registerAgaveAppInfo("tempCFD","tempCFD-2.4.0",{"solver"},{"inputDirectory"},"inputDirectory");
-
-    tmpHandle->registerAgaveAppInfo("twoDslice", "twoDslice-0.1.0", {"SlicePlane", "SimParams", "NewCaseFolder"},{"SGFFile"}, "SGFFile");
-    tmpHandle->registerAgaveAppInfo("twoDUmesh", "twoDUmesh-0.1.0", {"MeshParams","directory"},{}, "directory");
+    tmpHandle->registerAgaveAppInfo("cwe-mesh", "cwe-mesh-0.1.0", {"directory"}, {}, "directory");
+    tmpHandle->registerAgaveAppInfo("cwe-sim", "cwe-sim-2.4.0", {}, {"directory"}, "directory");
+    tmpHandle->registerAgaveAppInfo("cwe-post", "cwe-post-0.1.0", {"directory"}, {}, "directory");
 
     theConnector = (RemoteDataInterface *) tmpHandle;
     QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(fatalInterfaceError(QString)));
 
-    CFDanalysisType * newTemplate = new CFDanalysisType(":/config/building2D.json");
-    templateList.append(newTemplate);
+    /* populate with available cases */
+    QDir confDir(":/config");
+    QStringList filters;
+    filters << "*.json" << "*.JSON";
+    QStringList caseTypeFiles = confDir.entryList(filters);
+
+    foreach (QString caseConfigFile, caseTypeFiles) {
+        QString confPath = ":/config/";
+        confPath = confPath.append(caseConfigFile);
+        CFDanalysisType * newTemplate = new CFDanalysisType(confPath);
+        if (debug == false)
+        {
+            if (newTemplate->isDebugOnly() == false)
+            {
+                templateList.append(newTemplate);
+            }
+        }
+        else
+        {
+            templateList.append(newTemplate);
+        }
+    }
 }
 
 void VWTinterfaceDriver::startup()
@@ -86,15 +105,26 @@ void VWTinterfaceDriver::closeAuthScreen()
     }
 
     myJobHandle = new JobOperator(theConnector,this);
-    myJobHandle->demandJobDataRefresh();
     myFileHandle = new FileOperator(theConnector,this);
+
+    myJobHandle->demandJobDataRefresh();
     myFileHandle->resetFileData();
 
     mainWindow->runSetupSteps();
     mainWindow->show();
 
-    //The dynamics of this are different in windows. TODO: Find a more cross-platform solution
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
+
+    AgaveHandler * tmpHandle = (AgaveHandler *) theConnector;
+    AgaveTaskReply * getAppList = tmpHandle->getAgaveAppList();
+
+    if (getAppList == NULL)
+    {
+        fatalInterfaceError("Unable to get app list from DesignSafe");
+        return;
+    }
+    QObject::connect(getAppList, SIGNAL(haveAgaveAppList(RequestState,QJsonArray*)),
+                     this, SLOT(checkAppList(RequestState,QJsonArray*)));
 
     if (authWindow != NULL)
     {
@@ -107,11 +137,16 @@ void VWTinterfaceDriver::closeAuthScreen()
 
 void VWTinterfaceDriver::startOffline()
 {
+    offlineMode = true;
+
     mainWindow = new CWE_MainWindow(this);
 
     myJobHandle = new JobOperator(theConnector,this);
     myFileHandle = new FileOperator(theConnector,this);
 
+    setCurrentCase(new CFDcaseInstance(templateList.at(0),this));
+
+    mainWindow->runSetupSteps();
     mainWindow->show();
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
@@ -124,10 +159,93 @@ QString VWTinterfaceDriver::getBanner()
 
 QString VWTinterfaceDriver::getVersion()
 {
-    return "Version: 0.1";
+    return "Version: 0.1.1";
 }
 
 QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()
 {
     return &templateList;
+}
+
+CFDcaseInstance * VWTinterfaceDriver::getCurrentCase()
+{
+    return currentCFDCase;
+}
+
+void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
+{
+    if (newCase == currentCFDCase) return;
+
+    CFDcaseInstance * oldCase = currentCFDCase;
+    currentCFDCase = newCase;
+
+    if (oldCase != NULL)
+    {
+        QObject::disconnect(oldCase,0,0,0);
+        if (!oldCase->isDefunct())
+        {
+            oldCase->killCaseConnection();
+        }
+    }
+
+    if (newCase != NULL)
+    {
+        QObject::connect(newCase, SIGNAL(detachCase()),
+                         this, SLOT(currentCaseInvalidated()));
+        mainWindow->attachCaseSignals(newCase);
+    }
+    emit haveNewCase();
+}
+
+CWE_MainWindow * VWTinterfaceDriver::getMainWindow()
+{
+    return mainWindow;
+}
+
+void VWTinterfaceDriver::currentCaseInvalidated()
+{
+    setCurrentCase(NULL);
+}
+
+void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appList)
+{
+    if (replyState != RequestState::GOOD)
+    {
+        fatalInterfaceError("Unable to connect to Agave to get app info.");
+        return;
+    }
+
+    QList<QString> neededApps = {"cwe-mesh", "cwe-sim", "cwe-post"};
+
+    for (auto itr = appList->constBegin(); itr != appList->constEnd(); itr++)
+    {
+        QString appName = (*itr).toObject().value("name").toString();
+
+        if (appName.isEmpty())
+        {
+            continue;
+        }
+        if (neededApps.contains(appName))
+        {
+            neededApps.removeAll(appName);
+        }
+    }
+
+    if (!neededApps.isEmpty())
+    {
+        fatalInterfaceError("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
+    }
+}
+
+void VWTinterfaceDriver::displayMessagePopup(QString infoText)
+{
+    QMessageBox infoMessage;
+    infoMessage.setText(infoText);
+    infoMessage.setIcon(QMessageBox::Information);
+    infoMessage.exec();
+}
+
+bool VWTinterfaceDriver::inOfflineMode()
+{
+    return offlineMode;
 }

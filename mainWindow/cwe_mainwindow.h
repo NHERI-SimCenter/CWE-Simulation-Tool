@@ -42,13 +42,9 @@
 
 #include "cwe_guiWidgets/cwe_defines.h"
 #include "cwe_guiWidgets/cwe_landing.h"
-#include "cwe_guiWidgets/cwe_create_simulation.h"
 #include "cwe_guiWidgets/cwe_file_manager.h"
 #include "cwe_guiWidgets/cwe_manage_simulation.h"
-#include "cwe_guiWidgets/cwe_simulation_details.h"
-#include "cwe_guiWidgets/cwe_task_list.h"
 #include "cwe_guiWidgets/cwe_help.h"
-#include "cwe_guiWidgets/sidebar.h"
 
 #include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
 #include "vwtinterfacedriver.h"
@@ -57,6 +53,9 @@
 namespace Ui {
 class CWE_MainWindow;
 }
+
+class CFDcaseInstance;
+class cwe_state_label;
 
 class CWE_MainWindow : public QMainWindow
 {
@@ -68,21 +67,17 @@ public:
 
     void runSetupSteps();
 
+    void attachCaseSignals(CFDcaseInstance * newCase);
+
+    void switchToParameterTab();
+    void switchToResultsTab();
+    void switchToCreateTab();
+
 private slots:
     void menuExit();
     void menuCopyInfo();
 
     void on_action_Quit_triggered();
-
-    /* side bar functionality */
-    void task_selected(TASK);
-    void create_simulation_task_selected(TASK, SIM_MODE);
-    void selectLanding();
-    void selectCreateSimulation();
-    void selectManageRun();
-    void selectManageJobs();
-    void selectManageFiles();
-    void selectHelp();
 
     void on_actionCreate_New_Simulation_triggered();
     void on_actionManage_Simulation_triggered();
@@ -99,26 +94,12 @@ private slots:
     void on_actionManage_and_Download_Files_triggered();
 
 private:
+    void changeTabVisible(QTabWidget * theTab, bool newSetting);
+
     Ui::CWE_MainWindow *ui;
 
     VWTinterfaceDriver     *myDriver;
-
-    SideBar                *taskSideBar;
-    QWidget                *widgetStack;
-
-    CWE_create_simulation  *taskCreateSimulation = NULL;
-    CWE_file_manager       *taskFileManager = NULL;
-    CWE_landing            *taskLanding = NULL;
-    CWE_manage_simulation  *taskManageSimulation = NULL;
-    CWE_simulation_details *taskSimulationDetail = NULL;
-    CWE_task_list          *taskTaskList = NULL;
-    CWE_help               *taskHelp = NULL;
-
-    QStackedWidget         *sharedWidget;
-    RemoteDataInterface    *dataLink;
-
-    QMap<TASK, int>        stackedWidgetsIndex;
-    QStackedLayout         *stackLayout;
+    cwe_state_label        *stateLabel = NULL;
 };
 
 #endif // CWE_MAINWINDOW_H

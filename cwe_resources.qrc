@@ -10,9 +10,16 @@
         <file>images/CWE_download.png</file>
         <file>images/CWE_eye.png</file>
         <file>images/CWE_empty.png</file>
+        <file>images/placeholderIcon.png</file>
+        <file>images/defaultCaseImage.png</file>
     </qresource>
     <qresource prefix="/">
         <file>copyText.txt</file>
         <file>cweStyle.qss</file>
+        <file>images/Overview/CWEFlow1.png</file>
+        <file>images/Overview/CWEFlow2.png</file>
+        <file>images/Overview/CWEFlow3.png</file>
+        <file>images/Overview/CWEFlow4.png</file>
+        <file>images/Overview/CWEFlow5.png</file>
     </qresource>
 </RCC>

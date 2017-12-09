@@ -3,44 +3,62 @@
 
 #include <QWidget>
 #include <QMap>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QDoubleSpinBox>
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QLineEdit>
 
+#include "cwe_super.h"
+
+class CFDcaseInstance;
 class CFDanalysisType;
+class VWTinterfaceDriver;
+class CWE_StageTab;
+
+enum class CaseState;
+
+enum class CaseCommand { ROLLBACK, RUN, CANCEL };
 
 namespace Ui {
 class CWE_Parameters;
 }
 
-class CWE_Parameters : public QWidget
+class CWE_Parameters : public CWE_Super
 {
     Q_OBJECT
 
 public:
     explicit CWE_Parameters(QWidget *parent = 0);
     ~CWE_Parameters();
-    void setName(const QString &s);
-    void setType(const QString &s);
-    void setLocation(const QString &s);
-    int  setTemplate(CFDanalysisType * theTemplate);
+
+    virtual void linkDriver(VWTinterfaceDriver * newDriver);
+    void resetViewInfo();
+    void initStateTabs();
+
+    void switchToResults();
+    void performCaseCommand(QString stage, CaseCommand toEnact);
 
 private slots:
-    //void on_pbtn_saveAllParameters_clicked();
-    //void on_pBtn_simulation_run_clicked();
-    //void on_pBtn_simulation_cancel_clicked();
-    //void on_pBtn_simulation_results_clicked();
-    //void on_pBtn_simulation_rollback_clicked();
-    //void on_pBtn_model_run_clicked();
-    //void on_pBtn_model_cancel_clicked();
-    //void on_pBtn_model_results_clicked();
-    //void on_pBtn_model_rollback_clicked();
+    void on_pbtn_saveAllParameters_clicked();
+
+    void newCaseGiven();
+    void newCaseState(CaseState newState);
 
 private:
+    void saveAllParams();
+
     Ui::CWE_Parameters *ui;
 
-    QMap<QString, int> parameterTabs;
+    bool viewIsValid = false;
 
-    int meshIdx;
-    int simuIdx;
-    int postIdx;
+    QMap<QString, int> stageTabsIndex;
 };
 
 #endif // CWE_PARAMETERS_H
