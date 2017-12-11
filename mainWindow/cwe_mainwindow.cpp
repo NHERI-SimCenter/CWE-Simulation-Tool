@@ -50,20 +50,17 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
     //Esablish connections with driver
     myDriver = newDriver;
-    dataLink = myDriver->getDataConnection();
+
+    if (!myDriver->inDebugMode())
+    {
+        ui->tab_debug->deleteLater();
+    }
 
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
 
-    ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(ui->tab_spacer_1),false);
-    ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(ui->tab_spacer_2),false);
-
-    QObject::connect(ui->tab_parameters, SIGNAL(switchToParameterTab()), this, SLOT(switchToParameterTab()));
-    QObject::connect(ui->tab_parameters, SIGNAL(switchToResultsTab()),   this, SLOT(switchToResultsTab())  );
-    QObject::connect(ui->tab_parameters, SIGNAL(switchToCreateTab()),    this, SLOT(switchToCreateTab())   );
-
-    QObject::connect(ui->tab_create_new, SIGNAL(needParamTab()), this, SLOT(switchToParameterTab()));
-    QObject::connect(ui->tab_manage_and_run, SIGNAL(needParamTab()), this, SLOT(switchToParameterTab()));
+    changeTabVisible((QTabWidget *)ui->tab_spacer_1, false);
+    changeTabVisible((QTabWidget *)ui->tab_spacer_2, false);
 
     // adjust application size to display
     QRect rec = QApplication::desktop()->screenGeometry();
@@ -77,21 +74,8 @@ CWE_MainWindow::~CWE_MainWindow()
     delete ui;
 }
 
-void CWE_MainWindow::runOfflineSetupSteps()
-{
-    //TODO: Link driver offline should be a virtual function for a tab superclass
-    ui->tab_create_new->linkDriver(myDriver);
-}
-
 void CWE_MainWindow::runSetupSteps()
 {
-    //TODO: Link driver should be a virtual function for a tab superclass
-    ui->tab_files->linkDriver(myDriver);
-    ui->tab_parameters->linkWithDriver(myDriver);
-    ui->tab_landing_page->linkJobHandle(myDriver->getJobHandler());
-    ui->tab_create_new->linkDriverConnected(myDriver);
-    ui->tab_manage_and_run->linkDriver(myDriver);
-
     //Note: Adding widget to header will re-parent them
     stateLabel = new cwe_state_label(this);
     ui->header->appendWidget(stateLabel);
@@ -102,6 +86,17 @@ void CWE_MainWindow::runSetupSteps()
     QPushButton * logoutButton = new QPushButton("Logout");
     QObject::connect(logoutButton, SIGNAL(clicked(bool)), myDriver, SLOT(shutdown()));
     ui->header->appendWidget(logoutButton);
+
+    for (int i = 0; i < ui->tabContainer->count(); i++)
+    {
+        QWidget * rawWidget = ui->tabContainer->widget(i);
+        if (!rawWidget->inherits("CWE_Super"))
+        {
+            continue;
+        }
+        CWE_Super * aWidget = (CWE_Super *) rawWidget;
+        aWidget->linkDriver(myDriver);
+    }
 }
 
 void CWE_MainWindow::attachCaseSignals(CFDcaseInstance * newCase)
@@ -204,4 +199,9 @@ void CWE_MainWindow::switchToParameterTab()
 void CWE_MainWindow::switchToCreateTab()
 {
     ui->tabContainer->setCurrentWidget(ui->tab_create_new);
+}
+
+void CWE_MainWindow::changeTabVisible(QTabWidget * theTab, bool newSetting)
+{
+    ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(theTab),newSetting);
 }

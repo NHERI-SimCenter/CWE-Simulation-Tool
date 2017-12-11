@@ -37,11 +37,13 @@
 
 #include <QWidget>
 
+#include "cwe_super.h"
+
 namespace Ui {
 class CWE_help;
 }
 
-class CWE_help : public QWidget
+class CWE_help : public CWE_Super
 {
     Q_OBJECT
 

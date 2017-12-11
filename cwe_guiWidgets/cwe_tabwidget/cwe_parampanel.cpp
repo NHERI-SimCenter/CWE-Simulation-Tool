@@ -4,29 +4,19 @@
  */
 
 #include "cwe_parampanel.h"
-#include "ui_cwe_parampanel.h"
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 CWE_ParamPanel::CWE_ParamPanel(QWidget *parent) :
-    QScrollArea(parent),
-    ui(new Ui::CWE_ParamPanel)
+    QFrame(parent)
 {
-    ui->setupUi(this);
     variableWidgets = new QMap<QString, SCtr_MasterDataWidget *>();
     this->setViewState(SimCenterViewState::visible);
 }
 
 CWE_ParamPanel::~CWE_ParamPanel()
 {
-    delete ui;
-
     if (variableWidgets != NULL) delete variableWidgets;
-}
-
-QWidget * CWE_ParamPanel::getParameterSpace()
-{
-    return ui->parameterSpace;
 }
 
 void CWE_ParamPanel::setData(QJsonObject &obj)

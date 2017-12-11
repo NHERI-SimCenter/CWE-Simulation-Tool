@@ -44,7 +44,6 @@
 #include "cwe_guiWidgets/cwe_landing.h"
 #include "cwe_guiWidgets/cwe_file_manager.h"
 #include "cwe_guiWidgets/cwe_manage_simulation.h"
-#include "cwe_guiWidgets/cwe_simulation_details.h"
 #include "cwe_guiWidgets/cwe_help.h"
 
 #include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
@@ -66,16 +65,15 @@ public:
     explicit CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
     ~CWE_MainWindow();
 
-    void runOfflineSetupSteps();
     void runSetupSteps();
 
     void attachCaseSignals(CFDcaseInstance * newCase);
 
-private slots:
     void switchToParameterTab();
     void switchToResultsTab();
     void switchToCreateTab();
 
+private slots:
     void menuExit();
     void menuCopyInfo();
 
@@ -96,10 +94,11 @@ private slots:
     void on_actionManage_and_Download_Files_triggered();
 
 private:
+    void changeTabVisible(QTabWidget * theTab, bool newSetting);
+
     Ui::CWE_MainWindow *ui;
 
     VWTinterfaceDriver     *myDriver;
-    RemoteDataInterface    *dataLink;
     cwe_state_label        *stateLabel = NULL;
 };
 

@@ -1,12 +1,11 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
 ** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,18 +30,16 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_simulation_details.h"
-#include "ui_cwe_simulation_details.h"
+#include "cwe_super.h"
 
-CWE_simulation_details::CWE_simulation_details(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWE_simulation_details)
+CWE_Super::CWE_Super(QWidget *parent) : QFrame(parent)
 {
-    ui->setupUi(this);
+
 }
 
-CWE_simulation_details::~CWE_simulation_details()
+void CWE_Super::linkDriver(VWTinterfaceDriver * theDriver)
 {
-    delete ui;
+    myDriver = theDriver;
 }

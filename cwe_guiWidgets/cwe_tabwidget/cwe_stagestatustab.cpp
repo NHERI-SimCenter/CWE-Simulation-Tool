@@ -18,6 +18,11 @@ CWE_StageStatusTab::~CWE_StageStatusTab()
     delete ui;
 }
 
+void CWE_StageStatusTab::setCorrespondingPanel(CWE_GroupsWidget * newPanel)
+{
+    myPanel = newPanel;
+}
+
 void CWE_StageStatusTab::setStatus(QString s)
 {
     m_status = s;

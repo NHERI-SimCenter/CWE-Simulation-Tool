@@ -2,50 +2,34 @@
 #include "ui_cwe_parameters.h"
 #include "cwe_tabwidget/cwe_parampanel.h"
 
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QMap>
-#include <QDoubleSpinBox>
-#include <QSpinBox>
-#include <QCheckBox>
-#include <QComboBox>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QLineEdit>
-
 #include "qdebug.h"
 
 #include "vwtinterfacedriver.h"
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "mainWindow/cwe_mainwindow.h"
+
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
 
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
-    QWidget(parent),
+    CWE_Super(parent),
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
-
-    QObject::connect(ui->theTabWidget, SIGNAL(switchToParameterTab()), this, SLOT(switchToParameterSlot()));
-    QObject::connect(ui->theTabWidget, SIGNAL(switchToCreateTab()),    this, SLOT(switchToCreateSlot())   );
-    QObject::connect(ui->theTabWidget, SIGNAL(switchToResultsTab()),   this, SLOT(switchToResultsSlot())  );
-
-    }
+    ui->theTabWidget->setController(this);
+}
 
 CWE_Parameters::~CWE_Parameters()
 {
     delete ui;
 }
 
-void CWE_Parameters::linkWithDriver(VWTinterfaceDriver * newDriver)
+void CWE_Parameters::linkDriver(VWTinterfaceDriver * newDriver)
 {
-    myDriver = newDriver;
+    CWE_Super::linkDriver(newDriver);
     QObject::connect(myDriver, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
-    ui->theTabWidget->setupDriver(myDriver);
 }
 
 void CWE_Parameters::initStateTabs()
@@ -156,17 +140,13 @@ void CWE_Parameters::newCaseState(CaseState newState)
     //TODO: implement functions for changes in current params or stage states
 }
 
-void CWE_Parameters::switchToResultsSlot()
+void CWE_Parameters::switchToResults()
 {
-    emit switchToResultsTab();
+    myDriver->getMainWindow()->switchToResultsTab();
 }
 
-void CWE_Parameters::switchToParameterSlot()
+void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
 {
-    emit switchToParameterTab();
-}
-
-void CWE_Parameters::switchToCreateSlot()
-{
-    emit switchToCreateTab();
+    //TODO: link commands with active case
+    //TODO: Check that commands are valid
 }

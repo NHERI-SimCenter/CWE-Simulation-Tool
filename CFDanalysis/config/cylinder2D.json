@@ -3,6 +3,7 @@
     "internalName":"cylinder2D",
     "description":"This model describes \nthe air flow around a circular\n cylinder using 2D simulation.",
     "icon":"placeholderIcon.png",
+    "debugOnly":true,
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{

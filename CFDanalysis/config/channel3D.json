@@ -3,6 +3,7 @@
     "internalName":"channel3D",
     "description":"This model describes \nthe air flow thru an\n empty 3D channel.",
     "sequence":["mesh","sim"],
+    "debugOnly":true,
     "stages":{
         "mesh":{
             "name":"Mesh",

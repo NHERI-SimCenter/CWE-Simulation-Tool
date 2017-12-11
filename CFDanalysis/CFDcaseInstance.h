@@ -78,6 +78,7 @@ class CFDcaseInstance : public QObject
 public:
     CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
     CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
+    CFDcaseInstance(VWTinterfaceDriver * mainDriver);
 
     bool isDefunct();
     CaseState getCaseState();
@@ -86,7 +87,7 @@ public:
     QString currentAgaveRequest();
 
     //Note: For these, it can always answer "I don't know"
-    //But that should only happen in the LOADING state
+    //But that should only happen in the LOADING/ERROR state
     CFDanalysisType * getMyType();
     QMap<QString, QString> getCurrentParams();
     QMap<QString, StageState> getStageStates();

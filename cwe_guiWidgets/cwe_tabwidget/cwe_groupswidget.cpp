@@ -9,25 +9,19 @@
 #include "SimCenter_widgets/sctrstates.h"
 #include <QJsonObject>
 
-CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) :
-    QFrame(parent)
+CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) : QTabWidget(parent)
 {
-
-    m_tabWidget = NULL;
-    m_statusButton = NULL;
     this->setViewState(SimCenterViewState::visible);
 }
 
 CWE_GroupsWidget::~CWE_GroupsWidget()
 {
-    if (m_tabWidget != NULL) {
-        delete m_tabWidget;
-        m_tabWidget = NULL;
-    }
-    if (m_statusButton != NULL) {
-        delete m_statusButton;
-        m_statusButton = NULL;
-    }
+
+}
+
+void CWE_GroupsWidget::setCorrespondingTab(CWE_StageStatusTab * newTab)
+{
+    myTab = newTab;
 }
 
 // set the group definitions as a JSon file
@@ -35,6 +29,7 @@ void CWE_GroupsWidget::setData(QJsonObject &obj)
 {
     m_obj = obj;
 
+    /*
     QJsonObject stageInfo = m_obj[name].toObject();
     QString labelText;
 
@@ -44,12 +39,7 @@ void CWE_GroupsWidget::setData(QJsonObject &obj)
     // add a stage tab to ui->theTabWidget
     int idx = ui->theTabWidget->addGroupTab(name, labelText, StageState::UNRUN);
     stageTabsIndex.insert(name, idx);
-}
-
-// set the group definitions as a JSon file
-QJsonObject CWE_GroupsWidget::getData()
-{
-    return QJsonObject(m_obj);
+    */
 }
 
 // set the view state
@@ -69,16 +59,10 @@ void CWE_GroupsWidget::setViewState(SimCenterViewState state)
     }
 }
 
-// return current view state
-SimCenterViewState CWE_GroupsWidget::viewState()
-{
-    return m_viewState;
-}
-
-
-
 int CWE_GroupsWidget::addGroupTab(QString key, const QString &label, StageState currentState)
 {
+    int index = -1;
+    /*
     varTabWidgets->insert(key, new QMap<QString, QWidget *>());
 
     // create the tab
@@ -100,6 +84,7 @@ int CWE_GroupsWidget::addGroupTab(QString key, const QString &label, StageState 
     ui->stackedWidget->insertWidget(index, pWidget);
 
     groupTabList->insert(key, pWidget);
+    */
 
     return index;
 }
@@ -108,6 +93,7 @@ int CWE_GroupsWidget::addVarTab(QString key, const QString &label)
 {
     // create the widget to hold the parameter input
 
+    /*
     CWE_ParameterTab *itm = new CWE_ParameterTab(this);
     itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -122,16 +108,20 @@ int CWE_GroupsWidget::addVarTab(QString key, const QString &label)
     int index = qf->addTab(itm, label);
 
     return index;
+    */
+    return -1;
 }
 
 void CWE_GroupsWidget::addVSpacer(const QString &key, const QString &label)
 {
+    /*
     QWidget *parent = varTabWidgets->value(key)->value(label);
     if (parent != NULL)
     {
         QGridLayout *layout = (QGridLayout*)(parent->layout());
         layout->addItem(new QSpacerItem(10, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), layout->rowCount(), 2);
     }
+    */
 }
 
 void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
@@ -139,6 +129,7 @@ void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArra
     //QTabWidget *groupTab = groupTabList->value(key);
     //QWidget    *varTab   = varTabWidgets->value(key)->value(label);
 
+    /*
     foreach (const QJsonValue &item, *varList)
     {
         QString varKey = item.toString();
@@ -156,6 +147,7 @@ void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArra
         }
     }
     this->addVSpacer(key, label);
+    */
 }
 
 
