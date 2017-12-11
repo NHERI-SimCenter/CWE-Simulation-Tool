@@ -48,7 +48,7 @@
 
 #include "mainWindow/cwe_mainwindow.h"
 
-VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(parent)
+VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent, debug)
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
     tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
@@ -74,7 +74,17 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent) : AgaveSetupDriver(paren
         QString confPath = ":/config/";
         confPath = confPath.append(caseConfigFile);
         CFDanalysisType * newTemplate = new CFDanalysisType(confPath);
-        templateList.append(newTemplate);
+        if (debug == false)
+        {
+            if (newTemplate->isDebugOnly() == false)
+            {
+                templateList.append(newTemplate);
+            }
+        }
+        else
+        {
+            templateList.append(newTemplate);
+        }
     }
 }
 
@@ -95,8 +105,9 @@ void VWTinterfaceDriver::closeAuthScreen()
     }
 
     myJobHandle = new JobOperator(theConnector,this);
-    myJobHandle->demandJobDataRefresh();
     myFileHandle = new FileOperator(theConnector,this);
+
+    myJobHandle->demandJobDataRefresh();
     myFileHandle->resetFileData();
 
     mainWindow->runSetupSteps();
@@ -126,6 +137,8 @@ void VWTinterfaceDriver::closeAuthScreen()
 
 void VWTinterfaceDriver::startOffline()
 {
+    offlineMode = true;
+
     mainWindow = new CWE_MainWindow(this);
 
     myJobHandle = new JobOperator(theConnector,this);
@@ -133,7 +146,7 @@ void VWTinterfaceDriver::startOffline()
 
     setCurrentCase(new CFDcaseInstance(templateList.at(0),this));
 
-    mainWindow->runOfflineSetupSteps();
+    mainWindow->runSetupSteps();
     mainWindow->show();
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
@@ -146,7 +159,7 @@ QString VWTinterfaceDriver::getBanner()
 
 QString VWTinterfaceDriver::getVersion()
 {
-    return "Version: 0.1";
+    return "Version: 0.1.1";
 }
 
 QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()
@@ -182,6 +195,11 @@ void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
         mainWindow->attachCaseSignals(newCase);
     }
     emit haveNewCase();
+}
+
+CWE_MainWindow * VWTinterfaceDriver::getMainWindow()
+{
+    return mainWindow;
 }
 
 void VWTinterfaceDriver::currentCaseInvalidated()
@@ -225,4 +243,9 @@ void VWTinterfaceDriver::displayMessagePopup(QString infoText)
     infoMessage.setText(infoText);
     infoMessage.setIcon(QMessageBox::Information);
     infoMessage.exec();
+}
+
+bool VWTinterfaceDriver::inOfflineMode()
+{
+    return offlineMode;
 }

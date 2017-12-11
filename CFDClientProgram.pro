@@ -55,11 +55,11 @@ SOURCES += main.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
+    cwe_guiWidgets/cwe_super.cpp \
     cwe_guiWidgets/cwe_file_manager.cpp \
     cwe_guiWidgets/cwe_help.cpp \
     cwe_guiWidgets/cwe_landing.cpp \
     cwe_guiWidgets/cwe_manage_simulation.cpp \
-    cwe_guiWidgets/cwe_simulation_details.cpp \
     cwe_guiWidgets/cwe_welcome_screen.cpp \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
@@ -67,6 +67,9 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_debug_widget.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.cpp \
+    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.cpp \
+    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.cpp \
+    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.cpp \
     CFDanalysis/CFDanalysisType.cpp \
     CFDanalysis/CFDcaseInstance.cpp \
     SimCenter_widgets/sctrdatawidget.cpp \
@@ -85,16 +88,13 @@ SOURCES += main.cpp \
     ../AgaveExplorer/remoteFileOps/joboperator.cpp \
     ../AgaveExplorer/remoteFileOps/remotefiletree.cpp \
     ../AgaveExplorer/remoteFileOps/remotejoblister.cpp \
+    ../AgaveExplorer/remoteFileOps/remotejobentry.cpp \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.cpp \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.cpp \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.cpp \
     ../AgaveExplorer/utilFuncs/authform.cpp \
     ../AgaveExplorer/utilFuncs/copyrightdialog.cpp \
-    ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
-    ../AgaveExplorer/remoteFileOps/remotejobentry.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.cpp
+    ../AgaveExplorer/utilFuncs/singlelinedialog.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -104,19 +104,22 @@ HEADERS  += \
     visualUtils/cfdtoken.h \
     visualUtils/decompresswrapper.h \
     mainWindow/cwe_mainwindow.h \
+    cwe_guiWidgets/cwe_super.h \
     cwe_guiWidgets/cwe_defines.h \
     cwe_guiWidgets/cwe_file_manager.h \
     cwe_guiWidgets/cwe_help.h \
     cwe_guiWidgets/cwe_landing.h \
     cwe_guiWidgets/cwe_manage_simulation.h \
-    cwe_guiWidgets/cwe_simulation_details.h \
     cwe_guiWidgets/cwe_welcome_screen.h \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h \
     cwe_guiWidgets/cwe_create_copy_simulation.h \
     cwe_guiWidgets/cwe_debug_widget.h \
     cwe_guiWidgets/cwe_state_label.h \
+    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h \
+    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h \
+    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h \
+    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h \
     SimCenter_widgets/sctrdatawidget.h \
     SimCenter_widgets/sctrvalidators.h \
     SimCenter_widgets/sctrmasterdatawidget.h \
@@ -134,16 +137,13 @@ HEADERS  += \
     ../AgaveExplorer/remoteFileOps/joboperator.h \
     ../AgaveExplorer/remoteFileOps/remotefiletree.h \
     ../AgaveExplorer/remoteFileOps/remotejoblister.h \
+    ../AgaveExplorer/remoteFileOps/remotejobentry.h \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.h \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.h \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.h \
     ../AgaveExplorer/utilFuncs/authform.h \
     ../AgaveExplorer/utilFuncs/copyrightdialog.h \
-    ../AgaveExplorer/utilFuncs/singlelinedialog.h \
-    ../AgaveExplorer/remoteFileOps/remotejobentry.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h
+    ../AgaveExplorer/utilFuncs/singlelinedialog.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -151,12 +151,9 @@ FORMS    += \
     cwe_guiWidgets/cwe_help.ui \
     cwe_guiWidgets/cwe_landing.ui \
     cwe_guiWidgets/cwe_manage_simulation.ui \
-    cwe_guiWidgets/cwe_simulation_details.ui \
-    cwe_guiWidgets/cwe_task_list.ui \
     cwe_guiWidgets/cwe_welcome_screen.ui \
     cwe_guiWidgets/cwe_results.ui \
     cwe_guiWidgets/cwe_parameters.ui \
-    cwe_guiWidgets/cwe_create_simulation_old.ui \
     cwe_guiWidgets/cwe_create_copy_simulation.ui \
     cwe_guiWidgets/cwe_debug_widget.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.ui \
