@@ -132,6 +132,14 @@ void CWE_Parameters::saveAllParams()
 
 void CWE_Parameters::newCaseGiven()
 {
+    CFDcaseInstance * newCase = myDriver->getCurrentCase();
+
+    if (newCase != NULL)
+    {
+        QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
+                         this, SLOT(newCaseState(CaseState)));
+    }
+
     resetViewInfo();
 }
 

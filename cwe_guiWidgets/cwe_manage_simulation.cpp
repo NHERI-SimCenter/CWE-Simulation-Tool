@@ -71,14 +71,12 @@ void CWE_manage_simulation::linkDriver(VWTinterfaceDriver * theDriver)
     {
         ui->treeView->setFileOperator(theDriver->getFileHandler());
     }
+    QObject::connect(myDriver, SIGNAL(haveNewCase()),
+                     this, SLOT(newCaseGiven()));
 }
 
 void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
 {
-    if (tempCase != NULL)
-    {
-        tempCase->deleteLater();
-    }
     if (newFile == NULL)
     {
         tempCase = NULL;
@@ -89,52 +87,33 @@ void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
 
     tempCase = new CFDcaseInstance(newFile, myDriver);
     ui->label_caseStatus->setCurrentCase(tempCase);
-    QObject::connect(tempCase, SIGNAL(haveNewState(CaseState)), this, SLOT(provisionalCaseStateChange(CaseState)));
-    provisionalCaseStateChange(tempCase->getCaseState());
+    //QObject::connect(tempCase, SIGNAL(haveNewState(CaseState)), this, SLOT(provisionalCaseStateChange(CaseState)));
+    //provisionalCaseStateChange(tempCase->getCaseState());
 }
 
-void CWE_manage_simulation::on_pb_viewParameters_clicked()
+void CWE_manage_simulation::newCaseGiven()
 {
-    if (!verifyCaseAndSelect()) return;
+    CFDcaseInstance * newCase = myDriver->getCurrentCase();
 
-    // switch main window to parameters tab
-    myDriver->getMainWindow()->switchToParameterTab();
+    ui->label_caseStatus->setCurrentCase(newCase);
+
+    if (newCase != NULL)
+    {
+        QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
+                         this, SLOT(newCaseState(CaseState)));
+        newCaseState(newCase->getCaseState());
+    }
+    else
+    {
+        ui->pb_viewParameters->setEnabled(false);
+        ui->pb_viewResults->setEnabled(false);
+    }
 }
 
-void CWE_manage_simulation::on_pb_viewResults_clicked()
-{
-    if (!verifyCaseAndSelect()) return;
-
-    // switch main window to results tab
-    myDriver->getMainWindow()->switchToResultsTab();
-}
-
-void CWE_manage_simulation::clearSelectView()
-{
-    ui->label_caseTypeTag->setVisible(false);
-    ui->label_CaseTypeIcon->setVisible(false);
-    ui->label_stageListTag->setVisible(false);
-    ui->stageListView->setVisible(false);
-}
-
-void CWE_manage_simulation::showSelectView()
-{
-    ui->label_caseTypeTag->setVisible(true);
-    ui->label_CaseTypeIcon->setVisible(true);
-    ui->label_stageListTag->setVisible(true);
-    ui->stageListView->setVisible(true);
-}
-
-void CWE_manage_simulation::provisionalCaseStateChange(CaseState newState)
+void CWE_manage_simulation::newCaseState(CaseState newState)
 {
     //TODO: From PRS: I was not feeling well when writing this.
     //My instinct says this code should be reviewed.
-
-    if (tempCase == NULL)
-    {
-        clearSelectView();
-        return;
-    }
 
     if ((newState == CaseState::JOB_RUN) || (newState == CaseState::READY))
     {
@@ -187,6 +166,38 @@ void CWE_manage_simulation::provisionalCaseStateChange(CaseState newState)
     }
 
     ui->label_caseName->setText(tempCase->getCaseName());
+}
+
+void CWE_manage_simulation::on_pb_viewParameters_clicked()
+{
+    if (!verifyCaseAndSelect()) return;
+
+    // switch main window to parameters tab
+    myDriver->getMainWindow()->switchToParameterTab();
+}
+
+void CWE_manage_simulation::on_pb_viewResults_clicked()
+{
+    if (!verifyCaseAndSelect()) return;
+
+    // switch main window to results tab
+    myDriver->getMainWindow()->switchToResultsTab();
+}
+
+void CWE_manage_simulation::clearSelectView()
+{
+    ui->label_caseTypeTag->setVisible(false);
+    ui->label_CaseTypeIcon->setVisible(false);
+    ui->label_stageListTag->setVisible(false);
+    ui->stageListView->setVisible(false);
+}
+
+void CWE_manage_simulation::showSelectView()
+{
+    ui->label_caseTypeTag->setVisible(true);
+    ui->label_CaseTypeIcon->setVisible(true);
+    ui->label_stageListTag->setVisible(true);
+    ui->stageListView->setVisible(true);
 }
 
 bool CWE_manage_simulation::verifyCaseAndSelect()
