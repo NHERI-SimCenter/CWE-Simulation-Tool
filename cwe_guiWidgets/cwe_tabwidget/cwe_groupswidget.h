@@ -23,7 +23,7 @@ public:
     void addVSpacer(const QString &key, const QString &label);
     void addVarsToTab(QString key, const QString &label, QJsonArray *, QJsonObject *, QMap<QString,QString> * );
 
-    void setParameterConfig(QJsonObject &groupDoc);
+    void setParameterConfig(QString key, QJsonObject &obj);
     void linkWidget(CWE_StageStatusTab *tab);
 
 

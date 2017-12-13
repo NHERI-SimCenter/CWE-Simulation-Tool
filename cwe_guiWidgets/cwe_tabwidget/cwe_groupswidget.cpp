@@ -7,7 +7,9 @@
 
 #include "cwe_stagestatustab.h"
 #include "SimCenter_widgets/sctrstates.h"
+#include "cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h"
 #include <QJsonObject>
+#include <QJsonArray>
 
 CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) : QTabWidget(parent)
 {
@@ -150,9 +152,17 @@ void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArra
     */
 }
 
-void CWE_GroupsWidget::setParameterConfig(QJsonObject &groupDoc)
+void CWE_GroupsWidget::setParameterConfig(QString key, QJsonObject &obj)
 {
     /* find all groups and create a tab per group */
+    QJsonArray groups = obj.value(QString("stages")).toObject().value(key).toObject().value(QString("groups")).toArray();
+
+    foreach (QJsonValue group, groups)
+    {
+        QString groupName = group.toString();
+        this->addTab(new CWE_ParamPanel(this), groupName);
+    }
+
 }
 
 void CWE_GroupsWidget::linkWidget(CWE_StageStatusTab *tab)

@@ -115,8 +115,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         groupWidget->linkWidget(tab);
 
         /* set the parameter information for the CWE_GroupsWidget */
-        //QJsonObject groupDoc = ....;
-        //groupWidget->setParameterConfig(groupDoc);
+        groupWidget->setParameterConfig(stageName, obj);
     }
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
