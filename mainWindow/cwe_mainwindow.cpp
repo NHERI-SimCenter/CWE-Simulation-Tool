@@ -58,9 +58,8 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     {
         ui->tab_debug->deleteLater();
     }
-    //TODO: Want these visible but disabled: How?
-    changeTabEnabled(ui->tab_parameters, false);
-    changeTabEnabled(ui->tab_results, false);
+
+    changeParamsAndResultsEnabled(false);
 
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
@@ -116,14 +115,7 @@ void CWE_MainWindow::newCaseGiven()
 
     if (newCase == NULL)
     {
-        if ((ui->tabContainer->currentWidget() == ui->tab_parameters) ||
-            (ui->tabContainer->currentWidget() == ui->tab_results))
-        {
-            ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
-        }
-
-        changeTabEnabled(ui->tab_parameters, false);
-        changeTabEnabled(ui->tab_results, false);
+        changeParamsAndResultsEnabled(false);
 
         return;
     }
@@ -142,13 +134,11 @@ void CWE_MainWindow::newCaseState(CaseState newState)
             (newState == CaseState::ERROR) ||
             (newState == CaseState::INVALID))
     {
-        changeTabEnabled(ui->tab_parameters, false);
-        changeTabEnabled(ui->tab_results, false);
+        changeParamsAndResultsEnabled(false);
     }
     else
     {
-        changeTabEnabled(ui->tab_parameters, true);
-        changeTabEnabled(ui->tab_results, true);
+        changeParamsAndResultsEnabled(true);
     }
 }
 
@@ -163,7 +153,6 @@ void CWE_MainWindow::menuExit()
     myDriver->shutdown();
 }
 
-
 void CWE_MainWindow::setParameterConfig(QJsonDocument &obj)
 {
     ui->tab_parameters->setParameterConfig(obj);
@@ -171,17 +160,52 @@ void CWE_MainWindow::setParameterConfig(QJsonDocument &obj)
 
 void CWE_MainWindow::switchToResultsTab()
 {
-    ui->tabContainer->setCurrentWidget(ui->tab_results);
+    if (ui->tabContainer->isTabEnabled(ui->tabContainer->indexOf(ui->tab_results)))
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_results);
+    }
+    else
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
+    }
 }
 
 void CWE_MainWindow::switchToParameterTab()
 {
-    ui->tabContainer->setCurrentWidget(ui->tab_parameters);
+    if (ui->tabContainer->isTabEnabled(ui->tabContainer->indexOf(ui->tab_parameters)))
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_parameters);
+    }
+    else
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
+    }
 }
 
 void CWE_MainWindow::switchToCreateTab()
 {
     ui->tabContainer->setCurrentWidget(ui->tab_create_new);
+}
+
+void CWE_MainWindow::changeParamsAndResultsEnabled(bool setting)
+{
+    if (setting == true)
+    {
+        changeTabEnabled(ui->tab_parameters, true);
+        changeTabEnabled(ui->tab_results, true);
+
+        return;
+    }
+
+    if ((ui->tabContainer->currentWidget() == ui->tab_parameters) ||
+        (ui->tabContainer->currentWidget() == ui->tab_results))
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
+    }
+
+    //TODO: Want these visible but disabled: How?
+    changeTabEnabled(ui->tab_parameters, false);
+    changeTabEnabled(ui->tab_results, false);
 }
 
 void CWE_MainWindow::changeTabEnabled(QWidget * theTab, bool newSetting)

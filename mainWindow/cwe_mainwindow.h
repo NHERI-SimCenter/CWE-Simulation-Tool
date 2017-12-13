@@ -81,6 +81,7 @@ private slots:
     void menuCopyInfo();
 
 private:
+    void changeParamsAndResultsEnabled(bool setting);
     void changeTabEnabled(QWidget *theTab, bool newSetting);
 
     Ui::CWE_MainWindow *ui;
