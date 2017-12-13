@@ -6,11 +6,13 @@
 #include "cwe_parampanel.h"
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
+#include "SimCenter_widgets/sctrstddatawidget.h"
+#include "SimCenter_widgets/sctrbooldatawidget.h"
 
 CWE_ParamPanel::CWE_ParamPanel(QWidget *parent) :
     QFrame(parent)
 {
-    variableWidgets = new QMap<QString, SCtr_MasterDataWidget *>();
+    variableWidgets = new QMap<QString, SCtrMasterDataWidget *>();
     this->setViewState(SimCenterViewState::visible);
 }
 
@@ -65,3 +67,53 @@ bool CWE_ParamPanel::addVariable(QString varName, QJsonObject JSONvar, const QSt
     }
 }
 
+SCtrMasterDataWidget * CWE_ParamPanel::addVariable(QString varName, QJsonObject &theVariable)
+{
+    SCtrMasterDataWidget *theVar;
+
+    QLayout *layout = this->layout();
+
+    QString type = theVariable.value("type").toString();
+
+    if (type.toLower() == "std") {
+        theVar = new SCtrStdDataWidget(theVariable, this);
+        layout->addWidget(theVar);
+    }
+    else if (type.toLower() == "choose") {
+    }
+    else if (type.toLower() == "bool") {
+        theVar = new SCtrBoolDataWidget(theVariable, this);
+        layout->addWidget(theVar);
+    }
+    else if (type.toLower() == "file") {
+
+    }
+    else {
+        /* add an error message */
+        QMessageBox *msg = new QMessageBox(QMessageBox::Information,
+                                      QString("Warning"),
+                                      QString("Variable %1 of unknown type %2.\nVariable ignored.").arg(varName).arg(type));
+        msg->exec();
+    }
+
+    return theVar;
+}
+
+void CWE_ParamPanel::addParameterConfig(QJsonArray &groupVars, QJsonObject &allVars)
+{
+    QVBoxLayout *layout = (QVBoxLayout *)this->layout();
+    if (layout != NULL) { delete layout; }
+    layout = new QVBoxLayout();
+    this->setLayout(layout);
+
+    qDebug() << groupVars;
+
+    foreach (QJsonValue var, groupVars)
+    {
+        QString varName = var.toString();
+        QJsonObject theVariable = allVars.value(varName).toObject();
+        SCtrMasterDataWidget *varWidget = this->addVariable(varName, theVariable);
+    }
+
+    layout->addStretch(1);
+}

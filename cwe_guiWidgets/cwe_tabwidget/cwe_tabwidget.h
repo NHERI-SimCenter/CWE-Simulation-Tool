@@ -54,6 +54,8 @@ public:
 
     void addVarsData(QJsonObject , QJsonObject );
 
+    void setParameterConfig(QJsonObject &obj);
+
     QMap<QString, QString> collectParamData();
 
 private slots:
@@ -61,6 +63,8 @@ private slots:
     void on_pbtn_cancel_clicked();
     void on_pbtn_results_clicked();
     void on_pbtn_rollback_clicked();
+
+    void on_groupTabSelected(CWE_GroupsWidget *, QString);
 
 protected:
     void setButtonMode(uint mode);

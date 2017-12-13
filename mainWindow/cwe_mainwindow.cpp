@@ -163,6 +163,12 @@ void CWE_MainWindow::menuExit()
     myDriver->shutdown();
 }
 
+
+void CWE_MainWindow::setParameterConfig(QJsonDocument &obj)
+{
+    ui->tab_parameters->setParameterConfig(obj);
+}
+
 void CWE_MainWindow::switchToResultsTab()
 {
     ui->tabContainer->setCurrentWidget(ui->tab_results);

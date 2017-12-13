@@ -94,7 +94,8 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.cpp \
     ../AgaveExplorer/utilFuncs/authform.cpp \
     ../AgaveExplorer/utilFuncs/copyrightdialog.cpp \
-    ../AgaveExplorer/utilFuncs/singlelinedialog.cpp
+    ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
+    SimCenter_widgets/sctrbooldatawidget.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -143,7 +144,8 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.h \
     ../AgaveExplorer/utilFuncs/authform.h \
     ../AgaveExplorer/utilFuncs/copyrightdialog.h \
-    ../AgaveExplorer/utilFuncs/singlelinedialog.h
+    ../AgaveExplorer/utilFuncs/singlelinedialog.h \
+    SimCenter_widgets/sctrbooldatawidget.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
