@@ -116,6 +116,12 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 
         /* set the parameter information for the CWE_GroupsWidget */
         groupWidget->setParameterConfig(stageName, obj);
+
+        /* connect signals and slots */
+        connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
+        //connect(tab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
+
+
     }
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -395,4 +401,12 @@ void CWE_TabWidget::addStageTab(QString key, QJsonObject &obj)
     newTab->setCorrespondingPanel(newPanel);
     ui->tabsBar->layout()->addWidget(newTab);
     ui->stagePanels->addWidget(newPanel);
+}
+
+
+/* *** SLOTS *** */
+
+void CWE_TabWidget::on_groupTabSelected(CWE_GroupsWidget *groupWidget, QString s)
+{
+    //ui->stagePanels->setCurrentWidget();
 }
