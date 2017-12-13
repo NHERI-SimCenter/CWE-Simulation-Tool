@@ -160,9 +160,18 @@ void CWE_GroupsWidget::setParameterConfig(QString key, QJsonObject &obj)
     foreach (QJsonValue group, groups)
     {
         QString groupName = group.toString();
-        this->addTab(new CWE_ParamPanel(this), groupName);
-    }
+        QScrollArea *scrollArea = new QScrollArea(this);
+        CWE_ParamPanel *panel = new CWE_ParamPanel(this);
+        scrollArea->setWidgetResizable(true);
+        scrollArea->setWidget(panel);
 
+        this->addTab(scrollArea, groupName);
+
+        /* now add the parameter tabs */
+        QJsonArray groupVars = obj.value(QString("varGroups")).toObject().value(groupName).toArray();
+        QJsonObject allVars  = obj.value(QString("vars")).toObject();
+        panel->addParameterConfig(groupVars, allVars);
+    }
 }
 
 void CWE_GroupsWidget::linkWidget(CWE_StageStatusTab *tab)

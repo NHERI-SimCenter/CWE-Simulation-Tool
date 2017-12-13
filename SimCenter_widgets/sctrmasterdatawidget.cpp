@@ -1,4 +1,5 @@
-#include "sctrmasterdatawidget.h"
+#include "SimCenter_widgets/sctrbooldatawidget.h"
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 #include "cwe_guiWidgets/cwe_defines.h"
 
@@ -17,6 +18,11 @@
 SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
     QFrame(parent)
 {
+    theInputWidget = NULL;
+    theCheckBox    = NULL;
+    theComboBox    = NULL;
+    theValue       = NULL;
+
     // set up the UI for the widget
     this->initUI();
 
@@ -75,23 +81,26 @@ SimCenterViewState SCtrMasterDataWidget::ViewState()
 
 void SCtrMasterDataWidget::setViewState(SimCenterViewState state)
 {
-    switch (state) {
-    case SimCenterViewState::editable:
-        theInputWidget->setEnabled(false);
-        this->show();
-        m_ViewState = SimCenterViewState::editable;
-        break;
-    case SimCenterViewState::hidden:
-        theInputWidget->setEnabled(true);
-        this->hide();
-        m_ViewState = SimCenterViewState::hidden;
-        break;
-    case SimCenterViewState::visible:
-    default:
-        theInputWidget->setEnabled(true);
-        this->show();
-        m_ViewState = SimCenterViewState::visible;
-        break;
+    if (theInputWidget != NULL ) {
+
+        switch (state) {
+        case SimCenterViewState::editable:
+            theInputWidget->setEnabled(false);
+            this->show();
+            m_ViewState = SimCenterViewState::editable;
+            break;
+        case SimCenterViewState::hidden:
+            theInputWidget->setEnabled(true);
+            this->hide();
+            m_ViewState = SimCenterViewState::hidden;
+            break;
+        case SimCenterViewState::visible:
+        default:
+            theInputWidget->setEnabled(true);
+            this->show();
+            m_ViewState = SimCenterViewState::visible;
+            break;
+        }
     }
 }
 
