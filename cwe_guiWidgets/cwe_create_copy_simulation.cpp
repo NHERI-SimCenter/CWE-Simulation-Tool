@@ -40,6 +40,13 @@ void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
 
 void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 {
+    if (myDriver->inOfflineMode())
+    {
+        myDriver->setCurrentCase(new CFDcaseInstance(selectedTemplate, myDriver));
+        myDriver->getMainWindow()->switchToParameterTab();
+        return;
+    }
+
     /* take emergency exit if nothing has been selected */
     FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
     if (selectedNode == NULL) { return; }
