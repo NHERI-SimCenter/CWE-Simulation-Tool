@@ -39,7 +39,7 @@ void CWE_StageStatusTab::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         this->setActive(true);
         this->setStyleSheet("QFrame {background: #B0BEC5;}");
-        emit btn_pressed(m_index, m_name);
+        emit btn_pressed(myPanel, m_name);
     }
 }
 
@@ -47,7 +47,7 @@ void CWE_StageStatusTab::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         this->setActive();
-        emit btn_released(m_index);
+        emit btn_released(myPanel);
     }
 }
 
