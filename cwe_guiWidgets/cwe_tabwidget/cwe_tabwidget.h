@@ -54,6 +54,8 @@ public:
 
     void addVarsData(QJsonObject , QJsonObject );
 
+    void setParameterConfig(QJsonObject &obj);
+
     QMap<QString, QString> collectParamData();
 
 private slots:

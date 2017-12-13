@@ -7,9 +7,8 @@ CWE_StageStatusTab::CWE_StageStatusTab(QString stageName, QWidget *parent) :
     QFrame(parent),
     ui(new Ui::CWE_StageStatusTab)
 {
-    //m_active = true;
-    internal_name = stageName;
     ui->setupUi(this);
+    this->setName(stageName);
     this->setInActive();
 }
 
@@ -40,7 +39,7 @@ void CWE_StageStatusTab::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         this->setActive(true);
         this->setStyleSheet("QFrame {background: #B0BEC5;}");
-        emit btn_pressed(m_index, internal_name);
+        emit btn_pressed(m_index, m_name);
     }
 }
 
@@ -64,4 +63,16 @@ void CWE_StageStatusTab::setInActive(bool b)
     this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none}");
     if (!b) this->setActive();
     m_active = !b;
+}
+
+
+void CWE_StageStatusTab::setName(const QString s)
+{
+    m_name = s;
+    ui->mainLabel->setText(s);
+}
+
+void CWE_StageStatusTab::linkWidget(CWE_GroupsWidget *ptr)
+{
+    myPanel = ptr;
 }

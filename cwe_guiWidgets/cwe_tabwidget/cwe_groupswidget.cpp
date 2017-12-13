@@ -150,4 +150,12 @@ void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArra
     */
 }
 
+void CWE_GroupsWidget::setParameterConfig(QJsonObject &groupDoc)
+{
+    /* find all groups and create a tab per group */
+}
 
+void CWE_GroupsWidget::linkWidget(CWE_StageStatusTab *tab)
+{
+    myTab = tab;
+}

@@ -40,23 +40,28 @@ void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
 
 void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 {
+    /* take emergency exit if nothing has been selected */
     FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
-    if (selectedNode == NULL)
-    {
-        return;
-    }
+    if (selectedNode == NULL) { return; }
 
+    /* OK, something has been selected */
     CFDcaseInstance * newCase;
 
     //TODO: VERY IMPORTANT: NEED INPUT FILTERING
+    // PETER S.: what have you been thinkng of with this statement?
+
     if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
     {
+        /* we are creating a new case */
+
         if (selectedTemplate == NULL) return;
         newCase = new CFDcaseInstance(selectedTemplate, myDriver);
         newCase->createCase(ui->lineEdit_newCaseName->text(), selectedNode);
     }
     else
     {
+        /* we are cloning from an existing case */
+
         FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
         if (secondNode == NULL)
         {
@@ -71,6 +76,12 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
     }
 
     myDriver->setCurrentCase(newCase);
+
+    /* fetch the configuration file which holds the information for the ParameterTab */
+    QJsonDocument *config = selectedTemplate->getRawConfig();
+    myDriver->getMainWindow()->setParameterConfig(*config);
+
+    /* time to switch to the ParameterTab */
     myDriver->getMainWindow()->switchToParameterTab();
 }
 
