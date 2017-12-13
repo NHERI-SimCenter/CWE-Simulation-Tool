@@ -79,71 +79,80 @@ void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
 {
     if (newFile == NULL)
     {
-        tempCase = NULL;
-        ui->label_caseStatus->setCurrentCase(NULL);
-        clearSelectView();
+        myDriver->setCurrentCase(NULL);
         return;
     }
 
-    tempCase = new CFDcaseInstance(newFile, myDriver);
-    ui->label_caseStatus->setCurrentCase(tempCase);
-    //QObject::connect(tempCase, SIGNAL(haveNewState(CaseState)), this, SLOT(provisionalCaseStateChange(CaseState)));
-    //provisionalCaseStateChange(tempCase->getCaseState());
+    myDriver->setCurrentCase(new CFDcaseInstance(newFile, myDriver));
 }
 
 void CWE_manage_simulation::newCaseGiven()
 {
     CFDcaseInstance * newCase = myDriver->getCurrentCase();
 
-    ui->label_caseStatus->setCurrentCase(newCase);
+    ui->label_caseStatus->setCurrentCase(newCase);    
+
+    ui->treeView->setEnabled(true);
+    clearSelectView();
+
+    ui->pb_viewParameters->setEnabled(false);
+    ui->pb_viewResults->setEnabled(false);
 
     if (newCase != NULL)
     {
+        ui->label_caseName->setText(newCase->getCaseName());
+
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
         newCaseState(newCase->getCaseState());
     }
     else
     {
-        ui->pb_viewParameters->setEnabled(false);
-        ui->pb_viewResults->setEnabled(false);
+        ui->treeView->clearSelection();
     }
 }
 
 void CWE_manage_simulation::newCaseState(CaseState newState)
 {
-    //TODO: From PRS: I was not feeling well when writing this.
-    //My instinct says this code should be reviewed.
+    if (newState == CaseState::OP_INVOKE)
+    {
+        //TODO: This should be visible but unclickable
+        ui->treeView->setEnabled(false);
+
+        showSelectView();
+        ui->pb_viewParameters->setEnabled(false);
+        ui->pb_viewResults->setEnabled(false);
+        return;
+    }
+
+    ui->treeView->setEnabled(true);
+
+    if ((newState == CaseState::DEFUNCT) ||
+            (newState == CaseState::ERROR) ||
+            (newState == CaseState::INVALID) ||
+            (newState == CaseState::LOADING))
+    {
+        if (newState == CaseState::DEFUNCT)
+        {
+            ui->treeView->clearSelection();
+        }
+        if (newState != CaseState::LOADING)
+        {
+            clearSelectView();
+            ui->pb_viewParameters->setEnabled(false);
+            ui->pb_viewResults->setEnabled(false);
+        }
+        return;
+    }
 
     if ((newState == CaseState::JOB_RUN) || (newState == CaseState::READY))
     {
         ui->pb_viewParameters->setEnabled(true);
         ui->pb_viewResults->setEnabled(true);
-    }
-    else
-    {
-        ui->pb_viewParameters->setEnabled(false);
-        ui->pb_viewResults->setEnabled(false);
-    }
 
-    if ((newState == CaseState::DEFUNCT)
-             || (newState == CaseState::ERROR)
-             || (newState == CaseState::INVALID))
-    {
-        tempCase->deleteLater();
-        tempCase = NULL;
-        ui->label_caseStatus->setCurrentCase(NULL);
-        ui->label_caseName->setText("N/A");
-        clearSelectView();
-        return;
-    }
-    else if (newState == CaseState::LOADING)
-    {
-        clearSelectView();
-    }
-    else
-    {
-        CFDanalysisType * theType = tempCase->getMyType();
+        CFDcaseInstance * theCase = myDriver->getCurrentCase();
+
+        CFDanalysisType * theType = theCase->getMyType();
         if (theType == NULL)
         {
             myDriver->fatalInterfaceError("Type/stage mismatch for case.");
@@ -151,12 +160,12 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         }
         ui->label_CaseTypeIcon->setPixmap(theType->getIcon()->pixmap(150,100));
 
-        QMap<QString, StageState> stages = tempCase->getStageStates();
+        QMap<QString, StageState> stages = theCase->getStageStates();
         stageListModel.clear();
 
         for (auto itr = stages.cbegin(); itr != stages.cend(); itr++)
         {
-            QString aLine = tempCase->getMyType()->translateStageId(itr.key());
+            QString aLine = theCase->getMyType()->translateStageId(itr.key());
             aLine = aLine.append(" - ");
             aLine = aLine.append(getStateText(*itr));
             stageListModel.appendRow(new QStandardItem(aLine));
@@ -164,22 +173,16 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
 
         showSelectView();
     }
-
-    ui->label_caseName->setText(tempCase->getCaseName());
 }
 
 void CWE_manage_simulation::on_pb_viewParameters_clicked()
 {
-    if (!verifyCaseAndSelect()) return;
-
     // switch main window to parameters tab
     myDriver->getMainWindow()->switchToParameterTab();
 }
 
 void CWE_manage_simulation::on_pb_viewResults_clicked()
 {
-    if (!verifyCaseAndSelect()) return;
-
     // switch main window to results tab
     myDriver->getMainWindow()->switchToResultsTab();
 }
@@ -198,24 +201,6 @@ void CWE_manage_simulation::showSelectView()
     ui->label_CaseTypeIcon->setVisible(true);
     ui->label_stageListTag->setVisible(true);
     ui->stageListView->setVisible(true);
-}
-
-bool CWE_manage_simulation::verifyCaseAndSelect()
-{
-    if (tempCase == NULL)
-    {
-        return false;
-    }
-
-    CaseState theState = tempCase->getCaseState();
-    if ((theState == CaseState::JOB_RUN)
-            || (theState == CaseState::READY)
-            || (theState == CaseState::OP_INVOKE))
-    {
-        myDriver->setCurrentCase(tempCase);
-        return true;
-    }
-    return false;
 }
 
 QString CWE_manage_simulation::getStateText(StageState theState)

@@ -75,12 +75,9 @@ private:
     void clearSelectView();
     void showSelectView();
 
-    bool verifyCaseAndSelect();
     QString getStateText(StageState theState);
 
     Ui::CWE_manage_simulation *ui;
-
-    CFDcaseInstance * tempCase = NULL;
 
     QStandardItemModel stageListModel;
 };

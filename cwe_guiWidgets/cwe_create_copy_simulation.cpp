@@ -75,11 +75,8 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
         }
     }
 
+    //Set new case will signal the other panels so that they can get configurations
     myDriver->setCurrentCase(newCase);
-
-    /* fetch the configuration file which holds the information for the ParameterTab */
-    QJsonDocument *config = selectedTemplate->getRawConfig();
-    myDriver->getMainWindow()->setParameterConfig(*config);
 
     /* time to switch to the ParameterTab */
     myDriver->getMainWindow()->switchToParameterTab();
