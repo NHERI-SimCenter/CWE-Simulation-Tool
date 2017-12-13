@@ -186,6 +186,12 @@ void CWE_MainWindow::on_actionManage_and_Download_Files_triggered()
 
 }
 
+
+void CWE_MainWindow::setParameterConfig(QJsonDocument &obj)
+{
+    ui->tab_parameters->setParameterConfig(obj);
+}
+
 void CWE_MainWindow::switchToResultsTab()
 {
     ui->tabContainer->setCurrentWidget(ui->tab_results);

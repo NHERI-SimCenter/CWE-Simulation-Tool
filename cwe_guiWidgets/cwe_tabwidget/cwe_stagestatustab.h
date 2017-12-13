@@ -21,7 +21,7 @@ public:
 
     void setStatus(QString);
     void setText(QString);
-    void setName(const QString s) {m_name = s;};
+    void setName(const QString s);
     void setIndex(int idx) {m_index = idx;};
     QString name() {return m_name;};
     QString text() {return m_text;};
@@ -29,6 +29,7 @@ public:
     int index() {return m_index;};
     void setActive(bool b=true);
     void setInActive(bool b=true);
+    void linkWidget(CWE_GroupsWidget *ptr);
 
 signals:
     void btn_pressed(int, QString);
@@ -45,8 +46,6 @@ private:
     //void paintEvent(QPaintEvent*);
 
     CWE_GroupsWidget * myPanel = NULL;
-
-    QString internal_name;
 
     QString m_text;
     QString m_status = "unknown";

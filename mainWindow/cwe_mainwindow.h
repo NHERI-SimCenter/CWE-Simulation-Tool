@@ -69,6 +69,7 @@ public:
 
     void attachCaseSignals(CFDcaseInstance * newCase);
 
+    void setParameterConfig(QJsonDocument &obj);
     void switchToParameterTab();
     void switchToResultsTab();
     void switchToCreateTab();

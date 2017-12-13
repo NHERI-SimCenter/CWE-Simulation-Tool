@@ -85,6 +85,43 @@ void CWE_TabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
 
 }
 
+void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
+{
+    QVBoxLayout *tablayout = (QVBoxLayout *)ui->tabsBar->layout();
+    delete tablayout;
+    tablayout = new QVBoxLayout(this);
+    tablayout->setMargin(0);
+    tablayout->setSpacing(0);
+    ui->tabsBar->setLayout(tablayout);
+
+    QJsonArray  sequence = obj.value(QString("sequence")).toArray();
+    QJsonObject stages   = obj.value(QString("stages")).toObject();
+
+    foreach (QJsonValue theStage, sequence)
+    {
+        QString stageName = theStage.toString();
+
+        /* create a CWE_StageStatusTab */
+        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageName, this);
+        tablayout->addWidget(tab);
+        //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
+
+        /* create a CWE_GroupsWidget */
+        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(this);
+        ui->stagePanels->addWidget(groupWidget);
+
+        /* link tab and groupWidget */
+        tab->linkWidget(groupWidget);
+        groupWidget->linkWidget(tab);
+
+        /* set the parameter information for the CWE_GroupsWidget */
+        //QJsonObject groupDoc = ....;
+        //groupWidget->setParameterConfig(groupDoc);
+    }
+
+    tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+}
+
 /* *** moved to SCtrDataWidget ***
 
 QWidget * CWE_TabWidget::addStd(QJsonObject JSONvar, QWidget *parent, QString *setVal)
