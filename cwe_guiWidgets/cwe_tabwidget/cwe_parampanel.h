@@ -6,7 +6,7 @@
 #include <QJsonObject>
 #include <SimCenter_widgets/sctrstates.h>
 
-class SCtr_MasterDataWidget;
+class SCtrMasterDataWidget;
 
 namespace Ui {
 class CWE_ParamPanel;
@@ -24,11 +24,13 @@ public:
     SimCenterViewState getViewState();
     void setData(QJsonObject &);
     bool addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString * setVal);
+    SCtrMasterDataWidget * addVariable(QString varName, QJsonObject &theVariable);
+    void addParameterConfig(QJsonArray &groupVars, QJsonObject &allVars);
 
 private:
     SimCenterViewState m_viewState;
     QJsonObject m_obj;
-    QMap<QString, SCtr_MasterDataWidget *> *variableWidgets;
+    QMap<QString, SCtrMasterDataWidget *> *variableWidgets;
 };
 
 #endif // CWE_PARAMPANEL_H

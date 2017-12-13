@@ -47,7 +47,13 @@ private slots:
     void on_theValue_editingFinished();
 
 protected:
-    QWidget *theInputWidget;
+    QWidget   *theInputWidget;
+    QLineEdit *theValue;
+    QCheckBox *theCheckBox;
+    QComboBox *theComboBox;
+
+    QLabel  *label_varName = NULL;
+    QLabel  *label_unit = NULL;
 
 private:
     void setVariableName(QString s);
@@ -56,12 +62,6 @@ private:
     void showLineEdit();
     void showCheckBox();
     void showComboBox();
-
-    QLineEdit *theValue;
-    QCheckBox *theCheckBox;
-    QComboBox *theComboBox;
-    QLabel *label_varName = NULL;
-    QLabel *label_unit = NULL;
 
     SimCenterViewState m_ViewState;
 
