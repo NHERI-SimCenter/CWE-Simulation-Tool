@@ -7,7 +7,9 @@
 
 #include "cwe_stagestatustab.h"
 #include "SimCenter_widgets/sctrstates.h"
+#include "cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h"
 #include <QJsonObject>
+#include <QJsonArray>
 
 CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) : QTabWidget(parent)
 {
@@ -76,8 +78,8 @@ int CWE_GroupsWidget::addGroupTab(QString key, const QString &label, StageState 
 
     groupWidget->insert(key, newTab);
 
-    connect(newTab,SIGNAL(btn_pressed(int,QString)),this,SLOT(on_groupTabSelected(int, QString)));
-    //connect(newTab,SIGNAL(btn_released(int)),this,SLOT(on_groupTabSelected(int)));
+    connect(newTab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
+    //connect(newTab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
 
     // create the widget to hold the parameter input
     QTabWidget *pWidget = new QTabWidget();
@@ -150,4 +152,29 @@ void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArra
     */
 }
 
+void CWE_GroupsWidget::setParameterConfig(QString key, QJsonObject &obj)
+{
+    /* find all groups and create a tab per group */
+    QJsonArray groups = obj.value(QString("stages")).toObject().value(key).toObject().value(QString("groups")).toArray();
 
+    foreach (QJsonValue group, groups)
+    {
+        QString groupName = group.toString();
+        QScrollArea *scrollArea = new QScrollArea(this);
+        CWE_ParamPanel *panel = new CWE_ParamPanel(this);
+        scrollArea->setWidgetResizable(true);
+        scrollArea->setWidget(panel);
+
+        this->addTab(scrollArea, groupName);
+
+        /* now add the parameter tabs */
+        QJsonArray groupVars = obj.value(QString("varGroups")).toObject().value(groupName).toArray();
+        QJsonObject allVars  = obj.value(QString("vars")).toObject();
+        panel->addParameterConfig(groupVars, allVars);
+    }
+}
+
+void CWE_GroupsWidget::linkWidget(CWE_StageStatusTab *tab)
+{
+    myTab = tab;
+}

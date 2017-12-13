@@ -21,18 +21,19 @@ public:
 
     void setStatus(QString);
     void setText(QString);
-    void setName(const QString s) {m_name = s;};
-    void setIndex(int idx) {m_index = idx;};
+    void setName(const QString s);
+    //void setIndex(int idx) {m_index = idx;};
     QString name() {return m_name;};
     QString text() {return m_text;};
     QString status() {return m_status;};
-    int index() {return m_index;};
+    //int index() {return m_index;};
     void setActive(bool b=true);
     void setInActive(bool b=true);
+    void linkWidget(CWE_GroupsWidget *ptr);
 
 signals:
-    void btn_pressed(int, QString);
-    void btn_released(int);
+    void btn_pressed(CWE_GroupsWidget *, QString);
+    void btn_released(CWE_GroupsWidget *);
 
 private slots:
 
@@ -46,12 +47,10 @@ private:
 
     CWE_GroupsWidget * myPanel = NULL;
 
-    QString internal_name;
-
     QString m_text;
     QString m_status = "unknown";
     QString m_name = "label text";
-    int m_index = -1;
+    //int m_index = -1;
     bool m_active;
 };
 

@@ -14,10 +14,9 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "cwe_guiWidgets/cwe_parameters.h"
-
-#include "qdebug.h"
-
 #include "../CFDClientProgram/vwtinterfacedriver.h"
+
+#include "SimCenter_widgets/sctrdatawidget.h"
 
 CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     QFrame(parent),
@@ -83,6 +82,48 @@ int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varL
 void CWE_TabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
 {
 
+}
+
+void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
+{
+    QVBoxLayout *tablayout = (QVBoxLayout *)ui->tabsBar->layout();
+    delete tablayout;
+    tablayout = new QVBoxLayout(this);
+    tablayout->setMargin(0);
+    tablayout->setSpacing(0);
+    ui->tabsBar->setLayout(tablayout);
+
+    QJsonArray  sequence = obj.value(QString("sequence")).toArray();
+    QJsonObject stages   = obj.value(QString("stages")).toObject();
+
+    foreach (QJsonValue theStage, sequence)
+    {
+        QString stageName = theStage.toString();
+
+        /* create a CWE_StageStatusTab */
+        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageName, this);
+        tablayout->addWidget(tab);
+        //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
+
+        /* create a CWE_GroupsWidget */
+        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(this);
+        ui->stagePanels->addWidget(groupWidget);
+
+        /* link tab and groupWidget */
+        tab->linkWidget(groupWidget);
+        groupWidget->linkWidget(tab);
+
+        /* set the parameter information for the CWE_GroupsWidget */
+        groupWidget->setParameterConfig(stageName, obj);
+
+        /* connect signals and slots */
+        connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
+        //connect(tab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
+
+
+    }
+
+    tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 }
 
 /* *** moved to SCtrDataWidget ***
@@ -359,4 +400,12 @@ void CWE_TabWidget::addStageTab(QString key, QJsonObject &obj)
     newTab->setCorrespondingPanel(newPanel);
     ui->tabsBar->layout()->addWidget(newTab);
     ui->stagePanels->addWidget(newPanel);
+}
+
+
+/* *** SLOTS *** */
+
+void CWE_TabWidget::on_groupTabSelected(CWE_GroupsWidget *groupWidget, QString s)
+{
+    //ui->stagePanels->setCurrentWidget();
 }

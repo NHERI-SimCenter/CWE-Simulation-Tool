@@ -67,6 +67,8 @@ public:
 
     void runSetupSteps();
 
+    void setParameterConfig(QJsonDocument &obj);
+
     void switchToParameterTab();
     void switchToResultsTab();
     void switchToCreateTab();
