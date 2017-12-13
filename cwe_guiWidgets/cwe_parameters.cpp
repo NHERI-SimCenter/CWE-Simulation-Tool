@@ -16,8 +16,6 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
     CWE_Super(parent),
     ui(new Ui::CWE_Parameters)
 {
-    configFile = NULL;
-
     ui->setupUi(this);
     ui->theTabWidget->setController(this);
 }
@@ -106,17 +104,6 @@ void CWE_Parameters::initStateTabs()
     viewIsValid = true;
 
     //??? ui->theTabWidget->
-}
-
-void CWE_Parameters::setParameterConfig(QJsonDocument &doc)
-{
-    if (configFile != NULL) {
-        delete configFile;
-    }
-    configFile = new QJsonDocument(doc);
-    QJsonObject obj = configFile->object();
-
-    ui->theTabWidget->setParameterConfig(obj);
 }
 
 void CWE_Parameters::resetViewInfo()

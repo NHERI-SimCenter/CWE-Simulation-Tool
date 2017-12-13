@@ -108,6 +108,7 @@ void CWE_MainWindow::newCaseGiven()
 {
     CFDcaseInstance * newCase = myDriver->getCurrentCase();
 
+    changeParamsAndResultsEnabled(false);
     if (stateLabel != NULL)
     {
         stateLabel->setCurrentCase(newCase);
@@ -115,17 +116,12 @@ void CWE_MainWindow::newCaseGiven()
 
     if (newCase == NULL)
     {
-        changeParamsAndResultsEnabled(false);
-
         return;
     }
-    else
-    {
-        QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
+    QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
-        //Manually invoke state change to initialize visibility
-        newCaseState(newCase->getCaseState());
-    }
+    //Manually invoke state change to initialize visibility
+    newCaseState(newCase->getCaseState());
 }
 
 void CWE_MainWindow::newCaseState(CaseState newState)
@@ -135,6 +131,10 @@ void CWE_MainWindow::newCaseState(CaseState newState)
             (newState == CaseState::INVALID))
     {
         changeParamsAndResultsEnabled(false);
+    }
+    else if (newState == CaseState::LOADING)
+    {
+        return;
     }
     else
     {
@@ -151,11 +151,6 @@ void CWE_MainWindow::menuCopyInfo()
 void CWE_MainWindow::menuExit()
 {
     myDriver->shutdown();
-}
-
-void CWE_MainWindow::setParameterConfig(QJsonDocument &obj)
-{
-    ui->tab_parameters->setParameterConfig(obj);
 }
 
 void CWE_MainWindow::switchToResultsTab()
