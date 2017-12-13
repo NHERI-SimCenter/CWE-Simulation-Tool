@@ -76,6 +76,11 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
                      this, SLOT(agaveTaskDone(RequestState)));
+
+    if (theDriver->inOfflineMode())
+    {
+        myState = CaseState::OFFLINE;
+    }
 }
 
 CFDcaseInstance::CFDcaseInstance(VWTinterfaceDriver *mainDriver):
@@ -89,6 +94,11 @@ CFDcaseInstance::CFDcaseInstance(VWTinterfaceDriver *mainDriver):
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
                      this, SLOT(agaveTaskDone(RequestState)));
+
+    if (theDriver->inOfflineMode())
+    {
+        myState = CaseState::OFFLINE;
+    }
 }
 
 bool CFDcaseInstance::isDefunct()
@@ -364,6 +374,8 @@ void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolde
 {
     if (defunct) return;
 
+    if (myState == CaseState::OFFLINE) return;
+
     if (currentReq != PendingCFDrequest::NONE) return;
     if (theDriver->getFileHandler()->operationIsPending()) return;
     if (caseFolder != NULL) return;
@@ -389,6 +401,8 @@ void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolde
 void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFolder, FileTreeNode * oldCase)
 {
     if (defunct) return;
+
+    if (myState == CaseState::OFFLINE) return;
 
     if (containingFolder == NULL) return;
     if (oldCase == NULL) return;
@@ -418,6 +432,8 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 {
     if (defunct) return;
     if (caseFolder == NULL) return;
+
+    if (myState == CaseState::OFFLINE) return;
 
     if (currentReq != PendingCFDrequest::NONE) return;
     if (theDriver->getFileHandler()->operationIsPending()) return;
@@ -475,6 +491,8 @@ void CFDcaseInstance::startStageApp(QString stageID)
     if (defunct) return;
     if (caseFolder == NULL) return;
 
+    if (myState == CaseState::OFFLINE) return;
+
     if (currentReq != PendingCFDrequest::NONE) return;
 
     QString appName = "cwe-";
@@ -502,6 +520,8 @@ void CFDcaseInstance::rollBack(QString stageToDelete)
     //TODO: Also need to rollback subsequent stages eventually.
     if (defunct) return;
     if (caseFolder == NULL) return;
+
+    if (myState == CaseState::OFFLINE) return;
 
     if (currentReq != PendingCFDrequest::NONE) return;
     if (theDriver->getFileHandler()->operationIsPending()) return;
