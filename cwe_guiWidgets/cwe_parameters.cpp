@@ -138,6 +138,8 @@ void CWE_Parameters::newCaseGiven()
     {
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
+        QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
+        ui->theTabWidget->setParameterConfig(rawConfig);
     }
 
     resetViewInfo();
