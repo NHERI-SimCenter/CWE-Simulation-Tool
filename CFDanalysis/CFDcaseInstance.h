@@ -63,7 +63,7 @@ enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, JOB_RUN, OP_INVOKE};
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, JOB_RUN, OP_INVOKE, OFFLINE};
 //LOADING: Reloading file info to determine case stats
 //JOB_RUN: Running long-running tasks
 //OP_INVOKE: Running short file operations

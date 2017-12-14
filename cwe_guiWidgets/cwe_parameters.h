@@ -46,8 +46,6 @@ public:
     void switchToResults();
     void performCaseCommand(QString stage, CaseCommand toEnact);
 
-    void setParameterConfig(QJsonDocument &doc);
-
 private slots:
     void on_pbtn_saveAllParameters_clicked();
 
@@ -62,8 +60,6 @@ private:
     bool viewIsValid = false;
 
     QMap<QString, int> stageTabsIndex;
-
-    QJsonDocument *configFile;
 };
 
 #endif // CWE_PARAMETERS_H

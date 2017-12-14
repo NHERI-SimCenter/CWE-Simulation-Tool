@@ -51,16 +51,21 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     //Esablish connections with driver
     myDriver = newDriver;
 
+    QObject::connect(myDriver, SIGNAL(haveNewCase()),
+                     this, SLOT(newCaseGiven()));
+
     if (!myDriver->inDebugMode())
     {
         ui->tab_debug->deleteLater();
     }
 
+    changeParamsAndResultsEnabled(false);
+
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
 
-    changeTabVisible((QTabWidget *)ui->tab_spacer_1, false);
-    changeTabVisible((QTabWidget *)ui->tab_spacer_2, false);
+    changeTabEnabled(ui->tab_spacer_1, false);
+    changeTabEnabled(ui->tab_spacer_2, false);
 
     // adjust application size to display
     QRect rec = QApplication::desktop()->screenGeometry();
@@ -99,15 +104,42 @@ void CWE_MainWindow::runSetupSteps()
     }
 }
 
-void CWE_MainWindow::attachCaseSignals(CFDcaseInstance * newCase)
+void CWE_MainWindow::newCaseGiven()
 {
-    QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
-                     ui->tab_parameters, SLOT(newCaseState(CaseState)));
+    CFDcaseInstance * newCase = myDriver->getCurrentCase();
+
+    changeParamsAndResultsEnabled(false);
     if (stateLabel != NULL)
     {
         stateLabel->setCurrentCase(newCase);
     }
-    //It is expected that this list will grow
+
+    if (newCase == NULL)
+    {
+        return;
+    }
+    QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
+                         this, SLOT(newCaseState(CaseState)));
+    //Manually invoke state change to initialize visibility
+    newCaseState(newCase->getCaseState());
+}
+
+void CWE_MainWindow::newCaseState(CaseState newState)
+{
+    if ((newState == CaseState::DEFUNCT) ||
+            (newState == CaseState::ERROR) ||
+            (newState == CaseState::INVALID))
+    {
+        changeParamsAndResultsEnabled(false);
+    }
+    else if (newState == CaseState::LOADING)
+    {
+        return;
+    }
+    else
+    {
+        changeParamsAndResultsEnabled(true);
+    }
 }
 
 void CWE_MainWindow::menuCopyInfo()
@@ -121,85 +153,28 @@ void CWE_MainWindow::menuExit()
     myDriver->shutdown();
 }
 
-void CWE_MainWindow::on_action_Quit_triggered()
-{
-    myDriver->shutdown();
-}
-
-void CWE_MainWindow::on_actionOpen_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_actionOpen_existing_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_actionSave_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_actionSave_As_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_actionAbout_CWE_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_actionCreate_New_Simulation_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_actionManage_Simulation_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_actionHelp_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_action_Landing_Page_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_actionManage_Remote_Jobs_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_actionTutorials_and_Help_triggered()
-{
-
-}
-
-void CWE_MainWindow::on_actionManage_and_Download_Files_triggered()
-{
-
-}
-
-
-void CWE_MainWindow::setParameterConfig(QJsonDocument &obj)
-{
-    ui->tab_parameters->setParameterConfig(obj);
-}
-
 void CWE_MainWindow::switchToResultsTab()
 {
-    ui->tabContainer->setCurrentWidget(ui->tab_results);
+    if (ui->tabContainer->isTabEnabled(ui->tabContainer->indexOf(ui->tab_results)))
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_results);
+    }
+    else
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
+    }
 }
 
 void CWE_MainWindow::switchToParameterTab()
 {
-    ui->tabContainer->setCurrentWidget(ui->tab_parameters);
+    if (ui->tabContainer->isTabEnabled(ui->tabContainer->indexOf(ui->tab_parameters)))
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_parameters);
+    }
+    else
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
+    }
 }
 
 void CWE_MainWindow::switchToCreateTab()
@@ -207,7 +182,28 @@ void CWE_MainWindow::switchToCreateTab()
     ui->tabContainer->setCurrentWidget(ui->tab_create_new);
 }
 
-void CWE_MainWindow::changeTabVisible(QTabWidget * theTab, bool newSetting)
+void CWE_MainWindow::changeParamsAndResultsEnabled(bool setting)
+{
+    if (setting == true)
+    {
+        changeTabEnabled(ui->tab_parameters, true);
+        changeTabEnabled(ui->tab_results, true);
+
+        return;
+    }
+
+    if ((ui->tabContainer->currentWidget() == ui->tab_parameters) ||
+        (ui->tabContainer->currentWidget() == ui->tab_results))
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
+    }
+
+    //TODO: Want these visible but disabled: How?
+    changeTabEnabled(ui->tab_parameters, false);
+    changeTabEnabled(ui->tab_results, false);
+}
+
+void CWE_MainWindow::changeTabEnabled(QWidget * theTab, bool newSetting)
 {
     ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(theTab),newSetting);
 }

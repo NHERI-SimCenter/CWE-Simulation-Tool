@@ -1,8 +1,7 @@
 #include "cwe_parameters.h"
 #include "ui_cwe_parameters.h"
-#include "cwe_tabwidget/cwe_parampanel.h"
 
-#include "qdebug.h"
+#include "cwe_tabwidget/cwe_parampanel.h"
 
 #include "vwtinterfacedriver.h"
 #include "CFDanalysis/CFDanalysisType.h"
@@ -17,8 +16,6 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
     CWE_Super(parent),
     ui(new Ui::CWE_Parameters)
 {
-    configFile = NULL;
-
     ui->setupUi(this);
     ui->theTabWidget->setController(this);
 }
@@ -109,17 +106,6 @@ void CWE_Parameters::initStateTabs()
     //??? ui->theTabWidget->
 }
 
-void CWE_Parameters::setParameterConfig(QJsonDocument &doc)
-{
-    if (configFile != NULL) {
-        delete configFile;
-    }
-    configFile = new QJsonDocument(doc);
-    QJsonObject obj = configFile->object();
-
-    ui->theTabWidget->setParameterConfig(obj);
-}
-
 void CWE_Parameters::resetViewInfo()
 {
     viewIsValid = false;
@@ -146,6 +132,16 @@ void CWE_Parameters::saveAllParams()
 
 void CWE_Parameters::newCaseGiven()
 {
+    CFDcaseInstance * newCase = myDriver->getCurrentCase();
+
+    if (newCase != NULL)
+    {
+        QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
+                         this, SLOT(newCaseState(CaseState)));
+        QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
+        ui->theTabWidget->setParameterConfig(rawConfig);
+    }
+
     resetViewInfo();
 }
 

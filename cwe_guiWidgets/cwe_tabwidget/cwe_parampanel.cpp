@@ -6,13 +6,8 @@
 #include "cwe_parampanel.h"
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
-#include <QMessageBox>
-#include <QVBoxLayout>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QDebug>
-#include "SimCenter_widgets/SCtrStdDataWidget.h"
-#include "SimCenter_widgets/SCtrBoolDataWidget.h"
+#include "SimCenter_widgets/sctrstddatawidget.h"
+#include "SimCenter_widgets/sctrbooldatawidget.h"
 
 CWE_ParamPanel::CWE_ParamPanel(QWidget *parent) :
     QFrame(parent)
