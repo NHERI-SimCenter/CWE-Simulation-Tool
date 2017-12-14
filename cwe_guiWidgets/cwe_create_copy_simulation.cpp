@@ -146,8 +146,8 @@ void CWE_Create_Copy_Simulation::populateCaseTypes()
 
         /* create appropriate connection between signals and slots */
 
-        connect(buttonIcon, SIGNAL(pressed()),       this, SLOT(selectCaseTemplate()));
-        connect(radioBtn, SIGNAL(toggled(bool)),     this, SLOT(selectCaseTemplate()));
+        QObject::connect(buttonIcon, SIGNAL(pressed()),       this, SLOT(selectCaseTemplate()));
+        QObject::connect(radioBtn, SIGNAL(toggled(bool)),     this, SLOT(selectCaseTemplate()));
 
         idx++;
     }

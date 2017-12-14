@@ -117,8 +117,8 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         groupWidget->setParameterConfig(stageName, obj);
 
         /* connect signals and slots */
-        connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
-        //connect(tab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
+        QObject::connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
+        //QObject::connect(tab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
 
 
     }
