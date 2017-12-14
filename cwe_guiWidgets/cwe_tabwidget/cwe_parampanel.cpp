@@ -10,9 +10,13 @@
 #include <QVBoxLayout>
 #include <QJsonArray>
 #include <QJsonObject>
+
+#include "SimCenter_widgets/sctrchoicedatawidget.h"
+#include "SimCenter_widgets/sctrstddatawidget.h"
+#include "SimCenter_widgets/sctrbooldatawidget.h"
+
 #include <QDebug>
-#include "SimCenter_widgets/SCtrStdDataWidget.h"
-#include "SimCenter_widgets/SCtrBoolDataWidget.h"
+
 
 CWE_ParamPanel::CWE_ParamPanel(QWidget *parent) :
     QFrame(parent)
@@ -85,6 +89,8 @@ SCtrMasterDataWidget * CWE_ParamPanel::addVariable(QString varName, QJsonObject 
         layout->addWidget(theVar);
     }
     else if (type.toLower() == "choose") {
+        theVar = new SCtrChoiceDataWidget(theVariable, this);
+        layout->addWidget(theVar);
     }
     else if (type.toLower() == "bool") {
         theVar = new SCtrBoolDataWidget(theVariable, this);

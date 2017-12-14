@@ -19,7 +19,7 @@ void SCtrBoolDataWidget::setData(QJsonObject &obj)
 {
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
 
-     theCheckBox = new QCheckBox(this);
+    theCheckBox = new QCheckBox(this);
     layout->insertWidget(1, theCheckBox, 4);
 
     if (label_unit != NULL) {
