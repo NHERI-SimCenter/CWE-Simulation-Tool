@@ -1,4 +1,3 @@
-#include "SimCenter_widgets/sctrbooldatawidget.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 #include "cwe_guiWidgets/cwe_defines.h"

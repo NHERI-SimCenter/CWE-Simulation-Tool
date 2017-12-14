@@ -78,8 +78,8 @@ int CWE_GroupsWidget::addGroupTab(QString key, const QString &label, StageState 
 
     groupWidget->insert(key, newTab);
 
-    connect(newTab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
-    //connect(newTab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
+    QObject::connect(newTab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
+    //QObject::connect(newTab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
 
     // create the widget to hold the parameter input
     QTabWidget *pWidget = new QTabWidget();

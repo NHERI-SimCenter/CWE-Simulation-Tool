@@ -119,8 +119,6 @@ void CWE_ParamPanel::addParameterConfig(QJsonArray &groupVars, QJsonObject &allV
     layout = new QVBoxLayout();
     this->setLayout(layout);
 
-    qDebug() << groupVars;
-
     foreach (QJsonValue var, groupVars)
     {
         QString varName = var.toString();

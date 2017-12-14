@@ -24,8 +24,7 @@ CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //groupWidgetList = new QMap<QString, CWE_GroupsWidget *>();
-    //stageTabList    = new QMap<QString, CWE_StageStatusTab *>();
+    stageTabList = new QMap<QString, CWE_StageStatusTab *>();
 
     this->setButtonMode(CWE_BTN_NONE);
     this->setViewState(SimCenterViewState::visible);
@@ -34,6 +33,7 @@ CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
 CWE_TabWidget::~CWE_TabWidget()
 {
     delete ui;
+    delete stageTabList;
 }
 
 void CWE_TabWidget::setController(CWE_Parameters * newController)
@@ -66,6 +66,7 @@ void CWE_TabWidget::resetView()
 {
     //TODO: clear underlying widgets
 }
+
 int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
 {
     /*
@@ -93,16 +94,20 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     tablayout->setSpacing(0);
     ui->tabsBar->setLayout(tablayout);
 
+    stageTabList->clear();
+
     QJsonArray  sequence = obj.value(QString("sequence")).toArray();
     QJsonObject stages   = obj.value(QString("stages")).toObject();
 
     foreach (QJsonValue theStage, sequence)
     {
         QString stageName = theStage.toString();
+        QString stageLabel = stages.value(stageName).toObject().value("name").toString();
 
         /* create a CWE_StageStatusTab */
-        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageName, this);
+        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageLabel, this);
         tablayout->addWidget(tab);
+        stageTabList->insert(stageName, tab);
         //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
 
         /* create a CWE_GroupsWidget */
@@ -118,195 +123,14 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 
         /* connect signals and slots */
         QObject::connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
+        QObject::connect(tab,SIGNAL(btn_activated(CWE_StageStatusTab*)),this,SLOT(on_tabActivated(CWE_StageStatusTab *)));
         //QObject::connect(tab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
-
-
     }
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 }
 
-/* *** moved to SCtrDataWidget ***
 
-QWidget * CWE_TabWidget::addStd(QJsonObject JSONvar, QWidget *parent, QString *setVal)
-{
-    QVariant defaultOption = JSONvar["default"].toVariant();
-    QString unit           = JSONvar["unit"].toString();
-    // QJson fails to convert "1" to int, thus: QString::toInt( QJson::toString() )
-    int precision          = JSONvar["precision"].toString().toInt();
-
-    QLabel *theName = new QLabel(parent);
-    QString displayname = JSONvar["displayname"].toString();
-    theName->setText(displayname);
-    theName->setMinimumHeight(16);
-    //theName->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding);
-
-    QWidget * theValue;
-
-    if (precision > 0) {
-        theValue = new QDoubleSpinBox(parent);
-        ((QDoubleSpinBox *)theValue)->setValue(defaultOption.toDouble());
-        ((QDoubleSpinBox *)theValue)->setDecimals(precision);
-    }
-    else {
-        theValue = new QSpinBox(parent);
-        ((QSpinBox *)theValue)->setValue(defaultOption.toInt());
-    }
-
-    QLabel *theUnit = new QLabel(parent);
-    theUnit->setText(unit);
-
-    QGridLayout *layout = (QGridLayout*)(parent->layout());
-    int row = layout->rowCount();
-    layout->addWidget(theName, row,0);
-    layout->addWidget(theValue,row,1);
-    layout->addWidget(theUnit, row,2);
-
-    return theValue;
-}
-
-QWidget * CWE_TabWidget::addBool(QJsonObject JSONvar, QWidget *parent, QString * setVal)
-{
-    QLabel *theName = new QLabel(parent);
-    QString displayname = JSONvar["displayname"].toString();
-    theName->setText(displayname);
-
-    QCheckBox *theBox = new QCheckBox(parent);
-    if (setVal == NULL)
-    {
-        theBox->setChecked(JSONvar["default"].toBool());
-    }
-    else
-    {
-        theBox->setChecked(setVal);
-    }
-
-    QGridLayout *layout = (QGridLayout*)(parent->layout());
-    int row = layout->rowCount();
-    layout->addWidget(theName,row,0);
-    layout->addWidget(theBox, row,1);
-
-    return theBox;
-}
-
-QWidget * CWE_TabWidget::addFile(QJsonObject JSONvar, QWidget *parent, QString * setVal)
-{
-    QLabel *theName = new QLabel(parent);
-    QString displayname = JSONvar["displayname"].toString();
-    theName->setText(displayname);
-
-    QLineEdit *theFileName = new QLineEdit(parent);
-    theFileName->setText("unknown file name");
-
-    QGridLayout *layout = (QGridLayout*)(parent->layout());
-    int row = layout->rowCount();
-    layout->addWidget(theName,row,0);
-    layout->addWidget(theFileName,row,1,1,2);
-
-    return theFileName;
-}
-
-QWidget * CWE_TabWidget::addChoice(QJsonObject JSONvar, QWidget *parent, QString * setVal)
-{
-    QLabel *theName = new QLabel(parent);
-    QString displayname = JSONvar["displayname"].toString();
-    theName->setText(displayname);
-
-    QComboBox *theSelection = new QComboBox(parent);
-    QJsonObject combo_options = JSONvar["options"].toObject();
-
-    QStandardItemModel *theModel = new QStandardItemModel();
-    foreach (const QString &theKey, combo_options.keys())
-    {
-        //QStandardItem *itm = new QStandardItem(theKey);
-        QStandardItem *itm = new QStandardItem(combo_options[theKey].toString());
-        theModel->appendRow(itm);
-    }
-    theSelection->setModel(theModel);
-    if ((setVal == NULL) || (!combo_options.contains(*setVal)))
-    {
-        theSelection->setCurrentText(combo_options[JSONvar["default"].toString()].toString());
-    }
-    else
-    {
-        theSelection->setCurrentText(combo_options[*setVal].toString());
-    }
-
-    QGridLayout *layout = (QGridLayout*)(parent->layout());
-    int row = layout->rowCount();
-    layout->addWidget(theName, row,0);
-    layout->addWidget(theSelection,row,1,1,2);
-
-    return theSelection;
-}
-
-
-QWidget * CWE_TabWidget::addVector3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
-{
-    return NULL;
-}
-
-QWidget * CWE_TabWidget::addVector2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
-{
-    return NULL;
-}
-
-QWidget * CWE_TabWidget::addTensor3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
-{
-    return NULL;
-}
-
-QWidget * CWE_TabWidget::addTensor2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
-{
-    return NULL;
-}
-
-QWidget * CWE_TabWidget::addUnknown(QJsonObject JSONvar, QWidget *parent, QString *setVal)
-{
-    QLabel *theName = new QLabel(parent);
-    QString displayname = JSONvar["displayname"].toString();
-    theName->setText(displayname);
-
-    QGridLayout *layout = (QGridLayout*)(parent->layout());
-    int row = layout->rowCount();
-    layout->addWidget(theName,row,0);
-
-    return NULL;
-}
-
-void CWE_TabWidget::addType(const QString &varName, const QString &type, QJsonObject JSONvar, QWidget *parent, QString *setVal)
-{
-    QWidget *widget;
-
-    widget = NULL;
-
-    if      (type == "std")      { widget = this->addStd(JSONvar, parent, setVal); }
-    else if (type == "bool")     { widget = this->addBool(JSONvar, parent, setVal); }
-    else if (type == "file")     { widget = this->addFile(JSONvar, parent, setVal); }
-    else if (type == "choose")   { widget = this->addChoice(JSONvar, parent, setVal); }
-    else if (type == "vector2D") { widget = this->addVector2D(JSONvar, parent, setVal); }
-    else if (type == "tensor2D") { widget = this->addTensor2D(JSONvar, parent, setVal); }
-    else if (type == "vector3D") { widget = this->addVector3D(JSONvar, parent, setVal); }
-    else if (type == "tensor3D") { widget = this->addTensor3D(JSONvar, parent, setVal); }
-    else                         { widget = this->addUnknown(JSONvar, parent, setVal); }
-
-    // store information for reset operations, data collection, and validation
-    InputDataType *varData = new InputDataType;
-    varData->name        = varName;
-    varData->displayName = JSONvar["displayname"].toString();
-    varData->type        = type;
-    varData->defValue    = JSONvar["default"].toString();
-    varData->widget      = widget;
-    if (type == "choose") {
-        varData->options = new QJsonObject(JSONvar["options"].toObject());
-    }
-    else {
-        varData->options = NULL;
-    }
-    variableWidgets->insert(varName, varData);
-}
-
-*/
 
 void CWE_TabWidget::on_pbtn_run_clicked()
 {
@@ -394,8 +218,11 @@ void CWE_TabWidget::addStageTab(QString key, QJsonObject &obj)
      * create a stage tab for a stage identified by key
     */
 
+    QString name = obj.value(key).toObject().value("name").toString();
+    if (name.isEmpty()) {name = key;}
+
     CWE_GroupsWidget *newPanel = new CWE_GroupsWidget(ui->stagePanels);
-    CWE_StageStatusTab *newTab = new CWE_StageStatusTab(key, this);
+    CWE_StageStatusTab *newTab = new CWE_StageStatusTab(name, this);
     newPanel->setCorrespondingTab(newTab);
     newTab->setCorrespondingPanel(newPanel);
     ui->tabsBar->layout()->addWidget(newTab);
@@ -407,5 +234,15 @@ void CWE_TabWidget::addStageTab(QString key, QJsonObject &obj)
 
 void CWE_TabWidget::on_groupTabSelected(CWE_GroupsWidget *groupWidget, QString s)
 {
-    //ui->stagePanels->setCurrentWidget();
+    /* activate the proper panel */
+    ui->stagePanels->setCurrentWidget(groupWidget);
+}
+
+void CWE_TabWidget::on_tabActivated(CWE_StageStatusTab *activeTabWidget)
+{
+    foreach (QString key, stageTabList->keys())
+    {
+        stageTabList->value(key)->setInActive();
+    }
+    activeTabWidget->setActive();
 }

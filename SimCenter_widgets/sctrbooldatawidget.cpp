@@ -31,6 +31,10 @@ void SCtrBoolDataWidget::setData(QJsonObject &obj)
     }
 
     this->setLayout(layout);  // do I need this one?
+
+    /* set default */
+    bool defaultValue = obj.value(QString("default")).toBool();
+    theCheckBox->setChecked(defaultValue?Qt::Checked:Qt::Unchecked);
 }
 
 bool SCtrBoolDataWidget::toBool()

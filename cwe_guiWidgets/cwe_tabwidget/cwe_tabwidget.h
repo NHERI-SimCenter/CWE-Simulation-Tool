@@ -65,6 +65,7 @@ private slots:
     void on_pbtn_rollback_clicked();
 
     void on_groupTabSelected(CWE_GroupsWidget *, QString);
+    void on_tabActivated(CWE_StageStatusTab *);
 
 protected:
     void setButtonMode(uint mode);
@@ -78,6 +79,8 @@ private:
     Ui::CWE_TabWidget *ui;
 
     SimCenterViewState m_viewState;
+
+    QMap<QString, CWE_StageStatusTab *> *stageTabList;
 };
 
 #endif // CWE_TABWIDGET_H
