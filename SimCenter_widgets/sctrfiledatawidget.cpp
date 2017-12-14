@@ -30,8 +30,11 @@ void SCtrFileDataWidget::setData(QJsonObject &obj)
         label_varName->setText(obj.value(QString("displayname")).toString());
     }
 
-
     this->setLayout(layout);  // do I need this one?
+
+    /* set default */
+    QString defaultValue = obj.value(QString("default")).toString();
+    theValue->setText(defaultValue);
 }
 
 bool SCtrFileDataWidget::toBool()

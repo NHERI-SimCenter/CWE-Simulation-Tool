@@ -49,7 +49,6 @@ void SCtrChoiceDataWidget::setData(QJsonObject &obj)
     theComboBox->setModel(theModel);
     theComboBox->setCurrentText(theDefault);
 
-
     this->setLayout(layout);  // do I need this one?
 }
 

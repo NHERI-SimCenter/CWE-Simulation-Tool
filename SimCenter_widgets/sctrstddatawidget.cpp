@@ -20,8 +20,8 @@ void SCtrStdDataWidget::setData(QJsonObject &obj)
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
     layout->setMargin(0);
 
-     theInputWidget = new QLineEdit(this);
-    layout->insertWidget(1, theInputWidget, 4);
+    theValue = new QLineEdit(this);
+    layout->insertWidget(1, theValue, 4);
 
     if (label_unit != NULL) {
         label_unit->setText(obj.value(QString("unit")).toString());
@@ -31,14 +31,18 @@ void SCtrStdDataWidget::setData(QJsonObject &obj)
     }
 
     this->setLayout(layout);  // do I need this one?
+
+    /* set default */
+    QString defaultValue = obj.value(QString("default")).toString();
+    theValue->setText(defaultValue);
 }
 
 QString SCtrStdDataWidget::toString()
 {
-    return ((QLineEdit *)theInputWidget)->text();
+    return theValue->text();
 }
 
 double SCtrStdDataWidget::toDouble()
 {
-    return ((QLineEdit *)theInputWidget)->text().toDouble();
+    return theValue->text().toDouble();
 }
