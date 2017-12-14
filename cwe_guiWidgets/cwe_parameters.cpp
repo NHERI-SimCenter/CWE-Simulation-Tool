@@ -1,8 +1,7 @@
 #include "cwe_parameters.h"
 #include "ui_cwe_parameters.h"
-#include "cwe_tabwidget/cwe_parampanel.h"
 
-#include "qdebug.h"
+#include "cwe_tabwidget/cwe_parampanel.h"
 
 #include "vwtinterfacedriver.h"
 #include "CFDanalysis/CFDanalysisType.h"
@@ -10,6 +9,7 @@
 
 #include "mainWindow/cwe_mainwindow.h"
 
+#include "cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h"
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
 
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
@@ -132,6 +132,16 @@ void CWE_Parameters::saveAllParams()
 
 void CWE_Parameters::newCaseGiven()
 {
+    CFDcaseInstance * newCase = myDriver->getCurrentCase();
+
+    if (newCase != NULL)
+    {
+        QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
+                         this, SLOT(newCaseState(CaseState)));
+        QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
+        ui->theTabWidget->setParameterConfig(rawConfig);
+    }
+
     resetViewInfo();
 }
 
