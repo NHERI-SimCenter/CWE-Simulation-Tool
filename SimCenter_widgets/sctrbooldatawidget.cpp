@@ -18,6 +18,7 @@ SCtrBoolDataWidget::SCtrBoolDataWidget(QJsonObject &obj, QWidget *parent):
 void SCtrBoolDataWidget::setData(QJsonObject &obj)
 {
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
+    layout->setMargin(0);
 
     theCheckBox = new QCheckBox(this);
     layout->insertWidget(1, theCheckBox, 4);
@@ -28,7 +29,6 @@ void SCtrBoolDataWidget::setData(QJsonObject &obj)
     if (label_varName != NULL) {
         label_varName->setText(obj.value(QString("displayname")).toString());
     }
-
 
     this->setLayout(layout);  // do I need this one?
 }

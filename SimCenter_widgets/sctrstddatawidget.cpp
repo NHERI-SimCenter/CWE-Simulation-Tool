@@ -18,6 +18,7 @@ SCtrStdDataWidget::SCtrStdDataWidget(QJsonObject &obj, QWidget *parent):
 void SCtrStdDataWidget::setData(QJsonObject &obj)
 {
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
+    layout->setMargin(0);
 
      theInputWidget = new QLineEdit(this);
     layout->insertWidget(1, theInputWidget, 4);
@@ -28,7 +29,6 @@ void SCtrStdDataWidget::setData(QJsonObject &obj)
     if (label_varName != NULL) {
         label_varName->setText(obj.value(QString("displayname")).toString());
     }
-
 
     this->setLayout(layout);  // do I need this one?
 }

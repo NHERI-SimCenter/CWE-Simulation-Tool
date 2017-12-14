@@ -12,9 +12,10 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-#include "SimCenter_widgets/sctrchoicedatawidget.h"
 #include "SimCenter_widgets/sctrstddatawidget.h"
 #include "SimCenter_widgets/sctrbooldatawidget.h"
+#include "SimCenter_widgets/sctrfiledatawidget.h"
+#include "SimCenter_widgets/sctrchoicedatawidget.h"
 
 #include <QDebug>
 
