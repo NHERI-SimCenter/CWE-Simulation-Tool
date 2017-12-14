@@ -40,23 +40,35 @@ void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
 
 void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 {
-    FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
-    if (selectedNode == NULL)
+    if (myDriver->inOfflineMode())
     {
+        myDriver->setCurrentCase(new CFDcaseInstance(selectedTemplate, myDriver));
+        myDriver->getMainWindow()->switchToParameterTab();
         return;
     }
 
+    /* take emergency exit if nothing has been selected */
+    FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
+    if (selectedNode == NULL) { return; }
+
+    /* OK, something has been selected */
     CFDcaseInstance * newCase;
 
     //TODO: VERY IMPORTANT: NEED INPUT FILTERING
+    // PETER S.: what have you been thinkng of with this statement?
+
     if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
     {
+        /* we are creating a new case */
+
         if (selectedTemplate == NULL) return;
         newCase = new CFDcaseInstance(selectedTemplate, myDriver);
         newCase->createCase(ui->lineEdit_newCaseName->text(), selectedNode);
     }
     else
     {
+        /* we are cloning from an existing case */
+
         FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
         if (secondNode == NULL)
         {
@@ -70,7 +82,10 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
         }
     }
 
+    //Set new case will signal the other panels so that they can get configurations
     myDriver->setCurrentCase(newCase);
+
+    /* time to switch to the ParameterTab */
     myDriver->getMainWindow()->switchToParameterTab();
 }
 
@@ -131,8 +146,8 @@ void CWE_Create_Copy_Simulation::populateCaseTypes()
 
         /* create appropriate connection between signals and slots */
 
-        connect(buttonIcon, SIGNAL(pressed()),       this, SLOT(selectCaseTemplate()));
-        connect(radioBtn, SIGNAL(toggled(bool)),     this, SLOT(selectCaseTemplate()));
+        QObject::connect(buttonIcon, SIGNAL(pressed()),       this, SLOT(selectCaseTemplate()));
+        QObject::connect(radioBtn, SIGNAL(toggled(bool)),     this, SLOT(selectCaseTemplate()));
 
         idx++;
     }

@@ -1,27 +1,27 @@
-#include "SimCenter_widgets/sctrstddatawidget.h"
-#include "SimCenter_widgets/sctrmasterdatawidget.h"
+#include "sctrfiledatawidget.h"
 
 #include <QHBoxLayout>
+#include <QLineEdit>
 
-SCtrStdDataWidget::SCtrStdDataWidget(QWidget *parent):
+SCtrFileDataWidget::SCtrFileDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)
 {
 
 }
 
-SCtrStdDataWidget::SCtrStdDataWidget(QJsonObject &obj, QWidget *parent):
+SCtrFileDataWidget::SCtrFileDataWidget(QJsonObject &obj, QWidget *parent):
     SCtrMasterDataWidget(parent)
 {
     this->setData(obj);
 }
 
-void SCtrStdDataWidget::setData(QJsonObject &obj)
+void SCtrFileDataWidget::setData(QJsonObject &obj)
 {
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
     layout->setMargin(0);
 
     theValue = new QLineEdit(this);
-    layout->insertWidget(1, theValue, 4);
+    layout->insertWidget(1, theCheckBox, 4);
 
     if (label_unit != NULL) {
         label_unit->setText(obj.value(QString("unit")).toString());
@@ -37,12 +37,14 @@ void SCtrStdDataWidget::setData(QJsonObject &obj)
     theValue->setText(defaultValue);
 }
 
-QString SCtrStdDataWidget::toString()
+bool SCtrFileDataWidget::toBool()
+{
+    QString text = theValue->text();
+    return !text.isEmpty();
+}
+
+QString SCtrFileDataWidget::toString()
 {
     return theValue->text();
 }
 
-double SCtrStdDataWidget::toDouble()
-{
-    return theValue->text().toDouble();
-}

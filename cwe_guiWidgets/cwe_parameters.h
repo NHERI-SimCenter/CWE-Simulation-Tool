@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QMap>
 #include <QFile>
-#include <QJsonDocument>
+//#include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDoubleSpinBox>
@@ -21,6 +21,7 @@ class CFDcaseInstance;
 class CFDanalysisType;
 class VWTinterfaceDriver;
 class CWE_StageTab;
+class QJsonDocument;
 
 enum class CaseState;
 

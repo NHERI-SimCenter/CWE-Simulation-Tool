@@ -82,6 +82,14 @@ void CWE_Results::on_downloadEntireCaseButton_clicked()
 
 void CWE_Results::newCaseGiven()
 {
+    CFDcaseInstance * newCase = myDriver->getCurrentCase();
+
+    if (newCase != NULL)
+    {
+        QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
+                         this, SLOT(newCaseState(CaseState)));
+    }
+
     resetViewInfo();
 }
 
