@@ -21,9 +21,11 @@
 
 #include "../cwe_defines.h"
 
+
 class CWE_StageStatusTab;
 class CWE_GroupsWidget;
 class CWE_Parameters;
+class SCtrMasterDataWidget;
 enum class SimCenterViewState;
 enum class StageState;
 
@@ -55,6 +57,7 @@ public:
     void addVarsData(QJsonObject , QJsonObject );
 
     void setParameterConfig(QJsonObject &obj);
+    void initQuickParameterPtr();
 
     QMap<QString, QString> collectParamData();
 
@@ -81,6 +84,7 @@ private:
     SimCenterViewState m_viewState;
 
     QMap<QString, CWE_StageStatusTab *> *stageTabList;
+    QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
 };
 
 #endif // CWE_TABWIDGET_H

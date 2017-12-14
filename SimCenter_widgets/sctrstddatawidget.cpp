@@ -17,6 +17,8 @@ SCtrStdDataWidget::SCtrStdDataWidget(QJsonObject &obj, QWidget *parent):
 
 void SCtrStdDataWidget::setData(QJsonObject &obj)
 {
+    m_obj = obj;
+
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
     layout->setMargin(0);
 
@@ -39,10 +41,13 @@ void SCtrStdDataWidget::setData(QJsonObject &obj)
 
 QString SCtrStdDataWidget::toString()
 {
-    return theValue->text();
+    int prec  = m_obj.value("precision").toInt();
+    QString s = QString("%1").arg(((theValue->text()).toDouble()), 0, 'g', prec);
+    return s;
 }
 
 double SCtrStdDataWidget::toDouble()
 {
     return theValue->text().toDouble();
 }
+

@@ -30,6 +30,7 @@ public:
     void setActive(bool b=true);
     void setInActive(bool b=true);
     void linkWidget(CWE_GroupsWidget *ptr);
+    CWE_GroupsWidget * groupWidget() { return myPanel; };
 
 signals:
     void btn_pressed(CWE_GroupsWidget *, QString);

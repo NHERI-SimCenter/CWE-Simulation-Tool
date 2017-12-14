@@ -250,9 +250,9 @@ void SCtrMasterDataWidget::setValue(bool b)
     theValue->setText(s);
 }
 
-QString SCtrMasterDataWidget::Value()
+QString SCtrMasterDataWidget::toString()
 {
-    return theValue->text();
+    return QString("");
 }
 
 /* ********** various input data types ********** */

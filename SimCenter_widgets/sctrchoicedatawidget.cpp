@@ -24,6 +24,8 @@ SCtrChoiceDataWidget::SCtrChoiceDataWidget(QJsonObject &obj, QWidget *parent):
 
 void SCtrChoiceDataWidget::setData(QJsonObject &obj)
 {
+    m_obj = obj;
+
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
     layout->setMargin(0);
 
