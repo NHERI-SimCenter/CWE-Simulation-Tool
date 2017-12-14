@@ -6,6 +6,7 @@
 #include "cwe_parampanel.h"
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
+
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QJsonArray>

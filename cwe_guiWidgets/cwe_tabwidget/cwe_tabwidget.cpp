@@ -14,10 +14,9 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "cwe_guiWidgets/cwe_parameters.h"
-
-#include "qdebug.h"
-
 #include "../CFDClientProgram/vwtinterfacedriver.h"
+
+#include "SimCenter_widgets/sctrdatawidget.h"
 
 CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     QFrame(parent),

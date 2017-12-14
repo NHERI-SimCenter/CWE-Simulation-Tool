@@ -4,9 +4,13 @@
 #include <QScrollArea>
 #include <QMap>
 #include <QJsonObject>
-#include <SimCenter_widgets/sctrstates.h>
+#include <QLayout>
+#include <QMessageBox>
+#include <QDebug>
+#include <QJsonArray>
 
 class SCtrMasterDataWidget;
+enum class SimCenterViewState;
 
 namespace Ui {
 class CWE_ParamPanel;
