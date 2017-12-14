@@ -25,6 +25,7 @@ SCtrChoiceDataWidget::SCtrChoiceDataWidget(QJsonObject &obj, QWidget *parent):
 void SCtrChoiceDataWidget::setData(QJsonObject &obj)
 {
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
+    layout->setMargin(0);
 
     if (label_unit != NULL) {
         label_unit->setText(obj.value(QString("unit")).toString());
@@ -33,21 +34,15 @@ void SCtrChoiceDataWidget::setData(QJsonObject &obj)
         label_varName->setText(obj.value(QString("displayname")).toString());
     }
 
-    QStandardItemModel *theModel = new QStandardItemModel();
-    QList<QStandardItem *> theList;
+    QStandardItemModel *theModel = new QStandardItemModel(this);
 
-    QJsonArray options = obj.value(QString("options")).toArray();
+    QJsonObject options = obj.value(QString("options")).toObject();
     QString theDefault = obj.value(QString("default")).toString();
 
     foreach (QJsonValue val, options)
     {
-        theList.append(new QStandardItem(val.toString()));
+        theModel->appendRow(new QStandardItem(val.toString()));
     }
-    theModel->appendRow(theList);
-
-    qDebug() << options;
-    qDebug() << theList;
-    qDebug() << theModel;
 
     theComboBox = new QComboBox(this);
     layout->insertWidget(1, theComboBox, 4);
