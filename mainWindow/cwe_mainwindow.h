@@ -67,35 +67,22 @@ public:
 
     void runSetupSteps();
 
-    void attachCaseSignals(CFDcaseInstance * newCase);
-
     void setParameterConfig(QJsonDocument &obj);
+
     void switchToParameterTab();
     void switchToResultsTab();
     void switchToCreateTab();
 
 private slots:
+    void newCaseGiven();
+    void newCaseState(CaseState newState);
+
     void menuExit();
     void menuCopyInfo();
 
-    void on_action_Quit_triggered();
-
-    void on_actionCreate_New_Simulation_triggered();
-    void on_actionManage_Simulation_triggered();
-    void on_actionOpen_triggered();
-    void on_actionOpen_existing_triggered();
-    void on_actionSave_triggered();
-    void on_actionSave_As_triggered();
-    void on_actionAbout_CWE_triggered();
-    void on_actionHelp_triggered();
-    void on_action_Landing_Page_triggered();
-    void on_actionManage_Remote_Jobs_triggered();
-    void on_actionTutorials_and_Help_triggered();
-
-    void on_actionManage_and_Download_Files_triggered();
-
 private:
-    void changeTabVisible(QTabWidget * theTab, bool newSetting);
+    void changeParamsAndResultsEnabled(bool setting);
+    void changeTabEnabled(QWidget *theTab, bool newSetting);
 
     Ui::CWE_MainWindow *ui;
 
