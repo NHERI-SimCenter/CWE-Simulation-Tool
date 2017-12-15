@@ -17,7 +17,7 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
-    ui->theTabWidget->setController(this);
+    ui->theTabWidget->setController(this, myDriver);
 }
 
 CWE_Parameters::~CWE_Parameters()
