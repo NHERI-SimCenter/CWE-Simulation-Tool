@@ -17,7 +17,7 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
-    ui->theTabWidget->setController(this, myDriver);
+    ui->theTabWidget->setController(this);
 }
 
 CWE_Parameters::~CWE_Parameters()
@@ -34,12 +34,10 @@ void CWE_Parameters::linkDriver(VWTinterfaceDriver * newDriver)
 
 void CWE_Parameters::resetViewInfo()
 {
-    viewIsValid = false;
+    paramWidgetsExist = false;
 
     // erase all stage tabs
     ui->theTabWidget->resetView();
-
-    //this->initStateTabs();
 }
 
 void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
@@ -63,29 +61,60 @@ void CWE_Parameters::newCaseGiven()
 {
     CFDcaseInstance * newCase = myDriver->getCurrentCase();
 
-    QMap<QString, StageState> currentStates = newCase->getStageStates();
+    this->resetViewInfo();
 
     if (newCase != NULL)
     {
-        this->resetViewInfo();
-
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
-        QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
 
-        ui->label_theName->setText(newCase->getCaseName());
-        ui->label_theType->setText(newCase->getMyType()->getName());
-        ui->label_theLocation->setText(newCase->getCaseFolder());
+        if (newCase->getMyType() == NULL) return;
 
-        ui->theTabWidget->setParameterConfig(rawConfig);
-
-        viewIsValid = true;
+        createUnderlyingParamWidgets();
     }
 }
 
 void CWE_Parameters::newCaseState(CaseState newState)
 {
-    //TODO: implement functions for changes in current params or stage states
+    if (!paramWidgetsExist)
+    {
+        createUnderlyingParamWidgets();
+    }
+
+    if (!paramWidgetsExist)
+    {
+        return;
+    }
+
+    //TODO: HERE is where newState should be read and acted upon
+
+    if (newState == CaseState::OFFLINE) return;
+
+    if (newState == CaseState::READY)
+    {
+        //myDriver->getCurrentCase()->getCurrentParams();
+    }
+
+}
+
+void CWE_Parameters::createUnderlyingParamWidgets()
+{
+    if (paramWidgetsExist) return;
+
+    CFDcaseInstance * newCase = myDriver->getCurrentCase();
+
+    if (newCase == NULL) return;
+    if (newCase->getMyType() == NULL) return;
+
+    QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
+
+    ui->label_theName->setText(newCase->getCaseName());
+    ui->label_theType->setText(newCase->getMyType()->getName());
+    ui->label_theLocation->setText(newCase->getCaseFolder());
+
+    ui->theTabWidget->setParameterConfig(rawConfig);
+
+    paramWidgetsExist = true;
 }
 
 void CWE_Parameters::switchToResults()
