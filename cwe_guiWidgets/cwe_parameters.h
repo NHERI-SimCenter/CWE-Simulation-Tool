@@ -58,7 +58,6 @@ private:
 
     bool viewIsValid = false;
 
-    QMap<QString, int> stageTabsIndex;
 };
 
 #endif // CWE_PARAMETERS_H

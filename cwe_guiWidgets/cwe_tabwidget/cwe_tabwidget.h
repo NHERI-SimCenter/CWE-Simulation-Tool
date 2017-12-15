@@ -47,7 +47,6 @@ public:
     SimCenterViewState viewState();
 
     bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label , QString *setVal = NULL);
-
     void addVarsData(QJsonObject , QJsonObject );
 
     void setParameterConfig(QJsonObject &obj);

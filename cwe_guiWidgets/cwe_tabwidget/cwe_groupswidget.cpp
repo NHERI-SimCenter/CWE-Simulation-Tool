@@ -40,7 +40,6 @@ void CWE_GroupsWidget::setData(QJsonObject &obj)
 
     // add a stage tab to ui->theTabWidget
     int idx = ui->theTabWidget->addGroupTab(name, labelText, StageState::UNRUN);
-    stageTabsIndex.insert(name, idx);
     */
 
     /*
