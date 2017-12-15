@@ -17,6 +17,8 @@ SCtrFileDataWidget::SCtrFileDataWidget(QJsonObject &obj, QWidget *parent):
 
 void SCtrFileDataWidget::setData(QJsonObject &obj)
 {
+    m_obj = obj;
+
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
     layout->setMargin(0);
 

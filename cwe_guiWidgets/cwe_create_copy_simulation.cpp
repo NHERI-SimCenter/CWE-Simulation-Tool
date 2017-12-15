@@ -107,7 +107,7 @@ void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
 void CWE_Create_Copy_Simulation::populateCaseTypes()
 {
     QList<CFDanalysisType *> * templateList = myDriver->getTemplateList();
-    QGridLayout *layout = new QGridLayout(this);
+    QGridLayout *layout = new QGridLayout();
 
     int idx = 0;
 
@@ -151,6 +151,9 @@ void CWE_Create_Copy_Simulation::populateCaseTypes()
 
         idx++;
     }
+
+    QLayout *lyt = ui->scroll_NewCase->layout();
+    if (lyt != NULL) {delete lyt;}
 
     ui->scroll_NewCase->setLayout(layout);
 }

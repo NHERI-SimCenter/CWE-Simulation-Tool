@@ -80,7 +80,7 @@ bool CWE_ParamPanel::addVariable(QString varName, QJsonObject JSONvar, const QSt
 
 SCtrMasterDataWidget * CWE_ParamPanel::addVariable(QString varName, QJsonObject &theVariable)
 {
-    SCtrMasterDataWidget *theVar;
+    SCtrMasterDataWidget *theVar = NULL;
 
     QLayout *layout = this->layout();
 
@@ -99,7 +99,8 @@ SCtrMasterDataWidget * CWE_ParamPanel::addVariable(QString varName, QJsonObject 
         layout->addWidget(theVar);
     }
     else if (type.toLower() == "file") {
-
+        theVar = new SCtrFileDataWidget(theVariable, this);
+        layout->addWidget(theVar);
     }
     else {
         /* add an error message */
@@ -127,4 +128,20 @@ void CWE_ParamPanel::addParameterConfig(QJsonArray &groupVars, QJsonObject &allV
     }
 
     layout->addStretch(1);
+}
+
+
+QMap<QString, SCtrMasterDataWidget *> CWE_ParamPanel::getParameterWidgetMap()
+{
+    QMap<QString, SCtrMasterDataWidget *> panelMap;
+
+    QMapIterator<QString, SCtrMasterDataWidget *> variablesIter(*variableWidgets);
+
+    while (variablesIter.hasNext())
+    {
+        variablesIter.next();
+        panelMap.insert(variablesIter.key(), variablesIter.value());
+    }
+
+    return panelMap;
 }

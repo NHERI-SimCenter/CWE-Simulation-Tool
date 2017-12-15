@@ -28,7 +28,8 @@ public:
     virtual void setValue(float);
     virtual void setValue(int);
     virtual void setValue(bool);
-    virtual QString Value();
+    virtual QString toString();
+    QString value() {return this->toString();}
     void refresh();
 
 protected:
@@ -55,6 +56,8 @@ protected:
     QLabel  *label_varName = NULL;
     QLabel  *label_unit = NULL;
 
+    QJsonObject m_obj;
+
 private:
     void setVariableName(QString s);
     void setUnit(QString u);
@@ -65,7 +68,6 @@ private:
 
     SimCenterViewState m_ViewState;
 
-    QJsonObject m_obj;
     QValidator *m_validator = NULL;
     SimCenterDataType m_dataType;
 

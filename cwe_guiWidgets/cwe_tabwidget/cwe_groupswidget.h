@@ -6,6 +6,7 @@
 
 class CWE_StageStatusTab;
 class CWE_ParamTab;
+class SCtrMasterDataWidget;
 enum class SimCenterViewState;
 enum class StageState;
 
@@ -25,6 +26,7 @@ public:
 
     void setParameterConfig(QString key, QJsonObject &obj);
     void linkWidget(CWE_StageStatusTab *tab);
+    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
 
 
 protected:
