@@ -132,6 +132,8 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     }
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+    setButtonMode(CWE_BTN_RUN);
 }
 
 
@@ -159,6 +161,8 @@ void CWE_TabWidget::initQuickParameterPtr()
 void CWE_TabWidget::on_pbtn_run_clicked()
 {
     myController->performCaseCommand(currentSelectedStage, CaseCommand::RUN);
+
+    setButtonMode(CWE_BTN_CANCEL);
 }
 
 QMap<QString, QString> CWE_TabWidget::collectParamData()
@@ -182,6 +186,9 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
 void CWE_TabWidget::on_pbtn_cancel_clicked()
 {
     myController->performCaseCommand(currentSelectedStage, CaseCommand::CANCEL);
+
+    //setButtonMode(CWE_BTN_RESULTS|CWE_BTN_ROLLBACK);
+    setButtonMode(CWE_BTN_RUN);
 }
 
 void CWE_TabWidget::on_pbtn_results_clicked()
