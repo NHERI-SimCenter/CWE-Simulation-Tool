@@ -52,6 +52,8 @@ private slots:
     void newCaseState(CaseState newState);
 
 private:
+    void createUnderlyingParamWidgets();
+
     void saveAllParams();
 
     Ui::CWE_Parameters *ui;

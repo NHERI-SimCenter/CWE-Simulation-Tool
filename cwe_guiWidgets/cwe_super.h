@@ -46,6 +46,8 @@ public:
     explicit CWE_Super(QWidget *parent = nullptr);
     virtual void linkDriver(VWTinterfaceDriver * theDriver);
 
+    VWTinterfaceDriver * getDriver();
+
 protected:
     VWTinterfaceDriver * myDriver = NULL;
 };
