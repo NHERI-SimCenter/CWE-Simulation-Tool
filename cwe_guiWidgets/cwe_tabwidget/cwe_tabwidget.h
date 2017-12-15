@@ -41,7 +41,7 @@ class CWE_TabWidget : public QFrame
 public:
     explicit CWE_TabWidget(QWidget *parent = 0);
     ~CWE_TabWidget();
-    void setController(CWE_Parameters * newController, VWTinterfaceDriver * newDriver);
+    void setController(CWE_Parameters * newController);
     void resetView();
 
     void setViewState(SimCenterViewState);
@@ -71,7 +71,6 @@ private:
     static QString getStateText(StageState theState);
 
     CWE_Parameters * myController = NULL;
-    VWTinterfaceDriver * myDriver = NULL;
     QString currentSelectedStage;
 
     Ui::CWE_TabWidget *ui;
