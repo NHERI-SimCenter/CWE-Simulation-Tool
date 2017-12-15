@@ -42,28 +42,7 @@ void CWE_GroupsWidget::setData(QJsonObject &obj)
     int idx = ui->theTabWidget->addGroupTab(name, labelText, StageState::UNRUN);
     stageTabsIndex.insert(name, idx);
     */
-}
 
-// set the view state
-void CWE_GroupsWidget::setViewState(SimCenterViewState state)
-{
-    switch (state) {
-    case SimCenterViewState::hidden:
-        m_viewState = SimCenterViewState::hidden;
-        break;
-    case SimCenterViewState::editable:
-        m_viewState = SimCenterViewState::editable;
-        break;
-    case SimCenterViewState::visible:
-    default:
-        m_viewState = SimCenterViewState::visible;
-        break;
-    }
-}
-
-int CWE_GroupsWidget::addGroupTab(QString key, const QString &label, StageState currentState)
-{
-    int index = -1;
     /*
     varTabWidgets->insert(key, new QMap<QString, QWidget *>());
 
@@ -87,9 +66,55 @@ int CWE_GroupsWidget::addGroupTab(QString key, const QString &label, StageState 
 
     groupTabList->insert(key, pWidget);
     */
+}
+
+// set the view state
+void CWE_GroupsWidget::setViewState(SimCenterViewState state)
+{
+    switch (state) {
+    case SimCenterViewState::hidden:
+        m_viewState = SimCenterViewState::hidden;
+        break;
+    case SimCenterViewState::editable:
+        m_viewState = SimCenterViewState::editable;
+        break;
+    case SimCenterViewState::visible:
+    default:
+        m_viewState = SimCenterViewState::visible;
+        break;
+    }
+}
+
+/*
+int CWE_GroupsWidget::addGroupTab(QString key, const QString &label, StageState currentState)
+{
+    int index = -1;
+
+    varTabWidgets->insert(key, new QMap<QString, QWidget *>());
+
+    // create the tab
+    CWE_StageStatusTab *newTab = new CWE_StageStatusTab(key);
+    newTab->setText(label);
+
+    newTab->setStatus(getStateText(currentState));
+    int index = ui->verticalTabLayout->count()-1;
+    newTab->setIndex(index);
+    ui->verticalTabLayout->insertWidget(index, newTab);
+
+    groupWidget->insert(key, newTab);
+
+    QObject::connect(newTab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
+    //QObject::connect(newTab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
+
+    // create the widget to hold the parameter input
+    QTabWidget *pWidget = new QTabWidget();
+    ui->stackedWidget->insertWidget(index, pWidget);
+
+    groupTabList->insert(key, pWidget);
 
     return index;
 }
+*/
 
 int CWE_GroupsWidget::addVarTab(QString key, const QString &label)
 {
