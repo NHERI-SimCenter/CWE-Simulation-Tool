@@ -26,6 +26,7 @@ class CWE_StageStatusTab;
 class CWE_GroupsWidget;
 class CWE_Parameters;
 class SCtrMasterDataWidget;
+class VWTinterfaceDriver;
 enum class SimCenterViewState;
 enum class StageState;
 
@@ -40,20 +41,13 @@ class CWE_TabWidget : public QFrame
 public:
     explicit CWE_TabWidget(QWidget *parent = 0);
     ~CWE_TabWidget();
-    void setController(CWE_Parameters * newController);
+    void setController(CWE_Parameters * newController, VWTinterfaceDriver * newDriver);
     void resetView();
 
     void setViewState(SimCenterViewState);
     SimCenterViewState viewState();
 
-    void addStageTab(QString s, QJsonObject &obj);
-
     bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label , QString *setVal = NULL);
-
-    int addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString, QString> *setVars);
-    void addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> *setVars);
-
-
     void addVarsData(QJsonObject , QJsonObject );
 
     void setParameterConfig(QJsonObject &obj);
@@ -77,6 +71,7 @@ private:
     static QString getStateText(StageState theState);
 
     CWE_Parameters * myController = NULL;
+    VWTinterfaceDriver * myDriver = NULL;
     QString currentSelectedStage;
 
     Ui::CWE_TabWidget *ui;
