@@ -19,8 +19,6 @@ public:
 
     void setData(QJsonObject &obj);         // set the group definitions as a JSon file
     void setViewState(SimCenterViewState);  // set the view state
-    int addVarTab(QString key, const QString &label);
-    int  addGroupTab(QString key, const QString &label, StageState currentState);
     void addVSpacer(const QString &key, const QString &label);
     void addVarsToTab(QString key, const QString &label, QJsonArray *, QJsonObject *, QMap<QString,QString> * );
 

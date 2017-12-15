@@ -40,9 +40,10 @@ CWE_TabWidget::~CWE_TabWidget()
     delete stageTabList;
 }
 
-void CWE_TabWidget::setController(CWE_Parameters * newController)
+void CWE_TabWidget::setController(CWE_Parameters * newController, VWTinterfaceDriver * newDriver)
 {
     myController = newController;
+    myDriver = newDriver;
 }
 
 void CWE_TabWidget::setViewState(SimCenterViewState state)
@@ -68,26 +69,22 @@ SimCenterViewState CWE_TabWidget::viewState()
 
 void CWE_TabWidget::resetView()
 {
-    //TODO: clear underlying widgets
-}
+    QMapIterator<QString, CWE_StageStatusTab *> iter(*stageTabList);
 
-int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
-{
-    /*
-    int index = addVarTab(key, label);
-    if (index >= 0)
+    while (iter.hasNext())
     {
-        addVarsToTab(key, label, varList, varsInfo, setVars);
+        iter.next();
+        /* remove the groupWidgets from ui->stagePanels */
+        ui->stagePanels->removeWidget((iter.value())->groupWidget());
+        /* delete the groupWidget */
+        delete (iter.value())->groupWidget();
+        /* delete the StageStatusTab */
+        delete iter.value();
     }
-    return index;
-    */
-    return -1;
+    /* clear the stageTabList */
+    stageTabList->clear();
 }
 
-void CWE_TabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
-{
-
-}
 
 void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 {
@@ -103,13 +100,23 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     QJsonArray  sequence = obj.value(QString("sequence")).toArray();
     QJsonObject stages   = obj.value(QString("stages")).toObject();
 
+    QMap<QString, StageState> stageStates;
+    if (myDriver != NULL)
+    {
+        stageStates = myDriver->getCurrentCase()->getStageStates();
+    }
+
     foreach (QJsonValue theStage, sequence)
     {
         QString stageName = theStage.toString();
         QString stageLabel = stages.value(stageName).toObject().value("name").toString();
+        stageLabel += "\nParameters";
 
         /* create a CWE_StageStatusTab */
         CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageLabel, this);
+
+        tab->setStatus(getStateText(stageStates.value(stageName)));
+
         tablayout->addWidget(tab);
         stageTabList->insert(stageName, tab);
         //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
@@ -132,6 +139,8 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     }
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+    setButtonMode(CWE_BTN_RUN);
 }
 
 
@@ -159,6 +168,8 @@ void CWE_TabWidget::initQuickParameterPtr()
 void CWE_TabWidget::on_pbtn_run_clicked()
 {
     myController->performCaseCommand(currentSelectedStage, CaseCommand::RUN);
+
+    setButtonMode(CWE_BTN_CANCEL);
 }
 
 QMap<QString, QString> CWE_TabWidget::collectParamData()
@@ -182,6 +193,9 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
 void CWE_TabWidget::on_pbtn_cancel_clicked()
 {
     myController->performCaseCommand(currentSelectedStage, CaseCommand::CANCEL);
+
+    //setButtonMode(CWE_BTN_RUN|CWE_BTN_CANCEL|CWE_BTN_RESULTS|CWE_BTN_ROLLBACK);
+    setButtonMode(CWE_BTN_RUN);
 }
 
 void CWE_TabWidget::on_pbtn_results_clicked()
@@ -224,23 +238,6 @@ void CWE_TabWidget::setButtonMode(uint mode)
 
     btnState = (mode & CWE_BTN_ROLLBACK)?true:false;
     ui->pbtn_rollback->setEnabled(btnState);
-}
-
-void CWE_TabWidget::addStageTab(QString key, QJsonObject &obj)
-{
-    /*
-     * create a stage tab for a stage identified by key
-    */
-
-    QString name = obj.value(key).toObject().value("name").toString();
-    if (name.isEmpty()) {name = key;}
-
-    CWE_GroupsWidget *newPanel = new CWE_GroupsWidget(ui->stagePanels);
-    CWE_StageStatusTab *newTab = new CWE_StageStatusTab(name, this);
-    newPanel->setCorrespondingTab(newTab);
-    newTab->setCorrespondingPanel(newPanel);
-    ui->tabsBar->layout()->addWidget(newTab);
-    ui->stagePanels->addWidget(newPanel);
 }
 
 
