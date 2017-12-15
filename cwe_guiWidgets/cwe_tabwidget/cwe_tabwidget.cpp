@@ -40,9 +40,10 @@ CWE_TabWidget::~CWE_TabWidget()
     delete stageTabList;
 }
 
-void CWE_TabWidget::setController(CWE_Parameters * newController)
+void CWE_TabWidget::setController(CWE_Parameters * newController, VWTinterfaceDriver * newDriver)
 {
     myController = newController;
+    myDriver = newDriver;
 }
 
 void CWE_TabWidget::setViewState(SimCenterViewState state)
@@ -99,6 +100,8 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     QJsonArray  sequence = obj.value(QString("sequence")).toArray();
     QJsonObject stages   = obj.value(QString("stages")).toObject();
 
+    QMap<QString, StageState> stageStates = myDriver->getCurrentCase()->getStageStates();
+
     foreach (QJsonValue theStage, sequence)
     {
         QString stageName = theStage.toString();
@@ -108,9 +111,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         /* create a CWE_StageStatusTab */
         CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageLabel, this);
 
-        // NEED TO FIND CURRENT CASE AND CASE STATE.  HOW???
-        CaseState currentState = myController->myDriver->getCurrentCase()->getCaseState();
-        tab->setStatus(getStateText(currentState));
+        tab->setStatus(getStateText(stageStates.value(stageName)));
 
         tablayout->addWidget(tab);
         stageTabList->insert(stageName, tab);
