@@ -40,10 +40,9 @@ CWE_TabWidget::~CWE_TabWidget()
     delete stageTabList;
 }
 
-void CWE_TabWidget::setController(CWE_Parameters * newController, VWTinterfaceDriver * newDriver)
+void CWE_TabWidget::setController(CWE_Parameters * newController)
 {
     myController = newController;
-    myDriver = newDriver;
 }
 
 void CWE_TabWidget::setViewState(SimCenterViewState state)
@@ -101,10 +100,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     QJsonObject stages   = obj.value(QString("stages")).toObject();
 
     QMap<QString, StageState> stageStates;
-    if (myDriver != NULL)
-    {
-        stageStates = myDriver->getCurrentCase()->getStageStates();
-    }
+    stageStates = myController->getDriver()->getCurrentCase()->getStageStates();
 
     foreach (QJsonValue theStage, sequence)
     {
