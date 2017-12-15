@@ -107,6 +107,11 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 
         /* create a CWE_StageStatusTab */
         CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageLabel, this);
+
+        // NEED TO FIND CURRENT CASE AND CASE STATE.  HOW???
+        CaseState currentState = myController->myDriver->getCurrentCase()->getCaseState();
+        tab->setStatus(getStateText(currentState));
+
         tablayout->addWidget(tab);
         stageTabList->insert(stageName, tab);
         //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
@@ -184,7 +189,7 @@ void CWE_TabWidget::on_pbtn_cancel_clicked()
 {
     myController->performCaseCommand(currentSelectedStage, CaseCommand::CANCEL);
 
-    //setButtonMode(CWE_BTN_RESULTS|CWE_BTN_ROLLBACK);
+    //setButtonMode(CWE_BTN_RUN|CWE_BTN_CANCEL|CWE_BTN_RESULTS|CWE_BTN_ROLLBACK);
     setButtonMode(CWE_BTN_RUN);
 }
 
