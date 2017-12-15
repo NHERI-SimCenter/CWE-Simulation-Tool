@@ -26,6 +26,7 @@ class CWE_StageStatusTab;
 class CWE_GroupsWidget;
 class CWE_Parameters;
 class SCtrMasterDataWidget;
+class VWTinterfaceDriver;
 enum class SimCenterViewState;
 enum class StageState;
 
@@ -40,7 +41,7 @@ class CWE_TabWidget : public QFrame
 public:
     explicit CWE_TabWidget(QWidget *parent = 0);
     ~CWE_TabWidget();
-    void setController(CWE_Parameters * newController);
+    void setController(CWE_Parameters * newController, VWTinterfaceDriver * newDriver);
     void resetView();
 
     void setViewState(SimCenterViewState);
@@ -70,6 +71,7 @@ private:
     static QString getStateText(StageState theState);
 
     CWE_Parameters * myController = NULL;
+    VWTinterfaceDriver * myDriver = NULL;
     QString currentSelectedStage;
 
     Ui::CWE_TabWidget *ui;
