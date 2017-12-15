@@ -34,7 +34,7 @@ void CWE_Parameters::linkDriver(VWTinterfaceDriver * newDriver)
 
 void CWE_Parameters::resetViewInfo()
 {
-    viewIsValid = false;
+    paramWidgetsExist = false;
 
     // erase all stage tabs
     ui->theTabWidget->resetView();
@@ -73,17 +73,30 @@ void CWE_Parameters::newCaseGiven()
 
 void CWE_Parameters::newCaseState(CaseState newState)
 {
-    //TODO: implement functions for changes in current params or stage states
-
-    if (!viewIsValid)
+    if (!paramWidgetsExist)
     {
         createUnderlyingParamWidgets();
     }
+
+    if (!paramWidgetsExist)
+    {
+        return;
+    }
+
+    //TODO: HERE is where newState should be read and acted upon
+
+    if (newState == CaseState::OFFLINE) return;
+
+    if (newState == CaseState::READY)
+    {
+        //myDriver->getCurrentCase()->getCurrentParams();
+    }
+
 }
 
 void CWE_Parameters::createUnderlyingParamWidgets()
 {
-    if (viewIsValid) return;
+    if (paramWidgetsExist) return;
 
     CFDcaseInstance * newCase = myDriver->getCurrentCase();
 
@@ -98,7 +111,7 @@ void CWE_Parameters::createUnderlyingParamWidgets()
 
     ui->theTabWidget->setParameterConfig(rawConfig);
 
-    viewIsValid = true;
+    paramWidgetsExist = true;
 }
 
 void CWE_Parameters::switchToResults()
