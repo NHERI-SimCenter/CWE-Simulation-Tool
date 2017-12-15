@@ -100,7 +100,11 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     QJsonArray  sequence = obj.value(QString("sequence")).toArray();
     QJsonObject stages   = obj.value(QString("stages")).toObject();
 
-    QMap<QString, StageState> stageStates = myDriver->getCurrentCase()->getStageStates();
+    QMap<QString, StageState> stageStates;
+    if (myDriver != NULL)
+    {
+        stageStates = myDriver->getCurrentCase()->getStageStates();
+    }
 
     foreach (QJsonValue theStage, sequence)
     {
