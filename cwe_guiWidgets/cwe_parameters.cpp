@@ -65,9 +65,6 @@ void CWE_Parameters::initStateTabs()
 
         labelText = stageInfo["name"].toString();
         labelText = labelText.append("\nParameters");
-
-        ///ui->theTabWidget-> ... m_stageTabs[name]->setData(currentStates[name]);
-
     }
 
 #if 0
@@ -102,8 +99,6 @@ void CWE_Parameters::initStateTabs()
 #endif
 
     viewIsValid = true;
-
-    //??? ui->theTabWidget->
 }
 
 void CWE_Parameters::resetViewInfo()
