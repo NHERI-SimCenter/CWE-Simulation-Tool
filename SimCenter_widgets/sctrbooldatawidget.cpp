@@ -17,6 +17,8 @@ SCtrBoolDataWidget::SCtrBoolDataWidget(QJsonObject &obj, QWidget *parent):
 
 void SCtrBoolDataWidget::setData(QJsonObject &obj)
 {
+    m_obj = obj;
+
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
     layout->setMargin(0);
 
@@ -64,3 +66,4 @@ void SCtrBoolDataWidget::setUnchecked()
 {
     theCheckBox->setChecked(false);
 }
+

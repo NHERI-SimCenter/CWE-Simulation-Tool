@@ -12,6 +12,7 @@ public:
     void setData(QJsonObject &obj);
     QString toString();
     double  toDouble();
+    QString value();
 };
 
 #endif // SCTRSTDDATAWIDGET_H

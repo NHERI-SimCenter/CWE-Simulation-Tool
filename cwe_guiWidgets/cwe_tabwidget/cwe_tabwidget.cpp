@@ -12,11 +12,14 @@
 #include "cwe_stagestatustab.h"
 #include "cwe_groupswidget.h"
 #include "CFDanalysis/CFDcaseInstance.h"
+#include <QString>
+#include <QMap>
+#include <QMapIterator>
 
 #include "cwe_guiWidgets/cwe_parameters.h"
 #include "../CFDClientProgram/vwtinterfacedriver.h"
 
-#include "SimCenter_widgets/sctrdatawidget.h"
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     QFrame(parent),
@@ -25,6 +28,7 @@ CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     ui->setupUi(this);
 
     stageTabList = new QMap<QString, CWE_StageStatusTab *>();
+    quickParameterPtr = new QMap<QString, SCtrMasterDataWidget *>();
 
     this->setButtonMode(CWE_BTN_NONE);
     this->setViewState(SimCenterViewState::visible);
@@ -89,7 +93,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 {
     QVBoxLayout *tablayout = (QVBoxLayout *)ui->tabsBar->layout();
     delete tablayout;
-    tablayout = new QVBoxLayout(this);
+    tablayout = new QVBoxLayout();
     tablayout->setMargin(0);
     tablayout->setSpacing(0);
     ui->tabsBar->setLayout(tablayout);
@@ -131,6 +135,26 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 }
 
 
+void CWE_TabWidget::initQuickParameterPtr()
+{
+    SCtrMasterDataWidget *ptr = NULL;
+    QString key;
+
+    quickParameterPtr->clear();
+
+    QMapIterator<QString, CWE_StageStatusTab *> stageTabIter(*stageTabList);
+    while (stageTabIter.hasNext())
+    {
+        stageTabIter.next();
+        QMap<QString, SCtrMasterDataWidget *> groupMap = (stageTabIter.value())->groupWidget()->getParameterWidgetMap();
+        QMapIterator<QString, SCtrMasterDataWidget *> groupIter(groupMap);
+        while (groupIter.hasNext())
+        {
+            groupIter.next();
+            quickParameterPtr->insert(groupIter.key(), groupIter.value());
+        }
+    }
+}
 
 void CWE_TabWidget::on_pbtn_run_clicked()
 {
@@ -139,28 +163,18 @@ void CWE_TabWidget::on_pbtn_run_clicked()
 
 QMap<QString, QString> CWE_TabWidget::collectParamData()
 {
-    /*
-     * TODO:
-     * -- loop through groupsWidgetList and collect information fromCWE_GroupsWidgets
-     */
-
     QString val;
     QMap<QString, QString> currentParameters;
 
-    /*
-    // collect parameter values from all groupWidgets in groupWidgetList
-    foreach (const CWE_GroupsWidget *itm, groupWidgetList->values())
-    {
-        QMap<QString, QString> groupParams = itm->collectParamData();
+    // collect parameter values from all SCtrMasterDataWidget objects
+    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
 
-        // add to output
-        foreach (QString varName, groupParams.keys())
-        {
-            val = groupParams.value(varName);
-            currentParameters.insert(varName, val);
-        }
+    while (iter.hasNext())
+    {
+        iter.next();
+
+        currentParameters.insert(iter.key(), (iter.value())->value());
     }
-    */
 
     return currentParameters;
 }
