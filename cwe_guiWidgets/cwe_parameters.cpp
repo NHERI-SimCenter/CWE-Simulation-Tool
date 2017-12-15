@@ -49,6 +49,9 @@ void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
 
 void CWE_Parameters::saveAllParams()
 {
+    qDebug() << ui->theTabWidget->collectParamData();
+
+
     CFDcaseInstance * linkedCFDCase = myDriver->getCurrentCase();
     if (linkedCFDCase != NULL)
     {
