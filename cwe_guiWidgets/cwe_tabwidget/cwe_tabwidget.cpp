@@ -68,26 +68,22 @@ SimCenterViewState CWE_TabWidget::viewState()
 
 void CWE_TabWidget::resetView()
 {
-    //TODO: clear underlying widgets
-}
+    QMapIterator<QString, CWE_StageStatusTab *> iter(*stageTabList);
 
-int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
-{
-    /*
-    int index = addVarTab(key, label);
-    if (index >= 0)
+    while (iter.hasNext())
     {
-        addVarsToTab(key, label, varList, varsInfo, setVars);
+        iter.next();
+        /* remove the groupWidgets from ui->stagePanels */
+        ui->stagePanels->removeWidget((iter.value())->groupWidget());
+        /* delete the groupWidget */
+        delete (iter.value())->groupWidget();
+        /* delete the StageStatusTab */
+        delete iter.value();
     }
-    return index;
-    */
-    return -1;
+    /* clear the stageTabList */
+    stageTabList->clear();
 }
 
-void CWE_TabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
-{
-
-}
 
 void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 {
@@ -107,6 +103,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     {
         QString stageName = theStage.toString();
         QString stageLabel = stages.value(stageName).toObject().value("name").toString();
+        stageLabel += "\nParameters";
 
         /* create a CWE_StageStatusTab */
         CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageLabel, this);
@@ -231,23 +228,6 @@ void CWE_TabWidget::setButtonMode(uint mode)
 
     btnState = (mode & CWE_BTN_ROLLBACK)?true:false;
     ui->pbtn_rollback->setEnabled(btnState);
-}
-
-void CWE_TabWidget::addStageTab(QString key, QJsonObject &obj)
-{
-    /*
-     * create a stage tab for a stage identified by key
-    */
-
-    QString name = obj.value(key).toObject().value("name").toString();
-    if (name.isEmpty()) {name = key;}
-
-    CWE_GroupsWidget *newPanel = new CWE_GroupsWidget(ui->stagePanels);
-    CWE_StageStatusTab *newTab = new CWE_StageStatusTab(name, this);
-    newPanel->setCorrespondingTab(newTab);
-    newTab->setCorrespondingPanel(newPanel);
-    ui->tabsBar->layout()->addWidget(newTab);
-    ui->stagePanels->addWidget(newPanel);
 }
 
 

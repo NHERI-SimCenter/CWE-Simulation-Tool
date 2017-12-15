@@ -32,75 +32,6 @@ void CWE_Parameters::linkDriver(VWTinterfaceDriver * newDriver)
                      this, SLOT(newCaseGiven()));
 }
 
-void CWE_Parameters::initStateTabs()
-{
-    CFDcaseInstance * currentCase = myDriver->getCurrentCase();
-    if (currentCase == NULL) return;
-    CFDanalysisType * theTemplate = currentCase->getMyType();
-    if (theTemplate == NULL) return;
-    QMap<QString, StageState> currentStates = currentCase->getStageStates();
-
-    ui->label_theName->setText(currentCase->getCaseName());
-    ui->label_theType->setText(theTemplate->getName());
-    ui->label_theLocation->setText(currentCase->getCaseFolder());
-
-
-    // get the current configuration file
-    QJsonObject   obj    = theTemplate->getRawConfig()->object();
-
-    // read stage list for the current problem
-    QJsonObject    stages     = obj["stages"].toObject();
-    QList<QString> stageNames = stages.keys();
-
-    // create stage tabs
-    foreach (QString name, stageNames)
-    {
-        // create the stage tab
-        /* not sure about that yet ... */
-
-        //m_stageTabs[name] = new CWE_StageTab(parent=this);
-
-        QJsonObject stageInfo = stages[name].toObject();
-        QString labelText;
-
-        labelText = stageInfo["name"].toString();
-        labelText = labelText.append("\nParameters");
-    }
-
-#if 0
-    int cnt = 0;
-
-    foreach (QString name, stageNames)
-    {
-        QJsonObject stageInfo = stages[name].toObject();
-        QString labelText;
-
-        labelText = stageInfo["name"].toString();
-        labelText = labelText.append("\nParameters");
-
-        // add a stage tab to ui->theTabWidget
-        int idx = ui->theTabWidget->addGroupTab(name, labelText, currentStates[name]);
-        stageTabsIndex.insert(name, idx);
-
-        // add varGroub tabs
-        QJsonArray theGroups = stageInfo["groups"].toArray();
-        foreach (const QJsonValue item, theGroups)
-        {
-            QString subTitle = item.toString();
-            QJsonArray varList = varGroups[subTitle].toArray();
-            ui->theTabWidget->addVarTab(name, subTitle, &varList, &vars, &setVars);
-        }
-
-        cnt++;
-    }
-
-    if (cnt>0) {ui->theTabWidget->setIndex(0);}
-    // ----
-#endif
-
-    viewIsValid = true;
-}
-
 void CWE_Parameters::resetViewInfo()
 {
     viewIsValid = false;
@@ -108,7 +39,7 @@ void CWE_Parameters::resetViewInfo()
     // erase all stage tabs
     ui->theTabWidget->resetView();
 
-    this->initStateTabs();
+    //this->initStateTabs();
 }
 
 void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
@@ -129,15 +60,24 @@ void CWE_Parameters::newCaseGiven()
 {
     CFDcaseInstance * newCase = myDriver->getCurrentCase();
 
+    QMap<QString, StageState> currentStates = newCase->getStageStates();
+
     if (newCase != NULL)
     {
+        this->resetViewInfo();
+
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
         QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
-        ui->theTabWidget->setParameterConfig(rawConfig);
-    }
 
-    resetViewInfo();
+        ui->label_theName->setText(newCase->getCaseName());
+        ui->label_theType->setText(newCase->getMyType()->getName());
+        ui->label_theLocation->setText(newCase->getCaseFolder());
+
+        ui->theTabWidget->setParameterConfig(rawConfig);
+
+        viewIsValid = true;
+    }
 }
 
 void CWE_Parameters::newCaseState(CaseState newState)

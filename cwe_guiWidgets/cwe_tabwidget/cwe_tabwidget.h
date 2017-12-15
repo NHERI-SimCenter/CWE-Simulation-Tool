@@ -46,13 +46,7 @@ public:
     void setViewState(SimCenterViewState);
     SimCenterViewState viewState();
 
-    void addStageTab(QString s, QJsonObject &obj);
-
     bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label , QString *setVal = NULL);
-
-    int addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString, QString> *setVars);
-    void addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> *setVars);
-
 
     void addVarsData(QJsonObject , QJsonObject );
 
