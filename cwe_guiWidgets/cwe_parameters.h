@@ -41,7 +41,6 @@ public:
 
     virtual void linkDriver(VWTinterfaceDriver * newDriver);
     void resetViewInfo();
-    void initStateTabs();
 
     void switchToResults();
     void performCaseCommand(QString stage, CaseCommand toEnact);
