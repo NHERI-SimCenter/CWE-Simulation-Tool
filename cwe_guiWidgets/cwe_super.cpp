@@ -43,3 +43,8 @@ void CWE_Super::linkDriver(VWTinterfaceDriver * theDriver)
 {
     myDriver = theDriver;
 }
+
+VWTinterfaceDriver * CWE_Super::getDriver()
+{
+    return myDriver;
+}
