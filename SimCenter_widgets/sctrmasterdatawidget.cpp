@@ -12,6 +12,8 @@
 #include <QStandardItemModel>
 #include <QGridLayout>
 
+#include <QDebug>
+
 #include "SimCenter_widgets/sctrvalidators.h"
 
 SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
@@ -251,6 +253,11 @@ void SCtrMasterDataWidget::setValue(bool b)
 QString SCtrMasterDataWidget::toString()
 {
     return QString("");
+}
+
+void SCtrMasterDataWidget::updateValue(QString s)
+{
+    qDebug() << s;
 }
 
 /* ********** various input data types ********** */

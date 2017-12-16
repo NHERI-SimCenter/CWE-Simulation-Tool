@@ -15,6 +15,7 @@ public:
     bool toBool();
     void setChecked();
     void setUnchecked();
+    void updateValue(QString);
 };
 
 #endif // SCTRBOOLDATAWIDGET_H
