@@ -110,7 +110,10 @@ SCtrMasterDataWidget * CWE_ParamPanel::addVariable(QString varName, QJsonObject 
         msg->exec();
     }
 
+    variableWidgets->insert(varName, theVar);
+
     return theVar;
+
 }
 
 void CWE_ParamPanel::addParameterConfig(QJsonArray &groupVars, QJsonObject &allVars)

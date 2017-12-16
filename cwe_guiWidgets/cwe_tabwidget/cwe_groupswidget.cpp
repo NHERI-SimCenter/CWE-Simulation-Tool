@@ -118,7 +118,7 @@ QMap<QString, SCtrMasterDataWidget *> CWE_GroupsWidget::getParameterWidgetMap()
 
     for (int i=0; i<this->count(); i++)
     {
-        CWE_ParamPanel * panel = (CWE_ParamPanel *)this->widget(i);
+        CWE_ParamPanel * panel = (CWE_ParamPanel *)((QScrollArea *)(this->widget(i)))->widget();
         QMap<QString, SCtrMasterDataWidget *> panelParams = panel->getParameterWidgetMap();
         QMapIterator<QString, SCtrMasterDataWidget *> panelParamIter(panelParams);
         while (panelParamIter.hasNext())
