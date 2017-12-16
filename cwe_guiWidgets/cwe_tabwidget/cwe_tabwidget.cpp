@@ -136,22 +136,22 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
+    initQuickParameterPtr();
+
     setButtonMode(CWE_BTN_RUN);
 }
 
 
 void CWE_TabWidget::initQuickParameterPtr()
 {
-    SCtrMasterDataWidget *ptr = NULL;
-    QString key;
-
     quickParameterPtr->clear();
 
     QMapIterator<QString, CWE_StageStatusTab *> stageTabIter(*stageTabList);
     while (stageTabIter.hasNext())
     {
         stageTabIter.next();
-        QMap<QString, SCtrMasterDataWidget *> groupMap = (stageTabIter.value())->groupWidget()->getParameterWidgetMap();
+        CWE_GroupsWidget *groupTab = (stageTabIter.value())->groupWidget();
+        QMap<QString, SCtrMasterDataWidget *> groupMap = groupTab->getParameterWidgetMap();
         QMapIterator<QString, SCtrMasterDataWidget *> groupIter(groupMap);
         while (groupIter.hasNext())
         {
@@ -179,7 +179,6 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
     while (iter.hasNext())
     {
         iter.next();
-
         currentParameters.insert(iter.key(), (iter.value())->value());
     }
 
@@ -206,17 +205,13 @@ void CWE_TabWidget::on_pbtn_rollback_clicked()
 
 QString CWE_TabWidget::getStateText(StageState theState)
 {
-    if (theState == StageState::ERROR)
-        return "*** ERROR ***";
-    if (theState == StageState::FINISHED)
-        return "Task Finished";
-    if (theState == StageState::LOADING)
-        return "Loading Data ...";
-    if (theState == StageState::RUNNING)
-        return "Task Running";
-    if (theState == StageState::UNRUN)
-        return "Not Yet Run";
-    return "*** TOTAL ERROR ***";
+    QString msg = "*** TOTAL ERROR ***";
+    if (theState == StageState::ERROR)         { msg = "*** ERROR ***"; }
+    else if (theState == StageState::FINISHED) { msg = "Task Finished"; }
+    else if (theState == StageState::LOADING)  { msg = "Loading Data ..."; }
+    else if (theState == StageState::RUNNING)  { msg = "Task Running"; }
+    else if (theState == StageState::UNRUN)    { msg = "Not Yet Run"; }
+    return msg;
 }
 
 void CWE_TabWidget::setButtonMode(uint mode)

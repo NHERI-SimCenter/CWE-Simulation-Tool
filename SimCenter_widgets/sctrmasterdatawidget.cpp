@@ -27,8 +27,6 @@ SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
 
     this->setViewState(SimCenterViewState::visible);
 
-    variableWidgets = new QMap<QString, InputDataType *>();
-
     m_obj = QJsonObject();
     m_obj.insert("type","unknown");
     m_obj.insert("displayname","not specified");
@@ -431,9 +429,7 @@ void SCtrMasterDataWidget::addType(const QString &varName, const QString &type, 
     else {
         varData->options = NULL;
     }
-    variableWidgets->insert(varName, varData);
 }
-
 
 
 /* ********** helper functions ********** */

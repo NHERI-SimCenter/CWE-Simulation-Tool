@@ -70,8 +70,6 @@ private:
 
     QValidator *m_validator = NULL;
     SimCenterDataType m_dataType;
-
-    QMap<QString, InputDataType *> *variableWidgets;
 };
 
 #endif // SCTRDATAWIDGET_H

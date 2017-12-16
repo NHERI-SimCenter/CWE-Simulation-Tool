@@ -58,7 +58,7 @@ private:
 
     Ui::CWE_Parameters *ui;
 
-    bool viewIsValid = false;
+    bool paramWidgetsExist = false;
 
 };
 
