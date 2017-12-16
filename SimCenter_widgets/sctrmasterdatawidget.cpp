@@ -19,7 +19,7 @@
 SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
     QFrame(parent)
 {
-    theInputWidget = NULL;
+    //theInputWidget = NULL;
     theCheckBox    = NULL;
     theComboBox    = NULL;
     theValue       = NULL;
@@ -56,23 +56,6 @@ void SCtrMasterDataWidget::initUI()
     this->setLayout(layout);
 }
 
-void SCtrMasterDataWidget::refresh()
-{
-    QString s = m_obj["displayname"].toString();
-    if (s != "") this->setVariableName(s);
-
-    QString u = m_obj["unit"].toString();
-    if (u != "") this->setUnit(u);
-
-    if (theInputWidget != NULL ) {
-        QString currentValue = ((QLineEdit *)theInputWidget)->text();
-        if (currentValue == "") {
-            currentValue = m_obj["default"].toString();
-            ((QLineEdit *)theInputWidget)->setText(currentValue);
-        }
-    }
-}
-
 SimCenterViewState SCtrMasterDataWidget::ViewState()
 {
     return m_ViewState;
@@ -80,26 +63,29 @@ SimCenterViewState SCtrMasterDataWidget::ViewState()
 
 void SCtrMasterDataWidget::setViewState(SimCenterViewState state)
 {
-    if (theInputWidget != NULL ) {
-
-        switch (state) {
-        case SimCenterViewState::editable:
-            theInputWidget->setEnabled(false);
-            this->show();
-            m_ViewState = SimCenterViewState::editable;
-            break;
-        case SimCenterViewState::hidden:
-            theInputWidget->setEnabled(true);
-            this->hide();
-            m_ViewState = SimCenterViewState::hidden;
-            break;
-        case SimCenterViewState::visible:
-        default:
-            theInputWidget->setEnabled(true);
-            this->show();
-            m_ViewState = SimCenterViewState::visible;
-            break;
-        }
+    switch (state) {
+    case SimCenterViewState::visible:
+        if (theValue    != NULL) theValue->setEnabled(false);
+        if (theComboBox != NULL) theComboBox->setEnabled(false);
+        if (theCheckBox != NULL) theCheckBox->setEnabled(false);
+        this->show();
+        m_ViewState = SimCenterViewState::editable;
+        break;
+    case SimCenterViewState::hidden:
+        if (theValue    != NULL) theValue->setEnabled(true);
+        if (theComboBox != NULL) theComboBox->setEnabled(true);
+        if (theCheckBox != NULL) theCheckBox->setEnabled(true);
+        this->hide();
+        m_ViewState = SimCenterViewState::hidden;
+        break;
+    case SimCenterViewState::editable:
+    default:
+        if (theValue    != NULL) theValue->setEnabled(true);
+        if (theComboBox != NULL) theComboBox->setEnabled(true);
+        if (theCheckBox != NULL) theCheckBox->setEnabled(true);
+        this->show();
+        m_ViewState = SimCenterViewState::visible;
+        break;
     }
 }
 
