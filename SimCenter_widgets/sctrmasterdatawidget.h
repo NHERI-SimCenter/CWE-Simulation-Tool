@@ -29,6 +29,7 @@ public:
     virtual void setValue(int);
     virtual void setValue(bool);
     virtual QString toString();
+    virtual void updateValue(QString);
     QString value() {return this->toString();}
     void refresh();
 

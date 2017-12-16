@@ -7,6 +7,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QList>
+#include <QMessageBox>
+#include <QStandardItemModel>
 
 #include <QDebug>
 
@@ -56,7 +58,28 @@ void SCtrChoiceDataWidget::setData(QJsonObject &obj)
 
 QString SCtrChoiceDataWidget::toString()
 {
-    QString checked = theComboBox->currentText();
-    return checked;
+    QString selection = theComboBox->currentText();
+    return selection;
+}
+
+void SCtrChoiceDataWidget::updateValue(QString s)
+{
+    /* check if new information is an appropriate type */
+    QStandardItemModel *theModel = (QStandardItemModel *)theComboBox->model();
+    QList<QStandardItem *> itemList = theModel->findItems(s);
+    if (itemList.isEmpty())
+    {
+        /* add an error message */
+        QString name = m_obj["displayname"].toString();
+        QMessageBox *msg = new QMessageBox(QMessageBox::Information,
+                                           QString("Warning"),
+                                           QString("Variable %1 of unknown selection option \'%2\'.\nVariable ignored.").arg(name).arg(s));
+        msg->exec();
+        delete msg;
+        return;
+    }
+
+    /* update the value */
+    theComboBox->setCurrentText(s);
 }
 

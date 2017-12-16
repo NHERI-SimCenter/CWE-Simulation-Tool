@@ -141,6 +141,20 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     setButtonMode(CWE_BTN_RUN);
 }
 
+void CWE_TabWidget::updateParameterValues(QMap<QString, QString> newValues)
+{
+    QMapIterator<QString, QString> iter(newValues);
+
+    while (iter.hasNext())
+    {
+        iter.next();
+        QString key = iter.key();
+        if (quickParameterPtr->contains(key))
+        {
+            (quickParameterPtr->value(key))->updateValue(iter.value());
+        }
+    }
+}
 
 void CWE_TabWidget::initQuickParameterPtr()
 {

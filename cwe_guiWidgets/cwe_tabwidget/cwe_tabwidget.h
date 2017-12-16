@@ -51,6 +51,7 @@ public:
     void addVarsData(QJsonObject , QJsonObject );
 
     void setParameterConfig(QJsonObject &obj);
+    void updateParameterValues(QMap<QString, QString>);
     void initQuickParameterPtr();
 
     QMap<QString, QString> collectParamData();
