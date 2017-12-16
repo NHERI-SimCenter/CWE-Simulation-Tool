@@ -11,6 +11,7 @@ public:
     SCtrChoiceDataWidget(QJsonObject &obj, QWidget *parent);
     void setData(QJsonObject &obj);
     QString toString();
+    void updateValue(QString);
 };
 
 #endif // SCTRCHOICEDATAWIDGET_H

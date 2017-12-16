@@ -47,9 +47,6 @@ void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
 
 void CWE_Parameters::saveAllParams()
 {
-    qDebug() << ui->theTabWidget->collectParamData();
-
-
     CFDcaseInstance * linkedCFDCase = myDriver->getCurrentCase();
     if (linkedCFDCase != NULL)
     {
@@ -88,11 +85,27 @@ void CWE_Parameters::newCaseState(CaseState newState)
 
     //TODO: HERE is where newState should be read and acted upon
 
+
+    /* offline mode: do no more */
     if (newState == CaseState::OFFLINE) return;
 
-    if (newState == CaseState::READY)
+    switch (newState)
     {
-        //myDriver->getCurrentCase()->getCurrentParams();
+    case CaseState::DEFUNCT:
+        break;
+    case CaseState::ERROR:
+        break;
+    case CaseState::INVALID:
+        break;
+    case CaseState::JOB_RUN:
+        break;
+    case CaseState::LOADING:
+        break;
+    case CaseState::OP_INVOKE:
+        break;
+    case CaseState::READY:
+        ui->theTabWidget->updateParameterValues(myDriver->getCurrentCase()->getCurrentParams());
+        break;
     }
 
 }
