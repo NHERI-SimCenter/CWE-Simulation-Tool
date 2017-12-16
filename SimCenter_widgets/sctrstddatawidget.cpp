@@ -51,3 +51,12 @@ double SCtrStdDataWidget::toDouble()
     return theValue->text().toDouble();
 }
 
+void SCtrStdDataWidget::updateValue(QString s)
+{
+    /* check if new information is an appropriate type */
+    double x = s.toDouble();
+    QString val = QString("%1").arg(x, m_obj["precision"].toInt(), 'g');
+
+    /* update the value */
+    theValue->setText(val);
+}

@@ -50,3 +50,9 @@ QString SCtrFileDataWidget::toString()
     return theValue->text();
 }
 
+void SCtrFileDataWidget::updateValue(QString s)
+{
+    /* update the value */
+    theValue->setText(s);
+}
+

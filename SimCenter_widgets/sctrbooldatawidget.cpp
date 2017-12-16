@@ -2,6 +2,7 @@
 
 #include <QHBoxLayout>
 #include <QCheckBox>
+#include <QMessageBox>
 
 SCtrBoolDataWidget::SCtrBoolDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)
@@ -65,5 +66,25 @@ void SCtrBoolDataWidget::setChecked()
 void SCtrBoolDataWidget::setUnchecked()
 {
     theCheckBox->setChecked(false);
+}
+
+void SCtrBoolDataWidget::updateValue(QString s)
+{
+    /* check if new information is an appropriate type */
+    if (s.toLower() == "true")
+        { setChecked(); }
+    else if (s.toLower() == "false")
+        {  setUnchecked(); }
+    else
+    {
+        /* add an error message */
+        QString name = m_obj["displayname"].toString();
+        QMessageBox *msg = new QMessageBox(QMessageBox::Information,
+                                           QString("Warning"),
+                                           QString("Boolean variable %1 cannot be set to \'%2\'.\nVariable ignored.").arg(name).arg(s));
+        msg->exec();
+        delete msg;
+        return;
+    }
 }
 

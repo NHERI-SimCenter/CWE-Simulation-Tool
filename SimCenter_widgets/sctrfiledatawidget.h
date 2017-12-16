@@ -13,6 +13,7 @@ public:
     QString toString();
     double  toDouble();
     bool toBool();
+    void updateValue(QString);
 };
 
 #endif // SCTRFILEDATAWIDGET_H
