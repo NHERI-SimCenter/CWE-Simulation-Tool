@@ -59,6 +59,13 @@ void CWE_TabWidget::setViewState(SimCenterViewState state)
     default:
         m_viewState = SimCenterViewState::visible;
     }
+
+    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
+    while (iter.hasNext())
+    {
+        iter.next();
+        (iter.value())->setViewState(m_viewState);
+    }
 }
 
 SimCenterViewState CWE_TabWidget::viewState()
@@ -179,6 +186,7 @@ void CWE_TabWidget::on_pbtn_run_clicked()
 {
     myController->performCaseCommand(currentSelectedStage, CaseCommand::RUN);
 
+    setViewState(SimCenterViewState::visible);
     setButtonMode(CWE_BTN_CANCEL);
 }
 
@@ -204,6 +212,8 @@ void CWE_TabWidget::on_pbtn_cancel_clicked()
     myController->performCaseCommand(currentSelectedStage, CaseCommand::CANCEL);
 
     //setButtonMode(CWE_BTN_RUN|CWE_BTN_CANCEL|CWE_BTN_RESULTS|CWE_BTN_ROLLBACK);
+
+    setViewState(SimCenterViewState::editable);
     setButtonMode(CWE_BTN_RUN);
 }
 

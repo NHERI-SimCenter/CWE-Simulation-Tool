@@ -31,7 +31,6 @@ public:
     virtual QString toString();
     virtual void updateValue(QString);
     QString value() {return this->toString();}
-    void refresh();
 
 protected:
     QFrame * addStd(QJsonObject, QWidget *parent, QString *setVal = NULL );
@@ -49,7 +48,6 @@ private slots:
     void on_theValue_editingFinished();
 
 protected:
-    QWidget   *theInputWidget;
     QLineEdit *theValue;
     QCheckBox *theCheckBox;
     QComboBox *theComboBox;
