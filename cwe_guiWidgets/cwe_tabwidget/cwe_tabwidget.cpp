@@ -116,7 +116,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         stageLabel += "\nParameters";
 
         /* create a CWE_StageStatusTab */
-        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageLabel, this);
+        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageName, stageLabel, this);
 
         tab->setStatus(getStateText(stageStates.value(stageName)));
 

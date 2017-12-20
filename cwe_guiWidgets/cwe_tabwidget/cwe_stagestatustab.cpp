@@ -3,11 +3,12 @@
 //#include <QPainter>
 #include <QMouseEvent>
 
-CWE_StageStatusTab::CWE_StageStatusTab(QString stageName, QWidget *parent) :
+CWE_StageStatusTab::CWE_StageStatusTab(QString theStageKey, QString stageName, QWidget *parent) :
     QFrame(parent),
     ui(new Ui::CWE_StageStatusTab)
 {
     ui->setupUi(this);
+    stageKey = theStageKey;
     this->setName(stageName);
     this->setInActive();
 }

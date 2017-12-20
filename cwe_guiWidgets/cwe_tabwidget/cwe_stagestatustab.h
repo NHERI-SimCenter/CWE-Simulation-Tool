@@ -15,7 +15,7 @@ class CWE_StageStatusTab : public QFrame
     Q_OBJECT
 
 public:
-    explicit CWE_StageStatusTab(QString stageName, QWidget *parent = 0);
+    explicit CWE_StageStatusTab(QString stageKey, QString stageName, QWidget *parent = 0);
     ~CWE_StageStatusTab();
     void setCorrespondingPanel(CWE_GroupsWidget * newPanel);
 
@@ -31,6 +31,8 @@ public:
     void setInActive(bool b=true);
     void linkWidget(CWE_GroupsWidget *ptr);
     CWE_GroupsWidget * groupWidget() { return myPanel; };
+    QString getStageKey() { return stageKey; }
+    bool isStage(QString key) { return (stageKey == key);}
 
 signals:
     void btn_pressed(CWE_GroupsWidget *, QString);
@@ -50,6 +52,7 @@ private:
     CWE_GroupsWidget * myPanel = NULL;
 
     QString m_text;
+    QString stageKey = "";
     QString m_status = "unknown";
     QString m_name = "label text";
     //int m_index = -1;
