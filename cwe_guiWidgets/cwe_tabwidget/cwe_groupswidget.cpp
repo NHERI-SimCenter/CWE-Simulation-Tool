@@ -29,6 +29,7 @@ void CWE_GroupsWidget::setCorrespondingTab(CWE_StageStatusTab * newTab)
 // set the group definitions as a JSon file
 void CWE_GroupsWidget::setData(QJsonObject &obj)
 {
+    qWarning() << "CWE_GroupsWidget::setData depricated function called.";
     m_obj = obj;
 
     /*
