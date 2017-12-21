@@ -145,6 +145,9 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 
     initQuickParameterPtr();
 
+    QString firstTabKey = sequence[0].toString();
+    if (firstTabKey != "") { stageTabList->value(firstTabKey)->setActive(); }
+
     setButtonMode(CWE_BTN_RUN);
 }
 
