@@ -360,27 +360,27 @@ QFrame * SCtrMasterDataWidget::addChoice(QJsonObject JSONvar, QWidget *parent, Q
     return this;
 }
 
-QFrame * SCtrMasterDataWidget::addVector3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QFrame * SCtrMasterDataWidget::addVector3D(QJsonObject , QWidget *, QString * )
 {
     return NULL;
 }
 
-QFrame * SCtrMasterDataWidget::addVector2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QFrame * SCtrMasterDataWidget::addVector2D(QJsonObject , QWidget *, QString * )
 {
     return NULL;
 }
 
-QFrame * SCtrMasterDataWidget::addTensor3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QFrame * SCtrMasterDataWidget::addTensor3D(QJsonObject , QWidget *, QString * )
 {
     return NULL;
 }
 
-QFrame * SCtrMasterDataWidget::addTensor2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QFrame * SCtrMasterDataWidget::addTensor2D(QJsonObject , QWidget *, QString * )
 {
     return NULL;
 }
 
-QFrame * SCtrMasterDataWidget::addUnknown(QJsonObject JSONvar, QWidget *parent, QString *setVal)
+QFrame * SCtrMasterDataWidget::addUnknown(QJsonObject JSONvar, QWidget *parent, QString *)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
