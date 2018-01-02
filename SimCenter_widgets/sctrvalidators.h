@@ -8,8 +8,7 @@ class SCtrNoValidator: public QValidator
 public:
     SCtrNoValidator(QObject *parent = 0);
     // ~SCtrNoValidator();
-    void fixup(QString &str) const {};
-    QValidator::State validate(QString &input, int &pos) const { return QValidator::Acceptable; };
+    QValidator::State validate(QString &input, int &pos) const;
 };
 
 
@@ -18,7 +17,6 @@ class SCtrBoolValidator: public QValidator
 public:
     SCtrBoolValidator(QObject *parent = 0);
     // ~SCtrBoolValidator();
-    void fixup(QString &str) const {};
     QValidator::State validate(QString &input, int &pos) const;
 
 protected:

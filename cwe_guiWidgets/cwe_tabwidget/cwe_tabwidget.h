@@ -62,7 +62,7 @@ private slots:
     void on_pbtn_results_clicked();
     void on_pbtn_rollback_clicked();
 
-    void on_groupTabSelected(CWE_GroupsWidget *, QString);
+    void on_groupTabSelected(CWE_GroupsWidget *);
     void on_tabActivated(CWE_StageStatusTab *);
 
 protected:

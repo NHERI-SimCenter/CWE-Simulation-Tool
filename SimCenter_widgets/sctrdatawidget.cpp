@@ -222,7 +222,7 @@ QString SCtrDataWidget::Value()
 
 /* ********** various input data types ********** */
 
-QWidget * SCtrDataWidget::addStd(QJsonObject JSONvar, QWidget *parent, QString *setVal)
+QWidget * SCtrDataWidget::addStd(QJsonObject JSONvar, QWidget *parent, QString *)
 {
     QVariant defaultOption = JSONvar["default"].toVariant();
     QString unit           = JSONvar["unit"].toString();
@@ -283,7 +283,7 @@ QWidget * SCtrDataWidget::addBool(QJsonObject JSONvar, QWidget *parent, QString 
     return theBox;
 }
 
-QWidget * SCtrDataWidget::addFile(QJsonObject JSONvar, QWidget *parent, QString * setVal)
+QWidget * SCtrDataWidget::addFile(QJsonObject JSONvar, QWidget *parent, QString *)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -334,27 +334,27 @@ QWidget * SCtrDataWidget::addChoice(QJsonObject JSONvar, QWidget *parent, QStrin
     return theSelection;
 }
 
-QWidget * SCtrDataWidget::addVector3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QWidget * SCtrDataWidget::addVector3D(QJsonObject , QWidget *, QString * )
 {
     return NULL;
 }
 
-QWidget * SCtrDataWidget::addVector2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QWidget * SCtrDataWidget::addVector2D(QJsonObject , QWidget *, QString * )
 {
     return NULL;
 }
 
-QWidget * SCtrDataWidget::addTensor3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QWidget * SCtrDataWidget::addTensor3D(QJsonObject , QWidget *, QString * )
 {
     return NULL;
 }
 
-QWidget * SCtrDataWidget::addTensor2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
+QWidget * SCtrDataWidget::addTensor2D(QJsonObject , QWidget *, QString * )
 {
     return NULL;
 }
 
-QWidget * SCtrDataWidget::addUnknown(QJsonObject JSONvar, QWidget *parent, QString *setVal)
+QWidget * SCtrDataWidget::addUnknown(QJsonObject JSONvar, QWidget *parent, QString *)
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();

@@ -106,6 +106,10 @@ void CWE_Parameters::newCaseState(CaseState newState)
     case CaseState::READY:
         ui->theTabWidget->updateParameterValues(myDriver->getCurrentCase()->getCurrentParams());
         break;
+    default:
+        myDriver->fatalInterfaceError("Remote case has unhandled state");
+        return;
+        break;
     }
 
 }
