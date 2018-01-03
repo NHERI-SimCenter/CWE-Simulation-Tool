@@ -186,7 +186,7 @@ void CWE_TabWidget::initQuickParameterPtr()
 
 void CWE_TabWidget::on_pbtn_run_clicked()
 {
-    myController->performCaseCommand(currentSelectedStage, CaseCommand::RUN);
+    myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::RUN);
 
     setViewState(SimCenterViewState::visible);
     setButtonMode(CWE_BTN_CANCEL);
@@ -211,7 +211,7 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
 
 void CWE_TabWidget::on_pbtn_cancel_clicked()
 {
-    myController->performCaseCommand(currentSelectedStage, CaseCommand::CANCEL);
+    myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::CANCEL);
 
     //setButtonMode(CWE_BTN_RUN|CWE_BTN_CANCEL|CWE_BTN_RESULTS|CWE_BTN_ROLLBACK);
 
@@ -226,7 +226,7 @@ void CWE_TabWidget::on_pbtn_results_clicked()
 
 void CWE_TabWidget::on_pbtn_rollback_clicked()
 {
-    myController->performCaseCommand(currentSelectedStage, CaseCommand::ROLLBACK);
+    myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::ROLLBACK);
 }
 
 QString CWE_TabWidget::getStateText(StageState theState)
@@ -238,6 +238,12 @@ QString CWE_TabWidget::getStateText(StageState theState)
     else if (theState == StageState::RUNNING)  { msg = "Task Running"; }
     else if (theState == StageState::UNRUN)    { msg = "Not Yet Run"; }
     return msg;
+}
+
+QString CWE_TabWidget::getCurrentSelectedStage()
+{
+    //TODO: return id of selected stage
+    //TODO: PMH
 }
 
 void CWE_TabWidget::setButtonMode(uint mode)
