@@ -7,7 +7,6 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QList>
-#include <QMessageBox>
 #include <QStandardItemModel>
 
 #include <QDebug>
@@ -43,6 +42,7 @@ void SCtrChoiceDataWidget::setData(QJsonObject &obj)
     QJsonObject options = obj.value(QString("options")).toObject();
     QString theDefault = obj.value(QString("default")).toString();
 
+    //TODO: This is wrong, looks at human name and not internal name
     foreach (QJsonValue val, options)
     {
         theModel->appendRow(new QStandardItem(val.toString()));
@@ -71,11 +71,7 @@ void SCtrChoiceDataWidget::updateValue(QString s)
     {
         /* add an error message */
         QString name = m_obj["displayname"].toString();
-        QMessageBox *msg = new QMessageBox(QMessageBox::Information,
-                                           QString("Warning"),
-                                           QString("Variable %1 of unknown selection option \'%2\'.\nVariable ignored.").arg(name).arg(s));
-        msg->exec();
-        delete msg;
+        cwe_globals::displayPopup(QString("Variable %1 of unknown selection option \'%2\'.\nVariable ignored.").arg(name).arg(s), "Warning");
         return;
     }
 
