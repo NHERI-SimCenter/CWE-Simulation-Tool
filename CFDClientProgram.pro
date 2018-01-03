@@ -97,7 +97,8 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/singlelinedialog.cpp \
     SimCenter_widgets/sctrbooldatawidget.cpp \
     SimCenter_widgets/sctrchoicedatawidget.cpp \
-    SimCenter_widgets/sctrfiledatawidget.cpp
+    SimCenter_widgets/sctrfiledatawidget.cpp \
+    cwe_globals.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -149,7 +150,8 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/singlelinedialog.h \
     SimCenter_widgets/sctrbooldatawidget.h \
     SimCenter_widgets/sctrchoicedatawidget.h \
-    SimCenter_widgets/sctrfiledatawidget.h
+    SimCenter_widgets/sctrfiledatawidget.h \
+    cwe_globals.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \

@@ -40,6 +40,7 @@
 #include <QModelIndexList>
 #include <QFileInfo>
 
+#include "cwe_globals.h"
 #include "cwe_super.h"
 
 class VWTinterfaceDriver;

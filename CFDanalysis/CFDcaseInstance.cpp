@@ -793,8 +793,5 @@ void CFDcaseInstance::emitNewState(CaseState newState)
 
 void CFDcaseInstance::displayNetError(QString infoText)
 {
-    QMessageBox infoMessage;
-    infoMessage.setText(infoText);
-    infoMessage.setIcon(QMessageBox::Information);
-    infoMessage.exec();
+    cwe_globals::displayPopup(infoText, "Network Issue");
 }
