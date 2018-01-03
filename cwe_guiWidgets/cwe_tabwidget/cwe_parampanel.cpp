@@ -105,11 +105,7 @@ SCtrMasterDataWidget * CWE_ParamPanel::addVariable(QString varName, QJsonObject 
     }
     else {
         /* add an error message */
-        QMessageBox *msg = new QMessageBox(QMessageBox::Information,
-                                      QString("Warning"),
-                                      QString("Variable %1 of unknown type %2.\nVariable ignored.").arg(varName).arg(type));
-        msg->exec();
-        delete msg;
+        cwe_globals::displayPopup(QString("Variable %1 of unknown type %2.\nVariable ignored.").arg(varName).arg(type), "Warning");
     }
 
     variableWidgets->insert(varName, theVar);

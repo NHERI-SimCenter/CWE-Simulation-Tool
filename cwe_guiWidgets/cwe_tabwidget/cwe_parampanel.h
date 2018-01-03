@@ -5,7 +5,6 @@
 #include <QMap>
 #include <QJsonObject>
 #include <QLayout>
-#include <QMessageBox>
 #include <QDebug>
 #include <QJsonArray>
 

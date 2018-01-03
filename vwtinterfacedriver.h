@@ -96,8 +96,6 @@ public:
     void setCurrentCase(CFDcaseInstance * newCase);
     CWE_MainWindow * getMainWindow();
 
-    void displayMessagePopup(QString infoText);
-
     bool inOfflineMode();
 
 signals:
