@@ -70,9 +70,9 @@ protected:
 
 private:
     static QString getStateText(StageState theState);
+    QString getCurrentSelectedStage();
 
     CWE_Parameters * myController = NULL;
-    QString currentSelectedStage;
 
     Ui::CWE_TabWidget *ui;
 
