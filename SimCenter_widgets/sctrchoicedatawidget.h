@@ -2,7 +2,9 @@
 #define SCTRCHOICEDATAWIDGET_H
 
 #include <QWidget>
-#include <SimCenter_widgets/sctrmasterdatawidget.h>
+
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
+#include "cwe_globals.h"
 
 class SCtrChoiceDataWidget: public SCtrMasterDataWidget
 {

@@ -46,6 +46,8 @@
 
 #include <QTimer>
 
+#include "cwe_globals.h"
+
 class FileTreeNode;
 class CFDanalysisType;
 class EasyBoolLock;
