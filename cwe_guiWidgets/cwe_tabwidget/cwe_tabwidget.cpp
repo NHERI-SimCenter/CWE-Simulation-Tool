@@ -116,7 +116,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         stageLabel += "\nParameters";
 
         /* create a CWE_StageStatusTab */
-        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageLabel, this);
+        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageName, stageLabel, this);
 
         tab->setStatus(getStateText(stageStates.value(stageName)));
 
@@ -136,14 +136,16 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         groupWidget->setParameterConfig(stageName, obj);
 
         /* connect signals and slots */
-        QObject::connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
+        QObject::connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
         QObject::connect(tab,SIGNAL(btn_activated(CWE_StageStatusTab*)),this,SLOT(on_tabActivated(CWE_StageStatusTab *)));
-        //QObject::connect(tab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
     }
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
     initQuickParameterPtr();
+
+    QString firstTabKey = sequence[0].toString();
+    if (firstTabKey != "") { stageTabList->value(firstTabKey)->setActive(); }
 
     setButtonMode(CWE_BTN_RUN);
 }
@@ -258,7 +260,7 @@ void CWE_TabWidget::setButtonMode(uint mode)
 
 /* *** SLOTS *** */
 
-void CWE_TabWidget::on_groupTabSelected(CWE_GroupsWidget *groupWidget, QString s)
+void CWE_TabWidget::on_groupTabSelected(CWE_GroupsWidget *groupWidget)
 {
     /* activate the proper panel */
     ui->stagePanels->setCurrentWidget(groupWidget);
