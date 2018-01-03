@@ -87,7 +87,7 @@ void CWE_file_manager::on_pb_upload_clicked()
 {
     if (myDriver->getFileHandler()->operationIsPending())
     {
-        myDriver->displayMessagePopup("Currently running file operation. Please Wait.");
+        cwe_globals::displayPopup("Currently running file operation. Please Wait.");
         return;
     }
 
@@ -95,7 +95,7 @@ void CWE_file_manager::on_pb_upload_clicked()
 
     if ((targetFile == NULL) || (targetFile->getFileData().getFileType() != FileType::DIR))
     {
-        myDriver->displayMessagePopup("Please select a destination folder to upload to.");
+        cwe_globals::displayPopup("Please select a destination folder to upload to.");
         return;
     }
 
@@ -104,7 +104,7 @@ void CWE_file_manager::on_pb_upload_clicked()
 
     if (!fileData.isFile())
     {
-        myDriver->displayMessagePopup("Please select exactly 1 local file to upload.");
+        cwe_globals::displayPopup("Please select exactly 1 local file to upload.");
         return;
     }
 
@@ -112,7 +112,7 @@ void CWE_file_manager::on_pb_upload_clicked()
 
     if (!myDriver->getFileHandler()->operationIsPending())
     {
-        myDriver->displayMessagePopup("Error: Unable to start file operation. Please try again.");
+        cwe_globals::displayPopup("Error: Unable to start file operation. Please try again.");
     }
 }
 
@@ -120,7 +120,7 @@ void CWE_file_manager::on_pb_download_clicked()
 {
     if (myDriver->getFileHandler()->operationIsPending())
     {
-        myDriver->displayMessagePopup("Currently running file operation. Please Wait.");
+        cwe_globals::displayPopup("Currently running file operation. Please Wait.");
         return;
     }
 
@@ -128,7 +128,7 @@ void CWE_file_manager::on_pb_download_clicked()
 
     if ((targetFile == NULL) || (targetFile->getFileData().getFileType() != FileType::FILE))
     {
-        myDriver->displayMessagePopup("Please select a file to download to.");
+        cwe_globals::displayPopup("Please select a file to download to.");
         return;
     }
 
@@ -137,7 +137,7 @@ void CWE_file_manager::on_pb_download_clicked()
 
     if (!fileData.isDir())
     {
-        myDriver->displayMessagePopup("Please select exactly 1 local folder to download to");
+        cwe_globals::displayPopup("Please select exactly 1 local folder to download to");
         return;
     }
 
@@ -154,7 +154,7 @@ void CWE_file_manager::on_pb_download_clicked()
 
     if (!myDriver->getFileHandler()->operationIsPending())
     {
-        myDriver->displayMessagePopup("Error: Unable to start file operation. Please try again.");
+        cwe_globals::displayPopup("Error: Unable to start file operation. Please try again.");
     }
 }
 

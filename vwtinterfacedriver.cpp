@@ -236,14 +236,6 @@ void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appL
     }
 }
 
-void VWTinterfaceDriver::displayMessagePopup(QString infoText)
-{
-    QMessageBox infoMessage;
-    infoMessage.setText(infoText);
-    infoMessage.setIcon(QMessageBox::Information);
-    infoMessage.exec();
-}
-
 bool VWTinterfaceDriver::inOfflineMode()
 {
     return offlineMode;
