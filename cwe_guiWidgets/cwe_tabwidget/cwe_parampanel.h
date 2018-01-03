@@ -27,7 +27,7 @@ public:
     void setViewState(SimCenterViewState);
     SimCenterViewState getViewState();
     void setData(QJsonObject &);
-    bool addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString * setVal);
+    //bool addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString * setVal);
     SCtrMasterDataWidget * addVariable(QString varName, QJsonObject &theVariable);
     void addParameterConfig(QJsonArray &groupVars, QJsonObject &allVars);
     QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
