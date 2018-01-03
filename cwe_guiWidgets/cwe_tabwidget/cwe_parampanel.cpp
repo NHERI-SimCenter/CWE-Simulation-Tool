@@ -57,8 +57,8 @@ SimCenterViewState CWE_ParamPanel::getViewState()
 {
     return m_viewState;
 }
-
-bool CWE_ParamPanel::addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString * setVal)
+/*
+bool CWE_ParamPanel::addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString *)
 {
     QString type = JSONvar["type"].toString();
     if (type == "") {
@@ -70,13 +70,14 @@ bool CWE_ParamPanel::addVariable(QString varName, QJsonObject JSONvar, const QSt
         QWidget *parent = this;
         if (parent != NULL)
         {
-            /* temporary disabled */
+            // temporary disabled
             //this->addType(varName, type, JSONvar, parent, setVal);
             return true;
         }
         else { return false; }
     }
 }
+*/
 
 SCtrMasterDataWidget * CWE_ParamPanel::addVariable(QString varName, QJsonObject &theVariable)
 {

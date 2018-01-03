@@ -35,7 +35,7 @@ public:
     bool isStage(QString key) { return (stageKey == key);}
 
 signals:
-    void btn_pressed(CWE_GroupsWidget *, QString);
+    void btn_pressed(CWE_GroupsWidget *);
     void btn_released(CWE_GroupsWidget *);
     void btn_activated(CWE_StageStatusTab *);
 
