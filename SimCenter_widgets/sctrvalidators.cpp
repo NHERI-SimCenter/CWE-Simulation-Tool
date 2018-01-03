@@ -7,7 +7,12 @@ SCtrNoValidator::SCtrNoValidator(QObject *parent):
     QValidator(parent)
 {
 
-};
+}
+
+QValidator::State SCtrNoValidator::validate(QString &, int &) const
+{
+    return QValidator::Acceptable;
+}
 
 SCtrBoolValidator::SCtrBoolValidator(QObject *parent):
     QValidator(parent)
@@ -15,7 +20,7 @@ SCtrBoolValidator::SCtrBoolValidator(QObject *parent):
 
 }
 
-QValidator::State SCtrBoolValidator::validate(QString &input, int &pos) const
+QValidator::State SCtrBoolValidator::validate(QString &input, int &) const
 {
     if (input.toLower() == "f")     return QValidator::Acceptable;
     if (input.toLower() == "fa")    return QValidator::Acceptable;
@@ -28,4 +33,4 @@ QValidator::State SCtrBoolValidator::validate(QString &input, int &pos) const
     if (input.toLower() == "true")  return QValidator::Acceptable;
 
     return QValidator::Invalid;
-};
+}

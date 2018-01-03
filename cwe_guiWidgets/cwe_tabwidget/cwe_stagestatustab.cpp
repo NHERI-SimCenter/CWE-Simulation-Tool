@@ -3,11 +3,12 @@
 //#include <QPainter>
 #include <QMouseEvent>
 
-CWE_StageStatusTab::CWE_StageStatusTab(QString stageName, QWidget *parent) :
+CWE_StageStatusTab::CWE_StageStatusTab(QString theStageKey, QString stageName, QWidget *parent) :
     QFrame(parent),
     ui(new Ui::CWE_StageStatusTab)
 {
     ui->setupUi(this);
+    stageKey = theStageKey;
     this->setName(stageName);
     this->setInActive();
 }
@@ -40,7 +41,7 @@ void CWE_StageStatusTab::mousePressEvent(QMouseEvent *event)
         this->setActive(true);
         this->setStyleSheet("QFrame {background: #B0BEC5;}");
         emit btn_activated(this);
-        emit btn_pressed(myPanel, m_name);
+        emit btn_pressed(myPanel);
     }
 }
 
