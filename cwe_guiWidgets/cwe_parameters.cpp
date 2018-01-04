@@ -85,7 +85,6 @@ void CWE_Parameters::newCaseState(CaseState newState)
 
     //TODO: HERE is where newState should be read and acted upon
 
-
     /* offline mode: do no more */
     if (newState == CaseState::OFFLINE) return;
 
@@ -141,6 +140,23 @@ void CWE_Parameters::switchToResults()
 
 void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
 {
-    //TODO: link commands with active case
+    if (myDriver->getCurrentCase() == NULL)
+    {
+        return;
+    }
+
     //TODO: Check that commands are valid
+
+    if (toEnact == CaseCommand::CANCEL)
+    {
+        myDriver->getCurrentCase()->stopJob(stage);
+    }
+    else if (toEnact == CaseCommand::ROLLBACK)
+    {
+        myDriver->getCurrentCase()->rollBack(stage);
+    }
+    else if (toEnact == CaseCommand::RUN)
+    {
+        myDriver->getCurrentCase()->startStageApp(stage);
+    }
 }
