@@ -42,31 +42,40 @@ void SCtrChoiceDataWidget::setData(QJsonObject &obj)
     QJsonObject options = obj.value(QString("options")).toObject();
     QString theDefault = obj.value(QString("default")).toString();
 
-    //TODO: This is wrong, looks at human name and not internal name
-    foreach (QJsonValue val, options)
+    foreach (QString key, options.keys())
     {
-        theModel->appendRow(new QStandardItem(val.toString()));
+        QList<QStandardItem *> newRow;
+        // newRow.clear();
+        newRow.append(new QStandardItem(key));
+        newRow.append(new QStandardItem(options.value(key).toString()));
+
+        theModel->appendRow(newRow);
     }
 
     theComboBox = new QComboBox(this);
     layout->insertWidget(1, theComboBox, 4);
     theComboBox->setModel(theModel);
-    theComboBox->setCurrentText(theDefault);
+    theComboBox->setModelColumn(1);
+    theComboBox->setCurrentText(options.value(theDefault).toString());
 
-    this->setLayout(layout);  // do I need this one?
+    this->setLayout(layout);
 }
 
 QString SCtrChoiceDataWidget::toString()
 {
-    QString selection = theComboBox->currentText();
-    return selection;
+    QModelIndex idx = theComboBox->rootModelIndex();
+    QStandardItemModel *model = (QStandardItemModel *)theComboBox->model();
+    QStandardItem *item = model->item(theComboBox->currentIndex(), 0);
+
+    return item->text();
 }
 
 void SCtrChoiceDataWidget::updateValue(QString s)
 {
     /* check if new information is an appropriate type */
     QStandardItemModel *theModel = (QStandardItemModel *)theComboBox->model();
-    QList<QStandardItem *> itemList = theModel->findItems(s);
+    QList<QStandardItem *> itemList = theModel->findItems(s, Qt::MatchExactly, 0);
+
     if (itemList.isEmpty())
     {
         /* add an error message */
@@ -75,7 +84,23 @@ void SCtrChoiceDataWidget::updateValue(QString s)
         return;
     }
 
-    /* update the value */
-    theComboBox->setCurrentText(s);
+    /* *** update the value ***
+     *
+     * the model contains two columns:
+     *   col 0: the variable name
+     *   col 1: the human readable variable description
+     *
+     * theComboBox displays col 1
+     * the driver needs the associated value from col 0
+     *
+     * the following loop should never have more than one item in the itemList ...
+     */
+
+    foreach (QStandardItem *item, itemList)
+    {
+        QModelIndex idx = theModel->indexFromItem(item);
+        theComboBox->setCurrentIndex(idx.row());
+    }
+
 }
 
