@@ -72,7 +72,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.cpp \
     CFDanalysis/CFDanalysisType.cpp \
     CFDanalysis/CFDcaseInstance.cpp \
-    SimCenter_widgets/sctrdatawidget.cpp \
     SimCenter_widgets/sctrvalidators.cpp \
     SimCenter_widgets/sctrmasterdatawidget.cpp \
     SimCenter_widgets/sctrstddatawidget.cpp \
@@ -125,7 +124,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h \
-    SimCenter_widgets/sctrdatawidget.h \
     SimCenter_widgets/sctrvalidators.h \
     SimCenter_widgets/sctrmasterdatawidget.h \
     SimCenter_widgets/sctrstddatawidget.h \
@@ -167,7 +165,6 @@ FORMS    += \
     cwe_guiWidgets/cwe_create_copy_simulation.ui \
     cwe_guiWidgets/cwe_debug_widget.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.ui \
-    SimCenter_widgets/sctrdatawidget.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \

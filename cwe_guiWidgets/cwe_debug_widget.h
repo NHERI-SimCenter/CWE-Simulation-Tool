@@ -19,14 +19,6 @@ public:
     explicit CWE_Debug_Widget(QWidget *parent = 0);
     ~CWE_Debug_Widget();
 
-private slots:
-    void on_pushButton_clicked();
-    void on_pushButton_2_clicked();
-    void on_pushButton_4_clicked();
-    void on_pushButton_3_clicked();
-    void on_pushButton_5_clicked();
-    void on_pushButton_6_clicked();
-
 private:
     Ui::CWE_Debug_Widget *ui;
 };
