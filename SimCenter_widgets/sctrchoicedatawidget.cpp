@@ -63,6 +63,17 @@ void SCtrChoiceDataWidget::setData(QJsonObject &obj)
 
 QString SCtrChoiceDataWidget::toString()
 {
+    /* *** update the value ***
+     *
+     * the model contains two columns:
+     *   col 0: the variable name
+     *   col 1: the human readable variable description
+     *
+     * theComboBox displays col 1
+     * the driver uses the associated value from col 0
+     * thus, the return value is the associate QString from col 0
+     */
+
     QModelIndex idx = theComboBox->rootModelIndex();
     QStandardItemModel *model = (QStandardItemModel *)theComboBox->model();
     QStandardItem *item = model->item(theComboBox->currentIndex(), 0);
@@ -72,6 +83,17 @@ QString SCtrChoiceDataWidget::toString()
 
 void SCtrChoiceDataWidget::updateValue(QString s)
 {
+    /* *** update the value ***
+     *
+     * the model contains two columns:
+     *   col 0: the variable name
+     *   col 1: the human readable variable description
+     *
+     * theComboBox displays col 1
+     * the driver uses the associated value from col 0
+     */
+
+
     /* check if new information is an appropriate type */
     QStandardItemModel *theModel = (QStandardItemModel *)theComboBox->model();
     QList<QStandardItem *> itemList = theModel->findItems(s, Qt::MatchExactly, 0);
@@ -84,18 +106,7 @@ void SCtrChoiceDataWidget::updateValue(QString s)
         return;
     }
 
-    /* *** update the value ***
-     *
-     * the model contains two columns:
-     *   col 0: the variable name
-     *   col 1: the human readable variable description
-     *
-     * theComboBox displays col 1
-     * the driver needs the associated value from col 0
-     *
-     * the following loop should never have more than one item in the itemList ...
-     */
-
+    /* the following loop should never have more than one item in the itemList ...  */
     foreach (QStandardItem *item, itemList)
     {
         QModelIndex idx = theModel->indexFromItem(item);
