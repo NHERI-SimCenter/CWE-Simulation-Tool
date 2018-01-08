@@ -244,6 +244,7 @@ QString CWE_TabWidget::getCurrentSelectedStage()
 {
     //TODO: return id of selected stage
     //TODO: PMH
+    return QString("mesh");
 }
 
 void CWE_TabWidget::setButtonMode(uint mode)
