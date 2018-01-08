@@ -21,7 +21,6 @@
 
 #include "../cwe_defines.h"
 
-
 class CWE_StageStatusTab;
 class CWE_GroupsWidget;
 class CWE_Parameters;

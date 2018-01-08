@@ -17,6 +17,8 @@
 #include <QMapIterator>
 
 #include "cwe_guiWidgets/cwe_parameters.h"
+#include "cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h"
+
 #include "../CFDClientProgram/vwtinterfacedriver.h"
 
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
@@ -242,9 +244,17 @@ QString CWE_TabWidget::getStateText(StageState theState)
 
 QString CWE_TabWidget::getCurrentSelectedStage()
 {
-    //TODO: return id of selected stage
-    //TODO: PMH
-    return QString("mesh");
+    QString theStage = "UNKNOWN";
+
+    foreach (CWE_StageStatusTab *tab, *stageTabList)
+    {
+        if (tab->isActiveWindow()) {
+            theStage = tab->getStageKey();
+            break;
+        }
+    }
+
+    return theStage;
 }
 
 void CWE_TabWidget::setButtonMode(uint mode)
