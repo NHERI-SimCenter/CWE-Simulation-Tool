@@ -57,29 +57,8 @@ SimCenterViewState CWE_ParamPanel::getViewState()
 {
     return m_viewState;
 }
-/*
-bool CWE_ParamPanel::addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString *)
-{
-    QString type = JSONvar["type"].toString();
-    if (type == "") {
-        return false;
-    }
-    else
-    {
-        //QWidget *parent = varTabWidgets->value(key)->value(label);
-        QWidget *parent = this;
-        if (parent != NULL)
-        {
-            // temporary disabled
-            //this->addType(varName, type, JSONvar, parent, setVal);
-            return true;
-        }
-        else { return false; }
-    }
-}
-*/
 
-SCtrMasterDataWidget * CWE_ParamPanel::addVariable(QString varName, QJsonObject &theVariable)
+void CWE_ParamPanel::addVariable(QString varName, QJsonObject &theVariable)
 {
     SCtrMasterDataWidget *theVar = NULL;
 
@@ -106,12 +85,10 @@ SCtrMasterDataWidget * CWE_ParamPanel::addVariable(QString varName, QJsonObject 
     else {
         /* add an error message */
         cwe_globals::displayPopup(QString("Variable %1 of unknown type %2.\nVariable ignored.").arg(varName).arg(type), "Warning");
+        return;
     }
 
     variableWidgets->insert(varName, theVar);
-
-    return theVar;
-
 }
 
 void CWE_ParamPanel::addParameterConfig(QJsonArray &groupVars, QJsonObject &allVars)
@@ -125,7 +102,7 @@ void CWE_ParamPanel::addParameterConfig(QJsonArray &groupVars, QJsonObject &allV
     {
         QString varName = var.toString();
         QJsonObject theVariable = allVars.value(varName).toObject();
-        SCtrMasterDataWidget *varWidget = this->addVariable(varName, theVariable);
+        this->addVariable(varName, theVariable);
     }
 
     layout->addStretch(1);
