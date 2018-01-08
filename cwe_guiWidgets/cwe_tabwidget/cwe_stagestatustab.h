@@ -52,7 +52,7 @@ private:
     CWE_GroupsWidget * myPanel = NULL;
 
     QString m_text;
-    QString stageKey = "";
+    QString stageKey = "UNKNOWN";
     QString m_status = "unknown";
     QString m_name = "label text";
     //int m_index = -1;
