@@ -89,6 +89,7 @@ void SCtrMasterDataWidget::setViewState(SimCenterViewState state)
     }
 }
 
+/*
 void SCtrMasterDataWidget::setData(QJsonObject &obj)
 {
     QString setVal = "";
@@ -212,6 +213,7 @@ void SCtrMasterDataWidget::setData(QJsonObject &obj)
     QString unit           = obj["unit"].toString();
     label_unit->setText(unit);
 }
+*/
 
 void SCtrMasterDataWidget::setValue(QString s)
 {
@@ -247,7 +249,8 @@ void SCtrMasterDataWidget::updateValue(QString s)
 }
 
 /* ********** various input data types ********** */
-
+/*
+ * TODO Remove
 QFrame * SCtrMasterDataWidget::addStd(QJsonObject JSONvar, QWidget *parent, QString *setVal)
 {
     QVariant defaultOption = JSONvar["default"].toVariant();
@@ -285,7 +288,7 @@ QFrame * SCtrMasterDataWidget::addStd(QJsonObject JSONvar, QWidget *parent, QStr
     return this;
 }
 
-QFrame * SCtrMasterDataWidget::addBool(QJsonObject JSONvar, QWidget *parent, QString * setVal)
+QFrame * SCtrMasterDataWidget::addBool(QJsonObject JSONvar, QWidget *parent, QString * setVal )
 {
     QLabel *theName = new QLabel(parent);
     QString displayname = JSONvar["displayname"].toString();
@@ -423,29 +426,9 @@ void SCtrMasterDataWidget::addType(const QString &varName, const QString &type, 
         varData->options = NULL;
     }
 }
-
+*/
 
 /* ********** helper functions ********** */
-void SCtrMasterDataWidget::showLineEdit()
-{
-    theValue->show();
-    theCheckBox->hide();
-    theComboBox->hide();
-}
-
-void SCtrMasterDataWidget::showCheckBox()
-{
-    theValue->hide();
-    theCheckBox->show();
-    theComboBox->hide();
-}
-
-void SCtrMasterDataWidget::showComboBox()
-{
-    theValue->hide();
-    theCheckBox->hide();
-    theComboBox->show();
-}
 
 void SCtrMasterDataWidget::setVariableName(QString s)
 {

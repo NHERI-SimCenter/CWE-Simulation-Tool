@@ -12,6 +12,8 @@
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h"
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
 
+#include "SimCenter_widgets/sctrstates.h"
+
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
     CWE_Super(parent),
     ui(new Ui::CWE_Parameters)
@@ -83,34 +85,38 @@ void CWE_Parameters::newCaseState(CaseState newState)
         return;
     }
 
-    //TODO: HERE is where newState should be read and acted upon
-
-
-    /* offline mode: do no more */
-    if (newState == CaseState::OFFLINE) return;
-
     switch (newState)
     {
     case CaseState::DEFUNCT:
-        break;
     case CaseState::ERROR:
-        break;
     case CaseState::INVALID:
-        break;
-    case CaseState::JOB_RUN:
+    case CaseState::OFFLINE:
+        ui->theTabWidget->setViewState(SimCenterViewState::hidden);
+        return; //These states should be handled elsewhere
         break;
     case CaseState::LOADING:
-        break;
     case CaseState::OP_INVOKE:
+        ui->theTabWidget->setViewState(SimCenterViewState::visible);
+        break;
+    case CaseState::JOB_RUN:
+        setVisibleAccordingToStage();
         break;
     case CaseState::READY:
         ui->theTabWidget->updateParameterValues(myDriver->getCurrentCase()->getCurrentParams());
+        setVisibleAccordingToStage();
         break;
     default:
         myDriver->fatalInterfaceError("Remote case has unhandled state");
         return;
         break;
     }
+
+}
+
+void CWE_Parameters::setVisibleAccordingToStage()
+{
+    QMap<QString, StageState> stageStates = myDriver->getCurrentCase()->getStageStates();
+    //TODO: PMH
 
 }
 
@@ -130,6 +136,7 @@ void CWE_Parameters::createUnderlyingParamWidgets()
     ui->label_theLocation->setText(newCase->getCaseFolder());
 
     ui->theTabWidget->setParameterConfig(rawConfig);
+    ui->theTabWidget->setViewState(SimCenterViewState::visible);
 
     paramWidgetsExist = true;
 }
@@ -141,6 +148,23 @@ void CWE_Parameters::switchToResults()
 
 void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
 {
-    //TODO: link commands with active case
+    if (myDriver->getCurrentCase() == NULL)
+    {
+        return;
+    }
+
     //TODO: Check that commands are valid
+
+    if (toEnact == CaseCommand::CANCEL)
+    {
+        myDriver->getCurrentCase()->stopJob(stage);
+    }
+    else if (toEnact == CaseCommand::ROLLBACK)
+    {
+        myDriver->getCurrentCase()->rollBack(stage);
+    }
+    else if (toEnact == CaseCommand::RUN)
+    {
+        myDriver->getCurrentCase()->startStageApp(stage);
+    }
 }

@@ -52,6 +52,7 @@ private slots:
     void newCaseState(CaseState newState);
 
 private:
+    void setVisibleAccordingToStage();
     void createUnderlyingParamWidgets();
 
     void saveAllParams();

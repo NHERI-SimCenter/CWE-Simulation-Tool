@@ -44,7 +44,8 @@ public:
     void resetView();
 
     void setViewState(SimCenterViewState);
-    SimCenterViewState viewState();
+    void setViewState(SimCenterViewState, QString stageName);
+    SimCenterViewState viewState(QString stageName);
 
     bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label , QString *setVal = NULL);
     void addVarsData(QJsonObject , QJsonObject );
