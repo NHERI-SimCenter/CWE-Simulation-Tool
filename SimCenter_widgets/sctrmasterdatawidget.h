@@ -22,7 +22,7 @@ public:
     ~SCtrMasterDataWidget();
     SimCenterViewState ViewState();
     void setViewState(SimCenterViewState);
-    virtual void setData(QJsonObject &);
+    virtual void setData(QJsonObject &) = 0;
     virtual void initUI();
     virtual void setValue(QString);
     virtual void setValue(float);
@@ -33,6 +33,7 @@ public:
     QString value() {return this->toString();}
 
 protected:
+    /*
     QFrame * addStd(QJsonObject, QWidget *parent, QString *setVal = NULL );
     QFrame * addBool(QJsonObject, QWidget *parent, QString *setVal = NULL );
     QFrame * addFile(QJsonObject, QWidget *parent, QString *setVal = NULL );
@@ -43,6 +44,7 @@ protected:
     QFrame * addTensor2D(QJsonObject JSONvar, QWidget *parent, QString *setVal = NULL );
     QFrame * addUnknown(QJsonObject, QWidget *parent, QString *setVal = NULL );
     void addType(const QString &, const QString &, QJsonObject, QWidget *parent , QString * setVal);
+    */
 
 private slots:
     void on_theValue_editingFinished();
@@ -60,10 +62,6 @@ protected:
 private:
     void setVariableName(QString s);
     void setUnit(QString u);
-
-    void showLineEdit();
-    void showCheckBox();
-    void showComboBox();
 
     SimCenterViewState m_ViewState;
 

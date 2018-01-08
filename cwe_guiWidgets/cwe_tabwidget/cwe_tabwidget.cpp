@@ -49,6 +49,7 @@ void CWE_TabWidget::setController(CWE_Parameters * newController)
 
 void CWE_TabWidget::setViewState(SimCenterViewState state)
 {
+    //TODO: PMH
     switch (state)
     {
     case SimCenterViewState::editable:
@@ -68,10 +69,17 @@ void CWE_TabWidget::setViewState(SimCenterViewState state)
         iter.next();
         (iter.value())->setViewState(m_viewState);
     }
+    //Disable buttons (If appropriate)
 }
 
-SimCenterViewState CWE_TabWidget::viewState()
+void CWE_TabWidget::setViewState(SimCenterViewState, QString stageName)
 {
+    //TODO: PMH
+}
+
+SimCenterViewState CWE_TabWidget::viewState(QString stageName)
+{
+    //TODO: PMH
     return m_viewState;
 }
 
@@ -196,7 +204,6 @@ void CWE_TabWidget::on_pbtn_run_clicked()
 
 QMap<QString, QString> CWE_TabWidget::collectParamData()
 {
-    QString val;
     QMap<QString, QString> currentParameters;
 
     // collect parameter values from all SCtrMasterDataWidget objects

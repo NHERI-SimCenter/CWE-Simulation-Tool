@@ -74,7 +74,6 @@ QString SCtrChoiceDataWidget::toString()
      * thus, the return value is the associate QString from col 0
      */
 
-    QModelIndex idx = theComboBox->rootModelIndex();
     QStandardItemModel *model = (QStandardItemModel *)theComboBox->model();
     QStandardItem *item = model->item(theComboBox->currentIndex(), 0);
 
