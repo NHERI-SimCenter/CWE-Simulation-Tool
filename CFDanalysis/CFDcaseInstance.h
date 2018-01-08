@@ -104,6 +104,7 @@ public:
     void killCaseConnection();
 
     void downloadCase(QString destLocalFile);
+    void stopJob(QString stage);
 
 signals:
     void detachCase();

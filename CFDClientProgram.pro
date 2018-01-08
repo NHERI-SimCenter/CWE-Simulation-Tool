@@ -72,7 +72,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.cpp \
     CFDanalysis/CFDanalysisType.cpp \
     CFDanalysis/CFDcaseInstance.cpp \
-    SimCenter_widgets/sctrdatawidget.cpp \
     SimCenter_widgets/sctrvalidators.cpp \
     SimCenter_widgets/sctrmasterdatawidget.cpp \
     SimCenter_widgets/sctrstddatawidget.cpp \
@@ -98,7 +97,8 @@ SOURCES += main.cpp \
     SimCenter_widgets/sctrbooldatawidget.cpp \
     SimCenter_widgets/sctrchoicedatawidget.cpp \
     SimCenter_widgets/sctrfiledatawidget.cpp \
-    cwe_globals.cpp
+    cwe_globals.cpp \
+    ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -124,7 +124,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h \
-    SimCenter_widgets/sctrdatawidget.h \
     SimCenter_widgets/sctrvalidators.h \
     SimCenter_widgets/sctrmasterdatawidget.h \
     SimCenter_widgets/sctrstddatawidget.h \
@@ -151,7 +150,8 @@ HEADERS  += \
     SimCenter_widgets/sctrbooldatawidget.h \
     SimCenter_widgets/sctrchoicedatawidget.h \
     SimCenter_widgets/sctrfiledatawidget.h \
-    cwe_globals.h
+    cwe_globals.h \
+    ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -165,7 +165,6 @@ FORMS    += \
     cwe_guiWidgets/cwe_create_copy_simulation.ui \
     cwe_guiWidgets/cwe_debug_widget.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.ui \
-    SimCenter_widgets/sctrdatawidget.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \

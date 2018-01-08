@@ -96,5 +96,10 @@ void cwe_state_label::setNewState(CaseState newState)
         this->setText("Ready for user input");
         return;
     }
+    if (newState == CaseState::OFFLINE)
+    {
+        this->setText("OFFLINE MODE");
+        return;
+    }
     this->setText("ERROR");
 }
