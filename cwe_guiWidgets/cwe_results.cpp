@@ -74,10 +74,13 @@ void CWE_Results::resetViewInfo()
 
 void CWE_Results::on_downloadEntireCaseButton_clicked()
 {
+    if (myDriver->getCurrentCase() == NULL)
+    {
+        return;
+    }
     QString fileName = QFileDialog::getOpenFileName(this, "Select Destination Folder:");
 
-
-    //TODO: Enact compression and download
+    myDriver->getCurrentCase()->downloadCase(fileName);
 }
 
 void CWE_Results::newCaseGiven()

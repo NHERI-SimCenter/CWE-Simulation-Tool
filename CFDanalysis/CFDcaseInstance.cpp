@@ -554,6 +554,16 @@ void CFDcaseInstance::killCaseConnection()
     this->deleteLater();
 }
 
+void CFDcaseInstance::downloadCase(QString destLocalFile)
+{
+    //TODO
+}
+
+void CFDcaseInstance::stopJob(QString stage)
+{
+    //TODO
+}
+
 void CFDcaseInstance::underlyingFilesUpdated()
 {
     if (defunct) return;
