@@ -76,10 +76,9 @@ private:
 
     Ui::CWE_TabWidget *ui;
 
-    SimCenterViewState m_viewState;
+    QMap<QString, SimCenterViewState> m_viewState;
 
     QMap<QString, CWE_StageStatusTab *> *stageTabList;
-    QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
 };
 
 #endif // CWE_TABWIDGET_H
