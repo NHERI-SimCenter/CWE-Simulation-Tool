@@ -71,7 +71,7 @@ enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, JOB_RUN, OP_INVOK
 //OP_INVOKE: Running short file operations
 
 enum class PendingCFDrequest {NONE, CREATE_MKDIR, CREATE_UPLOAD, DUP_COPY, PARAM_UPLOAD,
-                             APP_INVOKE, APP_RUN, ROLLBACK_DEL};
+                             APP_INVOKE, APP_RUN, ROLLBACK_DEL, STOP_JOB};
 
 class CFDcaseInstance : public QObject
 {
