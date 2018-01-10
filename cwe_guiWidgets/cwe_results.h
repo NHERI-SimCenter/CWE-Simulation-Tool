@@ -29,17 +29,23 @@ public:
 
 private slots:
     void on_downloadEntireCaseButton_clicked();
+    void resultViewClicked(QModelIndex);
 
     void newCaseGiven();
     void newCaseState(CaseState newState);
 
 private:
+    QMap<QString, QString> getResultObjectFromName(QString name);
+    void populateResultsScreen();
+
     Ui::CWE_Results    *ui;
     QStandardItemModel *model;
 
     bool viewIsValid = false;
+    int showCol;
+    int downloadCol;
 
-    void addResult(QString name, bool showeye, bool download, QString type, QString description, QString filesize);
+    void addResult(QString name, bool showeye, bool download, QString type);
 };
 
 #endif // CWE_RESULTS_H

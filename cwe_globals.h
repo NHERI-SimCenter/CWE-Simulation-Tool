@@ -12,6 +12,7 @@ public:
     static void displayPopup(QString message);
 
     static bool isValidFolderName(QString folderName);
+    static bool isValidLocalFolder(QString folderName);
 };
 
 #endif // CWE_GLOBALS_H

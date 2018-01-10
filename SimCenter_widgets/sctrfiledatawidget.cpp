@@ -19,6 +19,8 @@ void SCtrFileDataWidget::setData(QJsonObject &obj)
 {
     m_obj = obj;
 
+    //TODO: PRS, file widget needs to have a file tree
+
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
     layout->setMargin(0);
 
