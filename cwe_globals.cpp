@@ -18,3 +18,13 @@ void cwe_globals::displayPopup(QString message)
 {
     displayPopup(message, "Error");
 }
+
+bool cwe_globals::isValidFolderName(QString folderName)
+{
+    if (folderName.isEmpty())
+    {
+        return false;
+    }
+    //TODO: PRS
+    return true;
+}

@@ -117,7 +117,6 @@ void CWE_Parameters::setVisibleAccordingToStage()
 {
     QMap<QString, StageState> stageStates = myDriver->getCurrentCase()->getStageStates();
     //TODO: PMH
-
 }
 
 void CWE_Parameters::createUnderlyingParamWidgets()
@@ -153,7 +152,7 @@ void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
         return;
     }
 
-    //TODO: Check that commands are valid
+    //TODO: Check that commands are valid : PRS
 
     if (toEnact == CaseCommand::CANCEL)
     {
