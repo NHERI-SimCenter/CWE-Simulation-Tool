@@ -30,7 +30,6 @@ CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     ui->setupUi(this);
 
     stageTabList = new QMap<QString, CWE_StageStatusTab *>();
-    quickParameterPtr = new QMap<QString, SCtrMasterDataWidget *>();
 
     this->setButtonMode(CWE_BTN_NONE);
     this->setViewState(SimCenterViewState::visible);
@@ -49,38 +48,50 @@ void CWE_TabWidget::setController(CWE_Parameters * newController)
 
 void CWE_TabWidget::setViewState(SimCenterViewState state)
 {
+    foreach (QString stageName, m_viewState.keys())
+    {
+        switch (state)
+        {
+        case SimCenterViewState::editable:
+            m_viewState[stageName] = SimCenterViewState::editable;
+            break;
+        case SimCenterViewState::hidden:
+            m_viewState[stageName] = SimCenterViewState::hidden;
+            break;
+        case SimCenterViewState::visible:
+        default:
+            m_viewState[stageName] = SimCenterViewState::visible;
+            state = SimCenterViewState::visible;
+        }
+
+        stageTabList->value(stageName)->getGroupsWidget()->setViewState(m_viewState.value(stageName));
+    }
+}
+
+void CWE_TabWidget::setViewState(SimCenterViewState state, QString stageName)
+{
     //TODO: PMH
     switch (state)
     {
     case SimCenterViewState::editable:
-        m_viewState = SimCenterViewState::editable;
+        m_viewState[stageName] = SimCenterViewState::editable;
         break;
     case SimCenterViewState::hidden:
-        m_viewState = SimCenterViewState::hidden;
+        m_viewState[stageName] = SimCenterViewState::hidden;
         break;
     case SimCenterViewState::visible:
     default:
-        m_viewState = SimCenterViewState::visible;
+        m_viewState[stageName] = SimCenterViewState::visible;
     }
 
-    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
-    while (iter.hasNext())
-    {
-        iter.next();
-        (iter.value())->setViewState(m_viewState);
-    }
+    stageTabList->value(stageName)->getGroupsWidget()->setViewState(state);
+
     //Disable buttons (If appropriate)
-}
-
-void CWE_TabWidget::setViewState(SimCenterViewState, QString stageName)
-{
-    //TODO: PMH
 }
 
 SimCenterViewState CWE_TabWidget::viewState(QString stageName)
 {
-    //TODO: PMH
-    return m_viewState;
+    return m_viewState.value(stageName);
 }
 
 void CWE_TabWidget::resetView()
@@ -162,35 +173,17 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 
 void CWE_TabWidget::updateParameterValues(QMap<QString, QString> newValues)
 {
-    QMapIterator<QString, QString> iter(newValues);
-
-    while (iter.hasNext())
+    foreach (QString stageName, stageTabList->keys())
     {
-        iter.next();
-        QString key = iter.key();
-        if (quickParameterPtr->contains(key))
-        {
-            (quickParameterPtr->value(key))->updateValue(iter.value());
-        }
+        stageTabList->value(stageName)->getGroupsWidget()->updateParameterValues(newValues);
     }
 }
 
 void CWE_TabWidget::initQuickParameterPtr()
 {
-    quickParameterPtr->clear();
-
-    QMapIterator<QString, CWE_StageStatusTab *> stageTabIter(*stageTabList);
-    while (stageTabIter.hasNext())
+    foreach (QString stageName, stageTabList->keys())
     {
-        stageTabIter.next();
-        CWE_GroupsWidget *groupTab = (stageTabIter.value())->groupWidget();
-        QMap<QString, SCtrMasterDataWidget *> groupMap = groupTab->getParameterWidgetMap();
-        QMapIterator<QString, SCtrMasterDataWidget *> groupIter(groupMap);
-        while (groupIter.hasNext())
-        {
-            groupIter.next();
-            quickParameterPtr->insert(groupIter.key(), groupIter.value());
-        }
+        stageTabList->value(stageName)->getGroupsWidget()->initQuickParameterPtr();
     }
 }
 
@@ -206,13 +199,9 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
 {
     QMap<QString, QString> currentParameters;
 
-    // collect parameter values from all SCtrMasterDataWidget objects
-    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
-
-    while (iter.hasNext())
+    foreach (QString stageName, stageTabList->keys())
     {
-        iter.next();
-        currentParameters.insert(iter.key(), (iter.value())->value());
+        stageTabList->value(stageName)->getGroupsWidget()->collectParamData(currentParameters);
     }
 
     return currentParameters;

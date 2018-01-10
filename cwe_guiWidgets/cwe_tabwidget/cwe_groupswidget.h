@@ -17,7 +17,6 @@ public:
     ~CWE_GroupsWidget();
     void setCorrespondingTab(CWE_StageStatusTab * newTab);
 
-    void setData(QJsonObject &obj);         // set the group definitions as a JSon file
     void setViewState(SimCenterViewState);  // set the view state
     void addVSpacer(const QString &key, const QString &label);
     void addVarsToTab(QString key, const QString &label, QJsonArray *, QJsonObject *, QMap<QString,QString> * );
@@ -25,6 +24,10 @@ public:
     void setParameterConfig(QString key, QJsonObject &obj);
     void linkWidget(CWE_StageStatusTab *tab);
     QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
+
+    void initQuickParameterPtr();
+    void updateParameterValues(QMap<QString, QString> );
+    int collectParamData(QMap<QString, QString> &);
 
 
 protected:
@@ -35,6 +38,8 @@ private:
     QJsonObject m_obj;
 
     CWE_StageStatusTab * myTab;
+
+    QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
 };
 
 #endif // CWE_GROUPSWIDGET_H
