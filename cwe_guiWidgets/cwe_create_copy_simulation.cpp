@@ -1,6 +1,7 @@
 #include "cwe_create_copy_simulation.h"
 #include "ui_cwe_create_copy_simulation.h"
 
+#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
 
@@ -10,6 +11,8 @@
 #include "mainWindow/cwe_mainwindow.h"
 
 #include "vwtinterfacedriver.h"
+
+#include "cwe_globals.h"
 
 CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
     CWE_Super(parent),
@@ -49,37 +52,84 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 
     /* take emergency exit if nothing has been selected */
     FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
-    if (selectedNode == NULL) { return; }
+    if (selectedNode == NULL)
+    {
+        cwe_globals::displayPopup("Please select a folder to place the new case.");
+        return;
+    }
+    if (!selectedNode->isFolder())
+    {
+        cwe_globals::displayPopup("Please select a folder to place the new case.");
+        return;
+    }
 
     /* OK, something has been selected */
     CFDcaseInstance * newCase;
 
-    //TODO: VERY IMPORTANT: NEED INPUT FILTERING
-    // PETER S.: what have you been thinkng of with this statement?
+    QString newCaseName = ui->lineEdit_newCaseName->text();
+
+    if (!cwe_globals::isValidFolderName(newCaseName))
+    {
+        cwe_globals::displayPopup("Please input a valid folder name");
+        return;
+    }
 
     if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
     {
         /* we are creating a new case */
 
-        if (selectedTemplate == NULL) return;
+        if (selectedTemplate == NULL)
+        {
+            cwe_globals::displayPopup("Please select a valid case type.");
+            return;
+        }
         newCase = new CFDcaseInstance(selectedTemplate, myDriver);
-        newCase->createCase(ui->lineEdit_newCaseName->text(), selectedNode);
+        newCase->createCase(newCaseName, selectedNode);
     }
     else
     {
         /* we are cloning from an existing case */
 
         FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
-        if (secondNode == NULL)
+        if (selectedNode == NULL)
         {
+            cwe_globals::displayPopup("Please select a folder to duplicate.");
             return;
         }
+        if (!selectedNode->isFolder())
+        {
+            cwe_globals::displayPopup("Please select a folder to duplicate.");
+            return;
+        }
+        CFDcaseInstance * tempCase = new CFDcaseInstance(selectedNode, myDriver);
+        CaseState dupState = tempCase->getCaseState();
+        tempCase->deleteLater();
+
+        if (dupState == CaseState::INVALID)
+        {
+            cwe_globals::displayPopup("ERROR: Can only duplicate CFD cases managed by CWE. Please select a valid folder containing a case for duplication.");
+            return;
+        }
+        if (dupState == CaseState::LOADING)
+        {
+            cwe_globals::displayPopup("Please wait for case folder to load before attempting to duplicate.");
+            return;
+        }
+        if (dupState != CaseState::READY)
+        {
+            cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
+            return;
+        }
+
         newCase = new CFDcaseInstance(myDriver);
-        newCase->duplicateCase(ui->lineEdit_newCaseName->text(), selectedNode, secondNode);
-        if (newCase->getCaseState() != CaseState::OP_INVOKE)
-        {
-            return;
-        }
+        newCase->duplicateCase(newCaseName, selectedNode, secondNode);
+    }
+
+    if (newCase->getCaseState() != CaseState::OP_INVOKE)
+    {
+        cwe_globals::displayPopup("Cannot create new case due to internal error.");
+        newCase->deleteLater();
+        return;
     }
 
     //Set new case will signal the other panels so that they can get configurations

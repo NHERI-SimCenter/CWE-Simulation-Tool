@@ -220,8 +220,6 @@ QMap<QString, QString> CFDcaseInstance::getCurrentParams()
 
 QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
 {
-    QMap<QString, RemoteJobData> jobs = theDriver->getJobHandler()->getRunningJobs();
-
     QMap<QString, RemoteJobData * > ret;
 
     if (caseFolder == NULL)
@@ -229,8 +227,11 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
         return ret;
     }
 
+    QMap<QString, RemoteJobData> jobs = theDriver->getJobHandler()->getRunningJobs();
+
     for (auto itr = jobs.begin(); itr != jobs.end(); itr++)
     {
+        QString jobID = (*itr).getID();
         QString appName = (*itr).getApp();
         if (!appName.contains("cwe-mesh")
                 && !appName.contains("cwe-sim")
@@ -241,7 +242,7 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
 
         if (!(*itr).detailsLoaded())
         {
-            ret.insert(appName, &(*itr));
+            ret.insert(jobID, &(*itr));
             theDriver->getJobHandler()->requestJobDetails(&(*itr));
             continue;
         }
@@ -250,7 +251,7 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
 
         if (caseFolder->fileNameMatches(jobDir))
         {
-            ret.insert(appName, &(*itr));
+            ret.insert(jobID, &(*itr));
         }
     }
     return ret;
@@ -295,7 +296,7 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
 
     if (relevantJobs.size() == 1)
     {
-        QString appName = relevantJobs.keys().at(0);
+        QString appName = relevantJobs.first()->getID();
         if (appName.contains("cwe-mesh"))
         {
             if (ret.contains("mesh"))
@@ -556,12 +557,65 @@ void CFDcaseInstance::killCaseConnection()
 
 void CFDcaseInstance::downloadCase(QString destLocalFile)
 {
-    //TODO
+    //TODO : PRS
 }
 
 void CFDcaseInstance::stopJob(QString stage)
 {
-    //TODO
+    QMap<QString, RemoteJobData * > relevantJobs = getRelevantJobs();
+
+    if (relevantJobs.size() == 0)
+    {
+        displayNetError("No job detected for stopping");
+        return;
+    }
+
+    if (relevantJobs.size() > 1)
+    {
+        displayNetError("Need to reload job list before job can be stopped, please wait.");
+        return;
+    }
+
+    QString jobID = relevantJobs.firstKey();
+    QString appName = relevantJobs.first()->getApp();
+
+    bool stopOkay = false;
+
+    //TODO: Can probably clean this logic up, but next version will be more generic for stage names.
+    if (appName.contains("cwe-mesh") && (stage == "mesh"))
+    {
+        stopOkay = true;
+    }
+    else if (appName.contains("cwe-sim") && (stage == "sim"))
+    {
+        stopOkay = true;
+    }
+    else if (appName.contains("cwe-post") && (stage == "post"))
+    {
+        stopOkay = true;
+    }
+
+    if (!stopOkay)
+    {
+        displayNetError("Job for deletion not detected.");
+        return;
+    }
+
+    RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
+    RemoteDataReply * jobHandle = remoteConnect->stopJob(jobID);
+
+    if (jobHandle == NULL)
+    {
+        displayNetError("Unable to contact design safe. Please wait and try again.");
+        return;
+    }
+
+    QObject::connect(jobHandle, SIGNAL(haveStoppedJob(RequestState)),
+                     this, SLOT(agaveTaskDone(RequestState)));
+
+    currentReq = PendingCFDrequest::STOP_JOB;
+    emitNewState(CaseState::OP_INVOKE);
+    requestDataBeingRefreshed = false;
 }
 
 void CFDcaseInstance::underlyingFilesUpdated()

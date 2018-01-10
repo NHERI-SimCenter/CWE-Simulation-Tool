@@ -8,11 +8,14 @@
 #include "cwe_stagestatustab.h"
 #include "SimCenter_widgets/sctrstates.h"
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h"
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 #include <QJsonObject>
 #include <QJsonArray>
 
 CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) : QTabWidget(parent)
 {
+    quickParameterPtr = new QMap<QString, SCtrMasterDataWidget *>();
+
     this->setViewState(SimCenterViewState::visible);
 }
 
@@ -24,48 +27,6 @@ CWE_GroupsWidget::~CWE_GroupsWidget()
 void CWE_GroupsWidget::setCorrespondingTab(CWE_StageStatusTab * newTab)
 {
     myTab = newTab;
-}
-
-// set the group definitions as a JSon file
-void CWE_GroupsWidget::setData(QJsonObject &obj)
-{
-    qWarning() << "CWE_GroupsWidget::setData depricated function called.";
-    m_obj = obj;
-
-    /*
-    QJsonObject stageInfo = m_obj[name].toObject();
-    QString labelText;
-
-    labelText = stageInfo["name"].toString();
-    labelText = labelText.append("\nParameters");
-
-    // add a stage tab to ui->theTabWidget
-    int idx = ui->theTabWidget->addGroupTab(name, labelText, StageState::UNRUN);
-    */
-
-    /*
-    varTabWidgets->insert(key, new QMap<QString, QWidget *>());
-
-    // create the tab
-    CWE_StageStatusTab *newTab = new CWE_StageStatusTab(key);
-    newTab->setText(label);
-
-    newTab->setStatus(getStateText(currentState));
-    int index = ui->verticalTabLayout->count()-1;
-    newTab->setIndex(index);
-    ui->verticalTabLayout->insertWidget(index, newTab);
-
-    groupWidget->insert(key, newTab);
-
-    QObject::connect(newTab,SIGNAL(btn_pressed(CWE_GroupsWidget *,QString)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *, QString)));
-    //QObject::connect(newTab,SIGNAL(btn_released(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
-
-    // create the widget to hold the parameter input
-    QTabWidget *pWidget = new QTabWidget();
-    ui->stackedWidget->insertWidget(index, pWidget);
-
-    groupTabList->insert(key, pWidget);
-    */
 }
 
 // set the view state
@@ -82,6 +43,13 @@ void CWE_GroupsWidget::setViewState(SimCenterViewState state)
     default:
         m_viewState = SimCenterViewState::visible;
         break;
+    }
+
+    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
+    while (iter.hasNext())
+    {
+        iter.next();
+        (iter.value())->setViewState(m_viewState);
     }
 }
 
@@ -131,3 +99,50 @@ QMap<QString, SCtrMasterDataWidget *> CWE_GroupsWidget::getParameterWidgetMap()
 
     return groupMap;
 }
+
+void CWE_GroupsWidget::initQuickParameterPtr()
+{
+    quickParameterPtr->clear();
+
+    QMap<QString, SCtrMasterDataWidget *> groupMap = this->getParameterWidgetMap();
+    QMapIterator<QString, SCtrMasterDataWidget *> groupIter(groupMap);
+
+    while (groupIter.hasNext())
+    {
+        groupIter.next();
+        quickParameterPtr->insert(groupIter.key(), groupIter.value());
+    }
+}
+
+void CWE_GroupsWidget::updateParameterValues(QMap<QString, QString> newValues)
+{
+    QMapIterator<QString, QString> iter(newValues);
+
+    while (iter.hasNext())
+    {
+        iter.next();
+        QString key = iter.key();
+        if (quickParameterPtr->contains(key))
+        {
+            (quickParameterPtr->value(key))->updateValue(iter.value());
+        }
+    }
+}
+
+int CWE_GroupsWidget::collectParamData(QMap<QString, QString> &currentParameters)
+{
+    int count = 0;
+
+    // collect parameter values from all SCtrMasterDataWidget objects
+    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
+
+    while (iter.hasNext())
+    {
+        iter.next();
+        currentParameters.insert(iter.key(), (iter.value())->value());
+        count++;
+    }
+
+    return count;
+}
+

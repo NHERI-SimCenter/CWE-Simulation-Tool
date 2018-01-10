@@ -33,6 +33,7 @@ public:
     CWE_GroupsWidget * groupWidget() { return myPanel; };
     QString getStageKey() { return stageKey; }
     bool isStage(QString key) { return (stageKey == key);}
+    CWE_GroupsWidget *getGroupsWidget() { return myPanel; }
 
 signals:
     void btn_pressed(CWE_GroupsWidget *);
