@@ -110,7 +110,6 @@ void CWE_Parameters::newCaseState(CaseState newState)
         return;
         break;
     }
-
 }
 
 void CWE_Parameters::setVisibleAccordingToStage()
@@ -127,6 +126,7 @@ void CWE_Parameters::createUnderlyingParamWidgets()
 
     if (newCase == NULL) return;
     if (newCase->getMyType() == NULL) return;
+    if (newCase->getCaseFolder().isEmpty()) return;
 
     QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
 

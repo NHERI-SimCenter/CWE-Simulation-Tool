@@ -28,3 +28,13 @@ bool cwe_globals::isValidFolderName(QString folderName)
     //TODO: PRS
     return true;
 }
+
+bool cwe_globals::isValidLocalFolder(QString folderName)
+{
+    if (folderName.isEmpty())
+    {
+        return false;
+    }
+    //TODO: PRS
+    return true;
+}

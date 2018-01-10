@@ -227,8 +227,12 @@ void CWE_file_manager::refreshMenuItem()
     ui->remoteTreeView->getFileOperator()->enactFolderRefresh(targetNode);
 }
 
+void CWE_file_manager::downloadBufferItem()
+{
+    ui->remoteTreeView->getFileOperator()->sendDownloadBuffReq(targetNode);
+}
 
-void CWE_file_manager::on_remoteTreeView_customContextMenuRequested(const QPoint &pos)
+void CWE_file_manager::customFileMenu(const QPoint &pos)
 {
     QMenu fileMenu;
     if (ui->remoteTreeView->getFileOperator()->operationIsPending())
@@ -268,7 +272,7 @@ void CWE_file_manager::on_remoteTreeView_customContextMenuRequested(const QPoint
     }
     if (theFileData.getFileType() == FileType::FILE)
     {
-        fileMenu.addAction("Download File",this, SLOT(downloadMenuItem()));
+        fileMenu.addAction("Download Buffer",this, SLOT(downloadBufferItem()));
     }
 
     if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))

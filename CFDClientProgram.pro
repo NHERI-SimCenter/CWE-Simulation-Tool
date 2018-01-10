@@ -98,7 +98,8 @@ SOURCES += main.cpp \
     SimCenter_widgets/sctrchoicedatawidget.cpp \
     SimCenter_widgets/sctrfiledatawidget.cpp \
     cwe_globals.cpp \
-    ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp
+    ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp \
+    cwe_guiWidgets/cwe_result_popup.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -151,7 +152,8 @@ HEADERS  += \
     SimCenter_widgets/sctrchoicedatawidget.h \
     SimCenter_widgets/sctrfiledatawidget.h \
     cwe_globals.h \
-    ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h
+    ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h \
+    cwe_guiWidgets/cwe_result_popup.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -169,7 +171,8 @@ FORMS    += \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui
+    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
+    cwe_guiWidgets/cwe_result_popup.ui
 
 RESOURCES += \
     cwe_resources.qrc \
