@@ -34,8 +34,11 @@
 
 #include "sctrfiledatawidget.h"
 
-#include <QHBoxLayout>
-#include <QLineEdit>
+#include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
+#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "../AgaveClientInterface/filemetadata.h"
+#include "mainWindow/cwe_mainwindow.h"
+#include "vwtinterfacedriver.h"
 
 SCtrFileDataWidget::SCtrFileDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)
@@ -43,52 +46,83 @@ SCtrFileDataWidget::SCtrFileDataWidget(QWidget *parent):
 
 }
 
-SCtrFileDataWidget::SCtrFileDataWidget(QJsonObject &obj, QWidget *parent):
+SCtrFileDataWidget::SCtrFileDataWidget(VWTinterfaceDriver *theDriver, QWidget *parent):
     SCtrMasterDataWidget(parent)
 {
-    this->setData(obj);
+    myDriver = theDriver;
+}
+
+void SCtrFileDataWidget::initUI()
+{
+    if (label_varName == NULL) {
+        label_varName = new QLabel(this);
+    }
+    if (selectedFile == NULL)
+    {
+        selectedFile = new QLabel(this);
+    }
+    explainText = new QLabel("\nIn order to run a simulation, a geometry file must be uploaded.\nClick on the files tab to go to the upload/download screen.\nCWE can use some .dae, .stl geometry files, as well as our own JSON geometry format.\n\nSelected File:");
+    explainText->setMaximumWidth(400);
+    explainText->setWordWrap(true);
+    QBoxLayout *fullLayout = new QHBoxLayout();
+    QBoxLayout *leftLayout = new QVBoxLayout();
+    leftLayout->addWidget(label_varName);
+    leftLayout->addWidget(explainText);
+    leftLayout->addWidget(selectedFile);
+    fullLayout->addItem(leftLayout);
+    this->setLayout(fullLayout);
 }
 
 void SCtrFileDataWidget::setData(QJsonObject &obj)
 {
-    m_obj = obj;
+    // set up the UI for the widget
+    this->initUI();
 
-    //TODO: PRS, file widget needs to have a file tree
+    m_obj = obj;
 
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
     layout->setMargin(0);
 
-    theValue = new QLineEdit(this);
-    layout->insertWidget(1, theCheckBox, 4);
+    myFileTree = new RemoteFileTree(this);
+    myFileTree->setFileOperator(myDriver->getFileHandler());
+    myFileTree->setEditTriggers(QTreeView::NoEditTriggers);
+    layout->insertWidget(1, myFileTree, 4);
 
-    if (label_unit != NULL) {
-        label_unit->setText(obj.value(QString("unit")).toString());
-    }
     if (label_varName != NULL) {
         label_varName->setText(obj.value(QString("displayname")).toString());
     }
 
-    this->setLayout(layout);  // do I need this one?
+    if (selectedFile != NULL) {
+        selectedFile->setText(obj.value(QString("default")).toString());
+    }
 
-    /* set default */
-    QString defaultValue = obj.value(QString("default")).toString();
-    theValue->setText(defaultValue);
+    QObject::connect(myFileTree, SIGNAL(newFileSelected(FileTreeNode*)),
+                     this, SLOT(newFileSelected(FileTreeNode*)));
 }
 
 bool SCtrFileDataWidget::toBool()
 {
-    QString text = theValue->text();
+    QString text = selectedFile->text();
     return !text.isEmpty();
 }
 
 QString SCtrFileDataWidget::toString()
 {
-    return theValue->text();
+    return selectedFile->text();
 }
 
 void SCtrFileDataWidget::updateValue(QString s)
 {
     /* update the value */
-    theValue->setText(s);
+    selectedFile->setText(s);
+    myFileTree->clearSelection();
 }
 
+void SCtrFileDataWidget::newFileSelected(FileTreeNode * newFile)
+{
+    if (newFile == NULL)
+    {
+        selectedFile->setText("");
+    }
+    selectedFile->setText(newFile->getFileData().getFullPath());
+}

@@ -43,9 +43,15 @@
 #include <QJsonObject>
 #include <QValidator>
 #include <QObject>
+#include <QDoubleSpinBox>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QGridLayout>
 
 #include "cwe_guiWidgets/cwe_defines.h"
 #include <SimCenter_widgets/sctrstates.h>
+
+class FileTreeNode;
 
 class SCtrMasterDataWidget : public QFrame
 {
@@ -66,27 +72,15 @@ public:
     virtual void updateValue(QString);
     QString value() {return this->toString();}
 
-protected:
-    /*
-    QFrame * addStd(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    QFrame * addBool(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    QFrame * addFile(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    QFrame * addChoice(QJsonObject, QWidget *parent, QString *setVal = NULL);
-    QFrame * addVector3D(QJsonObject JSONvar, QWidget *parent, QString *setVal = NULL );
-    QFrame * addVector2D(QJsonObject JSONvar, QWidget *parent, QString *setVal = NULL );
-    QFrame * addTensor3D(QJsonObject JSONvar, QWidget *parent, QString *setVal = NULL );
-    QFrame * addTensor2D(QJsonObject JSONvar, QWidget *parent, QString *setVal = NULL );
-    QFrame * addUnknown(QJsonObject, QWidget *parent, QString *setVal = NULL );
-    void addType(const QString &, const QString &, QJsonObject, QWidget *parent , QString * setVal);
-    */
-
 private slots:
     void on_theValue_editingFinished();
+    virtual void newFileSelected(FileTreeNode *);
+    //TODO: Need to rethink some of the polymorphism here
 
 protected:
-    QLineEdit *theValue;
-    QCheckBox *theCheckBox;
-    QComboBox *theComboBox;
+    QLineEdit *theValue = NULL;
+    QCheckBox *theCheckBox = NULL;
+    QComboBox *theComboBox = NULL;
 
     QLabel  *label_varName = NULL;
     QLabel  *label_unit = NULL;

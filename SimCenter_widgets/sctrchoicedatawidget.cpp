@@ -51,14 +51,11 @@ SCtrChoiceDataWidget::SCtrChoiceDataWidget(QWidget *parent):
 
 }
 
-SCtrChoiceDataWidget::SCtrChoiceDataWidget(QJsonObject &obj, QWidget *parent):
-    SCtrMasterDataWidget(parent)
-{
-    this->setData(obj);
-}
-
 void SCtrChoiceDataWidget::setData(QJsonObject &obj)
 {
+    // set up the UI for the widget
+    this->initUI();
+
     m_obj = obj;
 
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();

@@ -35,19 +35,35 @@
 #ifndef SCTRFILEDATAWIDGET_H
 #define SCTRFILEDATAWIDGET_H
 
+#include <QHBoxLayout>
+#include <QLineEdit>
 #include <QWidget>
-#include <SimCenter_widgets/sctrmasterdatawidget.h>
+
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
+
+class RemoteFileTree;
+class FileTreeNode;
+class VWTinterfaceDriver;
 
 class SCtrFileDataWidget: public SCtrMasterDataWidget
 {
 public:
     SCtrFileDataWidget(QWidget *parent);
-    SCtrFileDataWidget(QJsonObject &obj, QWidget *parent);
+    SCtrFileDataWidget(VWTinterfaceDriver* theDriver, QWidget *parent);
     void setData(QJsonObject &obj);
     QString toString();
-    double  toDouble();
     bool toBool();
-    void updateValue(QString);
+    virtual void updateValue(QString);
+    virtual void initUI();
+
+private slots:
+    virtual void newFileSelected(FileTreeNode *);
+
+private:
+    VWTinterfaceDriver * myDriver;
+    RemoteFileTree * myFileTree = NULL;
+    QLabel * selectedFile = NULL;
+    QLabel * explainText = NULL;
 };
 
 #endif // SCTRFILEDATAWIDGET_H

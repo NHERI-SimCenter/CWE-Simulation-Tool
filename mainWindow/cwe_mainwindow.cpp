@@ -182,6 +182,11 @@ void CWE_MainWindow::switchToCreateTab()
     ui->tabContainer->setCurrentWidget(ui->tab_create_new);
 }
 
+void CWE_MainWindow::switchToFilesTab()
+{
+    ui->tabContainer->setCurrentWidget(ui->tab_files);
+}
+
 void CWE_MainWindow::changeParamsAndResultsEnabled(bool setting)
 {
     if (setting == true)

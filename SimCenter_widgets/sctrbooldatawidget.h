@@ -44,7 +44,6 @@ class SCtrBoolDataWidget: public SCtrMasterDataWidget
 {
 public:
     SCtrBoolDataWidget(QWidget *parent);
-    SCtrBoolDataWidget(QJsonObject &obj, QWidget *parent);
     void setData(QJsonObject &obj);
     QString toString();
     double  toDouble();

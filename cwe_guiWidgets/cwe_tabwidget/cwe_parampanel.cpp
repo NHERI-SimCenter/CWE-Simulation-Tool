@@ -40,6 +40,7 @@
 #include "cwe_parampanel.h"
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
+#include "vwtinterfacedriver.h"
 
 #include <QMessageBox>
 #include <QVBoxLayout>
@@ -54,9 +55,10 @@
 #include <QDebug>
 
 
-CWE_ParamPanel::CWE_ParamPanel(QWidget *parent) :
+CWE_ParamPanel::CWE_ParamPanel(VWTinterfaceDriver * theDriver, QWidget *parent) :
     QFrame(parent)
 {
+    myDriver = theDriver;
     variableWidgets = new QMap<QString, SCtrMasterDataWidget *>();
     this->setViewState(SimCenterViewState::visible);
 }
@@ -101,26 +103,28 @@ void CWE_ParamPanel::addVariable(QString varName, QJsonObject &theVariable)
     QString type = theVariable.value("type").toString();
 
     if (type.toLower() == "std") {
-        theVar = new SCtrStdDataWidget(theVariable, this);
+        theVar = new SCtrStdDataWidget(this);
         layout->addWidget(theVar);
     }
     else if (type.toLower() == "choose") {
-        theVar = new SCtrChoiceDataWidget(theVariable, this);
+        theVar = new SCtrChoiceDataWidget(this);
         layout->addWidget(theVar);
     }
     else if (type.toLower() == "bool") {
-        theVar = new SCtrBoolDataWidget(theVariable, this);
+        theVar = new SCtrBoolDataWidget(this);
         layout->addWidget(theVar);
     }
     else if (type.toLower() == "file") {
-        theVar = new SCtrFileDataWidget(theVariable, this);
+        theVar = new SCtrFileDataWidget(myDriver, this);
         layout->addWidget(theVar);
     }
     else {
         /* add an error message */
         cwe_globals::displayPopup(QString("Variable %1 of unknown type %2.\nVariable ignored.").arg(varName).arg(type), "Warning");
+        theVar->deleteLater();
         return;
     }
+    theVar->setData(theVariable);
 
     variableWidgets->insert(varName, theVar);
 }
