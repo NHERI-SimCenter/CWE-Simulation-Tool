@@ -53,14 +53,13 @@
 #include <QStandardItemModel>
 #include <QLayout>
 
-#include "../cwe_defines.h"
-
 class CWE_StageStatusTab;
 class CWE_GroupsWidget;
 class CWE_Parameters;
 class SCtrMasterDataWidget;
 class VWTinterfaceDriver;
 enum class SimCenterViewState;
+enum class SimCenterButtonMode;
 enum class StageState;
 
 namespace Ui {
@@ -76,6 +75,11 @@ public:
     ~CWE_TabWidget();
     void setController(CWE_Parameters * newController);
     void resetView();
+
+    void setTabStage(StageState newState, QString stageName);
+
+    void setButtonMode(SimCenterButtonMode);
+    void setButtonMode(SimCenterButtonMode, QString stageName);
 
     void setViewState(SimCenterViewState);
     void setViewState(SimCenterViewState, QString stageName);
@@ -99,18 +103,17 @@ private slots:
     void on_groupTabSelected(CWE_GroupsWidget *);
     void on_tabActivated(CWE_StageStatusTab *);
 
-protected:
-    void setButtonMode(uint mode);
-
 private:
     static QString getStateText(StageState theState);
     QString getCurrentSelectedStage();
+    void enactButtonSetting();
 
     CWE_Parameters * myController = NULL;
 
     Ui::CWE_TabWidget *ui;
 
     QMap<QString, SimCenterViewState> m_viewState;
+    QMap<QString, SimCenterButtonMode> buttonModeList;
 
     QMap<QString, CWE_StageStatusTab *> *stageTabList;
 };

@@ -749,6 +749,7 @@ void CFDcaseInstance::jobListUpdated()
 {
     if (defunct) return;
     if (caseFolder == NULL) return;
+    if (myType == NULL) return;
 
     QMap<QString, RemoteJobData * > jobList = getRelevantJobs();
 
