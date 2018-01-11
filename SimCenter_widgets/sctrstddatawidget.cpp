@@ -3,6 +3,8 @@
 
 #include <QHBoxLayout>
 
+#include "qdebug.h"
+
 SCtrStdDataWidget::SCtrStdDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)
 {
@@ -36,13 +38,23 @@ void SCtrStdDataWidget::setData(QJsonObject &obj)
 
     /* set default */
     QString defaultValue = obj.value(QString("default")).toString();
-    theValue->setText(defaultValue);
+    this->updateValue(defaultValue);
 }
 
 QString SCtrStdDataWidget::toString()
 {
-    int prec  = m_obj.value("precision").toInt();
-    QString s = QString("%1").arg(((theValue->text()).toDouble()), 0, 'g', prec);
+    QString s = "";
+
+    QString precString  = m_obj.value("precision").toString();
+    if (precString.toLower() == "int")
+    {
+        s = QString("%1").arg(((theValue->text()).toInt()));
+    }
+    else
+    {
+        int prec = precString.toInt();
+        s = QString("%1").arg(((theValue->text()).toDouble()), 0, 'f', prec);
+    }
     return s;
 }
 
@@ -53,9 +65,20 @@ double SCtrStdDataWidget::toDouble()
 
 void SCtrStdDataWidget::updateValue(QString s)
 {
-    /* check if new information is an appropriate type */
-    double x = s.toDouble();
-    QString val = QString("%1").arg(x, m_obj["precision"].toInt(), 'g');
+    QString val = "";
+
+    /* check if new information is of an appropriate type */
+
+    QString precString  = m_obj.value("precision").toString();
+    if (precString.toLower() == "int")
+    {
+        val = QString("%1").arg(s.toInt());
+    }
+    else
+    {
+        int prec = precString.toInt();
+        val = QString("%1").arg(s.toDouble(), 0, 'f', prec);
+    }
 
     /* update the value */
     theValue->setText(val);

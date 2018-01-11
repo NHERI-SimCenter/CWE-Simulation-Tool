@@ -204,6 +204,8 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
         stageTabList->value(stageName)->getGroupsWidget()->collectParamData(currentParameters);
     }
 
+    qDebug() << currentParameters;
+
     return currentParameters;
 }
 
