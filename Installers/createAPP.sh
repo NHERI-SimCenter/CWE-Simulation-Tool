@@ -13,7 +13,7 @@ GENERATOR_DIR=$(dirname "$0")
 APPNAME=CFDClientProgram.app
 APPINSTALLER=SetupSimCenterCWEClient
 
-MACDEPLOY=${HOME}/Qt/5.9.2/clang_64/bin/macdeployqt
+MACDEPLOY=${HOME}/Qt/5.10.0/clang_64/bin/macdeployqt
 
 QTINSTALLER=${HOME}/Qt/Tools/QtInstallerFramework/3.0/bin/binarycreator
 QTINSTALLEROPTIONS="--offline-only --ignore-translations -c config/macconfig.xml -p packages"
