@@ -48,7 +48,6 @@
 #include <QStandardItemModel>
 #include <QGridLayout>
 
-#include "cwe_guiWidgets/cwe_defines.h"
 #include <SimCenter_widgets/sctrstates.h>
 
 class FileTreeNode;
@@ -61,7 +60,7 @@ public:
     explicit SCtrMasterDataWidget(QWidget *parent = 0);
     ~SCtrMasterDataWidget();
     SimCenterViewState ViewState();
-    void setViewState(SimCenterViewState);
+    virtual void setViewState(SimCenterViewState);
     virtual void setData(QJsonObject &) = 0;
     virtual void initUI();
     virtual void setValue(QString);

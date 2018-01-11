@@ -141,19 +141,20 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
     QString resultType = resultObject.value("type");
     if (resultType == "text")
     {
+        CWE_Result_Popup * resultPopup = NULL;
         if (theItem->column() == showCol)
         {
-            CWE_Result_Popup * resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
+            resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
                                  currentCase->getMyType()->getName(),
                                  resultObject, myDriver);
-            resultPopup->show();
         }
         else if (theItem->column() == downloadCol)
         {
-            new CWE_Result_Popup(currentCase->getCaseName(),
+            resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
                                  currentCase->getMyType()->getName(),
                                  resultObject, myDriver, true);
         }
+        resultPopup->show();
     }
     else if (resultType == "GLdata")
     {
@@ -304,7 +305,7 @@ void CWE_Results::populateResultsScreen()
             QString resultType = aResult.value("type").toString();
             if (resultType == "text")
             {
-                addResult(aResult.value("name").toString(),false,true,"Data File");
+                addResult(aResult.value("name").toString(),true,true,"Data File");
             }
             else if (resultType == "GLdata")
             {

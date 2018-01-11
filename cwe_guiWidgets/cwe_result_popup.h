@@ -38,6 +38,8 @@
 #include <QWidget>
 #include <QLabel>
 #include <QPlainTextEdit>
+#include <QString>
+#include <QFileDialog>
 
 class VWTinterfaceDriver;
 class CFDglCanvas;

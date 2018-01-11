@@ -131,31 +131,31 @@ void CWE_Result_Popup::closeButtonClicked()
 
 void CWE_Result_Popup::newFileInfo()
 {
-    FileTreeNode * folderNode = myDriver->getFileHandler()->getNodeFromName(targetFolder);
-
-    if (folderNode == NULL)
+    if ((resultType == "GLmesh") || (resultType == "GLdata"))
     {
-        folderNode = myDriver->getFileHandler()->getClosestNodeFromName(targetFolder);
+        FileTreeNode * folderNode = myDriver->getFileHandler()->getNodeFromName(targetFolder);
 
         if (folderNode == NULL)
         {
-            cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
-            this->deleteLater();
+            folderNode = myDriver->getFileHandler()->getClosestNodeFromName(targetFolder);
+
+            if (folderNode == NULL)
+            {
+                cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
+                this->deleteLater();
+                return;
+            }
+
+            myDriver->getFileHandler()->lsClosestNode(targetFolder);
             return;
         }
 
-        myDriver->getFileHandler()->lsClosestNode(targetFolder);
-        return;
-    }
+        if (folderNode->childIsUnloaded())
+        {
+            myDriver->getFileHandler()->lsClosestNode(targetFolder);
+            return;
+        }
 
-    if (folderNode->childIsUnloaded())
-    {
-        myDriver->getFileHandler()->lsClosestNode(targetFolder);
-        return;
-    }
-
-    if ((resultType == "GLmesh") || (resultType == "GLdata"))
-    {
         FileTreeNode * pointsFile = folderNode->getChildNodeWithName("points");
         FileTreeNode * facesFile = folderNode->getChildNodeWithName("faces");
         FileTreeNode * ownerFile = folderNode->getChildNodeWithName("owner");
@@ -374,7 +374,63 @@ void CWE_Result_Popup::newFileInfo()
     }
     else if (resultType == "text")
     {
-        //textBox
+        FileTreeNode * fileNode = myDriver->getFileHandler()->getNodeFromName(targetFile);
+
+        if (fileNode == NULL)
+        {
+            fileNode = myDriver->getFileHandler()->getClosestNodeFromName(targetFile);
+
+            if ((fileNode == NULL) || (!fileNode->childIsUnloaded())) //TODO: This check needs to go everywhere on file re-write
+            {
+                cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
+                this->deleteLater();
+                return;
+            }
+
+            myDriver->getFileHandler()->lsClosestNode(targetFile);
+            return;
+        }
+
+        QByteArray * fileText = fileNode->getFileBuffer();
+
+        if (fileText == NULL)
+        {
+            myDriver->getFileHandler()->sendDownloadBuffReq(fileNode);
+        }
+
+        if (download)
+        {
+            this->deleteLater();
+
+            QString fileName = QFileDialog::getSaveFileName(this, "Select Destination File:");
+            if (fileName.isEmpty())
+            {
+                return;
+            }
+
+            QFile destFile(fileName);
+            if (!destFile.open(QFile::WriteOnly))
+            {
+                cwe_globals::displayPopup("Error: Cannot open local file.");
+                return;
+            }
+            destFile.write(*fileText);
+            destFile.close();
+            cwe_globals::displayPopup("Result File Downloaded.");
+        }
+        else
+        {
+            textBox = new QPlainTextEdit(this);
+            textBox->setReadOnly(true);
+            textBox->setPlainText(QString::fromStdString(fileText->toStdString()));
+
+            loadingLabel->deleteLater();
+            loadingLabel = NULL;
+            ui->displayFrame->layout()->addWidget(myCanvas);
+        }
+
+        QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange()),
+                         this, SLOT(newFileInfo()));
     }
     else
     {

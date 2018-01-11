@@ -39,6 +39,12 @@ enum class SimCenterViewState { visible,
                                 editable,
                                 hidden };
 
+enum class SimCenterButtonMode { NONE,
+                                 RUN,
+                                 CANCEL,
+                                 RESET,
+                                 RESULTS};
+
 enum class SimCenterDataType { integer,
                                floatingpoint,
                                boolean,
