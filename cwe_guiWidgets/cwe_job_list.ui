@@ -35,8 +35,8 @@
 
 // Contributors:
  </comment>
- <class>CWE_landing</class>
- <widget class="QWidget" name="CWE_landing">
+ <class>CWE_job_list</class>
+ <widget class="QWidget" name="CWE_job_list">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -49,7 +49,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0" colspan="2">
+   <item row="0" column="0" colspan="2">
     <widget class="RemoteJobLister" name="tableView_jobs">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -63,21 +63,6 @@
      <property name="sizeAdjustPolicy">
       <enum>QAbstractScrollArea::AdjustIgnored</enum>
      </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QFrame" name="frame">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QGraphicsView" name="graphicsView"/>
-      </item>
-     </layout>
     </widget>
    </item>
   </layout>

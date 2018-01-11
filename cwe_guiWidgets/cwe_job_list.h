@@ -45,25 +45,24 @@
 class JobOperator;
 
 namespace Ui {
-class CWE_landing;
+class CWE_job_list;
 }
 
-class CWE_landing : public CWE_Super
+class CWE_job_list : public CWE_Super
 {
     Q_OBJECT
 
 public:
-    explicit CWE_landing(QWidget *parent = 0);
-    ~CWE_landing();
+    explicit CWE_job_list(QWidget *parent = 0);
+    ~CWE_job_list();
     void addDataRow(QString, uint, QString, QString, QString);
-    void addDummyDataRow(void);
 
     virtual void linkDriver(VWTinterfaceDriver * theDriver);
 
 private slots:
 
 private:
-    Ui::CWE_landing    *ui;
+    Ui::CWE_job_list    *ui;
     QStandardItemModel *model;
 };
 
