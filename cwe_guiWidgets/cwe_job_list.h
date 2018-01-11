@@ -1,12 +1,12 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
-** Copyright (c) 2018 The Regents of the University of California
+** Copyright (c) 2017 The University of Notre Dame
+** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this
+** 1. Redistributions of source code must retain the above copyright notice, this 
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -32,26 +32,38 @@
 
 // Contributors:
 
-#ifndef SCTRBOOLDATAWIDGET_H
-#define SCTRBOOLDATAWIDGET_H
+#ifndef CWE_LANDING_H
+#define CWE_LANDING_H
 
 #include <QWidget>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QTime>
 
-#include "cwe_globals.h"
-#include "SimCenter_widgets/sctrmasterdatawidget.h"
+#include "cwe_super.h"
 
-class SCtrBoolDataWidget: public SCtrMasterDataWidget
+class JobOperator;
+
+namespace Ui {
+class CWE_job_list;
+}
+
+class CWE_job_list : public CWE_Super
 {
+    Q_OBJECT
+
 public:
-    SCtrBoolDataWidget(QWidget *parent);
-    SCtrBoolDataWidget(QJsonObject &obj, QWidget *parent);
-    void setData(QJsonObject &obj);
-    QString toString();
-    double  toDouble();
-    bool toBool();
-    void setChecked();
-    void setUnchecked();
-    void updateValue(QString);
+    explicit CWE_job_list(QWidget *parent = 0);
+    ~CWE_job_list();
+    void addDataRow(QString, uint, QString, QString, QString);
+
+    virtual void linkDriver(VWTinterfaceDriver * theDriver);
+
+private slots:
+
+private:
+    Ui::CWE_job_list    *ui;
+    QStandardItemModel *model;
 };
 
-#endif // SCTRBOOLDATAWIDGET_H
+#endif // CWE_LANDING_H

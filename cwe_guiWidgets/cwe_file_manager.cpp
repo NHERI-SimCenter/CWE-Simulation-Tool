@@ -80,6 +80,8 @@ void CWE_file_manager::linkDriver(VWTinterfaceDriver * theDriver)
         ui->remoteTreeView->setupFileView();
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
+        QObject::connect(myDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
+                         this, SLOT(remoteOpDone()));
     }
 }
 
@@ -113,7 +115,10 @@ void CWE_file_manager::on_pb_upload_clicked()
     if (!myDriver->getFileHandler()->operationIsPending())
     {
         cwe_globals::displayPopup("Error: Unable to start file operation. Please try again.");
+        return;
     }
+    ui->pb_upload->setDisabled(true);
+    ui->pb_download->setDisabled(true);
 }
 
 void CWE_file_manager::on_pb_download_clicked()
@@ -156,6 +161,8 @@ void CWE_file_manager::on_pb_download_clicked()
     {
         cwe_globals::displayPopup("Error: Unable to start file operation. Please try again.");
     }
+    ui->pb_upload->setDisabled(true);
+    ui->pb_download->setDisabled(true);
 }
 
 void CWE_file_manager::copyMenuItem()
@@ -227,8 +234,18 @@ void CWE_file_manager::refreshMenuItem()
     ui->remoteTreeView->getFileOperator()->enactFolderRefresh(targetNode);
 }
 
+void CWE_file_manager::downloadBufferItem()
+{
+    ui->remoteTreeView->getFileOperator()->sendDownloadBuffReq(targetNode);
+}
 
-void CWE_file_manager::on_remoteTreeView_customContextMenuRequested(const QPoint &pos)
+void CWE_file_manager::remoteOpDone()
+{
+    ui->pb_upload->setDisabled(false);
+    ui->pb_download->setDisabled(false);
+}
+
+void CWE_file_manager::customFileMenu(const QPoint &pos)
 {
     QMenu fileMenu;
     if (ui->remoteTreeView->getFileOperator()->operationIsPending())
@@ -268,7 +285,7 @@ void CWE_file_manager::on_remoteTreeView_customContextMenuRequested(const QPoint
     }
     if (theFileData.getFileType() == FileType::FILE)
     {
-        fileMenu.addAction("Download File",this, SLOT(downloadMenuItem()));
+        fileMenu.addAction("Download Buffer (DEBUG)",this, SLOT(downloadBufferItem()));
     }
 
     if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))
