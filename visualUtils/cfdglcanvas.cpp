@@ -174,17 +174,36 @@ void CFDglCanvas::paintGL()
 
     if (myState == CFDDisplayState::FIELD)
     {
-        //TODO: Finish the field display
-        /*
-        for (auto ownerItr = ownerList.cbegin(); ownerItr != ownerList.cend(); ownerItr++)
+        int indexVal = -1;
+        for (auto faceItr = faceList.cbegin(); faceItr != faceList.cend(); faceItr++)
         {
+            indexVal++;
             QList<int> aFace = (*faceItr);
             bool allZ0 = isAllZ0(aFace);
 
             if (allZ0)
             {
+                double rawData = dataList.at(ownerList.at(indexVal)); //TODO: Probably should check bounds
+
+                double dataVal = (rawData - lowDataVal) / dataSpan;
+
                 glBegin(GL_POLYGON);
-                glColor3f(0.0, 0.0, 0.0);
+                double redVal = 1.0;
+                double greenVal = 0.0;
+                double blueVal = 1.0;
+
+                if (dataVal > 0.5)
+                {
+                    blueVal = 0.3 + 0.7 * ((1.0 - dataVal) / 0.5);
+                    greenVal = 0.3 + 0.7 * ((1.0 - dataVal) / 0.5);
+                }
+                else
+                {
+                    redVal = 0.3 + 0.7 * (dataVal / 0.5);
+                    greenVal = 0.3 + 0.7 * (dataVal / 0.5);
+                }
+
+                glColor3f(redVal, greenVal, blueVal);
 
                 for (int ind = 0; ind < aFace.size(); ind++)
                 {
@@ -194,8 +213,6 @@ void CFDglCanvas::paintGL()
                 glEnd();
             }
         }
-        */
-
     }
 }
 
@@ -349,10 +366,12 @@ bool CFDglCanvas::loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFi
         if (yVal < displayBounds.bottom()) displayBounds.setBottom(yVal);
     }
 
+    haveValidMeshData = true;
+
     return true;
 }
 
-bool CFDglCanvas::loadFieldData(QByteArray * rawDataFile)
+bool CFDglCanvas::loadFieldData(QByteArray * rawDataFile, QString valueType)
 {
     dataList.clear();
 
@@ -374,25 +393,79 @@ bool CFDglCanvas::loadFieldData(QByteArray * rawDataFile)
         return false;
     }
 
-    for (auto itr = dataElement->getChildList().cbegin();
-         itr != dataElement->getChildList().cend(); itr++)
+    if (valueType == "scalar")
     {
-        if ((*itr)->getType() == CFDtokenType::FLOAT)
+        for (auto itr = dataElement->getChildList().cbegin();
+             itr != dataElement->getChildList().cend(); itr++)
         {
-            dataList.append((*itr)->getFloatVal());
-        }
-        else
-        {
-            currentDisplayError = "Data list does not contain floats";
-            delete dataRoot;
-            return false;
+            if (((*itr)->getType() == CFDtokenType::FLOAT) ||
+                    ((*itr)->getType() == CFDtokenType::INT))
+            {
+                dataList.append((*itr)->getFloatVal());
+            }
+            else
+            {
+                currentDisplayError = "Data list does not contain floats";
+                delete dataRoot;
+                return false;
+            }
         }
     }
+    else if (valueType == "magnitude")
+    {
+        for (auto itr = dataElement->getChildList().cbegin();
+             itr != dataElement->getChildList().cend(); itr++)
+        {
+            if ((*itr)->getType() != CFDtokenType::DATA_ARRAY)
+            {
+                currentDisplayError = "Data list does not contain float arrays";
+                delete dataRoot;
+                return false;
+            }
+
+            double sum = 0.0;
+            for (auto itr2 = (*itr)->getChildList().cbegin();
+                 itr2 != (*itr)->getChildList().cend(); itr2++)
+            {
+                double rawVal = (*itr2)->getFloatVal();
+                sum += rawVal * rawVal;
+            }
+            dataList.append(sqrt(sum));
+        }
+    }
+    else
+    {
+        currentDisplayError = "Invalid data type";
+
+        delete dataRoot;
+        return false;
+    }
+
+    lowDataVal = INFINITY;
+    highDataVal = -INFINITY;
+
+    for (auto itr = dataList.cbegin(); itr != dataList.cend(); itr++)
+    {
+        if (*itr < lowDataVal)
+        {
+            lowDataVal = *itr;
+        }
+        if (*itr > highDataVal)
+        {
+            highDataVal = *itr;
+        }
+    }
+    dataSpan = highDataVal - lowDataVal;
 
     currentDisplayError = "No Error";
 
     delete dataRoot;
     return true;
+}
+
+bool CFDglCanvas::haveMeshData()
+{
+    return haveValidMeshData;
 }
 
 QString CFDglCanvas::getDisplayError()

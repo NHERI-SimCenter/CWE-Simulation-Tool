@@ -72,6 +72,7 @@ public:
     void switchToParameterTab();
     void switchToResultsTab();
     void switchToCreateTab();
+    void switchToFilesTab();
 
 private slots:
     void newCaseGiven();
