@@ -32,26 +32,40 @@
 
 // Contributors:
 
-#ifndef SCTRBOOLDATAWIDGET_H
-#define SCTRBOOLDATAWIDGET_H
+#ifndef CWE_RESULT_POPUP_H
+#define CWE_RESULT_POPUP_H
 
 #include <QWidget>
+#include <QLabel>
 
-#include "cwe_globals.h"
-#include "SimCenter_widgets/sctrmasterdatawidget.h"
+class VWTinterfaceDriver;
+class CFDglCanvas;
 
-class SCtrBoolDataWidget: public SCtrMasterDataWidget
+namespace Ui {
+class CWE_Result_Popup;
+}
+
+class CWE_Result_Popup : public QWidget
 {
+    Q_OBJECT
+
 public:
-    SCtrBoolDataWidget(QWidget *parent);
-    SCtrBoolDataWidget(QJsonObject &obj, QWidget *parent);
-    void setData(QJsonObject &obj);
-    QString toString();
-    double  toDouble();
-    bool toBool();
-    void setChecked();
-    void setUnchecked();
-    void updateValue(QString);
+    explicit CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, VWTinterfaceDriver * theDriver , QWidget *parent = 0);
+    ~CWE_Result_Popup();
+
+private slots:
+    void closeButtonClicked();
+    void newFileInfo();
+
+private:
+    Ui::CWE_Result_Popup *ui;
+    VWTinterfaceDriver * myDriver;
+
+    QString resultType;
+    QString targetFolder;
+
+    QLabel * loadingLabel = NULL;
+    CFDglCanvas * myCanvas = NULL;
 };
 
-#endif // SCTRBOOLDATAWIDGET_H
+#endif // CWE_RESULT_POPUP_H

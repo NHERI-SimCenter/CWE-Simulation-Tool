@@ -90,7 +90,7 @@ private:
     //Note: this should probably be static const
     double PRECISION = 0.000000001;
 
-    void recomputeProjectionMat();
+    void recomputeProjectionMat(int w, int h);
     void clearMeshData();
 
     bool isAllZ0(QList<int> aFace);

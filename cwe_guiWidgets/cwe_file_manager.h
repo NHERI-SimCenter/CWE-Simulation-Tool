@@ -64,7 +64,7 @@ private slots:
     void on_pb_upload_clicked();
     void on_pb_download_clicked();
 
-    void on_remoteTreeView_customContextMenuRequested(const QPoint &pos);
+    void customFileMenu(const QPoint &pos);
     void copyMenuItem();
     void moveMenuItem();
     void renameMenuItem();
@@ -74,6 +74,8 @@ private slots:
     void compressMenuItem();
     void decompressMenuItem();
     void refreshMenuItem();
+
+    void downloadBufferItem();
 
 
 private:
