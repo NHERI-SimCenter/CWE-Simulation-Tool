@@ -180,7 +180,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
 
         /* create a CWE_GroupsWidget */
-        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(this);
+        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(myController->getDriver(), this);
         ui->stagePanels->addWidget(groupWidget);
 
         /* link tab and groupWidget */

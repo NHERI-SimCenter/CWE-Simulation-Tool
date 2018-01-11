@@ -57,6 +57,10 @@ int CFDtoken::getIntVal()
 
 double CFDtoken::getFloatVal()
 {
+    if (myType == CFDtokenType::INT)
+    {
+        return (double) myInt;
+    }
     return myFloat;
 }
 

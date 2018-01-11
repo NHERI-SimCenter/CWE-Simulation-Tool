@@ -44,7 +44,6 @@ class SCtrChoiceDataWidget: public SCtrMasterDataWidget
 {
 public:
     SCtrChoiceDataWidget(QWidget *parent);
-    SCtrChoiceDataWidget(QJsonObject &obj, QWidget *parent);
     void setData(QJsonObject &obj);
     QString toString();
     void updateValue(QString);

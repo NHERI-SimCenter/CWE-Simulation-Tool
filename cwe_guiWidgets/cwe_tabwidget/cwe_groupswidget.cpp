@@ -43,12 +43,14 @@
 #include "SimCenter_widgets/sctrstates.h"
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
+#include "vwtinterfacedriver.h"
 #include <QJsonObject>
 #include <QJsonArray>
 
-CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) : QTabWidget(parent)
+CWE_GroupsWidget::CWE_GroupsWidget(VWTinterfaceDriver * theDriver, QWidget *parent) : QTabWidget(parent)
 {
     quickParameterPtr = new QMap<QString, SCtrMasterDataWidget *>();
+    myDriver = theDriver;
 
     this->setViewState(SimCenterViewState::visible);
 }
@@ -96,7 +98,7 @@ void CWE_GroupsWidget::setParameterConfig(QString key, QJsonObject &obj)
     {
         QString groupName = group.toString();
         QScrollArea *scrollArea = new QScrollArea(this);
-        CWE_ParamPanel *panel = new CWE_ParamPanel(this);
+        CWE_ParamPanel *panel = new CWE_ParamPanel(myDriver, this);
         scrollArea->setWidgetResizable(true);
         scrollArea->setWidget(panel);
 

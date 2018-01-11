@@ -141,11 +141,19 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
     QString resultType = resultObject.value("type");
     if (resultType == "text")
     {
-        if (theItem->column() != downloadCol)
+        if (theItem->column() == showCol)
         {
-            return;
+            CWE_Result_Popup * resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
+                                 currentCase->getMyType()->getName(),
+                                 resultObject, myDriver);
+            resultPopup->show();
         }
-        cwe_globals::displayPopup("Placeholder for text download","TODO: DEBUG");
+        else if (theItem->column() == downloadCol)
+        {
+            new CWE_Result_Popup(currentCase->getCaseName(),
+                                 currentCase->getMyType()->getName(),
+                                 resultObject, myDriver, true);
+        }
     }
     else if (resultType == "GLdata")
     {
@@ -153,7 +161,10 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
         {
             return;
         }
-        cwe_globals::displayPopup("Placeholder for field display","TODO: DEBUG");
+        CWE_Result_Popup * resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
+                             currentCase->getMyType()->getName(),
+                             resultObject, myDriver);
+        resultPopup->show();
     }
     else if (resultType == "GLmesh")
     {
