@@ -58,9 +58,10 @@ class CWE_GroupsWidget;
 class CWE_Parameters;
 class SCtrMasterDataWidget;
 class VWTinterfaceDriver;
-enum class SimCenterViewState;
-enum class SimCenterButtonMode;
+//enum class SimCenterViewState;
 enum class StageState;
+
+#include "SimCenter_widgets/sctrstates.h"
 
 namespace Ui {
 class CWE_TabWidget;
