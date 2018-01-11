@@ -36,8 +36,6 @@
 #include "cwe_job_list.h"
 #include "ui_cwe_job_list.h"
 
-#include "cwe_defines.h"
-
 #include "../AgaveExplorer/remoteFileOps/remotejoblister.h"
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 #include "vwtinterfacedriver.h"
@@ -78,33 +76,4 @@ void CWE_job_list::linkDriver(VWTinterfaceDriver * theDriver)
     {
         ui->tableView_jobs->setJobHandle(theDriver->getJobHandler());
     }
-}
-
-void CWE_job_list::addDataRow(QString name, uint state, QString time, QString id, QString app)
-{
-    QString theState;
-
-    if (state & CWE_STATE_NEW)          {theState = "new";}
-    else if (state & CWE_STATE_RUNNING) {theState = "running";}
-    else if (state & CWE_STATE_RESULTS) {theState = "done";}
-    else if (state & CWE_STATE_NONE)    {theState = "none";}
-    else if (state & CWE_STATE_CLEAR)   {theState = "clear";}
-    else {theState = "undefined";}
-
-    // Make data
-    QList<QStandardItem *> List;
-
-    QStandardItem *var1 = new QStandardItem(name);
-    List.append(var1);
-    QStandardItem *var2 = new QStandardItem(theState);
-    List.append(var2);
-    QStandardItem *var3 = new QStandardItem(time);
-    List.append(var3);
-    QStandardItem *var4 = new QStandardItem(id);
-    List.append(var4);
-    QStandardItem *var5 = new QStandardItem(app);
-    List.append(var5);
-
-    // Populate our model
-    model->appendRow(List);
 }
