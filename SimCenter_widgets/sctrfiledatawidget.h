@@ -45,6 +45,8 @@ class RemoteFileTree;
 class FileTreeNode;
 class VWTinterfaceDriver;
 
+//TODO: Need to write visibilty method
+
 class SCtrFileDataWidget: public SCtrMasterDataWidget
 {
 public:

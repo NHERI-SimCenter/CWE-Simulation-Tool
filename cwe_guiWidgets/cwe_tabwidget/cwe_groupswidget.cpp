@@ -68,24 +68,11 @@ void CWE_GroupsWidget::setCorrespondingTab(CWE_StageStatusTab * newTab)
 // set the view state
 void CWE_GroupsWidget::setViewState(SimCenterViewState state)
 {
-    switch (state) {
-    case SimCenterViewState::hidden:
-        m_viewState = SimCenterViewState::hidden;
-        break;
-    case SimCenterViewState::editable:
-        m_viewState = SimCenterViewState::editable;
-        break;
-    case SimCenterViewState::visible:
-    default:
-        m_viewState = SimCenterViewState::visible;
-        break;
-    }
+    m_viewState = state;
 
-    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
-    while (iter.hasNext())
+    for (auto itr = quickParameterPtr->cbegin(); itr != quickParameterPtr->cend(); itr++)
     {
-        iter.next();
-        (iter.value())->setViewState(m_viewState);
+        (*itr)->setViewState(state);
     }
 }
 

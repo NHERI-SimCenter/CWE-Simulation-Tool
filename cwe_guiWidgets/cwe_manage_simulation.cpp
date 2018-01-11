@@ -34,7 +34,6 @@
 
 #include "cwe_manage_simulation.h"
 #include "ui_cwe_manage_simulation.h"
-#include "cwe_defines.h"
 
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 
