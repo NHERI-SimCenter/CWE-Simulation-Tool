@@ -1,12 +1,12 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -32,39 +32,40 @@
 
 // Contributors:
 
-#ifndef CWE_LANDING_H
-#define CWE_LANDING_H
+#ifndef CWE_RESULT_POPUP_H
+#define CWE_RESULT_POPUP_H
 
 #include <QWidget>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QTime>
+#include <QLabel>
 
-#include "cwe_super.h"
-
-class JobOperator;
+class VWTinterfaceDriver;
+class CFDglCanvas;
 
 namespace Ui {
-class CWE_landing;
+class CWE_Result_Popup;
 }
 
-class CWE_landing : public CWE_Super
+class CWE_Result_Popup : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit CWE_landing(QWidget *parent = 0);
-    ~CWE_landing();
-    void addDataRow(QString, uint, QString, QString, QString);
-    void addDummyDataRow(void);
-
-    virtual void linkDriver(VWTinterfaceDriver * theDriver);
+    explicit CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, VWTinterfaceDriver * theDriver , QWidget *parent = 0);
+    ~CWE_Result_Popup();
 
 private slots:
+    void closeButtonClicked();
+    void newFileInfo();
 
 private:
-    Ui::CWE_landing    *ui;
-    QStandardItemModel *model;
+    Ui::CWE_Result_Popup *ui;
+    VWTinterfaceDriver * myDriver;
+
+    QString resultType;
+    QString targetFolder;
+
+    QLabel * loadingLabel = NULL;
+    CFDglCanvas * myCanvas = NULL;
 };
 
-#endif // CWE_LANDING_H
+#endif // CWE_RESULT_POPUP_H

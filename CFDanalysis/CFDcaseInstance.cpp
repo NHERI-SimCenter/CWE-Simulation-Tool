@@ -45,6 +45,7 @@
 #include "../AgaveClientInterface/remotejobdata.h"
 
 #include "vwtinterfacedriver.h"
+#include "cwe_globals.h"
 
 CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver):
     QObject((QObject *) mainDriver)
@@ -390,7 +391,7 @@ void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolde
 
     if (!theDriver->getFileHandler()->operationIsPending())
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
 
@@ -420,7 +421,7 @@ void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFo
 
     if (!theDriver->getFileHandler()->operationIsPending())
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
 
@@ -478,7 +479,7 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 
     if (!theDriver->getFileHandler()->operationIsPending())
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
 
@@ -506,7 +507,7 @@ void CFDcaseInstance::startStageApp(QString stageID)
 
     if (jobHandle == NULL)
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
@@ -531,7 +532,7 @@ void CFDcaseInstance::rollBack(QString stageToDelete)
 
     if (folderToRemove == NULL)
     {
-        displayNetError("Unable to remove stage not yet done.");
+        cwe_globals::displayPopup("Unable to remove stage not yet done.", "Network Issue");
         return;
     }
 
@@ -539,7 +540,7 @@ void CFDcaseInstance::rollBack(QString stageToDelete)
 
     if (!theDriver->getFileHandler()->operationIsPending())
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
 
@@ -557,6 +558,13 @@ void CFDcaseInstance::killCaseConnection()
 
 void CFDcaseInstance::downloadCase(QString destLocalFile)
 {
+    if (!cwe_globals::isValidLocalFolder(destLocalFile))
+    {
+        cwe_globals::displayPopup("Please select a valid local folder for download", "I/O Error");
+        return;
+    }
+
+    cwe_globals::displayPopup("Download debug message", "DEBUG: TODO");
     //TODO : PRS
 }
 
@@ -566,13 +574,13 @@ void CFDcaseInstance::stopJob(QString stage)
 
     if (relevantJobs.size() == 0)
     {
-        displayNetError("No job detected for stopping");
+        cwe_globals::displayPopup("No job detected for stopping", "Network Issue");
         return;
     }
 
     if (relevantJobs.size() > 1)
     {
-        displayNetError("Need to reload job list before job can be stopped, please wait.");
+        cwe_globals::displayPopup("Need to reload job list before job can be stopped, please wait.", "Network Issue");
         return;
     }
 
@@ -597,7 +605,7 @@ void CFDcaseInstance::stopJob(QString stage)
 
     if (!stopOkay)
     {
-        displayNetError("Job for deletion not detected.");
+        cwe_globals::displayPopup("Job for deletion not detected.", "Network Issue");
         return;
     }
 
@@ -606,7 +614,7 @@ void CFDcaseInstance::stopJob(QString stage)
 
     if (jobHandle == NULL)
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
 
@@ -635,7 +643,7 @@ void CFDcaseInstance::underlyingFilesUpdated()
             if ((caseFolder != NULL) || (expectedNewCaseFolder.isEmpty()))
             {
                 emitNewState(CaseState::ERROR);
-                displayNetError("Cannot create new case folder if case already has a folder.");
+                cwe_globals::displayPopup("Cannot create new case folder if case already has a folder.", "Network Issue");
                 return;
             }
 
@@ -667,7 +675,7 @@ void CFDcaseInstance::underlyingFilesUpdated()
 
                 if (!theDriver->getFileHandler()->operationIsPending())
                 {
-                    displayNetError("Unable to contact design safe. Please wait and try again.");
+                    cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
                     return;
                 }
 
@@ -759,7 +767,7 @@ void CFDcaseInstance::jobListUpdated()
         else
         {
             emitNewState(CaseState::ERROR);
-            displayNetError("Case has unrecognized app. Tasks may have been started without this program.");
+            cwe_globals::displayPopup("Case has unrecognized app. Tasks may have been started without this program.", "Network Issue");
             return;
         }
         emitNewState(CaseState::JOB_RUN);
@@ -783,7 +791,7 @@ void CFDcaseInstance::appInvokeDone(RequestState invokeStatus)
     if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(CaseState::ERROR);
-        displayNetError("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.");
+        cwe_globals::displayPopup("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.", "Network Issue");
         return;
     }
 
@@ -797,7 +805,7 @@ void CFDcaseInstance::agaveTaskDone(RequestState invokeStatus)
     if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(CaseState::ERROR);
-        displayNetError("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.");
+        cwe_globals::displayPopup("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.", "Network Issue");
         return;
     }
 
@@ -853,9 +861,4 @@ void CFDcaseInstance::emitNewState(CaseState newState)
     if (newState == myState) return;
     myState = newState;
     emit haveNewState(newState);
-}
-
-void CFDcaseInstance::displayNetError(QString infoText)
-{
-    cwe_globals::displayPopup(infoText, "Network Issue");
 }
