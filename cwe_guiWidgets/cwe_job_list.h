@@ -55,7 +55,6 @@ class CWE_job_list : public CWE_Super
 public:
     explicit CWE_job_list(QWidget *parent = 0);
     ~CWE_job_list();
-    void addDataRow(QString, uint, QString, QString, QString);
 
     virtual void linkDriver(VWTinterfaceDriver * theDriver);
 

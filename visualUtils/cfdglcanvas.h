@@ -72,7 +72,8 @@ public:
     ~CFDglCanvas();
 
     bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
-    bool loadFieldData(QByteArray * rawDataFile);
+    bool loadFieldData(QByteArray * rawDataFile, QString valueType);
+    bool haveMeshData();
     QString getDisplayError();
 
     void setDisplayState(CFDDisplayState newState);
@@ -108,6 +109,9 @@ private:
     QList<double> dataList;
 
     QRectF displayBounds;
+    double lowDataVal;
+    double highDataVal;
+    double dataSpan;
 
     //QOpenGLVertexArrayObject myVertexArray;
     //QOpenGLBuffer myBuffer;

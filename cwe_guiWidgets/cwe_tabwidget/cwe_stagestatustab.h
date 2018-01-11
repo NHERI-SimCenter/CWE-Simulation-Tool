@@ -61,6 +61,7 @@ public:
     QString text() {return m_text;};
     QString status() {return m_status;};
     //int index() {return m_index;};
+    bool tabIsActive();
     void setActive(bool b=true);
     void setInActive(bool b=true);
     void linkWidget(CWE_GroupsWidget *ptr);

@@ -126,18 +126,25 @@ void CWE_Parameters::newCaseState(CaseState newState)
     case CaseState::INVALID:
     case CaseState::OFFLINE:
         ui->theTabWidget->setViewState(SimCenterViewState::hidden);
+        ui->theTabWidget->setButtonMode(SimCenterButtonMode::NONE);
         return; //These states should be handled elsewhere
         break;
     case CaseState::LOADING:
+        ui->theTabWidget->setViewState(SimCenterViewState::visible);
+        ui->theTabWidget->setButtonMode(SimCenterButtonMode::NONE);
+        break;
     case CaseState::OP_INVOKE:
         ui->theTabWidget->setViewState(SimCenterViewState::visible);
+        ui->theTabWidget->setButtonMode(SimCenterButtonMode::NONE);
         break;
     case CaseState::JOB_RUN:
         setVisibleAccordingToStage();
+        setButtonsAccordingToStage();
         break;
     case CaseState::READY:
         ui->theTabWidget->updateParameterValues(myDriver->getCurrentCase()->getCurrentParams());
         setVisibleAccordingToStage();
+        setButtonsAccordingToStage();
         break;
     default:
         myDriver->fatalInterfaceError("Remote case has unhandled state");
@@ -146,10 +153,49 @@ void CWE_Parameters::newCaseState(CaseState newState)
     }
 }
 
+void CWE_Parameters::setButtonsAccordingToStage()
+{
+    QMap<QString, StageState> stageStates = myDriver->getCurrentCase()->getStageStates();
+    for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
+    {
+        ui->theTabWidget->setTabStage(*itr, itr.key());
+        switch (*itr)
+        {
+        case StageState::LOADING:
+        case StageState::ERROR:
+            ui->theTabWidget->setButtonMode(SimCenterButtonMode::NONE, itr.key());
+            break;
+        case StageState::RUNNING:
+            ui->theTabWidget->setButtonMode(SimCenterButtonMode::CANCEL, itr.key());
+            break;
+        case StageState::FINISHED:
+            ui->theTabWidget->setButtonMode(SimCenterButtonMode::RESET, itr.key());
+            break;
+        case StageState::UNRUN:
+        default:
+            ui->theTabWidget->setButtonMode(SimCenterButtonMode::RUN, itr.key());
+        }
+    }
+}
+
 void CWE_Parameters::setVisibleAccordingToStage()
 {
     QMap<QString, StageState> stageStates = myDriver->getCurrentCase()->getStageStates();
-    //TODO: PMH
+    for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
+    {
+        switch (*itr)
+        {
+        case StageState::ERROR:
+        case StageState::RUNNING:
+        case StageState::FINISHED:
+        case StageState::LOADING:
+            ui->theTabWidget->setViewState(SimCenterViewState::visible, itr.key());
+            break;
+        case StageState::UNRUN:
+        default:
+            ui->theTabWidget->setViewState(SimCenterViewState::editable, itr.key());
+        }
+    }
 }
 
 void CWE_Parameters::createUnderlyingParamWidgets()

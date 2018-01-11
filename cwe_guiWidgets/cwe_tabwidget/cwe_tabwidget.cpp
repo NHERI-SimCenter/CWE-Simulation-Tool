@@ -64,9 +64,7 @@ CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     ui->setupUi(this);
 
     stageTabList = new QMap<QString, CWE_StageStatusTab *>();
-
-    this->setButtonMode(CWE_BTN_NONE);
-    this->setViewState(SimCenterViewState::visible);
+    enactButtonSetting();
 }
 
 CWE_TabWidget::~CWE_TabWidget()
@@ -80,47 +78,75 @@ void CWE_TabWidget::setController(CWE_Parameters * newController)
     myController = newController;
 }
 
+void CWE_TabWidget::setTabStage(StageState newState, QString stageName)
+{
+    CWE_StageStatusTab * theTab = stageTabList->value(stageName);
+    if (theTab == NULL) return;
+
+    theTab->setStatus(getStateText(newState));
+}
+
+void CWE_TabWidget::setButtonMode(SimCenterButtonMode mode)
+{
+    QList<QString> stageNames = m_viewState.keys();
+
+    foreach (QString stageName, stageNames)
+    {
+        setButtonMode(mode, stageName);
+    }
+}
+
+void CWE_TabWidget::setButtonMode(SimCenterButtonMode mode, QString stageName)
+{
+    buttonModeList.insert(stageName,mode);
+    enactButtonSetting();
+}
+
+void CWE_TabWidget::enactButtonSetting()
+{
+    QString currentStage = getCurrentSelectedStage();
+    SimCenterButtonMode currentMode = SimCenterButtonMode::NONE;
+    if (currentStage != "UNKNOWN")
+    {
+        currentMode = buttonModeList.value(currentStage, SimCenterButtonMode::NONE);
+    }
+    ui->pbtn_run->setDisabled(true);
+    ui->pbtn_cancel->setDisabled(true);
+    ui->pbtn_results->setDisabled(true);
+    ui->pbtn_rollback->setDisabled(true);
+
+    if (currentMode == SimCenterButtonMode::RUN)
+    {
+        ui->pbtn_run->setDisabled(false);
+    }
+    else if (currentMode == SimCenterButtonMode::CANCEL)
+    {
+        ui->pbtn_cancel->setDisabled(false);
+    }
+    else if (currentMode == SimCenterButtonMode::RESET)
+    {
+        ui->pbtn_rollback->setDisabled(false);
+    }
+    else if (currentMode == SimCenterButtonMode::RESULTS)
+    {
+        ui->pbtn_results->setDisabled(false);
+    }
+}
+
 void CWE_TabWidget::setViewState(SimCenterViewState state)
 {
-    foreach (QString stageName, m_viewState.keys())
-    {
-        switch (state)
-        {
-        case SimCenterViewState::editable:
-            m_viewState[stageName] = SimCenterViewState::editable;
-            break;
-        case SimCenterViewState::hidden:
-            m_viewState[stageName] = SimCenterViewState::hidden;
-            break;
-        case SimCenterViewState::visible:
-        default:
-            m_viewState[stageName] = SimCenterViewState::visible;
-            state = SimCenterViewState::visible;
-        }
+    QList<QString> stageNames = m_viewState.keys();
 
-        stageTabList->value(stageName)->getGroupsWidget()->setViewState(m_viewState.value(stageName));
+    foreach (QString stageName, stageNames)
+    {
+        setViewState(state, stageName);
     }
 }
 
 void CWE_TabWidget::setViewState(SimCenterViewState state, QString stageName)
 {
-    //TODO: PMH
-    switch (state)
-    {
-    case SimCenterViewState::editable:
-        m_viewState[stageName] = SimCenterViewState::editable;
-        break;
-    case SimCenterViewState::hidden:
-        m_viewState[stageName] = SimCenterViewState::hidden;
-        break;
-    case SimCenterViewState::visible:
-    default:
-        m_viewState[stageName] = SimCenterViewState::visible;
-    }
-
+    m_viewState.insert(stageName, state);
     stageTabList->value(stageName)->getGroupsWidget()->setViewState(state);
-
-    //Disable buttons (If appropriate)
 }
 
 SimCenterViewState CWE_TabWidget::viewState(QString stageName)
@@ -144,6 +170,10 @@ void CWE_TabWidget::resetView()
     }
     /* clear the stageTabList */
     stageTabList->clear();
+    m_viewState.clear();
+    buttonModeList.clear();
+
+    enactButtonSetting();
 }
 
 
@@ -180,7 +210,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
 
         /* create a CWE_GroupsWidget */
-        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(this);
+        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(myController->getDriver(), this);
         ui->stagePanels->addWidget(groupWidget);
 
         /* link tab and groupWidget */
@@ -202,7 +232,8 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     QString firstTabKey = sequence[0].toString();
     if (firstTabKey != "") { stageTabList->value(firstTabKey)->setActive(); }
 
-    setButtonMode(CWE_BTN_RUN);
+    this->setButtonMode(SimCenterButtonMode::NONE);
+    this->setViewState(SimCenterViewState::hidden);
 }
 
 void CWE_TabWidget::updateParameterValues(QMap<QString, QString> newValues)
@@ -224,9 +255,6 @@ void CWE_TabWidget::initQuickParameterPtr()
 void CWE_TabWidget::on_pbtn_run_clicked()
 {
     myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::RUN);
-
-    setViewState(SimCenterViewState::visible);
-    setButtonMode(CWE_BTN_CANCEL);
 }
 
 QMap<QString, QString> CWE_TabWidget::collectParamData()
@@ -246,11 +274,6 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
 void CWE_TabWidget::on_pbtn_cancel_clicked()
 {
     myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::CANCEL);
-
-    //setButtonMode(CWE_BTN_RUN|CWE_BTN_CANCEL|CWE_BTN_RESULTS|CWE_BTN_ROLLBACK);
-
-    setViewState(SimCenterViewState::editable);
-    setButtonMode(CWE_BTN_RUN);
 }
 
 void CWE_TabWidget::on_pbtn_results_clicked()
@@ -276,36 +299,16 @@ QString CWE_TabWidget::getStateText(StageState theState)
 
 QString CWE_TabWidget::getCurrentSelectedStage()
 {
-    QString theStage = "UNKNOWN";
-
     foreach (CWE_StageStatusTab *tab, *stageTabList)
     {
-        if (tab->isActiveWindow()) {
-            theStage = tab->getStageKey();
-            break;
+        if (tab->tabIsActive())
+        {
+            return tab->getStageKey();
         }
     }
 
-    return theStage;
+    return "UNKNOWN";
 }
-
-void CWE_TabWidget::setButtonMode(uint mode)
-{
-    bool btnState;
-
-    btnState = (mode & CWE_BTN_RUN)?true:false;
-    ui->pbtn_run->setEnabled(btnState);
-
-    btnState = (mode & CWE_BTN_CANCEL)?true:false;
-    ui->pbtn_cancel->setEnabled(btnState);
-
-    btnState = (mode & CWE_BTN_RESULTS)?true:false;
-    ui->pbtn_results->setEnabled(btnState);
-
-    btnState = (mode & CWE_BTN_ROLLBACK)?true:false;
-    ui->pbtn_rollback->setEnabled(btnState);
-}
-
 
 /* *** SLOTS *** */
 
@@ -322,4 +325,5 @@ void CWE_TabWidget::on_tabActivated(CWE_StageStatusTab *activeTabWidget)
         stageTabList->value(key)->setInActive();
     }
     activeTabWidget->setActive();
+    enactButtonSetting();
 }
