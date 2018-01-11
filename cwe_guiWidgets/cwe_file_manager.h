@@ -77,6 +77,7 @@ private slots:
 
     void downloadBufferItem();
 
+    void remoteOpDone();
 
 private:
     Ui::CWE_file_manager *ui;
