@@ -105,32 +105,20 @@ void CWE_TabWidget::setButtonMode(SimCenterButtonMode mode, QString stageName)
 void CWE_TabWidget::enactButtonSetting()
 {
     QString currentStage = getCurrentSelectedStage();
-    SimCenterButtonMode currentMode = SimCenterButtonMode::NONE;
+    SimCenterButtonMode currentMode = SimCenterButtonMode_NONE;
     if (currentStage != "UNKNOWN")
     {
-        currentMode = buttonModeList.value(currentStage, SimCenterButtonMode::NONE);
+        currentMode = buttonModeList.value(currentStage, SimCenterButtonMode_NONE);
     }
     ui->pbtn_run->setDisabled(true);
     ui->pbtn_cancel->setDisabled(true);
     ui->pbtn_results->setDisabled(true);
     ui->pbtn_rollback->setDisabled(true);
 
-    if (currentMode == SimCenterButtonMode::RUN)
-    {
-        ui->pbtn_run->setDisabled(false);
-    }
-    else if (currentMode == SimCenterButtonMode::CANCEL)
-    {
-        ui->pbtn_cancel->setDisabled(false);
-    }
-    else if (currentMode == SimCenterButtonMode::RESET)
-    {
-        ui->pbtn_rollback->setDisabled(false);
-    }
-    else if (currentMode == SimCenterButtonMode::RESULTS)
-    {
-        ui->pbtn_results->setDisabled(false);
-    }
+    if (currentMode & SimCenterButtonMode_RUN)     { ui->pbtn_run->setEnabled(true);     }
+    if (currentMode & SimCenterButtonMode_CANCEL)  { ui->pbtn_cancel->setEnabled(true);  }
+    if (currentMode & SimCenterButtonMode_RESET)   { ui->pbtn_rollback->setEnabled(true);}
+    if (currentMode & SimCenterButtonMode_RESULTS) { ui->pbtn_results->setEnabled(true); }
 }
 
 void CWE_TabWidget::setViewState(SimCenterViewState state)
@@ -232,7 +220,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     QString firstTabKey = sequence[0].toString();
     if (firstTabKey != "") { stageTabList->value(firstTabKey)->setActive(); }
 
-    this->setButtonMode(SimCenterButtonMode::NONE);
+    this->setButtonMode(SimCenterButtonMode_NONE);
     this->setViewState(SimCenterViewState::hidden);
 }
 
