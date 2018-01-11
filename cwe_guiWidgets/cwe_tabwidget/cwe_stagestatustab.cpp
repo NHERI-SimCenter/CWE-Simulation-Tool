@@ -87,6 +87,11 @@ void CWE_StageStatusTab::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+bool CWE_StageStatusTab::tabIsActive()
+{
+    return m_active;
+}
+
 void CWE_StageStatusTab::setActive(bool b)
 {
     this->setStyleSheet("QFrame {background: #64B5F6; border-color: #808080; border-width: 1.5px; border-radius: 3px; border-style: inset;} QLabel {border-style: none}");

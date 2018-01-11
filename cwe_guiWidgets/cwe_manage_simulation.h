@@ -38,8 +38,6 @@
 #include <QWidget>
 #include <QStandardItemModel>
 
-#include "cwe_defines.h"
-
 #include "cwe_super.h"
 
 class FileTreeNode;

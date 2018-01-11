@@ -110,7 +110,6 @@ HEADERS  += \
     visualUtils/decompresswrapper.h \
     mainWindow/cwe_mainwindow.h \
     cwe_guiWidgets/cwe_super.h \
-    cwe_guiWidgets/cwe_defines.h \
     cwe_guiWidgets/cwe_file_manager.h \
     cwe_guiWidgets/cwe_help.h \
     cwe_guiWidgets/cwe_manage_simulation.h \

@@ -43,14 +43,11 @@ SCtrBoolDataWidget::SCtrBoolDataWidget(QWidget *parent):
 
 }
 
-SCtrBoolDataWidget::SCtrBoolDataWidget(QJsonObject &obj, QWidget *parent):
-    SCtrMasterDataWidget(parent)
-{
-    this->setData(obj);
-}
-
 void SCtrBoolDataWidget::setData(QJsonObject &obj)
 {
+    // set up the UI for the widget
+    this->initUI();
+
     m_obj = obj;
 
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();

@@ -46,12 +46,13 @@
 #include "vwtinterfacedriver.h"
 #include "cwe_globals.h"
 
-CWE_Result_Popup::CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, VWTinterfaceDriver * theDriver, QWidget *parent) :
+CWE_Result_Popup::CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, VWTinterfaceDriver * theDriver, bool downloadResult, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CWE_Result_Popup)
 {
     ui->setupUi(this);
     myDriver = theDriver;
+    download = downloadResult;
     CFDcaseInstance * currentCase = myDriver->getCurrentCase();
     if (currentCase == NULL)
     {
@@ -64,10 +65,32 @@ CWE_Result_Popup::CWE_Result_Popup(QString caseName, QString caseType, QMap<QStr
     ui->label_result->setText(theResult.value("name"));
 
     resultType = theResult.value("type");
+    myResult = theResult;
 
-    if (resultType == "GLmesh")
+    if ((resultType == "GLmesh") || (resultType == "GLdata"))
     {
         targetFolder = currentCase->getCaseFolder().append("/").append(theResult.value("stage")).append("/constant/polyMesh/");
+        if (download)
+        {
+            this->deleteLater();
+            return;
+        }
+        if (resultType == "GLdata")
+        {
+            targetFile = currentCase->getCaseFolder().append("/").append(theResult.value("stage")).append("/");
+            QString dataType = theResult.value("values");
+            if ((dataType != "magnitude") &&
+                    (dataType != "scalar"))
+            {
+                cwe_globals::displayPopup("Error: Unknown result type for display.");
+                this->deleteLater();
+                return;
+            }
+        }
+    }
+    else if (resultType == "text")
+    {
+        targetFile = currentCase->getCaseFolder().append("/").append(theResult.value("stage")).append("/").append(theResult.value("file"));
     }
     else
     {
@@ -108,31 +131,31 @@ void CWE_Result_Popup::closeButtonClicked()
 
 void CWE_Result_Popup::newFileInfo()
 {
-    FileTreeNode * folderNode = myDriver->getFileHandler()->getNodeFromName(targetFolder);
-
-    if (folderNode == NULL)
+    if ((resultType == "GLmesh") || (resultType == "GLdata"))
     {
-        folderNode = myDriver->getFileHandler()->getClosestNodeFromName(targetFolder);
+        FileTreeNode * folderNode = myDriver->getFileHandler()->getNodeFromName(targetFolder);
 
         if (folderNode == NULL)
         {
-            cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
-            this->deleteLater();
+            folderNode = myDriver->getFileHandler()->getClosestNodeFromName(targetFolder);
+
+            if (folderNode == NULL)
+            {
+                cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
+                this->deleteLater();
+                return;
+            }
+
+            myDriver->getFileHandler()->lsClosestNode(targetFolder);
             return;
         }
 
-        myDriver->getFileHandler()->lsClosestNode(targetFolder);
-        return;
-    }
+        if (folderNode->childIsUnloaded())
+        {
+            myDriver->getFileHandler()->lsClosestNode(targetFolder);
+            return;
+        }
 
-    if (folderNode->childIsUnloaded())
-    {
-        myDriver->getFileHandler()->lsClosestNode(targetFolder);
-        return;
-    }
-
-    if (resultType == "GLmesh")
-    {
         FileTreeNode * pointsFile = folderNode->getChildNodeWithName("points");
         FileTreeNode * facesFile = folderNode->getChildNodeWithName("faces");
         FileTreeNode * ownerFile = folderNode->getChildNodeWithName("owner");
@@ -147,62 +170,264 @@ void CWE_Result_Popup::newFileInfo()
             return;
         }
 
-        QByteArray * pointsBuffer = pointsFile->getFileBuffer();
-        QByteArray * facesBuffer = facesFile->getFileBuffer();
-        QByteArray * ownerBuffer = ownerFile->getFileBuffer();
+        if ((myCanvas == NULL) || (!myCanvas->haveMeshData()))
+        {
+            QByteArray * pointsBuffer = pointsFile->getFileBuffer();
+            QByteArray * facesBuffer = facesFile->getFileBuffer();
+            QByteArray * ownerBuffer = ownerFile->getFileBuffer();
 
-        if (pointsBuffer == NULL)
-        {
-            myDriver->getFileHandler()->sendDownloadBuffReq(pointsFile);
+            if (pointsBuffer == NULL)
+            {
+                myDriver->getFileHandler()->sendDownloadBuffReq(pointsFile);
+            }
+            if (facesBuffer == NULL)
+            {
+                myDriver->getFileHandler()->sendDownloadBuffReq(facesFile);
+            }
+            if (ownerBuffer == NULL)
+            {
+                myDriver->getFileHandler()->sendDownloadBuffReq(ownerFile);
+            }
+            if ((pointsBuffer == NULL) || (facesBuffer == NULL) || (ownerBuffer == NULL))
+            {
+                return;
+            }
+
+            QByteArray * realPointsBuffer = pointsBuffer;
+            QByteArray * realFacesBuffer = facesBuffer;
+            QByteArray * realOwnerBuffer = ownerBuffer;
+
+            if (pointsFile->getFileData().getFileName().endsWith(".gz"))
+            {
+                DeCompressWrapper realPoints(pointsBuffer);
+                realPointsBuffer = realPoints.getDecompressedFile();
+            }
+            if (pointsFile->getFileData().getFileName().endsWith(".gz"))
+            {
+                DeCompressWrapper realFaces(facesBuffer);
+                realFacesBuffer = realFaces.getDecompressedFile();
+            }
+            if (pointsFile->getFileData().getFileName().endsWith(".gz"))
+            {
+                DeCompressWrapper realOwner(ownerBuffer);
+                realOwnerBuffer = realOwner.getDecompressedFile();
+            }
+
+            if (myCanvas != NULL) myCanvas->deleteLater();
+            myCanvas = new CFDglCanvas();
+            myCanvas->loadMeshData(realPointsBuffer, realFacesBuffer, realOwnerBuffer);
+            if (realPointsBuffer != pointsBuffer) delete realPointsBuffer;
+            if (realFacesBuffer != facesBuffer) delete realFacesBuffer;
+            if (realOwnerBuffer != ownerBuffer) delete realOwnerBuffer;
+
+            if (!myCanvas->haveMeshData())
+            {
+                cwe_globals::displayPopup("Error: Data for result display is unreadable. Please reset and try again.");
+                this->deleteLater();
+                return;
+            }
         }
-        if (facesBuffer == NULL)
+
+        if (resultType == "GLmesh")
         {
-            myDriver->getFileHandler()->sendDownloadBuffReq(facesFile);
+            myCanvas->setDisplayState(CFDDisplayState::MESH);
+            myCanvas->show();
+
+            loadingLabel->deleteLater();
+            loadingLabel = NULL;
+            ui->displayFrame->layout()->addWidget(myCanvas);
+
+            QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange()),
+                             this, SLOT(newFileInfo()));
         }
-        if (ownerBuffer == NULL)
+        else if (resultType == "GLdata")
         {
-            myDriver->getFileHandler()->sendDownloadBuffReq(ownerFile);
+            FileTreeNode * baseFolderNode = myDriver->getFileHandler()->getNodeFromName(targetFile);
+
+            if (baseFolderNode == NULL)
+            {
+                baseFolderNode = myDriver->getFileHandler()->getClosestNodeFromName(targetFile);
+                if (baseFolderNode == NULL)
+                {
+                    cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
+                    this->deleteLater();
+                    return;
+                }
+
+                myDriver->getFileHandler()->lsClosestNode(targetFile);
+                return;
+            }
+
+            if (baseFolderNode->childIsUnloaded())
+            {
+                myDriver->getFileHandler()->lsClosestNode(targetFile);
+                return;
+            }
+
+            double biggestNum = -1;
+            FileTreeNode * targetChild = NULL;
+            QList<FileTreeNode *> * childList = baseFolderNode->getChildList();
+            for (auto itr = childList->cbegin(); itr != childList->cend(); itr++)
+            {
+                if ((*itr)->getFileData().getFileType() != FileType::DIR)
+                {
+                    continue;
+                }
+                QString childName = (*itr)->getFileData().getFileName();
+                if (childName == "0") continue;
+
+                bool isNum = false;
+                double childVal = childName.toDouble(&isNum);
+                if (isNum)
+                {
+                    if (biggestNum < childVal)
+                    {
+                        biggestNum = childVal;
+                        targetChild = (*itr);
+                    }
+                }
+            }
+
+            if (targetChild == NULL)
+            {
+                cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
+                this->deleteLater();
+                return;
+            }
+
+            if (targetChild->childIsUnloaded())
+            {
+                myDriver->getFileHandler()->lsClosestNode(targetChild->getFileData().getFullPath());
+                return;
+            }
+
+            if (myResult.value("file").isEmpty())
+            {
+                cwe_globals::displayPopup("Error: Invalid template configuration.");
+                this->deleteLater();
+                return;
+            }
+
+            bool zipped = false;
+            FileTreeNode * finalDataFile = targetChild->getChildNodeWithName(myResult.value("file"));
+            QByteArray * dataBuffer = NULL;;
+            if (finalDataFile == NULL)
+            {
+                zipped = true;
+                QString zipFileName = myResult.value("file");
+                zipFileName = zipFileName.append(".gz");
+                finalDataFile = targetChild->getChildNodeWithName(zipFileName);
+                if (finalDataFile == NULL)
+                {
+                    cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
+                    this->deleteLater();
+                    return;
+                }
+                QByteArray * rawBuffer = finalDataFile->getFileBuffer();
+                if (rawBuffer == NULL)
+                {
+                    myDriver->getFileHandler()->sendDownloadBuffReq(finalDataFile);
+                    return;
+                }
+                DeCompressWrapper dataExtractor(rawBuffer);
+                dataBuffer = dataExtractor.getDecompressedFile();
+            }
+            else
+            {
+                QByteArray * rawBuffer = finalDataFile->getFileBuffer();
+                if (rawBuffer == NULL)
+                {
+                    myDriver->getFileHandler()->sendDownloadBuffReq(finalDataFile);
+                    return;
+                }
+                dataBuffer = rawBuffer;
+            }
+
+            if (dataBuffer == NULL)
+            {
+                cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
+                this->deleteLater();
+                return;
+            }
+
+            myCanvas->loadFieldData(dataBuffer, myResult.value("values"));
+            if (zipped)
+            {
+                delete dataBuffer;
+            }
+            myCanvas->setDisplayState(CFDDisplayState::FIELD);
+            myCanvas->show();
+
+            loadingLabel->deleteLater();
+            loadingLabel = NULL;
+            ui->displayFrame->layout()->addWidget(myCanvas);
+
+            QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange()),
+                             this, SLOT(newFileInfo()));
         }
-        if ((pointsBuffer == NULL) || (facesBuffer == NULL) || (ownerBuffer == NULL))
+        else
         {
+            cwe_globals::displayPopup("Error: Data for result display is unreadable. Please reset and try again.");
+            this->deleteLater();
+            return;
+        }
+    }
+    else if (resultType == "text")
+    {
+        FileTreeNode * fileNode = myDriver->getFileHandler()->getNodeFromName(targetFile);
+
+        if (fileNode == NULL)
+        {
+            fileNode = myDriver->getFileHandler()->getClosestNodeFromName(targetFile);
+
+            if ((fileNode == NULL) || (!fileNode->childIsUnloaded())) //TODO: This check needs to go everywhere on file re-write
+            {
+                cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
+                this->deleteLater();
+                return;
+            }
+
+            myDriver->getFileHandler()->lsClosestNode(targetFile);
             return;
         }
 
-        QByteArray * realPointsBuffer = pointsBuffer;
-        QByteArray * realFacesBuffer = facesBuffer;
-        QByteArray * realOwnerBuffer = ownerBuffer;
+        QByteArray * fileText = fileNode->getFileBuffer();
 
-        if (pointsFile->getFileData().getFileName().endsWith(".gz"))
+        if (fileText == NULL)
         {
-            DeCompressWrapper realPoints(pointsBuffer);
-            realPointsBuffer = realPoints.getDecompressedFile();
-        }
-        if (pointsFile->getFileData().getFileName().endsWith(".gz"))
-        {
-            DeCompressWrapper realFaces(facesBuffer);
-            realFacesBuffer = realFaces.getDecompressedFile();
-        }
-        if (pointsFile->getFileData().getFileName().endsWith(".gz"))
-        {
-            DeCompressWrapper realOwner(ownerBuffer);
-            realOwnerBuffer = realOwner.getDecompressedFile();
+            myDriver->getFileHandler()->sendDownloadBuffReq(fileNode);
         }
 
-        myCanvas = new CFDglCanvas();
-        myCanvas->loadMeshData(realPointsBuffer, realFacesBuffer, realOwnerBuffer);
-        myCanvas->setDisplayState(CFDDisplayState::MESH);
-        myCanvas->show();
+        if (download)
+        {
+            this->deleteLater();
 
-        loadingLabel->deleteLater();
-        loadingLabel = NULL;
-        ui->displayFrame->layout()->addWidget(myCanvas);
+            QString fileName = QFileDialog::getSaveFileName(this, "Select Destination File:");
+            if (fileName.isEmpty())
+            {
+                return;
+            }
 
-        if (realPointsBuffer != pointsBuffer) delete realPointsBuffer;
-        if (realFacesBuffer != facesBuffer) delete realFacesBuffer;
-        if (realOwnerBuffer != ownerBuffer) delete realOwnerBuffer;
-        delete pointsBuffer;
-        delete facesBuffer;
-        delete ownerBuffer;
+            QFile destFile(fileName);
+            if (!destFile.open(QFile::WriteOnly))
+            {
+                cwe_globals::displayPopup("Error: Cannot open local file.");
+                return;
+            }
+            destFile.write(*fileText);
+            destFile.close();
+            cwe_globals::displayPopup("Result File Downloaded.");
+        }
+        else
+        {
+            textBox = new QPlainTextEdit(this);
+            textBox->setReadOnly(true);
+            textBox->setPlainText(QString::fromStdString(fileText->toStdString()));
+
+            loadingLabel->deleteLater();
+            loadingLabel = NULL;
+            ui->displayFrame->layout()->addWidget(myCanvas);
+        }
 
         QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange()),
                          this, SLOT(newFileInfo()));

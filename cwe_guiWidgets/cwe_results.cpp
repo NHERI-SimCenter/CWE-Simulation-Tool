@@ -141,11 +141,20 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
     QString resultType = resultObject.value("type");
     if (resultType == "text")
     {
-        if (theItem->column() != downloadCol)
+        CWE_Result_Popup * resultPopup = NULL;
+        if (theItem->column() == showCol)
         {
-            return;
+            resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
+                                 currentCase->getMyType()->getName(),
+                                 resultObject, myDriver);
         }
-        cwe_globals::displayPopup("Placeholder for text download","TODO: DEBUG");
+        else if (theItem->column() == downloadCol)
+        {
+            resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
+                                 currentCase->getMyType()->getName(),
+                                 resultObject, myDriver, true);
+        }
+        resultPopup->show();
     }
     else if (resultType == "GLdata")
     {
@@ -153,7 +162,10 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
         {
             return;
         }
-        cwe_globals::displayPopup("Placeholder for field display","TODO: DEBUG");
+        CWE_Result_Popup * resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
+                             currentCase->getMyType()->getName(),
+                             resultObject, myDriver);
+        resultPopup->show();
     }
     else if (resultType == "GLmesh")
     {
@@ -293,7 +305,7 @@ void CWE_Results::populateResultsScreen()
             QString resultType = aResult.value("type").toString();
             if (resultType == "text")
             {
-                addResult(aResult.value("name").toString(),false,true,"Data File");
+                addResult(aResult.value("name").toString(),true,true,"Data File");
             }
             else if (resultType == "GLdata")
             {

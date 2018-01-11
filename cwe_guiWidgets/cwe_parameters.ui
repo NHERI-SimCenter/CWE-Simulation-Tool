@@ -92,7 +92,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>setName(const QString &amp;s)</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -112,7 +112,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>setType(const QString &amp;s)</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -132,7 +132,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>setLocation(const QString &amp;s)</string>
+         <string/>
         </property>
        </widget>
       </item>

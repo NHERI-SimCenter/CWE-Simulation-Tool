@@ -40,7 +40,6 @@
 #include <QStackedLayout>
 #include <QPushButton>
 
-#include "cwe_guiWidgets/cwe_defines.h"
 #include "cwe_guiWidgets/cwe_job_list.h"
 #include "cwe_guiWidgets/cwe_file_manager.h"
 #include "cwe_guiWidgets/cwe_manage_simulation.h"
@@ -72,6 +71,7 @@ public:
     void switchToParameterTab();
     void switchToResultsTab();
     void switchToCreateTab();
+    void switchToFilesTab();
 
 private slots:
     void newCaseGiven();
