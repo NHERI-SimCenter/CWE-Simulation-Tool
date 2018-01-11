@@ -58,7 +58,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_super.cpp \
     cwe_guiWidgets/cwe_file_manager.cpp \
     cwe_guiWidgets/cwe_help.cpp \
-    cwe_guiWidgets/cwe_landing.cpp \
     cwe_guiWidgets/cwe_manage_simulation.cpp \
     cwe_guiWidgets/cwe_welcome_screen.cpp \
     cwe_guiWidgets/cwe_results.cpp \
@@ -98,7 +97,9 @@ SOURCES += main.cpp \
     SimCenter_widgets/sctrchoicedatawidget.cpp \
     SimCenter_widgets/sctrfiledatawidget.cpp \
     cwe_globals.cpp \
-    ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp
+    ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp \
+    cwe_guiWidgets/cwe_result_popup.cpp \
+    cwe_guiWidgets/cwe_job_list.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -112,7 +113,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_defines.h \
     cwe_guiWidgets/cwe_file_manager.h \
     cwe_guiWidgets/cwe_help.h \
-    cwe_guiWidgets/cwe_landing.h \
     cwe_guiWidgets/cwe_manage_simulation.h \
     cwe_guiWidgets/cwe_welcome_screen.h \
     cwe_guiWidgets/cwe_results.h \
@@ -151,13 +151,14 @@ HEADERS  += \
     SimCenter_widgets/sctrchoicedatawidget.h \
     SimCenter_widgets/sctrfiledatawidget.h \
     cwe_globals.h \
-    ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h
+    ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h \
+    cwe_guiWidgets/cwe_result_popup.h \
+    cwe_guiWidgets/cwe_job_list.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
     cwe_guiWidgets/cwe_file_manager.ui \
     cwe_guiWidgets/cwe_help.ui \
-    cwe_guiWidgets/cwe_landing.ui \
     cwe_guiWidgets/cwe_manage_simulation.ui \
     cwe_guiWidgets/cwe_welcome_screen.ui \
     cwe_guiWidgets/cwe_results.ui \
@@ -169,7 +170,9 @@ FORMS    += \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui
+    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
+    cwe_guiWidgets/cwe_result_popup.ui \
+    cwe_guiWidgets/cwe_job_list.ui
 
 RESOURCES += \
     cwe_resources.qrc \

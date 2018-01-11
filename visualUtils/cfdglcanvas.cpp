@@ -63,8 +63,6 @@ void CFDglCanvas::initializeGL()
     //myBuffer.allocate()//Not sure how much to allocate
     */
 
-    displayBounds.setCoords(-5.0,-5.0,5.0,5.0);
-
     initializeOpenGLFunctions();
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -74,10 +72,10 @@ void CFDglCanvas::resizeGL(int w, int h)
 {
     myWidth = w;
     myHeight = h;
-    recomputeProjectionMat();
+    recomputeProjectionMat(w, h);
 }
 
-void CFDglCanvas::recomputeProjectionMat()
+void CFDglCanvas::recomputeProjectionMat(int w, int h)
 {
     if (myState == CFDDisplayState::TEST_BOX)
     {
@@ -87,10 +85,38 @@ void CFDglCanvas::recomputeProjectionMat()
 
     if ((myState == CFDDisplayState::MESH) || (myState == CFDDisplayState::FIELD))
     {
-        //TODO: Maintain proper aspect ratios
         projectionMat.setToIdentity();
-        projectionMat.ortho(displayBounds.left(),displayBounds.right(),
-                            displayBounds.bottom(),displayBounds.top(),-1.0f,1.0f);
+
+        double rawleft = displayBounds.left();
+        double rawright = displayBounds.right();
+        double rawbottom = displayBounds.bottom();
+        double rawtop = displayBounds.top();
+
+        double rawXCenter = ((rawright - rawleft) / 2.0) + rawleft;
+        double rawYCenter = ((rawtop - rawbottom) / 2.0) + rawbottom;
+
+        double imgRatio = ((rawright - rawleft)/(rawtop - rawbottom));
+        double viewRatio = ((double)w)/((double)h);
+        if (imgRatio == viewRatio)
+        {
+            projectionMat.ortho(rawleft, rawright, rawbottom, rawtop, -1.0f,1.0f);
+        }
+        else if (imgRatio > viewRatio)
+        {
+            double newFactor = imgRatio / viewRatio;
+            double newBottom = rawYCenter - (newFactor * (rawYCenter - rawbottom));
+            double newTop = rawYCenter + (newFactor * (rawtop - rawYCenter));
+
+            projectionMat.ortho(rawleft, rawright, newBottom, newTop, -1.0f,1.0f);
+        }
+        else
+        {
+            double newFactor = viewRatio / imgRatio;
+            double newLeft = rawXCenter - (newFactor * (rawXCenter - rawleft));
+            double newRight = rawXCenter + (newFactor * (rawright - rawXCenter));
+
+            projectionMat.ortho(newLeft, newRight, rawbottom, rawtop, -1.0f,1.0f);
+        }
     }
 }
 
@@ -192,7 +218,7 @@ bool CFDglCanvas::isAllZ0(QList<int> aFace)
 void CFDglCanvas::setDisplayState(CFDDisplayState newState)
 {
     myState = newState;
-    recomputeProjectionMat();
+    //recomputeProjectionMat();
     this->update();
 }
 
@@ -383,79 +409,3 @@ void CFDglCanvas::clearMeshData()
     ownerList.clear();
     haveValidMeshData = false;
 }
-
-/*Saved code:
- * Need to convert to use file cache ability
-    setTestVisual();
-    FileTreeNode * currentNode = fileTreeData->getFileNodeFromPath(selectedFullPath);
-
-    FileTreeNode * constantFolder = currentNode->getChildNodeWithName("constant");
-    if (constantFolder == NULL) return;
-    FileTreeNode * polyMeshFolder = constantFolder->getChildNodeWithName("polyMesh");
-    if (polyMeshFolder == NULL) return;
-    FileTreeNode * pointsFile = polyMeshFolder->getChildNodeWithName("points");
-    FileTreeNode * facesFile = polyMeshFolder->getChildNodeWithName("faces");
-    FileTreeNode * ownerFile = polyMeshFolder->getChildNodeWithName("owner");
-    if (pointsFile == NULL) pointsFile = polyMeshFolder->getChildNodeWithName("points.gz");
-    if (facesFile == NULL) facesFile = polyMeshFolder->getChildNodeWithName("faces.gz");
-    if (ownerFile == NULL) ownerFile = polyMeshFolder->getChildNodeWithName("owner.gz");
-
-    if ((pointsFile == NULL) || (facesFile == NULL) || (ownerFile == NULL)) return;
-
-    RemoteDataReply * aReply = dataLink->downloadBuffer(pointsFile->getFileData().getFullPath());
-    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
-                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
-
-    aReply = dataLink->downloadBuffer(facesFile->getFileData().getFullPath());
-    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
-                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
-
-    aReply = dataLink->downloadBuffer(ownerFile->getFileData().getFullPath());
-    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
-                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
-}
-
-void ExplorerWindow::gotNewRawFile(RequestState authReply, QByteArray * fileBuffer)
-{
-    if (authReply != RequestState::GOOD) return;
-
-    RemoteDataReply * mySender = (RemoteDataReply *) QObject::sender();
-    if (mySender == NULL) return;
-    QString lookedForFile = mySender->getTaskParamList()->value("remoteName");
-    if (lookedForFile.isEmpty()) return;
-
-    QByteArray * realContents;
-
-    if (lookedForFile.endsWith(".gz"))
-    {
-        lookedForFile.chop(3);
-        DeCompressWrapper decompresser(fileBuffer);
-        realContents = decompresser.getDecompressedFile();
-    }
-    else
-    {
-        realContents = new QByteArray(*fileBuffer);
-    }
-    if (lookedForFile.endsWith("points"))
-    {
-        conditionalPurge(&pointData);
-        pointData = realContents;
-    }
-    if (lookedForFile.endsWith("faces"))
-    {
-        conditionalPurge(&faceData);
-        faceData = realContents;
-    }
-    if (lookedForFile.endsWith("owner"))
-    {
-        conditionalPurge(&ownerData);
-        ownerData = realContents;
-    }
-    if ((pointData != NULL) && (faceData != NULL) && (ownerData != NULL))
-    {
-        if(ui->openGLcfdWidget->loadMeshData(pointData, faceData, ownerData))
-        {
-            ui->openGLcfdWidget->setDisplayState(CFDDisplayState::MESH);
-        }
-    }
-    */
