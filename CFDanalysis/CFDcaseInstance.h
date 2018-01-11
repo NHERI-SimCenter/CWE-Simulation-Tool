@@ -120,7 +120,6 @@ private slots:
 
 private:
     void emitNewState(CaseState newState);
-    void displayNetError(QString infoText);
 
     QMap<QString, RemoteJobData * > getRelevantJobs();
 
@@ -137,6 +136,7 @@ private:
     CFDanalysisType * myType = NULL;
 
     QString expectedNewCaseFolder;
+    QString downloadDest;
 };
 
 #endif // CFDCASEINSTANCE_H
