@@ -33,8 +33,8 @@
 // Contributors:
 // Peter Mackenzie-Helnwein, UW Seattle
 
-#include "cwe_landing.h"
-#include "ui_cwe_landing.h"
+#include "cwe_job_list.h"
+#include "ui_cwe_job_list.h"
 
 #include "cwe_defines.h"
 
@@ -42,9 +42,9 @@
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 #include "vwtinterfacedriver.h"
 
-CWE_landing::CWE_landing(QWidget *parent) :
+CWE_job_list::CWE_job_list(QWidget *parent) :
     CWE_Super(parent),
-    ui(new Ui::CWE_landing)
+    ui(new Ui::CWE_job_list)
 {
     ui->setupUi(this);
 
@@ -64,17 +64,14 @@ CWE_landing::CWE_landing(QWidget *parent) :
     ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(2,QHeaderView::ResizeToContents);
     ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(3,QHeaderView::ResizeToContents);
     ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(4,QHeaderView::Stretch);
-
-    /* set some dummy contents */
-    this->addDummyDataRow();
 }
 
-CWE_landing::~CWE_landing()
+CWE_job_list::~CWE_job_list()
 {
     delete ui;
 }
 
-void CWE_landing::linkDriver(VWTinterfaceDriver * theDriver)
+void CWE_job_list::linkDriver(VWTinterfaceDriver * theDriver)
 {
     CWE_Super::linkDriver(theDriver);
     if (!theDriver->inOfflineMode())
@@ -83,7 +80,7 @@ void CWE_landing::linkDriver(VWTinterfaceDriver * theDriver)
     }
 }
 
-void CWE_landing::addDataRow(QString name, uint state, QString time, QString id, QString app)
+void CWE_job_list::addDataRow(QString name, uint state, QString time, QString id, QString app)
 {
     QString theState;
 
@@ -111,10 +108,3 @@ void CWE_landing::addDataRow(QString name, uint state, QString time, QString id,
     // Populate our model
     model->appendRow(List);
 }
-
-void CWE_landing::addDummyDataRow(void)
-{
-    /* set some dummy contents */
-    this->addDataRow("some URL", CWE_STATE_CLEAR, QTime::currentTime().toString(), "007", "SimCenter super app");
-}
-
