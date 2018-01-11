@@ -69,7 +69,7 @@ public:
     virtual void setValue(int);
     virtual void setValue(bool);
     virtual QString toString();
-    virtual void updateValue(QString);
+    virtual void updateValue(QString) = 0;
     QString value() {return this->toString();}
 
 private slots:
