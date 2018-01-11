@@ -130,11 +130,6 @@ QString SCtrMasterDataWidget::toString()
     return QString("");
 }
 
-void SCtrMasterDataWidget::updateValue(QString s)
-{
-    qDebug() << s;
-}
-
 /* ********** helper functions ********** */
 
 void SCtrMasterDataWidget::setVariableName(QString s)
