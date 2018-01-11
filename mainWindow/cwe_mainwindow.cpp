@@ -69,8 +69,8 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
     // adjust application size to display
     QRect rec = QApplication::desktop()->screenGeometry();
-    int height = this->height()<0.5*rec.height()?this->height():0.5*rec.height();
-    int width  = this->width()<0.5*rec.width()?this->width():0.5*rec.width();
+    int height = this->height()<0.75*rec.height()?this->height():0.75*rec.height();
+    int width  = this->width()<0.65*rec.width()?this->width():0.65*rec.width();
     this->resize(width, height);
 }
 
