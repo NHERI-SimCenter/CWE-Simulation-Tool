@@ -169,7 +169,7 @@ void CWE_Parameters::setButtonsAccordingToStage()
             ui->theTabWidget->setButtonMode(SimCenterButtonMode_CANCEL, itr.key());
             break;
         case StageState::FINISHED:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESET, itr.key());
+            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESET | SimCenterButtonMode_RESULTS, itr.key());
             break;
         case StageState::UNRUN:
         default:
