@@ -36,14 +36,11 @@
 #include "ui_cwe_create_copy_simulation.h"
 
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
-#include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
 
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "mainWindow/cwe_mainwindow.h"
-
 #include "vwtinterfacedriver.h"
 
 #include "cwe_globals.h"

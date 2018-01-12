@@ -35,14 +35,9 @@
 #ifndef CWE_LANDING_H
 #define CWE_LANDING_H
 
-#include <QWidget>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QTime>
-
 #include "cwe_super.h"
 
-class JobOperator;
+#include <QStandardItemModel>
 
 namespace Ui {
 class CWE_job_list;

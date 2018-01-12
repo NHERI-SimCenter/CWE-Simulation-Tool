@@ -39,13 +39,8 @@
 
 #include "cwe_groupswidget.h"
 
-#include "cwe_stagestatustab.h"
-#include "SimCenter_widgets/sctrstates.h"
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
-#include "vwtinterfacedriver.h"
-#include <QJsonObject>
-#include <QJsonArray>
 
 CWE_GroupsWidget::CWE_GroupsWidget(VWTinterfaceDriver * theDriver, QWidget *parent) : QTabWidget(parent)
 {

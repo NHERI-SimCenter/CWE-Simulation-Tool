@@ -34,8 +34,7 @@
 
 #include "sctrbooldatawidget.h"
 
-#include <QHBoxLayout>
-#include <QCheckBox>
+#include "cwe_globals.h"
 
 SCtrBoolDataWidget::SCtrBoolDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)

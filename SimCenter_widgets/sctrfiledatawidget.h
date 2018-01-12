@@ -35,14 +35,9 @@
 #ifndef SCTRFILEDATAWIDGET_H
 #define SCTRFILEDATAWIDGET_H
 
-#include <QHBoxLayout>
-#include <QLineEdit>
-#include <QWidget>
-
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 class RemoteFileTree;
-class FileTreeNode;
 class VWTinterfaceDriver;
 
 //TODO: Need to write visibilty method

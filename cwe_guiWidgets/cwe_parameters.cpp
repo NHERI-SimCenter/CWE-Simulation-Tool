@@ -35,18 +35,13 @@
 #include "cwe_parameters.h"
 #include "ui_cwe_parameters.h"
 
-#include "cwe_tabwidget/cwe_parampanel.h"
-
 #include "vwtinterfacedriver.h"
+
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "mainWindow/cwe_mainwindow.h"
-
-#include "cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h"
-#include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
-
-#include "SimCenter_widgets/sctrstates.h"
+#include "cwe_tabwidget/cwe_tabwidget.h"
 
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
     CWE_Super(parent),

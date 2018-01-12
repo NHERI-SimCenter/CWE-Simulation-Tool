@@ -35,14 +35,9 @@
 #ifndef CFDANALYSISTYPE_H
 #define CFDANALYSISTYPE_H
 
-#include <QString>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
-#include <QStringList>
 #include <QIcon>
-
 #include <QFile>
 
 class CFDanalysisType

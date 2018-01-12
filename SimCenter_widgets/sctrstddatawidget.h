@@ -35,8 +35,7 @@
 #ifndef SCTRSTDDATAWIDGET_H
 #define SCTRSTDDATAWIDGET_H
 
-#include <QWidget>
-#include <SimCenter_widgets/sctrmasterdatawidget.h>
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 class SCtrStdDataWidget: public SCtrMasterDataWidget
 {

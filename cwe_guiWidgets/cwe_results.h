@@ -35,15 +35,13 @@
 #ifndef CWE_RESULTS_H
 #define CWE_RESULTS_H
 
-#include <QWidget>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QFileDialog>
-#include <QPixmap>
-
 #include "cwe_super.h"
 
-class VWTinterfaceDriver;
+#include <QStandardItemModel>
+#include <QFileDialog>
+#include <QJsonObject>
+#include <QJsonArray>
+
 enum class CaseState;
 
 namespace Ui {
