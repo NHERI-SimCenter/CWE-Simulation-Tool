@@ -37,6 +37,8 @@
 
 #include "cfdtoken.h"
 
+#include "math.h"
+
 CFDglCanvas::CFDglCanvas(QWidget *parent, Qt::WindowFlags f) : QOpenGLWidget(parent,f)
 {
     currentDisplayError = "No Error";
