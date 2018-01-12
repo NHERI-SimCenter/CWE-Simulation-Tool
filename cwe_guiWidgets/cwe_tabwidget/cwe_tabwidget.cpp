@@ -123,7 +123,7 @@ void CWE_TabWidget::enactButtonSetting()
     {
         ui->pbtn_cancel->setDisabled(false);
     }
-    else if (currentMode == SimCenterButtonMode::RESET)
+    else if (currentMode == SimCenterButtonMode::RESET) //TODO: Should have reset and rollback for done tasks
     {
         ui->pbtn_rollback->setDisabled(false);
     }

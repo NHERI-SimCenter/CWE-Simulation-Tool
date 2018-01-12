@@ -55,6 +55,7 @@
 #include <QRectF>
 
 #include <QMatrix4x4>
+#include <math.h>
 
 class CFDtoken;
 
