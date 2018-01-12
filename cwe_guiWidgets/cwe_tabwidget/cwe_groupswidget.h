@@ -35,8 +35,11 @@
 #ifndef CWE_GROUPSWIDGET_H
 #define CWE_GROUPSWIDGET_H
 
-#include <QJsonObject>
 #include <QTabWidget>
+
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QScrollArea>
 
 class CWE_StageStatusTab;
 class CWE_ParamTab;

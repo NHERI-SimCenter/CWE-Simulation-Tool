@@ -34,8 +34,6 @@
 
 #include "cwe_stagestatustab.h"
 #include "ui_cwe_stagestatustab.h"
-//#include <QPainter>
-#include <QMouseEvent>
 
 CWE_StageStatusTab::CWE_StageStatusTab(QString theStageKey, QString stageName, QWidget *parent) :
     QFrame(parent),

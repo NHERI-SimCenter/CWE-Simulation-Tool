@@ -38,22 +38,13 @@
  */
 
 #include "cwe_parampanel.h"
-#include "cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h"
-#include "SimCenter_widgets/sctrmasterdatawidget.h"
-#include "vwtinterfacedriver.h"
-
-#include <QMessageBox>
-#include <QVBoxLayout>
-#include <QJsonArray>
-#include <QJsonObject>
 
 #include "SimCenter_widgets/sctrstddatawidget.h"
 #include "SimCenter_widgets/sctrbooldatawidget.h"
 #include "SimCenter_widgets/sctrfiledatawidget.h"
 #include "SimCenter_widgets/sctrchoicedatawidget.h"
 
-#include <QDebug>
-
+#include "cwe_globals.h"
 
 CWE_ParamPanel::CWE_ParamPanel(VWTinterfaceDriver * theDriver, QWidget *parent) :
     QFrame(parent)

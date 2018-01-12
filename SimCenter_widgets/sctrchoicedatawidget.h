@@ -35,10 +35,9 @@
 #ifndef SCTRCHOICEDATAWIDGET_H
 #define SCTRCHOICEDATAWIDGET_H
 
-#include <QWidget>
-
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
-#include "cwe_globals.h"
+
+#include <QStandardItemModel>
 
 class SCtrChoiceDataWidget: public SCtrMasterDataWidget
 {

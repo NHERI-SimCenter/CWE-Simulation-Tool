@@ -33,11 +33,6 @@
 // Contributors:
 
 #include "SimCenter_widgets/sctrstddatawidget.h"
-#include "SimCenter_widgets/sctrmasterdatawidget.h"
-
-#include <QHBoxLayout>
-
-#include "qdebug.h"
 
 SCtrStdDataWidget::SCtrStdDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)

@@ -36,6 +36,7 @@
 #include "ui_cwe_results.h"
 
 #include "vwtinterfacedriver.h"
+#include "cwe_globals.h"
 
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"

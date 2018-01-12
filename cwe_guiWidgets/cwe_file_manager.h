@@ -35,15 +35,11 @@
 #ifndef CWE_FILE_MANAGER_H
 #define CWE_FILE_MANAGER_H
 
-#include <QWidget>
-#include <QFileSystemModel>
-#include <QModelIndexList>
-#include <QFileInfo>
-
-#include "cwe_globals.h"
 #include "cwe_super.h"
 
-class VWTinterfaceDriver;
+#include <QFileSystemModel>
+#include <QMenu>
+
 class FileTreeNode;
 
 namespace Ui {

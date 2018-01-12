@@ -36,8 +36,6 @@
 #ifndef CWE_STATE_LABEL_H
 #define CWE_STATE_LABEL_H
 
-#include <QObject>
-#include <QWidget>
 #include <QLabel>
 
 enum class CaseState;

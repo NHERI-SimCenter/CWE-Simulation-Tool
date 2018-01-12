@@ -34,16 +34,7 @@
 
 #include "sctrchoicedatawidget.h"
 
-#include <QHBoxLayout>
-#include <QComboBox>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QList>
-#include <QStandardItemModel>
-
-#include <QDebug>
+#include "cwe_globals.h"
 
 SCtrChoiceDataWidget::SCtrChoiceDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)

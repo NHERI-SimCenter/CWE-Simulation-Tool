@@ -36,8 +36,6 @@
 #include "cwe_job_list.h"
 #include "ui_cwe_job_list.h"
 
-#include "../AgaveExplorer/remoteFileOps/remotejoblister.h"
-#include "../AgaveExplorer/remoteFileOps/joboperator.h"
 #include "vwtinterfacedriver.h"
 
 CWE_job_list::CWE_job_list(QWidget *parent) :

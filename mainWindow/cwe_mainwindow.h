@@ -36,25 +36,16 @@
 #define CWE_MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QStandardItem>
-#include <QStackedLayout>
-#include <QPushButton>
 
-#include "cwe_guiWidgets/cwe_job_list.h"
-#include "cwe_guiWidgets/cwe_file_manager.h"
-#include "cwe_guiWidgets/cwe_manage_simulation.h"
-#include "cwe_guiWidgets/cwe_help.h"
-
-#include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
-#include "vwtinterfacedriver.h"
-#include "../AgaveClientInterface/remotedatainterface.h"
+#include <QDesktopWidget>
 
 namespace Ui {
 class CWE_MainWindow;
 }
 
-class CFDcaseInstance;
 class cwe_state_label;
+class VWTinterfaceDriver;
+enum class CaseState;
 
 class CWE_MainWindow : public QMainWindow
 {

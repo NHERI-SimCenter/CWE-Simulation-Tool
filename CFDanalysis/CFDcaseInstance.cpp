@@ -33,11 +33,11 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 #include "CFDcaseInstance.h"
+
 #include "CFDanalysisType.h"
 
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
-#include "../AgaveExplorer/remoteFileOps/easyboollock.h"
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 
 #include "../AgaveClientInterface/filemetadata.h"
