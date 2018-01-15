@@ -32,26 +32,17 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-
 #ifndef CFDCASEINSTANCE_H
 #define CFDCASEINSTANCE_H
 
-#include <QString>
+#include <QObject>
+
 #include <QMap>
-#include <QStringList>
-
 #include <QJsonDocument>
-#include <QJsonArray>
 #include <QJsonObject>
-
-#include <QTimer>
-
-#include "cwe_globals.h"
 
 class FileTreeNode;
 class CFDanalysisType;
-class EasyBoolLock;
-class JobOperator;
 class RemoteJobData;
 enum class RequestState;
 

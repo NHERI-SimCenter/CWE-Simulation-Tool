@@ -35,33 +35,20 @@
 #ifndef CWE_TABWIDGET_H
 #define CWE_TABWIDGET_H
 
-#include <QWidget>
 #include <QFrame>
-#include <QMap>
-#include <QList>
-#include <QTabWidget>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
 
-#include <QLabel>
-#include <QDoubleSpinBox>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QComboBox>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QLayout>
+#include <QMap>
+#include <QJsonArray>
+#include <QDebug>
+
+#include "SimCenter_widgets/sctrstates.h"
 
 class CWE_StageStatusTab;
 class CWE_GroupsWidget;
 class CWE_Parameters;
-class SCtrMasterDataWidget;
-class VWTinterfaceDriver;
-//enum class SimCenterViewState;
-enum class StageState;
 
-#include "SimCenter_widgets/sctrstates.h"
+enum class SimCenterViewState;
+enum class StageState;
 
 namespace Ui {
 class CWE_TabWidget;

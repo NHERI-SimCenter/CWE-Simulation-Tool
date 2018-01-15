@@ -42,8 +42,7 @@
 #include "../AgaveExplorer/utilFuncs/singlelinedialog.h"
 
 #include "vwtinterfacedriver.h"
-
-#include <QFileDialog>
+#include "cwe_globals.h"
 
 CWE_file_manager::CWE_file_manager(QWidget *parent) :
     CWE_Super(parent),

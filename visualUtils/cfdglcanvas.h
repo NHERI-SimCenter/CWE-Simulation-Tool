@@ -36,27 +36,12 @@
 #ifndef CFDGLCANVAS_H
 #define CFDGLCANVAS_H
 
-#include "cfdglcanvas.h"
-
-#include <QObject>
-#include <QWidget>
 #include <QOpenGLWidget>
-#include <QBuffer>
-
 #include <QOpenGLFunctions>
-#include <QOpenGLBuffer>
-#include <QOpenGLShader>
-#include <QOpenGLTexture>
-#include <QOpenGLVertexArrayObject>
-
-#include <QPointF>
-#include <QPolygonF>
-#include <QList>
-#include <QRectF>
 
 #include <QMatrix4x4>
 
-class CFDtoken;
+#include <math.h>
 
 enum class CFDDisplayState
 {

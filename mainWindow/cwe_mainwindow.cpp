@@ -36,11 +36,11 @@
 #include "ui_cwe_mainwindow.h"
 
 #include "CFDanalysis/CFDcaseInstance.h"
-
 #include "cwe_guiWidgets/cwe_state_label.h"
 
-#include <QDesktopWidget>
-#include <QDebug>
+#include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
+#include "vwtinterfacedriver.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
 
 CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
     QMainWindow(parent),

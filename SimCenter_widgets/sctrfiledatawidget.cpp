@@ -37,7 +37,6 @@
 #include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "../AgaveClientInterface/filemetadata.h"
-#include "mainWindow/cwe_mainwindow.h"
 #include "vwtinterfacedriver.h"
 
 SCtrFileDataWidget::SCtrFileDataWidget(QWidget *parent):
