@@ -36,19 +36,15 @@
 #define SCTRDATAWIDGET_H
 
 #include <QFrame>
-#include <QLabel>
+
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QLabel>
 #include <QJsonObject>
-#include <QValidator>
-#include <QObject>
-#include <QDoubleSpinBox>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QGridLayout>
+#include <QBoxLayout>
 
-#include <SimCenter_widgets/sctrstates.h>
+#include "SimCenter_widgets/sctrstates.h"
 
 class FileTreeNode;
 

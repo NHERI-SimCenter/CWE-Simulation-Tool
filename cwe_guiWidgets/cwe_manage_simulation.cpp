@@ -35,8 +35,6 @@
 #include "cwe_manage_simulation.h"
 #include "ui_cwe_manage_simulation.h"
 
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
-
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 

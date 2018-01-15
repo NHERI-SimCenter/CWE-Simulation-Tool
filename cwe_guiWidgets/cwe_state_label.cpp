@@ -34,6 +34,7 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 #include "cwe_state_label.h"
+
 #include "CFDanalysis/CFDcaseInstance.h"
 
 cwe_state_label::cwe_state_label(QWidget *parent) : QLabel(parent)

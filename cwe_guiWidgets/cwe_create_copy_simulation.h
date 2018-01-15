@@ -35,16 +35,12 @@
 #ifndef CWE_CREATE_COPY_SIMULATION_H
 #define CWE_CREATE_COPY_SIMULATION_H
 
-#include <QFrame>
-#include <QMap>
-#include <QList>
-#include <QPushButton>
-#include <QRadioButton>
-
 #include "cwe_super.h"
 
-class FileOperator;
-class VWTinterfaceDriver;
+#include <QPushButton>
+#include <QRadioButton>
+#include <QJsonObject>
+
 class CFDanalysisType;
 
 struct CASE_TYPE_DATA {

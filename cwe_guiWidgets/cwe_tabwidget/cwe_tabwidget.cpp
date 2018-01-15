@@ -46,16 +46,9 @@
 #include "cwe_stagestatustab.h"
 #include "cwe_groupswidget.h"
 #include "CFDanalysis/CFDcaseInstance.h"
-#include <QString>
-#include <QMap>
-#include <QMapIterator>
 
 #include "cwe_guiWidgets/cwe_parameters.h"
-#include "cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h"
-
 #include "../CFDClientProgram/vwtinterfacedriver.h"
-
-#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     QFrame(parent),

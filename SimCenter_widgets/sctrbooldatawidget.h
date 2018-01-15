@@ -35,9 +35,6 @@
 #ifndef SCTRBOOLDATAWIDGET_H
 #define SCTRBOOLDATAWIDGET_H
 
-#include <QWidget>
-
-#include "cwe_globals.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 class SCtrBoolDataWidget: public SCtrMasterDataWidget

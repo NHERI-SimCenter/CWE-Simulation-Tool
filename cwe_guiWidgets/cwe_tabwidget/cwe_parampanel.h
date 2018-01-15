@@ -35,12 +35,13 @@
 #ifndef CWE_PARAMPANEL_H
 #define CWE_PARAMPANEL_H
 
-#include <QScrollArea>
-#include <QMap>
+#include <QFrame>
 #include <QJsonObject>
-#include <QLayout>
-#include <QDebug>
 #include <QJsonArray>
+#include <QMap>
+#include <QLayout>
+
+#include "SimCenter_widgets/sctrstates.h"
 
 class SCtrMasterDataWidget;
 class VWTinterfaceDriver;

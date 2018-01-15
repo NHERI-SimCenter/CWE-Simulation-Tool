@@ -35,14 +35,11 @@
 #ifndef CWE_MANAGE_SIMULATION_H
 #define CWE_MANAGE_SIMULATION_H
 
-#include <QWidget>
-#include <QStandardItemModel>
-
 #include "cwe_super.h"
 
+#include <QStandardItemModel>
+
 class FileTreeNode;
-class VWTinterfaceDriver;
-class CFDcaseInstance;
 enum class CaseState;
 enum class StageState;
 
