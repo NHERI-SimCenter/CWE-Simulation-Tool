@@ -34,9 +34,6 @@
 
 #include "sctrvalidators.h"
 
-#include <QValidator>
-
-
 SCtrNoValidator::SCtrNoValidator(QObject *parent):
     QValidator(parent)
 {

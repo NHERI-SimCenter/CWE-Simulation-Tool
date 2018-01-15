@@ -33,7 +33,6 @@
 // Contributors:
 
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
-#include "SimCenter_widgets/sctrvalidators.h"
 
 SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
     QFrame(parent)

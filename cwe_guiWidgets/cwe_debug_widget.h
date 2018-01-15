@@ -35,10 +35,6 @@
 #ifndef CWE_DEBUG_WIDGET_H
 #define CWE_DEBUG_WIDGET_H
 
-#include <QWidget>
-#include <QJsonObject>
-#include <QJsonArray>
-
 #include "cwe_super.h"
 
 namespace Ui {
