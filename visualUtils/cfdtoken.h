@@ -39,6 +39,8 @@
 #include <QByteArray>
 #include <QLinkedList>
 
+#include <cctype>
+
 //Note: this is not a complete parser,
 //but has the framework if anyone wants to complete it later
 
