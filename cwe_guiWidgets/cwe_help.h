@@ -35,8 +35,6 @@
 #ifndef CWE_HELP_H
 #define CWE_HELP_H
 
-#include <QWidget>
-
 #include "cwe_super.h"
 
 namespace Ui {

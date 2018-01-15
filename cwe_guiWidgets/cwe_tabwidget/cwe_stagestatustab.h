@@ -36,7 +36,8 @@
 #define CWE_STAGESTATUSTAB_H
 
 #include <QFrame>
-//#include <QAbstractButton>
+
+#include <QMouseEvent>
 
 class CWE_GroupsWidget;
 

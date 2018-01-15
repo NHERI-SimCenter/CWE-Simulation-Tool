@@ -35,30 +35,13 @@
 #ifndef CWE_PARAMETERS_H
 #define CWE_PARAMETERS_H
 
-#include <QWidget>
-#include <QMap>
-#include <QFile>
-//#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QDoubleSpinBox>
-#include <QSpinBox>
-#include <QCheckBox>
-#include <QComboBox>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QLineEdit>
-
 #include "cwe_super.h"
 
-class CFDcaseInstance;
-class CFDanalysisType;
-class VWTinterfaceDriver;
-class CWE_StageTab;
-class QJsonDocument;
+#include <QJsonObject>
+
+#include "SimCenter_widgets/sctrstates.h"
 
 enum class CaseState;
-
 enum class CaseCommand { ROLLBACK, RUN, CANCEL };
 
 namespace Ui {

@@ -36,9 +36,9 @@
 #define CWE_RESULT_POPUP_H
 
 #include <QWidget>
+
 #include <QLabel>
 #include <QPlainTextEdit>
-#include <QString>
 #include <QFileDialog>
 
 class VWTinterfaceDriver;

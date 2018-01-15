@@ -35,7 +35,6 @@
 
 #include "cwe_welcome_screen.h"
 #include "ui_cwe_welcome_screen.h"
-#include <QScreen>
 
 CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
     CWE_Super(parent),
