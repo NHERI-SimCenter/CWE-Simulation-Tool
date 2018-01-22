@@ -158,7 +158,8 @@ void CWE_file_manager::on_pb_download_clicked()
 
     if (!myDriver->getFileHandler()->operationIsPending())
     {
-        cwe_globals::displayPopup("Error: Unable to start file operation. Please try again.");
+        cwe_globals::displayPopup("Error: Unable to start file operation. Please check that the local file does not already exist and try again.");
+        return;
     }
     ui->pb_upload->setDisabled(true);
     ui->pb_download->setDisabled(true);
