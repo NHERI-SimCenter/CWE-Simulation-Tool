@@ -76,6 +76,24 @@ QString CFDanalysisType::getName()
     return obj["name"].toString();
 }
 
+QString CFDanalysisType::getStageApp(QString stageName)
+{
+    QJsonObject obj = myConfiguration.object();
+    QString tmpStr = obj["stages"].toObject().value(stageName).toObject().value("app").toString();
+    if (tmpStr.isEmpty())
+    {
+        return "cwe-serial";
+    }
+    return tmpStr;
+}
+
+QString CFDanalysisType::getExtraInput(QString stageName)
+{
+    QJsonObject obj = myConfiguration.object();
+    QString tmpStr = obj["stages"].toObject().value(stageName).toObject().value("app_input").toString();
+    return tmpStr;
+}
+
 QStringList CFDanalysisType::getStageNames()
 {
     QJsonObject obj = myConfiguration.object();
