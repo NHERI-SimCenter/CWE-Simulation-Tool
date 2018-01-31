@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -31,54 +31,23 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_MAINWINDOW_H
-#define CWE_MAINWINDOW_H
+#ifndef CWE_GLOBALS_H
+#define CWE_GLOBALS_H
 
-#include <QMainWindow>
+#include <QString>
+#include <QMessageBox>
 
-#include <QDesktopWidget>
-
-namespace Ui {
-class CWE_MainWindow;
-}
-
-class cwe_state_label;
-class VWTinterfaceDriver;
-enum class CaseState;
-
-class CWE_MainWindow : public QMainWindow
+class cwe_globals
 {
-    Q_OBJECT
-
 public:
-    explicit CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
-    ~CWE_MainWindow();
+    cwe_globals();
+    static void displayPopup(QString message, QString header);
+    static void displayPopup(QString message);
 
-    void runSetupSteps();
-
-    void setParameterConfig(QJsonDocument &obj);
-
-    void switchToParameterTab();
-    void switchToResultsTab();
-    void switchToCreateTab();
-    void switchToFilesTab();
-
-private slots:
-    void newCaseGiven();
-    void newCaseState(CaseState newState);
-
-    void menuExit();
-    void menuCopyInfo();
-
-private:
-    void changeParamsAndResultsEnabled(bool setting);
-    void changeTabEnabled(QWidget *theTab, bool newSetting);
-
-    Ui::CWE_MainWindow *ui;
-
-    VWTinterfaceDriver     *myDriver;
-    cwe_state_label        *stateLabel = NULL;
+    static bool isValidFolderName(QString folderName);
+    static bool isValidLocalFolder(QString folderName);
 };
 
-#endif // CWE_MAINWINDOW_H
+#endif // CWE_GLOBALS_H

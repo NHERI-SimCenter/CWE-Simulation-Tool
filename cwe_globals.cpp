@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -31,54 +31,45 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_MAINWINDOW_H
-#define CWE_MAINWINDOW_H
+#include "cwe_globals.h"
 
-#include <QMainWindow>
+cwe_globals::cwe_globals()
+{
 
-#include <QDesktopWidget>
-
-namespace Ui {
-class CWE_MainWindow;
 }
 
-class cwe_state_label;
-class VWTinterfaceDriver;
-enum class CaseState;
-
-class CWE_MainWindow : public QMainWindow
+void cwe_globals::displayPopup(QString message, QString header)
 {
-    Q_OBJECT
+    QMessageBox infoMessage;
+    infoMessage.setWindowTitle(header);
+    infoMessage.setText(message);
+    infoMessage.setIcon(QMessageBox::Information);
+    infoMessage.exec();
+}
 
-public:
-    explicit CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
-    ~CWE_MainWindow();
+void cwe_globals::displayPopup(QString message)
+{
+    displayPopup(message, "Error");
+}
 
-    void runSetupSteps();
+bool cwe_globals::isValidFolderName(QString folderName)
+{
+    if (folderName.isEmpty())
+    {
+        return false;
+    }
+    //TODO: PRS
+    return true;
+}
 
-    void setParameterConfig(QJsonDocument &obj);
-
-    void switchToParameterTab();
-    void switchToResultsTab();
-    void switchToCreateTab();
-    void switchToFilesTab();
-
-private slots:
-    void newCaseGiven();
-    void newCaseState(CaseState newState);
-
-    void menuExit();
-    void menuCopyInfo();
-
-private:
-    void changeParamsAndResultsEnabled(bool setting);
-    void changeTabEnabled(QWidget *theTab, bool newSetting);
-
-    Ui::CWE_MainWindow *ui;
-
-    VWTinterfaceDriver     *myDriver;
-    cwe_state_label        *stateLabel = NULL;
-};
-
-#endif // CWE_MAINWINDOW_H
+bool cwe_globals::isValidLocalFolder(QString folderName)
+{
+    if (folderName.isEmpty())
+    {
+        return false;
+    }
+    //TODO: PRS
+    return true;
+}

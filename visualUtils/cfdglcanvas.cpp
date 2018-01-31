@@ -63,8 +63,6 @@ void CFDglCanvas::initializeGL()
     //myBuffer.allocate()//Not sure how much to allocate
     */
 
-    displayBounds.setCoords(-5.0,-5.0,5.0,5.0);
-
     initializeOpenGLFunctions();
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -74,10 +72,10 @@ void CFDglCanvas::resizeGL(int w, int h)
 {
     myWidth = w;
     myHeight = h;
-    recomputeProjectionMat();
+    recomputeProjectionMat(w, h);
 }
 
-void CFDglCanvas::recomputeProjectionMat()
+void CFDglCanvas::recomputeProjectionMat(int w, int h)
 {
     if (myState == CFDDisplayState::TEST_BOX)
     {
@@ -87,10 +85,38 @@ void CFDglCanvas::recomputeProjectionMat()
 
     if ((myState == CFDDisplayState::MESH) || (myState == CFDDisplayState::FIELD))
     {
-        //TODO: Maintain proper aspect ratios
         projectionMat.setToIdentity();
-        projectionMat.ortho(displayBounds.left(),displayBounds.right(),
-                            displayBounds.bottom(),displayBounds.top(),-1.0f,1.0f);
+
+        double rawleft = displayBounds.left();
+        double rawright = displayBounds.right();
+        double rawbottom = displayBounds.bottom();
+        double rawtop = displayBounds.top();
+
+        double rawXCenter = ((rawright - rawleft) / 2.0) + rawleft;
+        double rawYCenter = ((rawtop - rawbottom) / 2.0) + rawbottom;
+
+        double imgRatio = ((rawright - rawleft)/(rawtop - rawbottom));
+        double viewRatio = ((double)w)/((double)h);
+        if (imgRatio == viewRatio)
+        {
+            projectionMat.ortho(rawleft, rawright, rawbottom, rawtop, -1.0f,1.0f);
+        }
+        else if (imgRatio > viewRatio)
+        {
+            double newFactor = imgRatio / viewRatio;
+            double newBottom = rawYCenter - (newFactor * (rawYCenter - rawbottom));
+            double newTop = rawYCenter + (newFactor * (rawtop - rawYCenter));
+
+            projectionMat.ortho(rawleft, rawright, newBottom, newTop, -1.0f,1.0f);
+        }
+        else
+        {
+            double newFactor = viewRatio / imgRatio;
+            double newLeft = rawXCenter - (newFactor * (rawXCenter - rawleft));
+            double newRight = rawXCenter + (newFactor * (rawright - rawXCenter));
+
+            projectionMat.ortho(newLeft, newRight, rawbottom, rawtop, -1.0f,1.0f);
+        }
     }
 }
 
@@ -148,17 +174,36 @@ void CFDglCanvas::paintGL()
 
     if (myState == CFDDisplayState::FIELD)
     {
-        //TODO: Finish the field display
-        /*
-        for (auto ownerItr = ownerList.cbegin(); ownerItr != ownerList.cend(); ownerItr++)
+        int indexVal = -1;
+        for (auto faceItr = faceList.cbegin(); faceItr != faceList.cend(); faceItr++)
         {
+            indexVal++;
             QList<int> aFace = (*faceItr);
             bool allZ0 = isAllZ0(aFace);
 
             if (allZ0)
             {
+                double rawData = dataList.at(ownerList.at(indexVal)); //TODO: Probably should check bounds
+
+                double dataVal = (rawData - lowDataVal) / dataSpan;
+
                 glBegin(GL_POLYGON);
-                glColor3f(0.0, 0.0, 0.0);
+                double redVal = 1.0;
+                double greenVal = 0.0;
+                double blueVal = 1.0;
+
+                if (dataVal > 0.5)
+                {
+                    blueVal = 0.3 + 0.7 * ((1.0 - dataVal) / 0.5);
+                    greenVal = 0.3 + 0.7 * ((1.0 - dataVal) / 0.5);
+                }
+                else
+                {
+                    redVal = 0.3 + 0.7 * (dataVal / 0.5);
+                    greenVal = 0.3 + 0.7 * (dataVal / 0.5);
+                }
+
+                glColor3f(redVal, greenVal, blueVal);
 
                 for (int ind = 0; ind < aFace.size(); ind++)
                 {
@@ -168,8 +213,6 @@ void CFDglCanvas::paintGL()
                 glEnd();
             }
         }
-        */
-
     }
 }
 
@@ -192,7 +235,7 @@ bool CFDglCanvas::isAllZ0(QList<int> aFace)
 void CFDglCanvas::setDisplayState(CFDDisplayState newState)
 {
     myState = newState;
-    recomputeProjectionMat();
+    //recomputeProjectionMat();
     this->update();
 }
 
@@ -323,10 +366,12 @@ bool CFDglCanvas::loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFi
         if (yVal < displayBounds.bottom()) displayBounds.setBottom(yVal);
     }
 
+    haveValidMeshData = true;
+
     return true;
 }
 
-bool CFDglCanvas::loadFieldData(QByteArray * rawDataFile)
+bool CFDglCanvas::loadFieldData(QByteArray * rawDataFile, QString valueType)
 {
     dataList.clear();
 
@@ -348,25 +393,79 @@ bool CFDglCanvas::loadFieldData(QByteArray * rawDataFile)
         return false;
     }
 
-    for (auto itr = dataElement->getChildList().cbegin();
-         itr != dataElement->getChildList().cend(); itr++)
+    if (valueType == "scalar")
     {
-        if ((*itr)->getType() == CFDtokenType::FLOAT)
+        for (auto itr = dataElement->getChildList().cbegin();
+             itr != dataElement->getChildList().cend(); itr++)
         {
-            dataList.append((*itr)->getFloatVal());
-        }
-        else
-        {
-            currentDisplayError = "Data list does not contain floats";
-            delete dataRoot;
-            return false;
+            if (((*itr)->getType() == CFDtokenType::FLOAT) ||
+                    ((*itr)->getType() == CFDtokenType::INT))
+            {
+                dataList.append((*itr)->getFloatVal());
+            }
+            else
+            {
+                currentDisplayError = "Data list does not contain floats";
+                delete dataRoot;
+                return false;
+            }
         }
     }
+    else if (valueType == "magnitude")
+    {
+        for (auto itr = dataElement->getChildList().cbegin();
+             itr != dataElement->getChildList().cend(); itr++)
+        {
+            if ((*itr)->getType() != CFDtokenType::DATA_ARRAY)
+            {
+                currentDisplayError = "Data list does not contain float arrays";
+                delete dataRoot;
+                return false;
+            }
+
+            double sum = 0.0;
+            for (auto itr2 = (*itr)->getChildList().cbegin();
+                 itr2 != (*itr)->getChildList().cend(); itr2++)
+            {
+                double rawVal = (*itr2)->getFloatVal();
+                sum += rawVal * rawVal;
+            }
+            dataList.append(sqrt(sum));
+        }
+    }
+    else
+    {
+        currentDisplayError = "Invalid data type";
+
+        delete dataRoot;
+        return false;
+    }
+
+    lowDataVal = INFINITY;
+    highDataVal = -INFINITY;
+
+    for (auto itr = dataList.cbegin(); itr != dataList.cend(); itr++)
+    {
+        if (*itr < lowDataVal)
+        {
+            lowDataVal = *itr;
+        }
+        if (*itr > highDataVal)
+        {
+            highDataVal = *itr;
+        }
+    }
+    dataSpan = highDataVal - lowDataVal;
 
     currentDisplayError = "No Error";
 
     delete dataRoot;
     return true;
+}
+
+bool CFDglCanvas::haveMeshData()
+{
+    return haveValidMeshData;
 }
 
 QString CFDglCanvas::getDisplayError()
@@ -383,79 +482,3 @@ void CFDglCanvas::clearMeshData()
     ownerList.clear();
     haveValidMeshData = false;
 }
-
-/*Saved code:
- * Need to convert to use file cache ability
-    setTestVisual();
-    FileTreeNode * currentNode = fileTreeData->getFileNodeFromPath(selectedFullPath);
-
-    FileTreeNode * constantFolder = currentNode->getChildNodeWithName("constant");
-    if (constantFolder == NULL) return;
-    FileTreeNode * polyMeshFolder = constantFolder->getChildNodeWithName("polyMesh");
-    if (polyMeshFolder == NULL) return;
-    FileTreeNode * pointsFile = polyMeshFolder->getChildNodeWithName("points");
-    FileTreeNode * facesFile = polyMeshFolder->getChildNodeWithName("faces");
-    FileTreeNode * ownerFile = polyMeshFolder->getChildNodeWithName("owner");
-    if (pointsFile == NULL) pointsFile = polyMeshFolder->getChildNodeWithName("points.gz");
-    if (facesFile == NULL) facesFile = polyMeshFolder->getChildNodeWithName("faces.gz");
-    if (ownerFile == NULL) ownerFile = polyMeshFolder->getChildNodeWithName("owner.gz");
-
-    if ((pointsFile == NULL) || (facesFile == NULL) || (ownerFile == NULL)) return;
-
-    RemoteDataReply * aReply = dataLink->downloadBuffer(pointsFile->getFileData().getFullPath());
-    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
-                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
-
-    aReply = dataLink->downloadBuffer(facesFile->getFileData().getFullPath());
-    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
-                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
-
-    aReply = dataLink->downloadBuffer(ownerFile->getFileData().getFullPath());
-    QObject::connect(aReply,SIGNAL(haveBufferDownloadReply(RequestState,QByteArray*)),
-                     this,SLOT(gotNewRawFile(RequestState,QByteArray*)));
-}
-
-void ExplorerWindow::gotNewRawFile(RequestState authReply, QByteArray * fileBuffer)
-{
-    if (authReply != RequestState::GOOD) return;
-
-    RemoteDataReply * mySender = (RemoteDataReply *) QObject::sender();
-    if (mySender == NULL) return;
-    QString lookedForFile = mySender->getTaskParamList()->value("remoteName");
-    if (lookedForFile.isEmpty()) return;
-
-    QByteArray * realContents;
-
-    if (lookedForFile.endsWith(".gz"))
-    {
-        lookedForFile.chop(3);
-        DeCompressWrapper decompresser(fileBuffer);
-        realContents = decompresser.getDecompressedFile();
-    }
-    else
-    {
-        realContents = new QByteArray(*fileBuffer);
-    }
-    if (lookedForFile.endsWith("points"))
-    {
-        conditionalPurge(&pointData);
-        pointData = realContents;
-    }
-    if (lookedForFile.endsWith("faces"))
-    {
-        conditionalPurge(&faceData);
-        faceData = realContents;
-    }
-    if (lookedForFile.endsWith("owner"))
-    {
-        conditionalPurge(&ownerData);
-        ownerData = realContents;
-    }
-    if ((pointData != NULL) && (faceData != NULL) && (ownerData != NULL))
-    {
-        if(ui->openGLcfdWidget->loadMeshData(pointData, faceData, ownerData))
-        {
-            ui->openGLcfdWidget->setDisplayState(CFDDisplayState::MESH);
-        }
-    }
-    */

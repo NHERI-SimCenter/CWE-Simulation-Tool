@@ -86,9 +86,9 @@
         <string>Page text space</string>
        </attribute>
       </widget>
-      <widget class="CWE_landing" name="tab_landing_page">
+      <widget class="CWE_job_list" name="tab_jobs_page">
        <attribute name="title">
-        <string>Dashboard</string>
+        <string>Running Jobs</string>
        </attribute>
       </widget>
       <widget class="CWE_Create_Copy_Simulation" name="tab_create_new">
@@ -146,7 +146,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -176,6 +176,7 @@
     </property>
     <addaction name="actionAbout_CWE"/>
     <addaction name="actionHelp"/>
+    <addaction name="actionCopyright_and_License"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuWindow"/>
@@ -251,6 +252,11 @@
     <string>Manage and &amp;Download Files</string>
    </property>
   </action>
+  <action name="actionCopyright_and_License">
+   <property name="text">
+    <string>Copyright and License</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -266,9 +272,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_landing</class>
+   <class>CWE_job_list</class>
    <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_landing.h</header>
+   <header>cwe_guiWidgets/cwe_job_list.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -321,5 +327,26 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>action_Quit</sender>
+   <signal>triggered()</signal>
+   <receiver>CWE_MainWindow</receiver>
+   <slot>menuExit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>menuExit()</slot>
+  <slot>menuCopyInfo()</slot>
+ </slots>
 </ui>

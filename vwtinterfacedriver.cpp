@@ -159,7 +159,7 @@ QString VWTinterfaceDriver::getBanner()
 
 QString VWTinterfaceDriver::getVersion()
 {
-    return "Version: 0.1.1";
+    return "Version: 0.1.3";
 }
 
 QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()
@@ -192,7 +192,6 @@ void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
     {
         QObject::connect(newCase, SIGNAL(detachCase()),
                          this, SLOT(currentCaseInvalidated()));
-        mainWindow->attachCaseSignals(newCase);
     }
     emit haveNewCase();
 }
@@ -235,14 +234,6 @@ void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appL
     {
         fatalInterfaceError("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
     }
-}
-
-void VWTinterfaceDriver::displayMessagePopup(QString infoText)
-{
-    QMessageBox infoMessage;
-    infoMessage.setText(infoText);
-    infoMessage.setIcon(QMessageBox::Information);
-    infoMessage.exec();
 }
 
 bool VWTinterfaceDriver::inOfflineMode()

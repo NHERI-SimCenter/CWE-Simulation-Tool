@@ -38,42 +38,10 @@
 
 #include "../AgaveExplorer/utilFuncs/agavesetupdriver.h"
 
-#include <QCoreApplication>
-
-#include <QtGlobal>
-#include <QObject>
-#include <QDialog>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QTreeView>
-#include <QStackedWidget>
 #include <QWindow>
 #include <QDir>
-#include <QString>
-#include <QStringList>
-#include <QDebug>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QPixmap>
-#include <QRadioButton>
-#include <QLabel>
-#include <QIcon>
-#include <QThread>
 
-enum class VWTerrorType: unsigned int;
-enum class RequestState;
-enum class CaseState;
-
-class RemoteDataInterface;
-
-class AuthForm;
-
-class DebugPanelWindow;
 class CWE_MainWindow;
-class JobOperator;
-class FileOperator;
 class CFDanalysisType;
 class CFDcaseInstance;
 
@@ -95,8 +63,6 @@ public:
     CFDcaseInstance * getCurrentCase();
     void setCurrentCase(CFDcaseInstance * newCase);
     CWE_MainWindow * getMainWindow();
-
-    void displayMessagePopup(QString infoText);
 
     bool inOfflineMode();
 

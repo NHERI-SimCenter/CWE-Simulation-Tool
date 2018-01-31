@@ -36,27 +36,12 @@
 #ifndef CFDGLCANVAS_H
 #define CFDGLCANVAS_H
 
-#include "cfdglcanvas.h"
-
-#include <QObject>
-#include <QWidget>
 #include <QOpenGLWidget>
-#include <QBuffer>
-
 #include <QOpenGLFunctions>
-#include <QOpenGLBuffer>
-#include <QOpenGLShader>
-#include <QOpenGLTexture>
-#include <QOpenGLVertexArrayObject>
-
-#include <QPointF>
-#include <QPolygonF>
-#include <QList>
-#include <QRectF>
 
 #include <QMatrix4x4>
 
-class CFDtoken;
+#include <math.h>
 
 enum class CFDDisplayState
 {
@@ -72,7 +57,8 @@ public:
     ~CFDglCanvas();
 
     bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
-    bool loadFieldData(QByteArray * rawDataFile);
+    bool loadFieldData(QByteArray * rawDataFile, QString valueType);
+    bool haveMeshData();
     QString getDisplayError();
 
     void setDisplayState(CFDDisplayState newState);
@@ -90,7 +76,7 @@ private:
     //Note: this should probably be static const
     double PRECISION = 0.000000001;
 
-    void recomputeProjectionMat();
+    void recomputeProjectionMat(int w, int h);
     void clearMeshData();
 
     bool isAllZ0(QList<int> aFace);
@@ -108,6 +94,9 @@ private:
     QList<double> dataList;
 
     QRectF displayBounds;
+    double lowDataVal;
+    double highDataVal;
+    double dataSpan;
 
     //QOpenGLVertexArrayObject myVertexArray;
     //QOpenGLBuffer myBuffer;

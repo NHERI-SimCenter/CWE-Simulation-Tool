@@ -1,3 +1,37 @@
+/*********************************************************************************
+**
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
+**
+** Redistribution and use in source and binary forms, with or without modification,
+** are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice, this
+** list of conditions and the following disclaimer.
+**
+** 2. Redistributions in binary form must reproduce the above copyright notice, this
+** list of conditions and the following disclaimer in the documentation and/or other
+** materials provided with the distribution.
+**
+** 3. Neither the name of the copyright holder nor the names of its contributors may
+** be used to endorse or promote products derived from this software without specific
+** prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+** EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+** SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+** INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+** TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+** IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+** SUCH DAMAGE.
+**
+***********************************************************************************/
+
+// Contributors:
+
 /*
  * the CWE_TabWidget is an extended version of a tab widget where
  * Tabs display a label AND a state
@@ -14,9 +48,6 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "cwe_guiWidgets/cwe_parameters.h"
-
-#include "qdebug.h"
-
 #include "../CFDClientProgram/vwtinterfacedriver.h"
 
 CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
@@ -25,16 +56,14 @@ CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //groupWidgetList = new QMap<QString, CWE_GroupsWidget *>();
-    //stageTabList    = new QMap<QString, CWE_StageStatusTab *>();
-
-    this->setButtonMode(CWE_BTN_NONE);
-    this->setViewState(SimCenterViewState::visible);
+    stageTabList = new QMap<QString, CWE_StageStatusTab *>();
+    enactButtonSetting();
 }
 
 CWE_TabWidget::~CWE_TabWidget()
 {
     delete ui;
+    delete stageTabList;
 }
 
 void CWE_TabWidget::setController(CWE_Parameters * newController)
@@ -42,267 +71,190 @@ void CWE_TabWidget::setController(CWE_Parameters * newController)
     myController = newController;
 }
 
-void CWE_TabWidget::setViewState(SimCenterViewState state)
+void CWE_TabWidget::setTabStage(StageState newState, QString stageName)
 {
-    switch (state)
+    CWE_StageStatusTab * theTab = stageTabList->value(stageName);
+    if (theTab == NULL) return;
+
+    theTab->setStatus(getStateText(newState));
+}
+
+void CWE_TabWidget::setButtonMode(SimCenterButtonMode mode)
+{
+    QList<QString> stageNames = m_viewState.keys();
+
+    foreach (QString stageName, stageNames)
     {
-    case SimCenterViewState::editable:
-        m_viewState = SimCenterViewState::editable;
-        break;
-    case SimCenterViewState::hidden:
-        m_viewState = SimCenterViewState::hidden;
-        break;
-    case SimCenterViewState::visible:
-    default:
-        m_viewState = SimCenterViewState::visible;
+        setButtonMode(mode, stageName);
     }
 }
 
-SimCenterViewState CWE_TabWidget::viewState()
+void CWE_TabWidget::setButtonMode(SimCenterButtonMode mode, QString stageName)
 {
-    return m_viewState;
+    buttonModeList.insert(stageName,mode);
+    enactButtonSetting();
+}
+
+void CWE_TabWidget::enactButtonSetting()
+{
+    QString currentStage = getCurrentSelectedStage();
+    SimCenterButtonMode currentMode = SimCenterButtonMode_NONE;
+    if (currentStage != "UNKNOWN")
+    {
+        currentMode = buttonModeList.value(currentStage, SimCenterButtonMode_NONE);
+    }
+    ui->pbtn_run->setDisabled(true);
+    ui->pbtn_cancel->setDisabled(true);
+    ui->pbtn_results->setDisabled(true);
+    ui->pbtn_rollback->setDisabled(true);
+
+    if (currentMode & SimCenterButtonMode_RUN)     { ui->pbtn_run->setEnabled(true);     }
+    if (currentMode & SimCenterButtonMode_CANCEL)  { ui->pbtn_cancel->setEnabled(true);  }
+    if (currentMode & SimCenterButtonMode_RESET)   { ui->pbtn_rollback->setEnabled(true);}
+    if (currentMode & SimCenterButtonMode_RESULTS) { ui->pbtn_results->setEnabled(true); }
+}
+
+void CWE_TabWidget::setViewState(SimCenterViewState state)
+{
+    QList<QString> stageNames = m_viewState.keys();
+
+    foreach (QString stageName, stageNames)
+    {
+        setViewState(state, stageName);
+    }
+}
+
+void CWE_TabWidget::setViewState(SimCenterViewState state, QString stageName)
+{
+    m_viewState.insert(stageName, state);
+    stageTabList->value(stageName)->getGroupsWidget()->setViewState(state);
+}
+
+SimCenterViewState CWE_TabWidget::viewState(QString stageName)
+{
+    return m_viewState.value(stageName);
 }
 
 void CWE_TabWidget::resetView()
 {
-    //TODO: clear underlying widgets
-}
-int CWE_TabWidget::addVarTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
-{
-    /*
-    int index = addVarTab(key, label);
-    if (index >= 0)
+    QMapIterator<QString, CWE_StageStatusTab *> iter(*stageTabList);
+
+    while (iter.hasNext())
     {
-        addVarsToTab(key, label, varList, varsInfo, setVars);
+        iter.next();
+        /* remove the groupWidgets from ui->stagePanels */
+        ui->stagePanels->removeWidget((iter.value())->groupWidget());
+        /* delete the groupWidget */
+        delete (iter.value())->groupWidget();
+        /* delete the StageStatusTab */
+        delete iter.value();
     }
-    return index;
-    */
-    return -1;
+    /* clear the stageTabList */
+    stageTabList->clear();
+    m_viewState.clear();
+    buttonModeList.clear();
+
+    enactButtonSetting();
 }
 
-void CWE_TabWidget::addVarsData(QJsonObject JSONgroup, QJsonObject JSONvars)
+
+void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 {
+    QVBoxLayout *tablayout = (QVBoxLayout *)ui->tabsBar->layout();
+    delete tablayout;
+    tablayout = new QVBoxLayout();
+    tablayout->setMargin(0);
+    tablayout->setSpacing(0);
+    ui->tabsBar->setLayout(tablayout);
 
-}
+    stageTabList->clear();
 
-/* *** moved to SCtrDataWidget ***
+    QJsonArray  sequence = obj.value(QString("sequence")).toArray();
+    QJsonObject stages   = obj.value(QString("stages")).toObject();
 
-QWidget * CWE_TabWidget::addStd(QJsonObject JSONvar, QWidget *parent, QString *setVal)
-{
-    QVariant defaultOption = JSONvar["default"].toVariant();
-    QString unit           = JSONvar["unit"].toString();
-    // QJson fails to convert "1" to int, thus: QString::toInt( QJson::toString() )
-    int precision          = JSONvar["precision"].toString().toInt();
+    QMap<QString, StageState> stageStates;
+    stageStates = myController->getDriver()->getCurrentCase()->getStageStates();
 
-    QLabel *theName = new QLabel(parent);
-    QString displayname = JSONvar["displayname"].toString();
-    theName->setText(displayname);
-    theName->setMinimumHeight(16);
-    //theName->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding);
-
-    QWidget * theValue;
-
-    if (precision > 0) {
-        theValue = new QDoubleSpinBox(parent);
-        ((QDoubleSpinBox *)theValue)->setValue(defaultOption.toDouble());
-        ((QDoubleSpinBox *)theValue)->setDecimals(precision);
-    }
-    else {
-        theValue = new QSpinBox(parent);
-        ((QSpinBox *)theValue)->setValue(defaultOption.toInt());
-    }
-
-    QLabel *theUnit = new QLabel(parent);
-    theUnit->setText(unit);
-
-    QGridLayout *layout = (QGridLayout*)(parent->layout());
-    int row = layout->rowCount();
-    layout->addWidget(theName, row,0);
-    layout->addWidget(theValue,row,1);
-    layout->addWidget(theUnit, row,2);
-
-    return theValue;
-}
-
-QWidget * CWE_TabWidget::addBool(QJsonObject JSONvar, QWidget *parent, QString * setVal)
-{
-    QLabel *theName = new QLabel(parent);
-    QString displayname = JSONvar["displayname"].toString();
-    theName->setText(displayname);
-
-    QCheckBox *theBox = new QCheckBox(parent);
-    if (setVal == NULL)
+    foreach (QJsonValue theStage, sequence)
     {
-        theBox->setChecked(JSONvar["default"].toBool());
+        QString stageName = theStage.toString();
+        QString stageLabel = stages.value(stageName).toObject().value("name").toString();
+        stageLabel += "\nParameters";
+
+        /* create a CWE_StageStatusTab */
+        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageName, stageLabel, this);
+
+        tab->setStatus(getStateText(stageStates.value(stageName)));
+
+        tablayout->addWidget(tab);
+        stageTabList->insert(stageName, tab);
+        //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
+
+        /* create a CWE_GroupsWidget */
+        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(myController->getDriver(), this);
+        ui->stagePanels->addWidget(groupWidget);
+
+        /* link tab and groupWidget */
+        tab->linkWidget(groupWidget);
+        groupWidget->linkWidget(tab);
+
+        /* set the parameter information for the CWE_GroupsWidget */
+        groupWidget->setParameterConfig(stageName, obj);
+
+        /* connect signals and slots */
+        QObject::connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
+        QObject::connect(tab,SIGNAL(btn_activated(CWE_StageStatusTab*)),this,SLOT(on_tabActivated(CWE_StageStatusTab *)));
     }
-    else
+
+    tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+    initQuickParameterPtr();
+
+    QString firstTabKey = sequence[0].toString();
+    if (firstTabKey != "") { stageTabList->value(firstTabKey)->setActive(); }
+
+    this->setButtonMode(SimCenterButtonMode_NONE);
+    this->setViewState(SimCenterViewState::hidden);
+}
+
+void CWE_TabWidget::updateParameterValues(QMap<QString, QString> newValues)
+{
+    foreach (QString stageName, stageTabList->keys())
     {
-        theBox->setChecked(setVal);
+        stageTabList->value(stageName)->getGroupsWidget()->updateParameterValues(newValues);
     }
-
-    QGridLayout *layout = (QGridLayout*)(parent->layout());
-    int row = layout->rowCount();
-    layout->addWidget(theName,row,0);
-    layout->addWidget(theBox, row,1);
-
-    return theBox;
 }
 
-QWidget * CWE_TabWidget::addFile(QJsonObject JSONvar, QWidget *parent, QString * setVal)
+void CWE_TabWidget::initQuickParameterPtr()
 {
-    QLabel *theName = new QLabel(parent);
-    QString displayname = JSONvar["displayname"].toString();
-    theName->setText(displayname);
-
-    QLineEdit *theFileName = new QLineEdit(parent);
-    theFileName->setText("unknown file name");
-
-    QGridLayout *layout = (QGridLayout*)(parent->layout());
-    int row = layout->rowCount();
-    layout->addWidget(theName,row,0);
-    layout->addWidget(theFileName,row,1,1,2);
-
-    return theFileName;
-}
-
-QWidget * CWE_TabWidget::addChoice(QJsonObject JSONvar, QWidget *parent, QString * setVal)
-{
-    QLabel *theName = new QLabel(parent);
-    QString displayname = JSONvar["displayname"].toString();
-    theName->setText(displayname);
-
-    QComboBox *theSelection = new QComboBox(parent);
-    QJsonObject combo_options = JSONvar["options"].toObject();
-
-    QStandardItemModel *theModel = new QStandardItemModel();
-    foreach (const QString &theKey, combo_options.keys())
+    foreach (QString stageName, stageTabList->keys())
     {
-        //QStandardItem *itm = new QStandardItem(theKey);
-        QStandardItem *itm = new QStandardItem(combo_options[theKey].toString());
-        theModel->appendRow(itm);
+        stageTabList->value(stageName)->getGroupsWidget()->initQuickParameterPtr();
     }
-    theSelection->setModel(theModel);
-    if ((setVal == NULL) || (!combo_options.contains(*setVal)))
-    {
-        theSelection->setCurrentText(combo_options[JSONvar["default"].toString()].toString());
-    }
-    else
-    {
-        theSelection->setCurrentText(combo_options[*setVal].toString());
-    }
-
-    QGridLayout *layout = (QGridLayout*)(parent->layout());
-    int row = layout->rowCount();
-    layout->addWidget(theName, row,0);
-    layout->addWidget(theSelection,row,1,1,2);
-
-    return theSelection;
 }
-
-
-QWidget * CWE_TabWidget::addVector3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
-{
-    return NULL;
-}
-
-QWidget * CWE_TabWidget::addVector2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
-{
-    return NULL;
-}
-
-QWidget * CWE_TabWidget::addTensor3D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
-{
-    return NULL;
-}
-
-QWidget * CWE_TabWidget::addTensor2D(QJsonObject JSONvar, QWidget *parent, QString *setVal )
-{
-    return NULL;
-}
-
-QWidget * CWE_TabWidget::addUnknown(QJsonObject JSONvar, QWidget *parent, QString *setVal)
-{
-    QLabel *theName = new QLabel(parent);
-    QString displayname = JSONvar["displayname"].toString();
-    theName->setText(displayname);
-
-    QGridLayout *layout = (QGridLayout*)(parent->layout());
-    int row = layout->rowCount();
-    layout->addWidget(theName,row,0);
-
-    return NULL;
-}
-
-void CWE_TabWidget::addType(const QString &varName, const QString &type, QJsonObject JSONvar, QWidget *parent, QString *setVal)
-{
-    QWidget *widget;
-
-    widget = NULL;
-
-    if      (type == "std")      { widget = this->addStd(JSONvar, parent, setVal); }
-    else if (type == "bool")     { widget = this->addBool(JSONvar, parent, setVal); }
-    else if (type == "file")     { widget = this->addFile(JSONvar, parent, setVal); }
-    else if (type == "choose")   { widget = this->addChoice(JSONvar, parent, setVal); }
-    else if (type == "vector2D") { widget = this->addVector2D(JSONvar, parent, setVal); }
-    else if (type == "tensor2D") { widget = this->addTensor2D(JSONvar, parent, setVal); }
-    else if (type == "vector3D") { widget = this->addVector3D(JSONvar, parent, setVal); }
-    else if (type == "tensor3D") { widget = this->addTensor3D(JSONvar, parent, setVal); }
-    else                         { widget = this->addUnknown(JSONvar, parent, setVal); }
-
-    // store information for reset operations, data collection, and validation
-    InputDataType *varData = new InputDataType;
-    varData->name        = varName;
-    varData->displayName = JSONvar["displayname"].toString();
-    varData->type        = type;
-    varData->defValue    = JSONvar["default"].toString();
-    varData->widget      = widget;
-    if (type == "choose") {
-        varData->options = new QJsonObject(JSONvar["options"].toObject());
-    }
-    else {
-        varData->options = NULL;
-    }
-    variableWidgets->insert(varName, varData);
-}
-
-*/
 
 void CWE_TabWidget::on_pbtn_run_clicked()
 {
-    myController->performCaseCommand(currentSelectedStage, CaseCommand::RUN);
+    myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::RUN);
 }
 
 QMap<QString, QString> CWE_TabWidget::collectParamData()
 {
-    /*
-     * TODO:
-     * -- loop through groupsWidgetList and collect information fromCWE_GroupsWidgets
-     */
-
-    QString val;
     QMap<QString, QString> currentParameters;
 
-    /*
-    // collect parameter values from all groupWidgets in groupWidgetList
-    foreach (const CWE_GroupsWidget *itm, groupWidgetList->values())
+    foreach (QString stageName, stageTabList->keys())
     {
-        QMap<QString, QString> groupParams = itm->collectParamData();
-
-        // add to output
-        foreach (QString varName, groupParams.keys())
-        {
-            val = groupParams.value(varName);
-            currentParameters.insert(varName, val);
-        }
+        stageTabList->value(stageName)->getGroupsWidget()->collectParamData(currentParameters);
     }
-    */
+
+    qDebug() << currentParameters;
 
     return currentParameters;
 }
 
 void CWE_TabWidget::on_pbtn_cancel_clicked()
 {
-    myController->performCaseCommand(currentSelectedStage, CaseCommand::CANCEL);
+    myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::CANCEL);
 }
 
 void CWE_TabWidget::on_pbtn_results_clicked()
@@ -312,51 +264,47 @@ void CWE_TabWidget::on_pbtn_results_clicked()
 
 void CWE_TabWidget::on_pbtn_rollback_clicked()
 {
-    myController->performCaseCommand(currentSelectedStage, CaseCommand::ROLLBACK);
+    myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::ROLLBACK);
 }
 
 QString CWE_TabWidget::getStateText(StageState theState)
 {
-    if (theState == StageState::ERROR)
-        return "*** ERROR ***";
-    if (theState == StageState::FINISHED)
-        return "Task Finished";
-    if (theState == StageState::LOADING)
-        return "Loading Data ...";
-    if (theState == StageState::RUNNING)
-        return "Task Running";
-    if (theState == StageState::UNRUN)
-        return "Not Yet Run";
-    return "*** TOTAL ERROR ***";
+    QString msg = "*** TOTAL ERROR ***";
+    if (theState == StageState::ERROR)         { msg = "*** ERROR ***"; }
+    else if (theState == StageState::FINISHED) { msg = "Task Finished"; }
+    else if (theState == StageState::LOADING)  { msg = "Loading Data ..."; }
+    else if (theState == StageState::RUNNING)  { msg = "Task Running"; }
+    else if (theState == StageState::UNRUN)    { msg = "Not Yet Run"; }
+    return msg;
 }
 
-void CWE_TabWidget::setButtonMode(uint mode)
+QString CWE_TabWidget::getCurrentSelectedStage()
 {
-    bool btnState;
+    foreach (CWE_StageStatusTab *tab, *stageTabList)
+    {
+        if (tab->tabIsActive())
+        {
+            return tab->getStageKey();
+        }
+    }
 
-    btnState = (mode & CWE_BTN_RUN)?true:false;
-    ui->pbtn_run->setEnabled(btnState);
-
-    btnState = (mode & CWE_BTN_CANCEL)?true:false;
-    ui->pbtn_cancel->setEnabled(btnState);
-
-    btnState = (mode & CWE_BTN_RESULTS)?true:false;
-    ui->pbtn_results->setEnabled(btnState);
-
-    btnState = (mode & CWE_BTN_ROLLBACK)?true:false;
-    ui->pbtn_rollback->setEnabled(btnState);
+    return "UNKNOWN";
 }
 
-void CWE_TabWidget::addStageTab(QString key, QJsonObject &obj)
-{
-    /*
-     * create a stage tab for a stage identified by key
-    */
+/* *** SLOTS *** */
 
-    CWE_GroupsWidget *newPanel = new CWE_GroupsWidget(ui->stagePanels);
-    CWE_StageStatusTab *newTab = new CWE_StageStatusTab(key, this);
-    newPanel->setCorrespondingTab(newTab);
-    newTab->setCorrespondingPanel(newPanel);
-    ui->tabsBar->layout()->addWidget(newTab);
-    ui->stagePanels->addWidget(newPanel);
+void CWE_TabWidget::on_groupTabSelected(CWE_GroupsWidget *groupWidget)
+{
+    /* activate the proper panel */
+    ui->stagePanels->setCurrentWidget(groupWidget);
+}
+
+void CWE_TabWidget::on_tabActivated(CWE_StageStatusTab *activeTabWidget)
+{
+    foreach (QString key, stageTabList->keys())
+    {
+        stageTabList->value(key)->setInActive();
+    }
+    activeTabWidget->setActive();
+    enactButtonSetting();
 }

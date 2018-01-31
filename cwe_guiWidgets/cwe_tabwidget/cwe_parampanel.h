@@ -1,12 +1,51 @@
+/*********************************************************************************
+**
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
+**
+** Redistribution and use in source and binary forms, with or without modification,
+** are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice, this
+** list of conditions and the following disclaimer.
+**
+** 2. Redistributions in binary form must reproduce the above copyright notice, this
+** list of conditions and the following disclaimer in the documentation and/or other
+** materials provided with the distribution.
+**
+** 3. Neither the name of the copyright holder nor the names of its contributors may
+** be used to endorse or promote products derived from this software without specific
+** prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+** EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+** SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+** INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+** TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+** IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+** SUCH DAMAGE.
+**
+***********************************************************************************/
+
+// Contributors:
+
 #ifndef CWE_PARAMPANEL_H
 #define CWE_PARAMPANEL_H
 
-#include <QScrollArea>
-#include <QMap>
+#include <QFrame>
 #include <QJsonObject>
-#include <SimCenter_widgets/sctrstates.h>
+#include <QJsonArray>
+#include <QMap>
+#include <QLayout>
 
-class SCtr_MasterDataWidget;
+#include "SimCenter_widgets/sctrstates.h"
+
+class SCtrMasterDataWidget;
+class VWTinterfaceDriver;
+enum class SimCenterViewState;
 
 namespace Ui {
 class CWE_ParamPanel;
@@ -17,18 +56,21 @@ class CWE_ParamPanel : public QFrame
     Q_OBJECT
 
 public:
-    explicit CWE_ParamPanel(QWidget *parent = 0);
+    explicit CWE_ParamPanel(VWTinterfaceDriver *theDriver, QWidget *parent = 0);
     ~CWE_ParamPanel();
 
     void setViewState(SimCenterViewState);
     SimCenterViewState getViewState();
     void setData(QJsonObject &);
-    bool addVariable(QString varName, QJsonObject JSONvar, const QString &key, const QString &label, QString * setVal);
+    void addVariable(QString varName, QJsonObject &theVariable);
+    void addParameterConfig(QJsonArray &groupVars, QJsonObject &allVars);
+    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
 
 private:
     SimCenterViewState m_viewState;
     QJsonObject m_obj;
-    QMap<QString, SCtr_MasterDataWidget *> *variableWidgets;
+    QMap<QString, SCtrMasterDataWidget *> *variableWidgets;
+    VWTinterfaceDriver * myDriver;
 };
 
 #endif // CWE_PARAMPANEL_H

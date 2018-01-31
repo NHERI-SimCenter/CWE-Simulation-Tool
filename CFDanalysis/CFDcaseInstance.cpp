@@ -33,11 +33,11 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 #include "CFDcaseInstance.h"
+
 #include "CFDanalysisType.h"
 
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
-#include "../AgaveExplorer/remoteFileOps/easyboollock.h"
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 
 #include "../AgaveClientInterface/filemetadata.h"
@@ -45,6 +45,7 @@
 #include "../AgaveClientInterface/remotejobdata.h"
 
 #include "vwtinterfacedriver.h"
+#include "cwe_globals.h"
 
 CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver):
     QObject((QObject *) mainDriver)
@@ -76,6 +77,11 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
                      this, SLOT(agaveTaskDone(RequestState)));
+
+    if (theDriver->inOfflineMode())
+    {
+        myState = CaseState::OFFLINE;
+    }
 }
 
 CFDcaseInstance::CFDcaseInstance(VWTinterfaceDriver *mainDriver):
@@ -89,6 +95,11 @@ CFDcaseInstance::CFDcaseInstance(VWTinterfaceDriver *mainDriver):
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
                      this, SLOT(agaveTaskDone(RequestState)));
+
+    if (theDriver->inOfflineMode())
+    {
+        myState = CaseState::OFFLINE;
+    }
 }
 
 bool CFDcaseInstance::isDefunct()
@@ -210,8 +221,6 @@ QMap<QString, QString> CFDcaseInstance::getCurrentParams()
 
 QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
 {
-    QMap<QString, RemoteJobData> jobs = theDriver->getJobHandler()->getRunningJobs();
-
     QMap<QString, RemoteJobData * > ret;
 
     if (caseFolder == NULL)
@@ -219,8 +228,11 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
         return ret;
     }
 
+    QMap<QString, RemoteJobData> jobs = theDriver->getJobHandler()->getRunningJobs();
+
     for (auto itr = jobs.begin(); itr != jobs.end(); itr++)
     {
+        QString jobID = (*itr).getID();
         QString appName = (*itr).getApp();
         if (!appName.contains("cwe-mesh")
                 && !appName.contains("cwe-sim")
@@ -231,7 +243,7 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
 
         if (!(*itr).detailsLoaded())
         {
-            ret.insert(appName, &(*itr));
+            ret.insert(jobID, &(*itr));
             theDriver->getJobHandler()->requestJobDetails(&(*itr));
             continue;
         }
@@ -240,7 +252,7 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
 
         if (caseFolder->fileNameMatches(jobDir))
         {
-            ret.insert(appName, &(*itr));
+            ret.insert(jobID, &(*itr));
         }
     }
     return ret;
@@ -285,7 +297,7 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
 
     if (relevantJobs.size() == 1)
     {
-        QString appName = relevantJobs.keys().at(0);
+        QString appName = relevantJobs.first()->getID();
         if (appName.contains("cwe-mesh"))
         {
             if (ret.contains("mesh"))
@@ -364,6 +376,8 @@ void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolde
 {
     if (defunct) return;
 
+    if (myState == CaseState::OFFLINE) return;
+
     if (currentReq != PendingCFDrequest::NONE) return;
     if (theDriver->getFileHandler()->operationIsPending()) return;
     if (caseFolder != NULL) return;
@@ -377,7 +391,7 @@ void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolde
 
     if (!theDriver->getFileHandler()->operationIsPending())
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
 
@@ -389,6 +403,8 @@ void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolde
 void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFolder, FileTreeNode * oldCase)
 {
     if (defunct) return;
+
+    if (myState == CaseState::OFFLINE) return;
 
     if (containingFolder == NULL) return;
     if (oldCase == NULL) return;
@@ -405,7 +421,7 @@ void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFo
 
     if (!theDriver->getFileHandler()->operationIsPending())
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
 
@@ -418,6 +434,8 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 {
     if (defunct) return;
     if (caseFolder == NULL) return;
+
+    if (myState == CaseState::OFFLINE) return;
 
     if (currentReq != PendingCFDrequest::NONE) return;
     if (theDriver->getFileHandler()->operationIsPending()) return;
@@ -461,7 +479,7 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 
     if (!theDriver->getFileHandler()->operationIsPending())
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
 
@@ -475,6 +493,8 @@ void CFDcaseInstance::startStageApp(QString stageID)
     if (defunct) return;
     if (caseFolder == NULL) return;
 
+    if (myState == CaseState::OFFLINE) return;
+
     if (currentReq != PendingCFDrequest::NONE) return;
 
     QString appName = "cwe-";
@@ -487,7 +507,7 @@ void CFDcaseInstance::startStageApp(QString stageID)
 
     if (jobHandle == NULL)
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
@@ -503,6 +523,8 @@ void CFDcaseInstance::rollBack(QString stageToDelete)
     if (defunct) return;
     if (caseFolder == NULL) return;
 
+    if (myState == CaseState::OFFLINE) return;
+
     if (currentReq != PendingCFDrequest::NONE) return;
     if (theDriver->getFileHandler()->operationIsPending()) return;
 
@@ -510,7 +532,7 @@ void CFDcaseInstance::rollBack(QString stageToDelete)
 
     if (folderToRemove == NULL)
     {
-        displayNetError("Unable to remove stage not yet done.");
+        cwe_globals::displayPopup("Unable to remove stage not yet done.", "Network Issue");
         return;
     }
 
@@ -518,7 +540,7 @@ void CFDcaseInstance::rollBack(QString stageToDelete)
 
     if (!theDriver->getFileHandler()->operationIsPending())
     {
-        displayNetError("Unable to contact design safe. Please wait and try again.");
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
     }
 
@@ -532,6 +554,76 @@ void CFDcaseInstance::killCaseConnection()
     defunct = true;
     emit detachCase();
     this->deleteLater();
+}
+
+void CFDcaseInstance::downloadCase(QString destLocalFile)
+{
+    if (!cwe_globals::isValidLocalFolder(destLocalFile))
+    {
+        cwe_globals::displayPopup("Please select a valid local folder for download", "I/O Error");
+        return;
+    }
+
+    cwe_globals::displayPopup("Download debug message", "DEBUG: TODO");
+    //TODO : PRS
+}
+
+void CFDcaseInstance::stopJob(QString stage)
+{
+    QMap<QString, RemoteJobData * > relevantJobs = getRelevantJobs();
+
+    if (relevantJobs.size() == 0)
+    {
+        cwe_globals::displayPopup("No job detected for stopping", "Network Issue");
+        return;
+    }
+
+    if (relevantJobs.size() > 1)
+    {
+        cwe_globals::displayPopup("Need to reload job list before job can be stopped, please wait.", "Network Issue");
+        return;
+    }
+
+    QString jobID = relevantJobs.firstKey();
+    QString appName = relevantJobs.first()->getApp();
+
+    bool stopOkay = false;
+
+    //TODO: Can probably clean this logic up, but next version will be more generic for stage names.
+    if (appName.contains("cwe-mesh") && (stage == "mesh"))
+    {
+        stopOkay = true;
+    }
+    else if (appName.contains("cwe-sim") && (stage == "sim"))
+    {
+        stopOkay = true;
+    }
+    else if (appName.contains("cwe-post") && (stage == "post"))
+    {
+        stopOkay = true;
+    }
+
+    if (!stopOkay)
+    {
+        cwe_globals::displayPopup("Job for deletion not detected.", "Network Issue");
+        return;
+    }
+
+    RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
+    RemoteDataReply * jobHandle = remoteConnect->stopJob(jobID);
+
+    if (jobHandle == NULL)
+    {
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+        return;
+    }
+
+    QObject::connect(jobHandle, SIGNAL(haveStoppedJob(RequestState)),
+                     this, SLOT(agaveTaskDone(RequestState)));
+
+    currentReq = PendingCFDrequest::STOP_JOB;
+    emitNewState(CaseState::OP_INVOKE);
+    requestDataBeingRefreshed = false;
 }
 
 void CFDcaseInstance::underlyingFilesUpdated()
@@ -551,7 +643,7 @@ void CFDcaseInstance::underlyingFilesUpdated()
             if ((caseFolder != NULL) || (expectedNewCaseFolder.isEmpty()))
             {
                 emitNewState(CaseState::ERROR);
-                displayNetError("Cannot create new case folder if case already has a folder.");
+                cwe_globals::displayPopup("Cannot create new case folder if case already has a folder.", "Network Issue");
                 return;
             }
 
@@ -583,7 +675,7 @@ void CFDcaseInstance::underlyingFilesUpdated()
 
                 if (!theDriver->getFileHandler()->operationIsPending())
                 {
-                    displayNetError("Unable to contact design safe. Please wait and try again.");
+                    cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
                     return;
                 }
 
@@ -657,6 +749,7 @@ void CFDcaseInstance::jobListUpdated()
 {
     if (defunct) return;
     if (caseFolder == NULL) return;
+    if (myType == NULL) return;
 
     QMap<QString, RemoteJobData * > jobList = getRelevantJobs();
 
@@ -675,7 +768,7 @@ void CFDcaseInstance::jobListUpdated()
         else
         {
             emitNewState(CaseState::ERROR);
-            displayNetError("Case has unrecognized app. Tasks may have been started without this program.");
+            cwe_globals::displayPopup("Case has unrecognized app. Tasks may have been started without this program.", "Network Issue");
             return;
         }
         emitNewState(CaseState::JOB_RUN);
@@ -699,7 +792,7 @@ void CFDcaseInstance::appInvokeDone(RequestState invokeStatus)
     if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(CaseState::ERROR);
-        displayNetError("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.");
+        cwe_globals::displayPopup("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.", "Network Issue");
         return;
     }
 
@@ -713,7 +806,7 @@ void CFDcaseInstance::agaveTaskDone(RequestState invokeStatus)
     if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(CaseState::ERROR);
-        displayNetError("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.");
+        cwe_globals::displayPopup("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.", "Network Issue");
         return;
     }
 
@@ -769,12 +862,4 @@ void CFDcaseInstance::emitNewState(CaseState newState)
     if (newState == myState) return;
     myState = newState;
     emit haveNewState(newState);
-}
-
-void CFDcaseInstance::displayNetError(QString infoText)
-{
-    QMessageBox infoMessage;
-    infoMessage.setText(infoText);
-    infoMessage.setIcon(QMessageBox::Information);
-    infoMessage.exec();
 }

@@ -36,7 +36,8 @@
 #ifndef DECOMPRESSWRAPPER_H
 #define DECOMPRESSWRAPPER_H
 
-#include <QtGlobal>
+#include <QSysInfo>
+
 #ifdef Q_OS_WIN
     #include <QtZlib/zlib.h>
 #else

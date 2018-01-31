@@ -198,7 +198,7 @@
             "sign":"+"
         },
         "lowYPlane":{
-            "displayname":"Boundary Condition (Top)",
+            "displayname":"Boundary Condition (Bottom)",
             "type":"choose",
             "default":"SYM_PLANE",
             "options":{
@@ -207,7 +207,7 @@
             }
         },
         "highYPlane":{
-            "displayname":"Boundary Condition (Bottom)",
+            "displayname":"Boundary Condition (Top)",
             "type":"choose",
             "default":"SYM_PLANE",
             "options":{

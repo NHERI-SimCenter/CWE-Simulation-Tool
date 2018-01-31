@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -32,53 +32,47 @@
 
 // Contributors:
 
-#ifndef CWE_MAINWINDOW_H
-#define CWE_MAINWINDOW_H
+#ifndef CWE_RESULT_POPUP_H
+#define CWE_RESULT_POPUP_H
 
-#include <QMainWindow>
+#include <QWidget>
 
-#include <QDesktopWidget>
+#include <QLabel>
+#include <QPlainTextEdit>
+#include <QFileDialog>
+
+class VWTinterfaceDriver;
+class CFDglCanvas;
 
 namespace Ui {
-class CWE_MainWindow;
+class CWE_Result_Popup;
 }
 
-class cwe_state_label;
-class VWTinterfaceDriver;
-enum class CaseState;
-
-class CWE_MainWindow : public QMainWindow
+class CWE_Result_Popup : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
-    ~CWE_MainWindow();
-
-    void runSetupSteps();
-
-    void setParameterConfig(QJsonDocument &obj);
-
-    void switchToParameterTab();
-    void switchToResultsTab();
-    void switchToCreateTab();
-    void switchToFilesTab();
+    explicit CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, VWTinterfaceDriver * theDriver, bool downloadResult = false, QWidget *parent = 0);
+    ~CWE_Result_Popup();
 
 private slots:
-    void newCaseGiven();
-    void newCaseState(CaseState newState);
-
-    void menuExit();
-    void menuCopyInfo();
+    void closeButtonClicked();
+    void newFileInfo();
 
 private:
-    void changeParamsAndResultsEnabled(bool setting);
-    void changeTabEnabled(QWidget *theTab, bool newSetting);
+    Ui::CWE_Result_Popup *ui;
+    VWTinterfaceDriver * myDriver;
+    bool download;
+    QMap<QString, QString> myResult;
 
-    Ui::CWE_MainWindow *ui;
+    QString resultType;
+    QString targetFolder;
+    QString targetFile;
 
-    VWTinterfaceDriver     *myDriver;
-    cwe_state_label        *stateLabel = NULL;
+    QLabel * loadingLabel = NULL;
+    CFDglCanvas * myCanvas = NULL;
+    QPlainTextEdit * textBox = NULL;
 };
 
-#endif // CWE_MAINWINDOW_H
+#endif // CWE_RESULT_POPUP_H

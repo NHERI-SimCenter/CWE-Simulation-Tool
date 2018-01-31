@@ -35,14 +35,11 @@
 #ifndef CWE_FILE_MANAGER_H
 #define CWE_FILE_MANAGER_H
 
-#include <QWidget>
-#include <QFileSystemModel>
-#include <QModelIndexList>
-#include <QFileInfo>
-
 #include "cwe_super.h"
 
-class VWTinterfaceDriver;
+#include <QFileSystemModel>
+#include <QMenu>
+
 class FileTreeNode;
 
 namespace Ui {
@@ -63,7 +60,7 @@ private slots:
     void on_pb_upload_clicked();
     void on_pb_download_clicked();
 
-    void on_remoteTreeView_customContextMenuRequested(const QPoint &pos);
+    void customFileMenu(const QPoint &pos);
     void copyMenuItem();
     void moveMenuItem();
     void renameMenuItem();
@@ -74,6 +71,9 @@ private slots:
     void decompressMenuItem();
     void refreshMenuItem();
 
+    void downloadBufferItem();
+
+    void remoteOpDone();
 
 private:
     Ui::CWE_file_manager *ui;

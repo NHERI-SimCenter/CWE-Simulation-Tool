@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -32,50 +32,20 @@
 
 // Contributors:
 
-#ifndef CWE_DEFINES_H
-#define CWE_DEFINES_H
+#ifndef SCTRCHOICEDATAWIDGET_H
+#define SCTRCHOICEDATAWIDGET_H
 
-#include <QString>
-#include <QWidget>
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
-/* define binary mode flags for all pages of the GUI  */
-/* setting mode = CWE_LANDING_TAB|CWE_RESULTS_TAB|... */
-/* testing if (mode & CWE_LANDING_TAB) { ... }        */
+#include <QStandardItemModel>
 
-#define CWE_NONE_TAB         0x00000000
-#define CWE_LANDING_TAB      0x00000001
-#define CWE_CREATE_NEW_TAB   0x00000002
-#define CWE_CREATE_COPY_TAB  0x00000004
-#define CWE_CASE_SELECT_TAB  0x00000008
-#define CWE_DETAILS_TAB      0x00000010
-#define CWE_RESULTS_TAB      0x00000020
-#define CWE_HELP_TAB         0x00000040
-#define CWE_WIDGET_PAGE_TAB  0x00000080
-#define CWE_FILE_MANAGER_TAB 0x00000100
-
-/* define state switches */
-#define CWE_STATE_NONE       0x00000000
-#define CWE_STATE_NEW        0x00010000
-#define CWE_STATE_RUNNING    0x00020000
-#define CWE_STATE_RESULTS    0x00040000
-#define CWE_STATE_CLEAR      0x00080000
-
-/* define active buttons */
-#define CWE_BTN_RUN          0x01000000
-#define CWE_BTN_CANCEL       0x02000000
-#define CWE_BTN_RESULTS      0x04000000
-#define CWE_BTN_ROLLBACK     0x08000000
-#define CWE_BTN_SAVE_ALL     0x10000000
-#define CWE_BTN_ALL          0xff000000
-#define CWE_BTN_NONE         0x00000000
-
-struct InputDataType {
-    QString      name;
-    QString      displayName;
-    QString      type;
-    QString      defValue;
-    QWidget     *widget;
-    QJsonObject *options;
+class SCtrChoiceDataWidget: public SCtrMasterDataWidget
+{
+public:
+    SCtrChoiceDataWidget(QWidget *parent);
+    void setData(QJsonObject &obj);
+    QString toString();
+    void updateValue(QString);
 };
 
-#endif // CWE_DEFINES_H
+#endif // SCTRCHOICEDATAWIDGET_H

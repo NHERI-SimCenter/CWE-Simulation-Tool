@@ -1,15 +1,49 @@
+/*********************************************************************************
+**
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
+**
+** Redistribution and use in source and binary forms, with or without modification,
+** are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice, this
+** list of conditions and the following disclaimer.
+**
+** 2. Redistributions in binary form must reproduce the above copyright notice, this
+** list of conditions and the following disclaimer in the documentation and/or other
+** materials provided with the distribution.
+**
+** 3. Neither the name of the copyright holder nor the names of its contributors may
+** be used to endorse or promote products derived from this software without specific
+** prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+** EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+** SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+** INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+** TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+** IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+** SUCH DAMAGE.
+**
+***********************************************************************************/
+
+// Contributors:
+
 #include "cwe_create_copy_simulation.h"
 #include "ui_cwe_create_copy_simulation.h"
 
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
-#include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
+#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "mainWindow/cwe_mainwindow.h"
-
 #include "vwtinterfacedriver.h"
+
+#include "cwe_globals.h"
 
 CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
     CWE_Super(parent),
@@ -40,37 +74,99 @@ void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
 
 void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 {
-    FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
-    if (selectedNode == NULL)
+    if (myDriver->inOfflineMode())
     {
+        myDriver->setCurrentCase(new CFDcaseInstance(selectedTemplate, myDriver));
+        myDriver->getMainWindow()->switchToParameterTab();
         return;
     }
 
+    /* take emergency exit if nothing has been selected */
+    FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
+    if (selectedNode == NULL)
+    {
+        cwe_globals::displayPopup("Please select a folder to place the new case.");
+        return;
+    }
+    if (!selectedNode->isFolder())
+    {
+        cwe_globals::displayPopup("Please select a folder to place the new case.");
+        return;
+    }
+
+    /* OK, something has been selected */
     CFDcaseInstance * newCase;
 
-    //TODO: VERY IMPORTANT: NEED INPUT FILTERING
+    QString newCaseName = ui->lineEdit_newCaseName->text();
+
+    if (!cwe_globals::isValidFolderName(newCaseName))
+    {
+        cwe_globals::displayPopup("Please input a valid folder name");
+        return;
+    }
+
     if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
     {
-        if (selectedTemplate == NULL) return;
+        /* we are creating a new case */
+
+        if (selectedTemplate == NULL)
+        {
+            cwe_globals::displayPopup("Please select a valid case type.");
+            return;
+        }
         newCase = new CFDcaseInstance(selectedTemplate, myDriver);
-        newCase->createCase(ui->lineEdit_newCaseName->text(), selectedNode);
+        newCase->createCase(newCaseName, selectedNode);
     }
     else
     {
+        /* we are cloning from an existing case */
+
         FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
-        if (secondNode == NULL)
+        if (selectedNode == NULL)
         {
+            cwe_globals::displayPopup("Please select a folder to duplicate.");
             return;
         }
+        if (!selectedNode->isFolder())
+        {
+            cwe_globals::displayPopup("Please select a folder to duplicate.");
+            return;
+        }
+        CFDcaseInstance * tempCase = new CFDcaseInstance(selectedNode, myDriver);
+        CaseState dupState = tempCase->getCaseState();
+        tempCase->deleteLater();
+
+        if (dupState == CaseState::INVALID)
+        {
+            cwe_globals::displayPopup("ERROR: Can only duplicate CFD cases managed by CWE. Please select a valid folder containing a case for duplication.");
+            return;
+        }
+        if (dupState == CaseState::LOADING)
+        {
+            cwe_globals::displayPopup("Please wait for case folder to load before attempting to duplicate.");
+            return;
+        }
+        if (dupState != CaseState::READY)
+        {
+            cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
+            return;
+        }
+
         newCase = new CFDcaseInstance(myDriver);
-        newCase->duplicateCase(ui->lineEdit_newCaseName->text(), selectedNode, secondNode);
-        if (newCase->getCaseState() != CaseState::OP_INVOKE)
-        {
-            return;
-        }
+        newCase->duplicateCase(newCaseName, selectedNode, secondNode);
     }
 
+    if (newCase->getCaseState() != CaseState::OP_INVOKE)
+    {
+        cwe_globals::displayPopup("Cannot create new case due to internal error.");
+        newCase->deleteLater();
+        return;
+    }
+
+    //Set new case will signal the other panels so that they can get configurations
     myDriver->setCurrentCase(newCase);
+
+    /* time to switch to the ParameterTab */
     myDriver->getMainWindow()->switchToParameterTab();
 }
 
@@ -92,7 +188,7 @@ void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
 void CWE_Create_Copy_Simulation::populateCaseTypes()
 {
     QList<CFDanalysisType *> * templateList = myDriver->getTemplateList();
-    QGridLayout *layout = new QGridLayout(this);
+    QGridLayout *layout = new QGridLayout();
 
     int idx = 0;
 
@@ -131,11 +227,14 @@ void CWE_Create_Copy_Simulation::populateCaseTypes()
 
         /* create appropriate connection between signals and slots */
 
-        connect(buttonIcon, SIGNAL(pressed()),       this, SLOT(selectCaseTemplate()));
-        connect(radioBtn, SIGNAL(toggled(bool)),     this, SLOT(selectCaseTemplate()));
+        QObject::connect(buttonIcon, SIGNAL(pressed()),       this, SLOT(selectCaseTemplate()));
+        QObject::connect(radioBtn, SIGNAL(toggled(bool)),     this, SLOT(selectCaseTemplate()));
 
         idx++;
     }
+
+    QLayout *lyt = ui->scroll_NewCase->layout();
+    if (lyt != NULL) {delete lyt;}
 
     ui->scroll_NewCase->setLayout(layout);
 }

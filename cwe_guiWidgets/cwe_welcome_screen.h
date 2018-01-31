@@ -35,8 +35,6 @@
 #ifndef CWE_WELCOME_SCREEN_H
 #define CWE_WELCOME_SCREEN_H
 
-#include <QFrame>
-
 #include "cwe_super.h"
 
 namespace Ui {

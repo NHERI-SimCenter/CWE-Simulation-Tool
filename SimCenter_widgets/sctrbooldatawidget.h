@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -32,53 +32,22 @@
 
 // Contributors:
 
-#ifndef CWE_MAINWINDOW_H
-#define CWE_MAINWINDOW_H
+#ifndef SCTRBOOLDATAWIDGET_H
+#define SCTRBOOLDATAWIDGET_H
 
-#include <QMainWindow>
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
-#include <QDesktopWidget>
-
-namespace Ui {
-class CWE_MainWindow;
-}
-
-class cwe_state_label;
-class VWTinterfaceDriver;
-enum class CaseState;
-
-class CWE_MainWindow : public QMainWindow
+class SCtrBoolDataWidget: public SCtrMasterDataWidget
 {
-    Q_OBJECT
-
 public:
-    explicit CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
-    ~CWE_MainWindow();
-
-    void runSetupSteps();
-
-    void setParameterConfig(QJsonDocument &obj);
-
-    void switchToParameterTab();
-    void switchToResultsTab();
-    void switchToCreateTab();
-    void switchToFilesTab();
-
-private slots:
-    void newCaseGiven();
-    void newCaseState(CaseState newState);
-
-    void menuExit();
-    void menuCopyInfo();
-
-private:
-    void changeParamsAndResultsEnabled(bool setting);
-    void changeTabEnabled(QWidget *theTab, bool newSetting);
-
-    Ui::CWE_MainWindow *ui;
-
-    VWTinterfaceDriver     *myDriver;
-    cwe_state_label        *stateLabel = NULL;
+    SCtrBoolDataWidget(QWidget *parent);
+    void setData(QJsonObject &obj);
+    QString toString();
+    double  toDouble();
+    bool toBool();
+    void setChecked();
+    void setUnchecked();
+    void updateValue(QString);
 };
 
-#endif // CWE_MAINWINDOW_H
+#endif // SCTRBOOLDATAWIDGET_H

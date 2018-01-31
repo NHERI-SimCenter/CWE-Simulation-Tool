@@ -42,8 +42,7 @@
 #include "../AgaveExplorer/utilFuncs/singlelinedialog.h"
 
 #include "vwtinterfacedriver.h"
-
-#include <QFileDialog>
+#include "cwe_globals.h"
 
 CWE_file_manager::CWE_file_manager(QWidget *parent) :
     CWE_Super(parent),
@@ -80,6 +79,8 @@ void CWE_file_manager::linkDriver(VWTinterfaceDriver * theDriver)
         ui->remoteTreeView->setupFileView();
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
+        QObject::connect(myDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
+                         this, SLOT(remoteOpDone()));
     }
 }
 
@@ -87,7 +88,7 @@ void CWE_file_manager::on_pb_upload_clicked()
 {
     if (myDriver->getFileHandler()->operationIsPending())
     {
-        myDriver->displayMessagePopup("Currently running file operation. Please Wait.");
+        cwe_globals::displayPopup("Currently running file operation. Please Wait.");
         return;
     }
 
@@ -95,7 +96,7 @@ void CWE_file_manager::on_pb_upload_clicked()
 
     if ((targetFile == NULL) || (targetFile->getFileData().getFileType() != FileType::DIR))
     {
-        myDriver->displayMessagePopup("Please select a destination folder to upload to.");
+        cwe_globals::displayPopup("Please select a destination folder to upload to.");
         return;
     }
 
@@ -104,7 +105,7 @@ void CWE_file_manager::on_pb_upload_clicked()
 
     if (!fileData.isFile())
     {
-        myDriver->displayMessagePopup("Please select exactly 1 local file to upload.");
+        cwe_globals::displayPopup("Please select exactly 1 local file to upload.");
         return;
     }
 
@@ -112,15 +113,18 @@ void CWE_file_manager::on_pb_upload_clicked()
 
     if (!myDriver->getFileHandler()->operationIsPending())
     {
-        myDriver->displayMessagePopup("Error: Unable to start file operation. Please try again.");
+        cwe_globals::displayPopup("Error: Unable to start file operation. Please try again.");
+        return;
     }
+    ui->pb_upload->setDisabled(true);
+    ui->pb_download->setDisabled(true);
 }
 
 void CWE_file_manager::on_pb_download_clicked()
 {
     if (myDriver->getFileHandler()->operationIsPending())
     {
-        myDriver->displayMessagePopup("Currently running file operation. Please Wait.");
+        cwe_globals::displayPopup("Currently running file operation. Please Wait.");
         return;
     }
 
@@ -128,7 +132,7 @@ void CWE_file_manager::on_pb_download_clicked()
 
     if ((targetFile == NULL) || (targetFile->getFileData().getFileType() != FileType::FILE))
     {
-        myDriver->displayMessagePopup("Please select a file to download to.");
+        cwe_globals::displayPopup("Please select a file to download to.");
         return;
     }
 
@@ -137,7 +141,7 @@ void CWE_file_manager::on_pb_download_clicked()
 
     if (!fileData.isDir())
     {
-        myDriver->displayMessagePopup("Please select exactly 1 local folder to download to");
+        cwe_globals::displayPopup("Please select exactly 1 local folder to download to");
         return;
     }
 
@@ -154,8 +158,11 @@ void CWE_file_manager::on_pb_download_clicked()
 
     if (!myDriver->getFileHandler()->operationIsPending())
     {
-        myDriver->displayMessagePopup("Error: Unable to start file operation. Please try again.");
+        cwe_globals::displayPopup("Error: Unable to start file operation. Please check that the local file does not already exist and try again.");
+        return;
     }
+    ui->pb_upload->setDisabled(true);
+    ui->pb_download->setDisabled(true);
 }
 
 void CWE_file_manager::copyMenuItem()
@@ -227,8 +234,18 @@ void CWE_file_manager::refreshMenuItem()
     ui->remoteTreeView->getFileOperator()->enactFolderRefresh(targetNode);
 }
 
+void CWE_file_manager::downloadBufferItem()
+{
+    ui->remoteTreeView->getFileOperator()->sendDownloadBuffReq(targetNode);
+}
 
-void CWE_file_manager::on_remoteTreeView_customContextMenuRequested(const QPoint &pos)
+void CWE_file_manager::remoteOpDone()
+{
+    ui->pb_upload->setDisabled(false);
+    ui->pb_download->setDisabled(false);
+}
+
+void CWE_file_manager::customFileMenu(const QPoint &pos)
 {
     QMenu fileMenu;
     if (ui->remoteTreeView->getFileOperator()->operationIsPending())
@@ -268,7 +285,7 @@ void CWE_file_manager::on_remoteTreeView_customContextMenuRequested(const QPoint
     }
     if (theFileData.getFileType() == FileType::FILE)
     {
-        fileMenu.addAction("Download File",this, SLOT(downloadMenuItem()));
+        fileMenu.addAction("Download Buffer (DEBUG)",this, SLOT(downloadBufferItem()));
     }
 
     if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))

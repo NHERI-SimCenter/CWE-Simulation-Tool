@@ -32,15 +32,17 @@
 
 // Contributors:
 
-#include "SimCenter_widgets/sctrstddatawidget.h"
+#include "sctrbooldatawidget.h"
 
-SCtrStdDataWidget::SCtrStdDataWidget(QWidget *parent):
+#include "cwe_globals.h"
+
+SCtrBoolDataWidget::SCtrBoolDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)
 {
 
 }
 
-void SCtrStdDataWidget::setData(QJsonObject &obj)
+void SCtrBoolDataWidget::setData(QJsonObject &obj)
 {
     // set up the UI for the widget
     this->initUI();
@@ -50,8 +52,8 @@ void SCtrStdDataWidget::setData(QJsonObject &obj)
     QHBoxLayout *layout = (QHBoxLayout *)this->layout();
     layout->setMargin(0);
 
-    theValue = new QLineEdit(this);
-    layout->insertWidget(1, theValue, 4);
+    theCheckBox = new QCheckBox(this);
+    layout->insertWidget(1, theCheckBox, 4);
 
     if (label_unit != NULL) {
         label_unit->setText(obj.value(QString("unit")).toString());
@@ -63,49 +65,52 @@ void SCtrStdDataWidget::setData(QJsonObject &obj)
     this->setLayout(layout);  // do I need this one?
 
     /* set default */
-    QString defaultValue = obj.value(QString("default")).toString();
-    this->updateValue(defaultValue);
+    bool defaultValue = obj.value(QString("default")).toBool();
+    theCheckBox->setChecked(defaultValue?Qt::Checked:Qt::Unchecked);
 }
 
-QString SCtrStdDataWidget::toString()
+bool SCtrBoolDataWidget::toBool()
 {
-    QString s = "";
+    bool checked = theCheckBox->checkState()==Qt::Checked?true:false;
+    return checked;
+}
 
-    QString precString  = m_obj.value("precision").toString();
-    if (precString.toLower() == "int")
-    {
-        s = QString("%1").arg(((theValue->text()).toInt()));
-    }
+QString SCtrBoolDataWidget::toString()
+{
+    QString checked = theCheckBox->checkState()==Qt::Checked?QString("true"):QString("false");
+    return checked;
+}
+
+double SCtrBoolDataWidget::toDouble()
+{
+    double checked = theCheckBox->checkState()==Qt::Checked?1.0:0.0;
+    return checked;
+}
+
+void SCtrBoolDataWidget::setChecked()
+{
+    theCheckBox->setChecked(true);
+}
+
+void SCtrBoolDataWidget::setUnchecked()
+{
+    theCheckBox->setChecked(false);
+}
+
+void SCtrBoolDataWidget::updateValue(QString s)
+{
+    /* check if new information is an appropriate type */
+    if (s.toLower() == "true")
+        { setChecked(); }
+    else if (s.toLower() == "false")
+        {  setUnchecked(); }
     else
     {
-        int prec = precString.toInt();
-        s = QString("%1").arg(((theValue->text()).toDouble()), 0, 'f', prec);
+        /* add an error message */
+        QString name = m_obj["displayname"].toString();
+
+        cwe_globals::displayPopup(QString("Boolean variable %1 cannot be set to \'%2\'.\nVariable ignored.").arg(name).arg(s), "Warning");
+        return;
     }
-    return s;
 }
 
-double SCtrStdDataWidget::toDouble()
-{
-    return theValue->text().toDouble();
-}
-
-void SCtrStdDataWidget::updateValue(QString s)
-{
-    QString val = "";
-
-    /* check if new information is of an appropriate type */
-
-    QString precString  = m_obj.value("precision").toString();
-    if (precString.toLower() == "int")
-    {
-        val = QString("%1").arg(s.toInt());
-    }
-    else
-    {
-        int prec = precString.toInt();
-        val = QString("%1").arg(s.toDouble(), 0, 'f', prec);
-    }
-
-    /* update the value */
-    theValue->setText(val);
-}

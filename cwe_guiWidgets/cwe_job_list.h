@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this
+** 1. Redistributions of source code must retain the above copyright notice, this 
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -32,53 +32,32 @@
 
 // Contributors:
 
-#ifndef CWE_MAINWINDOW_H
-#define CWE_MAINWINDOW_H
+#ifndef CWE_LANDING_H
+#define CWE_LANDING_H
 
-#include <QMainWindow>
+#include "cwe_super.h"
 
-#include <QDesktopWidget>
+#include <QStandardItemModel>
 
 namespace Ui {
-class CWE_MainWindow;
+class CWE_job_list;
 }
 
-class cwe_state_label;
-class VWTinterfaceDriver;
-enum class CaseState;
-
-class CWE_MainWindow : public QMainWindow
+class CWE_job_list : public CWE_Super
 {
     Q_OBJECT
 
 public:
-    explicit CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
-    ~CWE_MainWindow();
+    explicit CWE_job_list(QWidget *parent = 0);
+    ~CWE_job_list();
 
-    void runSetupSteps();
-
-    void setParameterConfig(QJsonDocument &obj);
-
-    void switchToParameterTab();
-    void switchToResultsTab();
-    void switchToCreateTab();
-    void switchToFilesTab();
+    virtual void linkDriver(VWTinterfaceDriver * theDriver);
 
 private slots:
-    void newCaseGiven();
-    void newCaseState(CaseState newState);
-
-    void menuExit();
-    void menuCopyInfo();
 
 private:
-    void changeParamsAndResultsEnabled(bool setting);
-    void changeTabEnabled(QWidget *theTab, bool newSetting);
-
-    Ui::CWE_MainWindow *ui;
-
-    VWTinterfaceDriver     *myDriver;
-    cwe_state_label        *stateLabel = NULL;
+    Ui::CWE_job_list    *ui;
+    QStandardItemModel *model;
 };
 
-#endif // CWE_MAINWINDOW_H
+#endif // CWE_LANDING_H

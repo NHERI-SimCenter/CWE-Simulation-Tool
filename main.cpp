@@ -34,13 +34,11 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 #include <QApplication>
-#include <QObject>
-#include <QtGlobal>
 #include <QFile>
-#include <string.h>
-#include "vwtinterfacedriver.h"
-
 #include <QSslSocket>
+#include <QtGlobal>
+
+#include "vwtinterfacedriver.h"
 
 void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
 

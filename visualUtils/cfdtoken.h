@@ -44,7 +44,7 @@
 //Note: this is not a complete parser,
 //but has the framework if anyone wants to complete it later
 
-//Note: Int and float types might be vulnerable to overflow,
+//TODO Note: Int and float types might be vulnerable to overflow,
 //check the setString function if you wish to change this
 
 enum class CFDtokenType

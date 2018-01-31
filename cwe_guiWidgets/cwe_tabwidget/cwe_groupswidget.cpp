@@ -1,3 +1,37 @@
+/*********************************************************************************
+**
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
+**
+** Redistribution and use in source and binary forms, with or without modification,
+** are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice, this
+** list of conditions and the following disclaimer.
+**
+** 2. Redistributions in binary form must reproduce the above copyright notice, this
+** list of conditions and the following disclaimer in the documentation and/or other
+** materials provided with the distribution.
+**
+** 3. Neither the name of the copyright holder nor the names of its contributors may
+** be used to endorse or promote products derived from this software without specific
+** prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+** EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+** SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+** INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+** TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+** IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+** SUCH DAMAGE.
+**
+***********************************************************************************/
+
+// Contributors:
+
 /*
  * the CWE_StageTab represents a single tab and data field within
  * the CWE_TabWidget.
@@ -5,12 +39,14 @@
 
 #include "cwe_groupswidget.h"
 
-#include "cwe_stagestatustab.h"
-#include "SimCenter_widgets/sctrstates.h"
-#include <QJsonObject>
+#include "cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h"
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
-CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) : QTabWidget(parent)
+CWE_GroupsWidget::CWE_GroupsWidget(VWTinterfaceDriver * theDriver, QWidget *parent) : QTabWidget(parent)
 {
+    quickParameterPtr = new QMap<QString, SCtrMasterDataWidget *>();
+    myDriver = theDriver;
+
     this->setViewState(SimCenterViewState::visible);
 }
 
@@ -24,130 +60,107 @@ void CWE_GroupsWidget::setCorrespondingTab(CWE_StageStatusTab * newTab)
     myTab = newTab;
 }
 
-// set the group definitions as a JSon file
-void CWE_GroupsWidget::setData(QJsonObject &obj)
-{
-    m_obj = obj;
-
-    /*
-    QJsonObject stageInfo = m_obj[name].toObject();
-    QString labelText;
-
-    labelText = stageInfo["name"].toString();
-    labelText = labelText.append("\nParameters");
-
-    // add a stage tab to ui->theTabWidget
-    int idx = ui->theTabWidget->addGroupTab(name, labelText, StageState::UNRUN);
-    stageTabsIndex.insert(name, idx);
-    */
-}
-
 // set the view state
 void CWE_GroupsWidget::setViewState(SimCenterViewState state)
 {
-    switch (state) {
-    case SimCenterViewState::hidden:
-        m_viewState = SimCenterViewState::hidden;
-        break;
-    case SimCenterViewState::editable:
-        m_viewState = SimCenterViewState::editable;
-        break;
-    case SimCenterViewState::visible:
-    default:
-        m_viewState = SimCenterViewState::visible;
-        break;
+    m_viewState = state;
+
+    for (auto itr = quickParameterPtr->cbegin(); itr != quickParameterPtr->cend(); itr++)
+    {
+        (*itr)->setViewState(state);
     }
 }
 
-int CWE_GroupsWidget::addGroupTab(QString key, const QString &label, StageState currentState)
+void CWE_GroupsWidget::setParameterConfig(QString key, QJsonObject &obj)
 {
-    int index = -1;
-    /*
-    varTabWidgets->insert(key, new QMap<QString, QWidget *>());
+    /* find all groups and create a tab per group */
+    QJsonArray groups = obj.value(QString("stages")).toObject().value(key).toObject().value(QString("groups")).toArray();
 
-    // create the tab
-    CWE_StageStatusTab *newTab = new CWE_StageStatusTab(key);
-    newTab->setText(label);
-
-    newTab->setStatus(getStateText(currentState));
-    int index = ui->verticalTabLayout->count()-1;
-    newTab->setIndex(index);
-    ui->verticalTabLayout->insertWidget(index, newTab);
-
-    groupWidget->insert(key, newTab);
-
-    connect(newTab,SIGNAL(btn_pressed(int,QString)),this,SLOT(on_groupTabSelected(int, QString)));
-    //connect(newTab,SIGNAL(btn_released(int)),this,SLOT(on_groupTabSelected(int)));
-
-    // create the widget to hold the parameter input
-    QTabWidget *pWidget = new QTabWidget();
-    ui->stackedWidget->insertWidget(index, pWidget);
-
-    groupTabList->insert(key, pWidget);
-    */
-
-    return index;
-}
-
-int CWE_GroupsWidget::addVarTab(QString key, const QString &label)
-{
-    // create the widget to hold the parameter input
-
-    /*
-    CWE_ParameterTab *itm = new CWE_ParameterTab(this);
-    itm->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    itm->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    itm->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::MinimumExpanding);
-
-    QGridLayout *lyt = new QGridLayout();
-    itm->setLayout(lyt);
-
-    //varTabWidgets->value(key)->insert(label, itm);
-
-    QTabWidget * qf = groupTabList->value(key);
-    int index = qf->addTab(itm, label);
-
-    return index;
-    */
-    return -1;
-}
-
-void CWE_GroupsWidget::addVSpacer(const QString &key, const QString &label)
-{
-    /*
-    QWidget *parent = varTabWidgets->value(key)->value(label);
-    if (parent != NULL)
+    foreach (QJsonValue group, groups)
     {
-        QGridLayout *layout = (QGridLayout*)(parent->layout());
-        layout->addItem(new QSpacerItem(10, 40, QSizePolicy::Minimum, QSizePolicy::Expanding), layout->rowCount(), 2);
+        QString groupName = group.toString();
+        QScrollArea *scrollArea = new QScrollArea(this);
+        CWE_ParamPanel *panel = new CWE_ParamPanel(myDriver, this);
+        scrollArea->setWidgetResizable(true);
+        scrollArea->setWidget(panel);
+
+        this->addTab(scrollArea, groupName);
+
+        /* now add the parameter tabs */
+        QJsonArray groupVars = obj.value(QString("varGroups")).toObject().value(groupName).toArray();
+        QJsonObject allVars  = obj.value(QString("vars")).toObject();
+        panel->addParameterConfig(groupVars, allVars);
     }
-    */
 }
 
-void CWE_GroupsWidget::addVarsToTab(QString key, const QString &label, QJsonArray *varList, QJsonObject *varsInfo, QMap<QString,QString> * setVars)
+void CWE_GroupsWidget::linkWidget(CWE_StageStatusTab *tab)
 {
-    //QTabWidget *groupTab = groupTabList->value(key);
-    //QWidget    *varTab   = varTabWidgets->value(key)->value(label);
+    myTab = tab;
+}
 
-    /*
-    foreach (const QJsonValue &item, *varList)
+
+QMap<QString, SCtrMasterDataWidget *> CWE_GroupsWidget::getParameterWidgetMap()
+{
+    QMap<QString, SCtrMasterDataWidget *> groupMap;
+
+    for (int i=0; i<this->count(); i++)
     {
-        QString varKey = item.toString();
-        QJsonObject variableObject = (*varsInfo)[varKey].toObject();
-        QString setVal;
-
-        if (setVars->contains(varKey))
+        CWE_ParamPanel * panel = (CWE_ParamPanel *)((QScrollArea *)(this->widget(i)))->widget();
+        QMap<QString, SCtrMasterDataWidget *> panelParams = panel->getParameterWidgetMap();
+        QMapIterator<QString, SCtrMasterDataWidget *> panelParamIter(panelParams);
+        while (panelParamIter.hasNext())
         {
-            setVal = setVars->value(varKey);
-            this->addVariable(varKey, variableObject, key, label, &setVal);
-        }
-        else
-        {
-            this->addVariable(varKey, variableObject, key, label, NULL);
+            panelParamIter.next();
+            groupMap.insert(panelParamIter.key(), panelParamIter.value());
         }
     }
-    this->addVSpacer(key, label);
-    */
+
+    return groupMap;
 }
 
+void CWE_GroupsWidget::initQuickParameterPtr()
+{
+    quickParameterPtr->clear();
+
+    QMap<QString, SCtrMasterDataWidget *> groupMap = this->getParameterWidgetMap();
+    QMapIterator<QString, SCtrMasterDataWidget *> groupIter(groupMap);
+
+    while (groupIter.hasNext())
+    {
+        groupIter.next();
+        quickParameterPtr->insert(groupIter.key(), groupIter.value());
+    }
+}
+
+void CWE_GroupsWidget::updateParameterValues(QMap<QString, QString> newValues)
+{
+    QMapIterator<QString, QString> iter(newValues);
+
+    while (iter.hasNext())
+    {
+        iter.next();
+        QString key = iter.key();
+        if (quickParameterPtr->contains(key))
+        {
+            (quickParameterPtr->value(key))->updateValue(iter.value());
+        }
+    }
+}
+
+int CWE_GroupsWidget::collectParamData(QMap<QString, QString> &currentParameters)
+{
+    int count = 0;
+
+    // collect parameter values from all SCtrMasterDataWidget objects
+    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
+
+    while (iter.hasNext())
+    {
+        iter.next();
+        currentParameters.insert(iter.key(), (iter.value())->value());
+        count++;
+    }
+
+    return count;
+}
 

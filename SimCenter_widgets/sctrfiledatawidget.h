@@ -1,12 +1,12 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -32,39 +32,35 @@
 
 // Contributors:
 
-#ifndef CWE_LANDING_H
-#define CWE_LANDING_H
+#ifndef SCTRFILEDATAWIDGET_H
+#define SCTRFILEDATAWIDGET_H
 
-#include <QWidget>
-#include <QStandardItem>
-#include <QStandardItemModel>
-#include <QTime>
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
-#include "cwe_super.h"
+class RemoteFileTree;
+class VWTinterfaceDriver;
 
-class JobOperator;
+//TODO: Need to write visibilty method
 
-namespace Ui {
-class CWE_landing;
-}
-
-class CWE_landing : public CWE_Super
+class SCtrFileDataWidget: public SCtrMasterDataWidget
 {
-    Q_OBJECT
-
 public:
-    explicit CWE_landing(QWidget *parent = 0);
-    ~CWE_landing();
-    void addDataRow(QString, uint, QString, QString, QString);
-    void addDummyDataRow(void);
-
-    virtual void linkDriver(VWTinterfaceDriver * theDriver);
+    SCtrFileDataWidget(QWidget *parent);
+    SCtrFileDataWidget(VWTinterfaceDriver* theDriver, QWidget *parent);
+    void setData(QJsonObject &obj);
+    QString toString();
+    bool toBool();
+    virtual void updateValue(QString);
+    virtual void initUI();
 
 private slots:
+    virtual void newFileSelected(FileTreeNode *);
 
 private:
-    Ui::CWE_landing    *ui;
-    QStandardItemModel *model;
+    VWTinterfaceDriver * myDriver;
+    RemoteFileTree * myFileTree = NULL;
+    QLabel * selectedFile = NULL;
+    QLabel * explainText = NULL;
 };
 
-#endif // CWE_LANDING_H
+#endif // SCTRFILEDATAWIDGET_H

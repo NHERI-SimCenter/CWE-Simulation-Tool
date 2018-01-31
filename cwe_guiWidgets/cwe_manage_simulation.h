@@ -35,16 +35,11 @@
 #ifndef CWE_MANAGE_SIMULATION_H
 #define CWE_MANAGE_SIMULATION_H
 
-#include <QWidget>
-#include <QStandardItemModel>
-
-#include "cwe_defines.h"
-
 #include "cwe_super.h"
 
+#include <QStandardItemModel>
+
 class FileTreeNode;
-class VWTinterfaceDriver;
-class CFDcaseInstance;
 enum class CaseState;
 enum class StageState;
 
@@ -65,20 +60,19 @@ public:
 private slots:
     void newFileSelected(FileTreeNode * newFile);
 
+    void newCaseGiven();
+    void newCaseState(CaseState newState);
+
     void on_pb_viewParameters_clicked();
     void on_pb_viewResults_clicked();
 
+private:
     void clearSelectView();
     void showSelectView();
-    void provisionalCaseStateChange(CaseState newState);
 
-private:
-    bool verifyCaseAndSelect();
     QString getStateText(StageState theState);
 
     Ui::CWE_manage_simulation *ui;
-
-    CFDcaseInstance * tempCase = NULL;
 
     QStandardItemModel stageListModel;
 };

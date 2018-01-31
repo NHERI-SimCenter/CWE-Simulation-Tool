@@ -32,24 +32,17 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-
 #ifndef CFDCASEINSTANCE_H
 #define CFDCASEINSTANCE_H
 
-#include <QString>
+#include <QObject>
+
 #include <QMap>
-#include <QStringList>
-
 #include <QJsonDocument>
-#include <QJsonArray>
 #include <QJsonObject>
-
-#include <QTimer>
 
 class FileTreeNode;
 class CFDanalysisType;
-class EasyBoolLock;
-class JobOperator;
 class RemoteJobData;
 enum class RequestState;
 
@@ -63,13 +56,13 @@ enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, JOB_RUN, OP_INVOKE};
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, JOB_RUN, OP_INVOKE, OFFLINE};
 //LOADING: Reloading file info to determine case stats
 //JOB_RUN: Running long-running tasks
 //OP_INVOKE: Running short file operations
 
 enum class PendingCFDrequest {NONE, CREATE_MKDIR, CREATE_UPLOAD, DUP_COPY, PARAM_UPLOAD,
-                             APP_INVOKE, APP_RUN, ROLLBACK_DEL};
+                             APP_INVOKE, APP_RUN, ROLLBACK_DEL, STOP_JOB};
 
 class CFDcaseInstance : public QObject
 {
@@ -102,6 +95,7 @@ public:
     void killCaseConnection();
 
     void downloadCase(QString destLocalFile);
+    void stopJob(QString stage);
 
 signals:
     void detachCase();
@@ -117,7 +111,6 @@ private slots:
 
 private:
     void emitNewState(CaseState newState);
-    void displayNetError(QString infoText);
 
     QMap<QString, RemoteJobData * > getRelevantJobs();
 
@@ -134,6 +127,7 @@ private:
     CFDanalysisType * myType = NULL;
 
     QString expectedNewCaseFolder;
+    QString downloadDest;
 };
 
 #endif // CFDCASEINSTANCE_H
