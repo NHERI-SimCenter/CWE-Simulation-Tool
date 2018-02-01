@@ -234,9 +234,7 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
     {
         QString jobID = (*itr).getID();
         QString appName = (*itr).getApp();
-        if (!appName.contains("cwe-mesh")
-                && !appName.contains("cwe-sim")
-                && !appName.contains("cwe-post"))
+        if (!appName.contains("cwe-serial") && !appName.contains("cwe-parallel"))
         {
             continue;
         }
@@ -283,72 +281,29 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
         return ret;
     }
 
+    if (caseFolder->childIsUnloaded())
+    {
+        return ret;
+    }
+
     //Check job handler for running tasks on this folder
     QMap<QString, RemoteJobData * > relevantJobs = getRelevantJobs();
 
     if (relevantJobs.size() > 1)
     {
-        for (auto itr = stateList.begin(); itr != stateList.cend(); itr++)
-        {
-            ret[*itr] = StageState::LOADING;
-        }
         return ret;
     }
 
     if (relevantJobs.size() == 1)
     {
-        QString appName = relevantJobs.first()->getID();
-        if (appName.contains("cwe-mesh"))
-        {
-            if (ret.contains("mesh"))
-            {
-                ret["mesh"] = StageState::RUNNING;
-            }
-            if (ret.contains("sim"))
-            {
-                ret["sim"] = StageState::UNRUN;
-            }
-            if (ret.contains("post"))
-            {
-                ret["post"] = StageState::UNRUN;
-            }
-        }
-        if (appName.contains("cwe-sim"))
-        {
-            if (ret.contains("mesh"))
-            {
-                ret["mesh"] = StageState::FINISHED;
-            }
-            if (ret.contains("sim"))
-            {
-                ret["sim"] = StageState::RUNNING;
-            }
-            if (ret.contains("post"))
-            {
-                ret["post"] = StageState::UNRUN;
-            }
-        }
-        if (appName.contains("cwe-post"))
-        {
-            if (ret.contains("mesh"))
-            {
-                ret["mesh"] = StageState::FINISHED;
-            }
-            if (ret.contains("sim"))
-            {
-                ret["sim"] = StageState::FINISHED;
-            }
-            if (ret.contains("post"))
-            {
-                ret["post"] = StageState::RUNNING;
-            }
-        }
-        return ret;
-    }
+        RemoteJobData * theJob = relevantJobs.first();
+        QString stageName = theJob->getParams().value("stage");
 
-    if (caseFolder->childIsUnloaded())
-    {
-        return ret;
+        if (stageName.isEmpty())
+        {
+            return ret;
+        }
+        ret[stageName] = StageState::RUNNING;
     }
 
     //Check known files for expected result files
@@ -493,14 +448,24 @@ void CFDcaseInstance::startStageApp(QString stageID)
     if (defunct) return;
     if (caseFolder == NULL) return;
 
+    if (myType == NULL) return;
     if (myState == CaseState::OFFLINE) return;
 
     if (currentReq != PendingCFDrequest::NONE) return;
 
-    QString appName = "cwe-";
-    appName = appName.append(stageID);
+    QString appName = myType->getStageApp(stageID);
 
     QMultiMap<QString, QString> rawParams;
+    rawParams.insert("stage",stageID);
+    QString extraInput = myType->getExtraInput(stageID);
+    if (!extraInput.isEmpty())
+    {
+        QString addedInputVal = getCurrentParams().value(extraInput);
+        if (!addedInputVal.isEmpty())
+        {
+            rawParams.insert("file_input", addedInputVal);
+        }
+    }
 
     RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
     RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder->getFileData().getFullPath());
@@ -585,25 +550,15 @@ void CFDcaseInstance::stopJob(QString stage)
     }
 
     QString jobID = relevantJobs.firstKey();
-    QString appName = relevantJobs.first()->getApp();
+    RemoteJobData * theJob = relevantJobs.first();
 
-    bool stopOkay = false;
-
-    //TODO: Can probably clean this logic up, but next version will be more generic for stage names.
-    if (appName.contains("cwe-mesh") && (stage == "mesh"))
+    if (theJob->detailsLoaded() == false)
     {
-        stopOkay = true;
-    }
-    else if (appName.contains("cwe-sim") && (stage == "sim"))
-    {
-        stopOkay = true;
-    }
-    else if (appName.contains("cwe-post") && (stage == "post"))
-    {
-        stopOkay = true;
+        cwe_globals::displayPopup("Need to reload job list before job can be stopped, please wait.", "Network Issue");
+        return;
     }
 
-    if (!stopOkay)
+    if (theJob->getParams().value("stage") != stage)
     {
         cwe_globals::displayPopup("Job for deletion not detected.", "Network Issue");
         return;
@@ -759,9 +714,7 @@ void CFDcaseInstance::jobListUpdated()
 
         QString appName = theJob->getApp();
 
-        if (appName.contains("cwe-mesh") ||
-                appName.contains("cwe-sim") ||
-                appName.contains("cwe-post"))
+        if (appName.contains("cwe-serial") || appName.contains("cwe-parallel"))
         {
             currentReq = PendingCFDrequest::APP_RUN;
         }

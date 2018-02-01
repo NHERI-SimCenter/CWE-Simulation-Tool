@@ -7,6 +7,8 @@
     "stages":{
         "mesh":{
             "name":"Mesh",
+            "app":"cwe-serial",
+            "app_input":"geoFile",
             "groups":[
                 "Building Geometry",
                 "Mesh Density",
@@ -22,6 +24,7 @@
         },
         "sim":{
             "name":"Simulation",
+            "app":"cwe-parallel",
             "groups":[
                 "Simulation Control",
                 "Advanced"

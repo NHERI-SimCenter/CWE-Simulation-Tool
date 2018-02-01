@@ -53,13 +53,9 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetup
     AgaveHandler * tmpHandle = new AgaveHandler(this);
     tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
     tmpHandle->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
-    tmpHandle->registerAgaveAppInfo("openfoam","openfoam-2.4.0u11",{"solver"},{"inputDirectory"},"inputDirectory");
 
-    //The following are being debuged:
-    tmpHandle->registerAgaveAppInfo("FileEcho", "fileEcho-0.1.0",{"directory","NewFile", "EchoText"},{},"directory");
-    tmpHandle->registerAgaveAppInfo("cwe-mesh", "cwe-mesh-0.1.0", {"directory"}, {}, "directory");
-    tmpHandle->registerAgaveAppInfo("cwe-sim", "cwe-sim-2.4.0", {}, {"directory"}, "directory");
-    tmpHandle->registerAgaveAppInfo("cwe-post", "cwe-post-0.1.0", {"directory"}, {}, "directory");
+    tmpHandle->registerAgaveAppInfo("cwe-serial", "cwe-serial-0.1.0", {"stage"}, {"directory", "file_input"}, "directory");
+    tmpHandle->registerAgaveAppInfo("cwe-parallel", "cwe-parallel-0.1.0", {"stage"}, {"directory", "file_input"}, "directory");
 
     theConnector = (RemoteDataInterface *) tmpHandle;
     QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(fatalInterfaceError(QString)));
@@ -159,7 +155,7 @@ QString VWTinterfaceDriver::getBanner()
 
 QString VWTinterfaceDriver::getVersion()
 {
-    return "Version: 0.1.3";
+    return "Version: 0.2.1";
 }
 
 QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()
@@ -214,7 +210,7 @@ void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appL
         return;
     }
 
-    QList<QString> neededApps = {"cwe-mesh", "cwe-sim", "cwe-post"};
+    QList<QString> neededApps = {"cwe-serial", "cwe-parallel"};
 
     for (auto itr = appList->constBegin(); itr != appList->constEnd(); itr++)
     {
