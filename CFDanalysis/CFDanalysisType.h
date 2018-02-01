@@ -48,6 +48,8 @@ public:
     QJsonDocument * getRawConfig();
     QString getInternalName();
     QString getName();
+    QString getStageApp(QString stageName);
+    QString getExtraInput(QString stageName);
 
     QStringList getStageNames();
     QString translateStageId(QString stageId);
