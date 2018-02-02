@@ -53,6 +53,7 @@ CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
     ui->text_label_2->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     ui->text_label_2->setScaledContents(true);
 
+    /*
     ui->text_label_3->setBackgroundRole(QPalette::Base);
     ui->text_label_3->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     ui->text_label_3->setScaledContents(true);
@@ -64,12 +65,15 @@ CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
     ui->text_label_5->setBackgroundRole(QPalette::Base);
     ui->text_label_5->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     ui->text_label_5->setScaledContents(true);
+    */
 
     ui->text_label_1->setPixmap(QPixmap(":/images/Overview/CWEFlow1.png"));
     ui->text_label_2->setPixmap(QPixmap(":/images/Overview/CWEFlow2.png"));
+    /*
     ui->text_label_3->setPixmap(QPixmap(":/images/Overview/CWEFlow3.png"));
     ui->text_label_4->setPixmap(QPixmap(":/images/Overview/CWEFlow4.png"));
     ui->text_label_5->setPixmap(QPixmap(":/images/Overview/CWEFlow5.png"));
+    */
 
 }
 
@@ -84,7 +88,8 @@ void CWE_welcome_screen::on_commandLinkButton_2_clicked()
 
     int index = ui->WelcomeStackedWidget->currentIndex();
     index--;
-    if (index<0) { index += 5; }
+    //if (index<0) { index += 5; }
+    if (index<0) { index += 2; }
     ui->WelcomeStackedWidget->setCurrentIndex(index);
 }
 
@@ -94,6 +99,7 @@ void CWE_welcome_screen::on_commandLinkButton_clicked()
 
     int index = ui->WelcomeStackedWidget->currentIndex();
     index++;
-    if (index>4) { index -= 5; }
+    //if (index>4) { index -= 5; }
+    if (index>1) { index -= 2; }
     ui->WelcomeStackedWidget->setCurrentIndex(index);
 }
