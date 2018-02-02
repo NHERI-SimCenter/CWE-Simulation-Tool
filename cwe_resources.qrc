@@ -197,5 +197,13 @@
         <file>icons/world2.gif</file>
         <file>icons/world2.png</file>
         <file>icons/xml.png</file>
+        <file>help/overview.html</file>
+        <file>help/default.html</file>
+        <file>help/about_developers.html</file>
+        <file>help/about_simcenter.html</file>
+        <file>help/license.html</file>
+        <file>help/clone_case.html</file>
+        <file>help/continue_case.html</file>
+        <file>help/create_case.html</file>
     </qresource>
 </RCC>
