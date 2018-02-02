@@ -49,6 +49,11 @@ public:
     explicit CWE_help(QWidget *parent = 0);
     ~CWE_help();
 
+    void setOverview();
+
+public slots:
+    void on_Overview_anchorClicked(const QUrl &);
+
 private:
     Ui::CWE_help *ui;
 };
