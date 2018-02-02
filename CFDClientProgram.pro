@@ -99,7 +99,8 @@ SOURCES += main.cpp \
     cwe_globals.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp \
     cwe_guiWidgets/cwe_result_popup.cpp \
-    cwe_guiWidgets/cwe_job_list.cpp
+    cwe_guiWidgets/cwe_job_list.cpp \
+    cwe_guiWidgets/cwe_file_manager2.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -152,7 +153,8 @@ HEADERS  += \
     cwe_globals.h \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h \
     cwe_guiWidgets/cwe_result_popup.h \
-    cwe_guiWidgets/cwe_job_list.h
+    cwe_guiWidgets/cwe_job_list.h \
+    cwe_guiWidgets/cwe_file_manager2.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -171,11 +173,10 @@ FORMS    += \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
     cwe_guiWidgets/cwe_result_popup.ui \
-    cwe_guiWidgets/cwe_job_list.ui
+    cwe_guiWidgets/cwe_job_list.ui \
+    cwe_guiWidgets/cwe_file_manager2.ui
 
 RESOURCES += \
     cwe_resources.qrc \
     ../AgaveExplorer/SimCenterCommon/commonResources.qrc \
     CFDanalysis/config/cfdconfig.qrc
-
-DISTFILES +=
