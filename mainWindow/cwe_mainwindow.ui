@@ -106,6 +106,11 @@
         <string>Files</string>
        </attribute>
       </widget>
+      <widget class="CWE_file_manager2" name="tab_files2">
+       <attribute name="title">
+        <string>File (2)</string>
+       </attribute>
+      </widget>
       <widget class="QWidget" name="tab_spacer_2">
        <attribute name="title">
         <string>some text for size</string>
@@ -146,7 +151,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -323,6 +328,12 @@
    <class>CWE_Debug_Widget</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_debug_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_file_manager2</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_file_manager2.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
