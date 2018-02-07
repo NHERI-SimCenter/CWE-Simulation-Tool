@@ -289,21 +289,22 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
     //Check job handler for running tasks on this folder
     QMap<QString, RemoteJobData * > relevantJobs = getRelevantJobs();
 
-    if (relevantJobs.size() > 1)
+    for (auto itr = relevantJobs.cbegin(); itr != relevantJobs.cend(); itr++)
     {
-        return ret;
-    }
-
-    if (relevantJobs.size() == 1)
-    {
-        RemoteJobData * theJob = relevantJobs.first();
-        QString stageName = theJob->getParams().value("stage");
-
-        if (stageName.isEmpty())
+        if (!(*itr)->detailsLoaded())
         {
             return ret;
         }
-        ret[stageName] = StageState::RUNNING;
+    }
+
+    for (auto itr = relevantJobs.cbegin(); itr != relevantJobs.cend(); itr++)
+    {
+        RemoteJobData * theJob = *itr;
+        QString stageName = theJob->getParams().value("stage");
+        if (ret.contains(stageName))
+        {
+            ret[stageName] = StageState::RUNNING;
+        }
     }
 
     //Check known files for expected result files
@@ -468,7 +469,10 @@ void CFDcaseInstance::startStageApp(QString stageID)
     }
 
     RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder->getFileData().getFullPath());
+    QString jobName = appName;
+    jobName = jobName.append("-");
+    jobName = jobName.append(stageID);
+    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder->getFileData().getFullPath(), jobName);
 
     if (jobHandle == NULL)
     {
