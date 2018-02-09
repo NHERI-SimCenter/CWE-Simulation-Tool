@@ -100,7 +100,8 @@ SOURCES += main.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp \
     cwe_guiWidgets/cwe_result_popup.cpp \
     cwe_guiWidgets/cwe_job_list.cpp \
-    cwe_guiWidgets/cwe_file_manager2.cpp
+    cwe_guiWidgets/cwe_file_manager2.cpp \
+    ../AgaveExplorer/utilFuncs/linkedstandarditem.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -154,7 +155,8 @@ HEADERS  += \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h \
     cwe_guiWidgets/cwe_result_popup.h \
     cwe_guiWidgets/cwe_job_list.h \
-    cwe_guiWidgets/cwe_file_manager2.h
+    cwe_guiWidgets/cwe_file_manager2.h \
+    ../AgaveExplorer/utilFuncs/linkedstandarditem.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
