@@ -181,7 +181,7 @@ QMap<QString, QString> CFDcaseInstance::getCurrentParams()
         return ret;
     }
 
-    if ((caseFolder == NULL) || (caseFolder->childIsUnloaded()))
+    if ((caseFolder == NULL) || (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED))
     {
         underlyingFilesUpdated();
         return ret;
@@ -281,7 +281,7 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
         return ret;
     }
 
-    if (caseFolder->childIsUnloaded())
+    if (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED)
     {
         return ret;
     }
@@ -652,7 +652,7 @@ void CFDcaseInstance::underlyingFilesUpdated()
         return;
     }
 
-    if (caseFolder->childIsUnloaded())
+    if (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED)
     {
         theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
         emitNewState(CaseState::LOADING);
