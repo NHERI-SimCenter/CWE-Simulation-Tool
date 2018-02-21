@@ -95,10 +95,7 @@ void CWE_Parameters::newCaseGiven()
     {
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
-
-        if (newCase->getMyType() == NULL) return;
-
-        createUnderlyingParamWidgets();
+        newCaseState(newCase->getCaseState());
     }
 }
 

@@ -55,7 +55,7 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
 
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(fileSystemChange()),
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
                      this, SLOT(underlyingFilesUpdated()));
     QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
                      this, SLOT(jobListUpdated()));
@@ -71,8 +71,6 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
     myType = caseType;
     theDriver = mainDriver;
 
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(fileSystemChange()),
-                     this, SLOT(underlyingFilesUpdated()));
     QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
@@ -89,8 +87,6 @@ CFDcaseInstance::CFDcaseInstance(VWTinterfaceDriver *mainDriver):
 {
     theDriver = mainDriver;
 
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(fileSystemChange()),
-                     this, SLOT(underlyingFilesUpdated()));
     QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
@@ -257,7 +253,7 @@ QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
 }
 
 QMap<QString, StageState> CFDcaseInstance::getStageStates()
-{
+{//TODO: Consider cacheing this result
     QMap<QString, StageState> ret;
     if (defunct)
     {
@@ -280,7 +276,7 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
     {
         return ret;
     }
-
+//TODO: Need to clarify the following line
     if (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED)
     {
         return ret;
@@ -619,6 +615,8 @@ void CFDcaseInstance::underlyingFilesUpdated()
                 expectedNewCaseFolder.clear();
                 QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                                  this, SLOT(caseFolderRemoved()));
+                QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
+                                 this, SLOT(underlyingFilesUpdated()));
                 if (currentReq == PendingCFDrequest::DUP_COPY)
                 {
                     currentReq = PendingCFDrequest::NONE;
@@ -651,7 +649,7 @@ void CFDcaseInstance::underlyingFilesUpdated()
     {
         return;
     }
-
+//TODO: Line below needs to be checked
     if (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED)
     {
         theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
@@ -736,7 +734,7 @@ void CFDcaseInstance::jobListUpdated()
             (currentReq == PendingCFDrequest::APP_RUN))
     {
         currentReq = PendingCFDrequest::NONE;
-        theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+        theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
 
         emitNewState(CaseState::LOADING);
     }
@@ -769,10 +767,17 @@ void CFDcaseInstance::agaveTaskDone(RequestState invokeStatus)
 
     CaseState newState = CaseState::OP_INVOKE;
 
+    /*
+    if (currentReq == PendingCFDrequest::NONE)
+    {
+        return;
+    }
+    */
+
     if ((currentReq == PendingCFDrequest::CREATE_MKDIR) || (currentReq == PendingCFDrequest::DUP_COPY))
     {
         requestDataBeingRefreshed = true;
-        theDriver->getFileHandler()->lsClosestNode(expectedNewCaseFolder);
+        theDriver->getFileHandler()->lsClosestNode(expectedNewCaseFolder, true);
     }
     else
     {
@@ -818,5 +823,7 @@ void CFDcaseInstance::emitNewState(CaseState newState)
 {
     if (newState == myState) return;
     myState = newState;
+    //TODO: Here is where some switches need to be flipped regarding cached data no longer being valid
+
     emit haveNewState(newState);
 }

@@ -108,10 +108,7 @@ void CWE_Results::newCaseGiven()
     {
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
-
-        if (newCase->getMyType() == NULL) return;
-
-        populateResultsScreen();
+        newCaseState(newCase->getCaseState());
     }
 }
 
