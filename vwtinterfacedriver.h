@@ -51,6 +51,7 @@ class VWTinterfaceDriver : public AgaveSetupDriver
 
 public:
     explicit VWTinterfaceDriver(QObject *parent = nullptr, bool debug = false);
+    ~VWTinterfaceDriver();
     virtual void startup();
     virtual void closeAuthScreen();
 
