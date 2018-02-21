@@ -84,6 +84,20 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetup
     }
 }
 
+VWTinterfaceDriver::~VWTinterfaceDriver()
+{
+    if (mainWindow != NULL)
+    {
+        delete mainWindow;
+        mainWindow = NULL;
+    }
+    if (authWindow != NULL)
+    {
+        delete authWindow;
+        authWindow = NULL;
+    }
+}
+
 void VWTinterfaceDriver::startup()
 {
     authWindow = new AuthForm(this);
