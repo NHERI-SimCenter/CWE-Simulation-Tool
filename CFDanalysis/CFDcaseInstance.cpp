@@ -453,6 +453,11 @@ void CFDcaseInstance::emitNewState(InternalCaseState newState)
 {
     if (defunct) return;
 
+    if (myState == InternalCaseState::ERROR)
+    {
+        return;
+    }
+
     if (newState != myState)
     {
         myState = newState;
@@ -563,6 +568,7 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
         {
             if (caseDataLoaded())
             {
+                computeParamList();
                 emitNewState(InternalCaseState::READY);
             }
             else
@@ -676,7 +682,7 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
         if (theChange == StateChangeType::REMOTE_OP_DONE)
         {
             theDriver->getJobHandler()->demandJobDataRefresh();
-            newState = InternalCaseState::RUNNING_JOB;
+            emitNewState(InternalCaseState::RUNNING_JOB);
         }
         return;
     }
@@ -686,7 +692,7 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
         if (theChange == StateChangeType::REMOTE_OP_DONE)
         {
             theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
-            newState = InternalCaseState::FOLDER_CHECK_STOPPED_JOB;
+            emitNewState(InternalCaseState::FOLDER_CHECK_STOPPED_JOB);
         }
         return;
     }
@@ -701,7 +707,7 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
                 paramNode->setFileBuffer(NULL);
             }
             enactDataReload();
-            newState = InternalCaseState::RE_DATA_LOAD;
+            emitNewState(InternalCaseState::RE_DATA_LOAD);
         }
         return;
     }
@@ -712,24 +718,20 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
         {
             theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
             enactDataReload();
-            newState = InternalCaseState::RE_DATA_LOAD;
+            emitNewState(InternalCaseState::RE_DATA_LOAD);
         }
         return;
     }
 }
 
-//DOLINE
-
 void CFDcaseInstance::enactDataReload()
 {
-    //TODO
-
-    /*
-     * FileTreeNode * varFile = caseFolder->getChildNodeWithName(caseParamFileName);
+    if (defunct) return;
+    FileTreeNode * varFile = caseFolder->getChildNodeWithName(caseParamFileName);
 
     if (varFile == NULL)
     {
-        emitNewState(CaseState::INVALID);
+        theDriver->getFileHandler()->speculateNodeWithName(caseFolder, caseParamFileName, false);
         return;
     }
 
@@ -737,7 +739,6 @@ void CFDcaseInstance::enactDataReload()
     if (varStore == NULL)
     {
         theDriver->getFileHandler()->sendDownloadBuffReq(varFile);
-        emitNewState(CaseState::LOADING);
         return;
     }
 
@@ -766,12 +767,24 @@ void CFDcaseInstance::enactDataReload()
             return;
         }
     }
-    */
 }
 
 bool CFDcaseInstance::caseDataLoaded()
 {
-    //TODO
+    if (defunct) return false;
+    if (myType == NULL) return false;
+    if (caseFolder == NULL) return false;
+
+    FileTreeNode * varFile = caseFolder->getChildNodeWithName(caseParamFileName);
+
+    if (varFile == NULL) return false;
+    QByteArray * varStore = varFile->getFileBuffer();
+    if (varStore == NULL) return false;
+
+    if (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED) return false;
+    if (varFile->getNodeState() != NodeState::FILE_BUFF_LOADED) return false;
+
+    return true;
 }
 
 bool CFDcaseInstance::stageStatesEqual(QMap<QString, StageState> *list1, QMap<QString, StageState> *list2)
@@ -794,6 +807,8 @@ bool CFDcaseInstance::stageStatesEqual(QMap<QString, StageState> *list1, QMap<QS
     }
     return true;
 }
+
+//DOLINE: Last method below
 
 QMap<QString, StageState> CFDcaseInstance::computeStageStates()
 {
@@ -871,47 +886,27 @@ QMap<QString, StageState> CFDcaseInstance::computeStageStates()
 void CFDcaseInstance::computeParamList()
 {
     if (defunct) return;
-    if (myState != CaseState::READY)
-    {
-        return;
-    }
-    //TODO: Rewrite this so that demand for data refresh is done elsewhere
-    if ((caseFolder == NULL) || (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED))
-    {
-        underlyingFilesUpdated();
-        return ret;
-    }
+    if (!caseDataLoaded()) return;
 
-    FileTreeNode * vars = caseFolder->getChildNodeWithName(caseParamFileName);
-    if (vars == NULL)
-    {
-        underlyingFilesUpdated();
-        return ret;
-    }
+    FileTreeNode * varFile = caseFolder->getChildNodeWithName(caseParamFileName);
+    QByteArray * varStore = varFile->getFileBuffer();
 
-    QByteArray * rawVars = vars->getFileBuffer();
-    if (rawVars == NULL)
-    {
-        underlyingFilesUpdated();
-        return ret;
-    }
-
-    QJsonDocument varDoc = QJsonDocument::fromJson(*rawVars);
+    QJsonDocument varDoc = QJsonDocument::fromJson(*varStore);
 
     if (varDoc.isNull())
     {
-        underlyingFilesUpdated();
-        return ret;
+        emitNewState(CaseState::ERROR);
+        return;
     }
 
     QJsonObject varsList = varDoc.object().value("vars").toObject();
+    storedParamList.clear();
+    prospectiveNewParamList.clear();
 
     for (auto itr = varsList.constBegin(); itr != varsList.constEnd(); itr++)
     {
-        ret.insert(itr.key(),(*itr).toString());
+        storedParamList.insert(itr.key(),(*itr).toString());
     }
-
-    return ret;
 }
 
 QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
