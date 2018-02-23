@@ -113,7 +113,7 @@ private:
     void emitNewState(InternalCaseState newState);
     void processInternalStateInput(StateChangeType theChange, RequestState invokeStatus);
     void enactDataReload();
-    void internalStateError();
+    bool caseDataLoaded();
 
     bool stageStatesEqual(QMap<QString, StageState> * list1, QMap<QString, StageState> * list2);
     QMap<QString, StageState> computeStageStates();
@@ -136,6 +136,8 @@ private:
 
     QString expectedNewCaseFolder;
     QString downloadDest;
+
+    QString caseParamFileName = ".caseParams";
 };
 
 #endif // CFDCASEINSTANCE_H
