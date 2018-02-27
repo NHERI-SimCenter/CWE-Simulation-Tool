@@ -62,7 +62,7 @@ void cwe_state_label::setCurrentCase(CFDcaseInstance * newCase)
 
 void cwe_state_label::setNewState(CaseState newState)
 {
-    if (newState == CaseState::JOB_RUN)
+    if (newState == CaseState::RUNNING)
     {
         this->setText("Running Remote Task . . . Please Wait");
         return;
@@ -70,6 +70,11 @@ void cwe_state_label::setNewState(CaseState newState)
     if (newState == CaseState::OP_INVOKE)
     {
         this->setText("Updating remote files . . . Please Wait");
+        return;
+    }
+    if (newState == CaseState::DOWNLOAD)
+    {
+        this->setText("Downloading remote case . . . Please Wait");
         return;
     }
     if (newState == CaseState::DEFUNCT)

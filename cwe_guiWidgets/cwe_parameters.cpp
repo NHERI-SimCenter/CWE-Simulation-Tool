@@ -125,11 +125,12 @@ void CWE_Parameters::newCaseState(CaseState newState)
         ui->theTabWidget->setViewState(SimCenterViewState::visible);
         ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
         break;
+    case CaseState::DOWNLOAD:
     case CaseState::OP_INVOKE:
         ui->theTabWidget->setViewState(SimCenterViewState::visible);
         ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
         break;
-    case CaseState::JOB_RUN:
+    case CaseState::RUNNING:
         setVisibleAccordingToStage();
         setButtonsAccordingToStage();
         break;
@@ -153,9 +154,8 @@ void CWE_Parameters::setButtonsAccordingToStage()
         ui->theTabWidget->setTabStage(*itr, itr.key());
         switch (*itr)
         {
-        case StageState::LOADING:
         case StageState::ERROR:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE, itr.key());
+            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESET, itr.key());
             break;
         case StageState::RUNNING:
             ui->theTabWidget->setButtonMode(SimCenterButtonMode_CANCEL, itr.key());
@@ -163,9 +163,19 @@ void CWE_Parameters::setButtonsAccordingToStage()
         case StageState::FINISHED:
             ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESET | SimCenterButtonMode_RESULTS, itr.key());
             break;
+        case StageState::FINISHED_PREREQ:
+            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESULTS, itr.key());
+            break;
         case StageState::UNRUN:
-        default:
             ui->theTabWidget->setButtonMode(SimCenterButtonMode_RUN, itr.key());
+            break;
+        default:
+        case StageState::LOADING:
+        case StageState::DOWNLOADING:
+        case StageState::OFFLINE:
+        case StageState::UNREADY:
+            ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE, itr.key());
+            break;
         }
     }
 }

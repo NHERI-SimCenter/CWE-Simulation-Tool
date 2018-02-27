@@ -196,7 +196,9 @@ QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
     {
         QString stageName = itr.key();
-        if (currentStates.value(stageName, StageState::ERROR) != StageState::FINISHED)
+        StageState theStageState = currentStates.value(stageName, StageState::ERROR);
+        if ((theStageState != StageState::FINISHED) &&
+                (theStageState != StageState::FINISHED_PREREQ))
         {
             continue;
         }
@@ -241,14 +243,17 @@ void CWE_Results::newCaseState(CaseState newState)
         resetViewInfo();
         return; //These states should be handled elsewhere
         break;
+    case CaseState::DOWNLOAD:
     case CaseState::LOADING:
     case CaseState::OP_INVOKE:
         resetViewInfo();
+        return;
         break;
-    case CaseState::JOB_RUN:
+    case CaseState::RUNNING:
     case CaseState::READY:
         resetViewInfo();
         populateResultsScreen();
+        return;
         break;
     default:
         myDriver->fatalInterfaceError("Remote case has unhandled state");
@@ -291,7 +296,9 @@ void CWE_Results::populateResultsScreen()
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
     {
         QString stageName = itr.key();
-        if (currentStates.value(stageName, StageState::ERROR) != StageState::FINISHED)
+        StageState theStageState = currentStates.value(stageName, StageState::ERROR);
+        if ((theStageState != StageState::FINISHED) &&
+                (theStageState != StageState::FINISHED_PREREQ))
         {
             continue;
         }
