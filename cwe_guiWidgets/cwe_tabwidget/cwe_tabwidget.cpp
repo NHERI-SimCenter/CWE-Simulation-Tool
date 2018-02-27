@@ -269,13 +269,16 @@ void CWE_TabWidget::on_pbtn_rollback_clicked()
 
 QString CWE_TabWidget::getStateText(StageState theState)
 {
-    QString msg = "*** TOTAL ERROR ***";
-    if (theState == StageState::ERROR)         { msg = "*** ERROR ***"; }
-    else if (theState == StageState::FINISHED) { msg = "Task Finished"; }
-    else if (theState == StageState::LOADING)  { msg = "Loading Data ..."; }
-    else if (theState == StageState::RUNNING)  { msg = "Task Running"; }
-    else if (theState == StageState::UNRUN)    { msg = "Not Yet Run"; }
-    return msg;
+    if (theState == StageState::DOWNLOADING)    { return "Downloading . . ."; }
+    if (theState == StageState::ERROR)          { return "*** ERROR ***"; }
+    if (theState == StageState::FINISHED)       { return "Task Finished"; }
+    if (theState == StageState::FINISHED_PREREQ){ return "Task Finished"; }
+    if (theState == StageState::LOADING)        { return "Loading Data ..."; }
+    if (theState == StageState::OFFLINE)        { return "Offline (Debug)"; }
+    if (theState == StageState::RUNNING)        { return "Task Running"; }
+    if (theState == StageState::UNREADY)        { return "Need Prev. Stage"; }
+    if (theState == StageState::UNRUN)          { return "Not Yet Run"; }
+    return "*** TOTAL ERROR ***";
 }
 
 QString CWE_TabWidget::getCurrentSelectedStage()

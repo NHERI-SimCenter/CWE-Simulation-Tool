@@ -48,7 +48,7 @@ enum class RequestState;
 
 class VWTinterfaceDriver;
 
-enum class StageState {UNREADY, UNRUN, RUNNING, FINISHED, FINISHED_PREREQ, LOADING, ERROR};
+enum class StageState {UNREADY, UNRUN, RUNNING, FINISHED, FINISHED_PREREQ, LOADING, ERROR, DOWNLOADING, OFFLINE};
 //Stages:
 //UNRUN: Parameters changeable, RUN button active
 //LOADING: Parameters frozen(visible), no buttons
@@ -56,7 +56,7 @@ enum class StageState {UNREADY, UNRUN, RUNNING, FINISHED, FINISHED_PREREQ, LOADI
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, RUNNING, DOWNLOAD, OFFLINE};
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, OP_INVOKE, RUNNING, DOWNLOAD, OFFLINE};
 enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
                              TYPE_SELECTED, EMPTY_CASE, INIT_DATA_LOAD,
                              MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD, READY,
@@ -114,6 +114,8 @@ private:
     void processInternalStateInput(StateChangeType theChange, RequestState invokeStatus);
     void enactDataReload();
     bool caseDataLoaded();
+    bool caseDataInvalid();
+    void computeCaseType();
 
     bool stageStatesEqual(QMap<QString, StageState> * list1, QMap<QString, StageState> * list2);
     QMap<QString, StageState> computeStageStates();
