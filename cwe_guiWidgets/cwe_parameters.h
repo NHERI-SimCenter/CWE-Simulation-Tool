@@ -61,6 +61,8 @@ public:
 
     void switchToResults();
     void performCaseCommand(QString stage, CaseCommand toEnact);
+    void setSaveAllButtonDisabled(bool newSetting);
+    void setSaveAllButtonEnabled(bool newSetting);
 
 private slots:
     void on_pbtn_saveAllParameters_clicked();

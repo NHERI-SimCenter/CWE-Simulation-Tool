@@ -602,7 +602,7 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
 
     if (myState == InternalCaseState::INIT_PARAM_UPLOAD)
     {
-        if (theChange == StateChangeType::REMOTE_OP_DONE)
+        if (theChange == StateChangeType::NEW_FILE_DATA)
         {
             FileTreeNode * paramNode = caseFolder->getChildNodeWithName(caseParamFileName);
             if (paramNode == NULL)
@@ -817,7 +817,7 @@ bool CFDcaseInstance::caseDataInvalid()
     }
 
     QList<CFDanalysisType *> * templates = theDriver->getTemplateList();
-    for (auto itr = templates->cbegin(); (itr != templates->cend()) && (myType == NULL); itr++)
+    for (auto itr = templates->cbegin(); itr != templates->cend(); itr++)
     {
         if (templateName == (*itr)->getInternalName())
         {
