@@ -127,12 +127,9 @@ void CWE_Parameters::newCaseState(CaseState newState)
         break;
     case CaseState::DOWNLOAD:
     case CaseState::OP_INVOKE:
+    case CaseState::RUNNING:
         ui->theTabWidget->setViewState(SimCenterViewState::visible);
         ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
-        break;
-    case CaseState::RUNNING:
-        setVisibleAccordingToStage();
-        setButtonsAccordingToStage();
         break;
     case CaseState::READY:
         ui->theTabWidget->updateParameterValues(myDriver->getCurrentCase()->getCurrentParams());
@@ -263,5 +260,5 @@ void CWE_Parameters::setSaveAllButtonDisabled(bool newSetting)
 
 void CWE_Parameters::setSaveAllButtonEnabled(bool newSetting)
 {
-    ui->pbtn_saveAllParameters->setDisabled(newSetting);
+    ui->pbtn_saveAllParameters->setEnabled(newSetting);
 }
