@@ -78,11 +78,13 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
     if (caseDataLoaded())
     {
         myState = InternalCaseState::READY;
+        storedStageStates = computeStageStates();
         computeParamList();
         return;
     }
 
     myState = InternalCaseState::INIT_DATA_LOAD;
+    storedStageStates = computeStageStates();
     enactDataReload();
 }
 
@@ -691,8 +693,13 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
 
             if (foundRelevantTask == false)
             {
+                theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
                 enactDataReload();
                 emitNewState(InternalCaseState::RE_DATA_LOAD);
+            }
+            else
+            {
+                emitNewState(InternalCaseState::RUNNING_JOB);
             }
         }
         return;
@@ -933,7 +940,11 @@ QMap<QString, StageState> CFDcaseInstance::computeStageStates()
         return ret;
     }
 
-    if (currentState == CaseState::RUNNING)
+    if (myState == InternalCaseState::STARTING_JOB)
+    {
+        ret[runningStage] = StageState::RUNNING;
+    }
+    else if (currentState == CaseState::RUNNING)
     {
         //Check job handler for running tasks on this folder
         QMap<QString, RemoteJobData * > relevantJobs = getRelevantJobs();
