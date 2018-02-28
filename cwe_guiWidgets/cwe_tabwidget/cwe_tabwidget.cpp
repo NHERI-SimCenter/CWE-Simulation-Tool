@@ -107,11 +107,13 @@ void CWE_TabWidget::enactButtonSetting()
     ui->pbtn_cancel->setDisabled(true);
     ui->pbtn_results->setDisabled(true);
     ui->pbtn_rollback->setDisabled(true);
+    myController->setSaveAllButtonDisabled(true);
 
     if (currentMode & SimCenterButtonMode_RUN)     { ui->pbtn_run->setEnabled(true);     }
     if (currentMode & SimCenterButtonMode_CANCEL)  { ui->pbtn_cancel->setEnabled(true);  }
     if (currentMode & SimCenterButtonMode_RESET)   { ui->pbtn_rollback->setEnabled(true);}
     if (currentMode & SimCenterButtonMode_RESULTS) { ui->pbtn_results->setEnabled(true); }
+    if (currentMode & SimCenterButtonMode_SAVE_ALL) { myController->setSaveAllButtonEnabled(true); }
 }
 
 void CWE_TabWidget::setViewState(SimCenterViewState state)

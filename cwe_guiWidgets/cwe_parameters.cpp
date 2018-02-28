@@ -167,13 +167,15 @@ void CWE_Parameters::setButtonsAccordingToStage()
             ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESULTS, itr.key());
             break;
         case StageState::UNRUN:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RUN, itr.key());
+            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RUN | SimCenterButtonMode_SAVE_ALL, itr.key());
             break;
-        default:
+        case StageState::UNREADY:
+            ui->theTabWidget->setButtonMode(SimCenterButtonMode_SAVE_ALL, itr.key());
+            break;
         case StageState::LOADING:
         case StageState::DOWNLOADING:
         case StageState::OFFLINE:
-        case StageState::UNREADY:
+        default:
             ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE, itr.key());
             break;
         }
@@ -187,12 +189,16 @@ void CWE_Parameters::setVisibleAccordingToStage()
     {
         switch (*itr)
         {
+        case StageState::DOWNLOADING:
         case StageState::ERROR:
-        case StageState::RUNNING:
         case StageState::FINISHED:
+        case StageState::FINISHED_PREREQ:
         case StageState::LOADING:
+        case StageState::RUNNING:
             ui->theTabWidget->setViewState(SimCenterViewState::visible, itr.key());
             break;
+        case StageState::OFFLINE:
+        case StageState::UNREADY:
         case StageState::UNRUN:
         default:
             ui->theTabWidget->setViewState(SimCenterViewState::editable, itr.key());
@@ -248,4 +254,14 @@ void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
     {
         myDriver->getCurrentCase()->startStageApp(stage);
     }
+}
+
+void CWE_Parameters::setSaveAllButtonDisabled(bool newSetting)
+{
+    ui->pbtn_saveAllParameters->setDisabled(newSetting);
+}
+
+void CWE_Parameters::setSaveAllButtonEnabled(bool newSetting)
+{
+    ui->pbtn_saveAllParameters->setDisabled(newSetting);
 }
