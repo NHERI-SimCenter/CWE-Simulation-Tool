@@ -157,7 +157,8 @@ CaseState CFDcaseInstance::getCaseState()
     case InternalCaseState::STOPPING_JOB :
     case InternalCaseState::USER_PARAM_UPLOAD :
     case InternalCaseState::WAITING_FOLDER_DEL : return CaseState::OP_INVOKE;
-    case InternalCaseState::RUNNING_JOB : return CaseState::RUNNING;
+    case InternalCaseState::RUNNING_JOB_LINKED :
+    case InternalCaseState::RUNNING_JOB_UNLINKED : return CaseState::RUNNING;
     default:
         return CaseState::ERROR;
     }
@@ -301,6 +302,7 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 
 void CFDcaseInstance::startStageApp(QString stageID)
 {
+    //TODO: Re-write for now job funcs
     if (defunct) return;
     if (caseFolder == NULL) return;
     if (myType == NULL) return;
@@ -387,6 +389,7 @@ void CFDcaseInstance::downloadCase(QString destLocalFile)
 
 void CFDcaseInstance::stopJob(QString stage)
 {
+    //TODO: Re-write for now job funcs
     if (defunct) return;
     if (caseFolder == NULL) return;
     if (myState != InternalCaseState::RUNNING_JOB) return;
@@ -458,6 +461,12 @@ void CFDcaseInstance::agaveTaskDone(RequestState invokeStatus)
     processInternalStateInput(StateChangeType::REMOTE_OP_DONE, invokeStatus);
 }
 
+void CFDcaseInstance::individualJobChange(JobListNode * theNode)
+{
+    if (defunct) return;
+    processInternalStateInput(StateChangeType::INDIV_JOB_CHANGE, RequestState::GOOD, theNode);
+}
+
 void CFDcaseInstance::caseFolderRemoved()
 {
     killCaseConnection();
@@ -490,7 +499,7 @@ void CFDcaseInstance::emitNewState(InternalCaseState newState)
     }
 }
 
-void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, RequestState invokeStatus)
+void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, RequestState invokeStatus, JobListNode * changedNode)
 {
     if (defunct) return;
 
@@ -667,8 +676,8 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
         }
     }
 
-    if (myState == InternalCaseState::RUNNING_JOB)
-    {
+    if (myState == InternalCaseState::RUNNING_JOB_LINKED)
+    {//TODO: Redo for stage split
         if (theChange == StateChangeType::NEW_JOB_LIST)
         {
             QMap<QString, RemoteJobData * > jobList = getRelevantJobs();
@@ -688,6 +697,7 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
                 else
                 {
                     foundRelevantTask = true;
+                    theDriver->getJobHandler()->requestJobDetails(aJob);
                 }
             }
 
@@ -705,8 +715,15 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
         return;
     }
 
+    if (myState == InternalCaseState::RUNNING_JOB_UNLINKED)
+    {
+        //TODO: Finish for new state
+        return;
+    }
+
     if (myState == InternalCaseState::STARTING_JOB)
     {
+        //TODO: Change for state split
         if (theChange == StateChangeType::REMOTE_OP_DONE)
         {
             theDriver->getJobHandler()->demandJobDataRefresh();

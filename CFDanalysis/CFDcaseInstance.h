@@ -44,6 +44,7 @@
 class FileTreeNode;
 class CFDanalysisType;
 class RemoteJobData;
+class JobListNode;
 enum class RequestState;
 
 class VWTinterfaceDriver;
@@ -61,9 +62,9 @@ enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
                              TYPE_SELECTED, EMPTY_CASE, INIT_DATA_LOAD,
                              MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD, READY,
                              USER_PARAM_UPLOAD, WAITING_FOLDER_DEL, RE_DATA_LOAD,
-                             STARTING_JOB, STOPPING_JOB, RUNNING_JOB,
+                             STARTING_JOB, STOPPING_JOB, RUNNING_JOB_UNLINKED, RUNNING_JOB_LINKED,
                              FOLDER_CHECK_STOPPED_JOB, DOWNLOAD};
-enum class StateChangeType {NEW_FILE_DATA, REMOTE_OP_DONE, NEW_JOB_LIST};
+enum class StateChangeType {NEW_FILE_DATA, REMOTE_OP_DONE, NEW_JOB_LIST, INDIV_JOB_CHANGE};
 
 class CFDcaseInstance : public QObject
 {
@@ -106,12 +107,13 @@ private slots:
     void underlyingFilesUpdated();
     void jobListUpdated();
     void agaveTaskDone(RequestState invokeStatus);
+    void individualJobChange(JobListNode * theNode);
 
     void caseFolderRemoved();
 
 private:
     void emitNewState(InternalCaseState newState);
-    void processInternalStateInput(StateChangeType theChange, RequestState invokeStatus);
+    void processInternalStateInput(StateChangeType theChange, RequestState invokeStatus, JobListNode * changedNode = NULL);
     void enactDataReload();
     bool caseDataLoaded();
     bool caseDataInvalid();
@@ -129,6 +131,7 @@ private:
     QMap<QString, QString> storedParamList;
     QMap<QString, QString> prospectiveNewParamList;
     QString runningStage;
+    JobListNode * runningJobNode = NULL;
     InternalCaseState myState = InternalCaseState::ERROR;
 
     VWTinterfaceDriver * theDriver;
