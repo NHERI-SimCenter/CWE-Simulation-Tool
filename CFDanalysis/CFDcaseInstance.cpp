@@ -39,6 +39,7 @@
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
+#include "../AgaveExplorer/remoteFileOps/joblistnode.h"
 
 #include "../AgaveClientInterface/filemetadata.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
@@ -302,7 +303,6 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 
 void CFDcaseInstance::startStageApp(QString stageID)
 {
-    //TODO: Re-write for now job funcs
     if (defunct) return;
     if (caseFolder == NULL) return;
     if (myType == NULL) return;
@@ -335,6 +335,7 @@ void CFDcaseInstance::startStageApp(QString stageID)
         return;
     }
     runningStage = stageID;
+    runningJobNode = NULL; //Note: job nodes are managed and cleaned up by the job handler
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
                      this, SLOT(agaveTaskDone(RequestState)));
     emitNewState(InternalCaseState::STARTING_JOB);
@@ -389,10 +390,38 @@ void CFDcaseInstance::downloadCase(QString destLocalFile)
 
 void CFDcaseInstance::stopJob(QString stage)
 {
-    //TODO: Re-write for now job funcs
     if (defunct) return;
     if (caseFolder == NULL) return;
-    if (myState != InternalCaseState::RUNNING_JOB) return;
+    if ((myState != InternalCaseState::RUNNING_JOB_LINKED) &&
+            (myState != InternalCaseState::RUNNING_JOB_LINKED))
+    {
+        return;
+    }
+
+    if (myState == InternalCaseState::RUNNING_JOB_LINKED)
+    {
+        if (runningJobNode == NULL)
+        {
+            cwe_globals::displayPopup("Error: Stop invoked for non-extant running job.", "Internal Program Inconsitancy");
+            emitNewState(InternalCaseState::ERROR);
+            return;
+        }
+
+        RemoteDataReply * jobHandle = theDriver->getDataConnection()->stopJob(runningJobNode->getData().getID());
+
+        if (jobHandle == NULL)
+        {
+            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+            return;
+        }
+
+        QObject::connect(jobHandle, SIGNAL(haveStoppedJob(RequestState)),
+                         this, SLOT(agaveTaskDone(RequestState)));
+
+        emitNewState(InternalCaseState::STOPPING_JOB);
+        return;
+    }
+
     if (stage != runningStage)
     {
         cwe_globals::displayPopup("Error: Stop for non-existant job detected.", "Internal Program Inconsitancy");
@@ -403,29 +432,34 @@ void CFDcaseInstance::stopJob(QString stage)
 
     if (relevantJobs.size() == 0)
     {
-        cwe_globals::displayPopup("No job detected for stopping", "Network Issue");
+        theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
+        enactDataReload();
+        emitNewState(InternalCaseState::FOLDER_CHECK_STOPPED_JOB);
         return;
     }
 
-    if (relevantJobs.size() > 1)
+    for (auto itr = relevantJobs.cbegin(); itr != relevantJobs.cend(); itr++)
     {
-        cwe_globals::displayPopup("Need to reload job list before job can be stopped, please wait.", "Network Issue");
+        if (!(*itr)->detailsLoaded())
+        {
+            cwe_globals::displayPopup("Need to reload job list before job can be stopped, please wait.", "Network Issue");
+            return;
+        }
+    }
+
+    if (relevantJobs.size() > 0)
+    {
+        cwe_globals::displayPopup("Multiple jobs detected for this case. CWE is in inconsistant state.", "ERROR");
+        emitNewState(InternalCaseState::ERROR);
         return;
     }
 
     QString jobID = relevantJobs.firstKey();
     RemoteJobData * theJob = relevantJobs.first();
 
-    if (theJob->detailsLoaded() == false)
-    {
-        cwe_globals::displayPopup("Need to reload job list before job can be stopped, please wait.", "Network Issue");
-        return;
-    }
-
     if (theJob->getParams().value("stage") != stage)
     {
-        cwe_globals::displayPopup("Job for deletion not detected.", "Network Issue");
-        return;
+        cwe_globals::displayPopup("Job for deletion does not match running stage.", "Error:");
     }
 
     RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
@@ -588,7 +622,7 @@ void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, Reque
     }
 
     if ((myState == InternalCaseState::INIT_DATA_LOAD) || (myState == InternalCaseState::RE_DATA_LOAD))
-    {
+    {//TODO: Need to check for running job
         if ((theChange == StateChangeType::NEW_FILE_DATA) || (theChange == StateChangeType::NEW_JOB_LIST))
         {
             if (caseDataInvalid())
@@ -807,6 +841,16 @@ bool CFDcaseInstance::caseDataLoaded()
     return true;
 }
 
+bool CFDcaseInstance::outstandingJobDataFound()
+{
+    //TODO
+}
+
+void CFDcaseInstance::assignJobPointer()
+{
+    //TODO
+}
+
 bool CFDcaseInstance::caseDataInvalid()
 {
     if (defunct) return false;
@@ -905,16 +949,10 @@ QMap<QString, StageState> CFDcaseInstance::computeStageStates()
 {
     //Note: For such a simple method, the code here is a bit sloppy.
     //Needs re-think and re-write
+    //TODO: Redo for running job state split
     QMap<QString, StageState> ret;
-    if (defunct)
-    {
-        return ret;
-    }
-
-    if (myType == NULL)
-    {
-        return ret;
-    }
+    if (defunct) return ret;
+    if (myType == NULL) return ret;
 
     QStringList stateList = myType->getStageSequence();
     CaseState currentState = getCaseState();
@@ -961,7 +999,11 @@ QMap<QString, StageState> CFDcaseInstance::computeStageStates()
     {
         ret[runningStage] = StageState::RUNNING;
     }
-    else if (currentState == CaseState::RUNNING)
+    else if (currentState == InternalCaseState::RUNNING_JOB_LINKED)
+    {
+        //DOLINE
+    }
+    else if (currentState == InternalCaseState::RUNNING_JOB_UNLINKED)
     {
         //Check job handler for running tasks on this folder
         QMap<QString, RemoteJobData * > relevantJobs = getRelevantJobs();

@@ -116,6 +116,8 @@ private:
     void processInternalStateInput(StateChangeType theChange, RequestState invokeStatus, JobListNode * changedNode = NULL);
     void enactDataReload();
     bool caseDataLoaded();
+    bool outstandingJobDataFound();
+    void assignJobPointer();
     bool caseDataInvalid();
     void computeCaseType();
 
