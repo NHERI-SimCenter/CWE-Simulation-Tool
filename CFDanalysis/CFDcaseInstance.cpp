@@ -158,8 +158,8 @@ CaseState CFDcaseInstance::getCaseState()
     case InternalCaseState::STOPPING_JOB :
     case InternalCaseState::USER_PARAM_UPLOAD :
     case InternalCaseState::WAITING_FOLDER_DEL : return CaseState::OP_INVOKE;
-    case InternalCaseState::RUNNING_JOB_LINKED :
-    case InternalCaseState::RUNNING_JOB_UNLINKED : return CaseState::RUNNING;
+    case InternalCaseState::RUNNING_JOB_NORECORD :
+    case InternalCaseState::RUNNING_JOB_YESRECORD : return CaseState::RUNNING;
     default:
         return CaseState::ERROR;
     }
@@ -302,7 +302,7 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 }
 
 void CFDcaseInstance::startStageApp(QString stageID)
-{//TODO: Redo for new job ops
+{
     if (defunct) return;
     if (caseFolder == NULL) return;
     if (myType == NULL) return;
@@ -337,7 +337,7 @@ void CFDcaseInstance::startStageApp(QString stageID)
     runningStage = stageID;
     runningJobNode = NULL; //Note: job nodes are managed and cleaned up by the job handler
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(jobInvoked(RequestState)));
+                     this, SLOT(jobInvoked(RequestState,QJsonDocument*)));
     emitNewState(InternalCaseState::STARTING_JOB);
 }
 
@@ -389,81 +389,34 @@ void CFDcaseInstance::downloadCase(QString destLocalFile)
 }
 
 void CFDcaseInstance::stopJob(QString stage)
-{//TODO: Redo for new job ops
+{
     if (defunct) return;
     if (caseFolder == NULL) return;
-    if ((myState != InternalCaseState::RUNNING_JOB_LINKED) &&
-            (myState != InternalCaseState::RUNNING_JOB_LINKED))
-    {
-        return;
-    }
+    if ((myState != InternalCaseState::RUNNING_JOB_YESRECORD) && (myState != InternalCaseState::RUNNING_JOB_NORECORD)) return;
 
-    if (myState == InternalCaseState::RUNNING_JOB_LINKED)
+    RemoteDataReply * jobHandle = NULL;
+    if (myState == InternalCaseState::RUNNING_JOB_YESRECORD)
     {
         if (runningJobNode == NULL)
         {
-            cwe_globals::displayPopup("Error: Stop invoked for non-extant running job.", "Internal Program Inconsitancy");
+            cwe_globals::displayPopup("Error: Stop invoked for non-identified running job.", "Internal Program Inconsitancy");
             emitNewState(InternalCaseState::ERROR);
             return;
         }
 
-        RemoteDataReply * jobHandle = theDriver->getDataConnection()->stopJob(runningJobNode->getData().getID());
-
-        if (jobHandle == NULL)
+        if (runningJobNode->getParams().value("stage") != stage)
         {
-            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+            cwe_globals::displayPopup("Error: Stop invoked for job in wrong stage.", "Internal Program Inconsitancy");
+            emitNewState(InternalCaseState::ERROR);
             return;
         }
 
-        QObject::connect(jobHandle, SIGNAL(haveStoppedJob(RequestState)),
-                         this, SLOT(jobInvoked(RequestState)));
-
-        emitNewState(InternalCaseState::STOPPING_JOB);
-        return;
+        jobHandle = theDriver->getDataConnection()->stopJob(runningJobNode->getID());
     }
-
-    if (stage != runningStage)
+    else
     {
-        cwe_globals::displayPopup("Error: Stop for non-existant job detected.", "Internal Program Inconsitancy");
-        return;
+        jobHandle = theDriver->getDataConnection()->stopJob(runningID);
     }
-
-    QMap<QString, RemoteJobData * > relevantJobs = getRelevantJobs();
-
-    if (relevantJobs.size() == 0)
-    {
-        theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
-        enactDataReload();
-        emitNewState(InternalCaseState::FOLDER_CHECK_STOPPED_JOB);
-        return;
-    }
-
-    for (auto itr = relevantJobs.cbegin(); itr != relevantJobs.cend(); itr++)
-    {
-        if (!(*itr)->detailsLoaded())
-        {
-            cwe_globals::displayPopup("Need to reload job list before job can be stopped, please wait.", "Network Issue");
-            return;
-        }
-    }
-
-    if (relevantJobs.size() > 0)
-    {
-        cwe_globals::displayPopup("Multiple jobs detected for this case. CWE is in inconsistant state.", "ERROR");
-        emitNewState(InternalCaseState::ERROR);
-        return;
-    }
-
-    QString jobID = relevantJobs.firstKey();
-    RemoteJobData * theJob = relevantJobs.first();
-
-    if (theJob->getParams().value("stage") != stage)
-    {
-        cwe_globals::displayPopup("Job for deletion does not match running stage.", "Error:");
-    }
-
-    RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
-    RemoteDataReply * jobHandle = remoteConnect->stopJob(jobID);
 
     if (jobHandle == NULL)
     {
@@ -472,9 +425,10 @@ void CFDcaseInstance::stopJob(QString stage)
     }
 
     QObject::connect(jobHandle, SIGNAL(haveStoppedJob(RequestState)),
-                     this, SLOT(jobInvoked(RequestState)));
+                     this, SLOT(jobKilled(RequestState)));
 
     emitNewState(InternalCaseState::STOPPING_JOB);
+    return;
 }
 
 void CFDcaseInstance::underlyingFilesUpdated()
@@ -518,8 +472,11 @@ void CFDcaseInstance::jobListUpdated()
     case InternalCaseState::READY:
         state_Ready_fileChange_jobList(); return;
 
-    case InternalCaseState::RUNNING_JOB_UNLINKED:
-        state_RunningUnlinked_jobList(); return;
+    case InternalCaseState::RUNNING_JOB_NORECORD:
+        state_RunningNoRecord_jobList(); return;
+
+    case InternalCaseState::RUNNING_JOB_YESRECORD:
+        state_RunningYesRecord_jobList(); return;
 
     default:
         return;
@@ -564,23 +521,7 @@ void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
     }
 }
 
-void CFDcaseInstance::individualJobChange(JobListNode * theNode)
-{
-    if (defunct) return;
-
-    InternalCaseState activeState = myState;
-
-    switch (activeState)
-    {
-    case InternalCaseState::RUNNING_JOB_LINKED:
-        state_RunningLinked_indvJobChange(theNode); return;
-
-    default:
-        return;
-    }
-}
-
-void CFDcaseInstance::jobInvoked(RequestState invokeStatus)
+void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument *jobData)
 {
     if (defunct) return;
 
@@ -593,9 +534,42 @@ void CFDcaseInstance::jobInvoked(RequestState invokeStatus)
 
     if (invokeStatus == RequestState::FAIL)
     {
-        cwe_globals::displayPopup("Unable to start/stop requested job. Reloading Case", "Network Connection Error");
-        enactDataReload();
         emitNewState(InternalCaseState::RE_DATA_LOAD);
+        cwe_globals::displayPopup("Unable to start requested job. Reloading Case", "Network Connection Error");
+        enactDataReload();
+        return;
+    }
+
+    InternalCaseState activeState = myState;
+
+    QString idFromReply = jobData->object().value("result").toObject().value("id").toString();
+
+    switch (activeState)
+    {
+    case InternalCaseState::STARTING_JOB:
+        state_StartingJob_jobInvoked(idFromReply); return;
+
+    default:
+        return;
+    }
+}
+
+void CFDcaseInstance::jobKilled(RequestState invokeStatus)
+{
+    if (defunct) return;
+
+    if (invokeStatus == RequestState::NO_CONNECT)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Lost connection to DesignSafe. Please check network and try again.", "Network Connection Error");
+        return;
+    }
+
+    if (invokeStatus == RequestState::FAIL)
+    {
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        cwe_globals::displayPopup("Unable to stop requested job. Reloading Case", "Network Connection Error");
+        enactDataReload();
         return;
     }
 
@@ -603,11 +577,8 @@ void CFDcaseInstance::jobInvoked(RequestState invokeStatus)
 
     switch (activeState)
     {
-    case InternalCaseState::STARTING_JOB:
-        state_StartingJob_jobInvoked(); return;
-
     case InternalCaseState::STOPPING_JOB:
-        state_StoppingJob_jobInvoked(); return;
+        state_StoppingJob_jobKilled(); return;
 
     default:
         return;
@@ -684,41 +655,21 @@ bool CFDcaseInstance::caseDataLoaded()
     return true;
 }
 
-bool CFDcaseInstance::outstandingJobDataFound()
-{
-    //TODO
-}
-
-void CFDcaseInstance::assignJobPointer()
-{
-    //TODO
-}
-
 bool CFDcaseInstance::caseDataInvalid()
 {
+    //This is for when we have loaded the remote info and we know this current folder is NOT a CWE case
     if (defunct) return false;
     if (caseFolder == NULL) return false;
 
+    if (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED) return false;
+
     FileTreeNode * varFile = caseFolder->getChildNodeWithName(caseParamFileName);
 
-    if (varFile == NULL)
-    {
-        if (caseFolder->getNodeState() == NodeState::FOLDER_CONTENTS_LOADED)
-        {
-            return true;
-        }
-        return false;
-    }
+    if (varFile == NULL) return true;
+    if (varFile->getNodeState() != NodeState::FILE_BUFF_LOADED) return false;
 
     QByteArray * varStore = varFile->getFileBuffer();
-    if (varStore == NULL)
-    {
-        if (varFile->getNodeState() == NodeState::FILE_BUFF_LOADED)
-        {
-            return true;
-        }
-        return false;
-    }
+    if (varStore == NULL) return true;
 
     QJsonDocument varDoc = QJsonDocument::fromJson(*varStore);
     QString templateName = varDoc.object().value("type").toString();
@@ -790,9 +741,9 @@ bool CFDcaseInstance::stageStatesEqual(QMap<QString, StageState> *list1, QMap<QS
 
 QMap<QString, StageState> CFDcaseInstance::computeStageStates()
 {
-    //Note: For such a simple method, the code here is a bit sloppy.
+    //Note: The code here smells bad
     //Needs re-think and re-write
-    //TODO: Redo for running job state split
+
     QMap<QString, StageState> ret;
     if (defunct) return ret;
     if (myType == NULL) return ret;
@@ -833,40 +784,28 @@ QMap<QString, StageState> CFDcaseInstance::computeStageStates()
         ret.insert((*itr), StageState::LOADING);
     }
 
-    if ((caseFolder == NULL) || (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED) || (currentState == CaseState::OP_INVOKE))
+    if ((caseFolder == NULL) || (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED) ||
+            (myState == InternalCaseState::STOPPING_JOB) || (myState == InternalCaseState::MAKING_FOLDER) ||
+            (myState == InternalCaseState::INIT_PARAM_UPLOAD) || (myState == InternalCaseState::USER_PARAM_UPLOAD) ||
+            (myState == InternalCaseState::FOLDER_CHECK_STOPPED_JOB) || (myState == InternalCaseState::COPYING_FOLDER) ||
+            (myState == InternalCaseState::WAITING_FOLDER_DEL))
     {
         return ret;
     }
 
-    if (myState == InternalCaseState::STARTING_JOB)
+    if ((myState == InternalCaseState::STARTING_JOB) || (myState == InternalCaseState::RUNNING_JOB_NORECORD))
     {
-        ret[runningStage] = StageState::RUNNING;
-    }
-    else if (currentState == InternalCaseState::RUNNING_JOB_LINKED)
-    {
-        //DOLINE
-    }
-    else if (currentState == InternalCaseState::RUNNING_JOB_UNLINKED)
-    {
-        //Check job handler for running tasks on this folder
-        QMap<QString, RemoteJobData * > relevantJobs = getRelevantJobs();
-
-        for (auto itr = relevantJobs.cbegin(); itr != relevantJobs.cend(); itr++)
+        if (ret.contains(runningStage))
         {
-            if (!(*itr)->detailsLoaded())
-            {
-                return ret;
-            }
+            ret[runningStage] = StageState::RUNNING;
         }
-
-        for (auto itr = relevantJobs.cbegin(); itr != relevantJobs.cend(); itr++)
+    }
+    else if (myState == InternalCaseState::RUNNING_JOB_YESRECORD)
+    {
+        QString trueStage = runningJobNode->getParams().value("stage");
+        if (ret.contains(trueStage))
         {
-            RemoteJobData * theJob = *itr;
-            QString stageName = theJob->getParams().value("stage");
-            if (ret.contains(stageName))
-            {
-                ret[stageName] = StageState::RUNNING;
-            }
+            ret[trueStage] = StageState::RUNNING;
         }
     }
 
@@ -948,38 +887,44 @@ void CFDcaseInstance::computeParamList()
     }
 }
 
-QMap<QString, RemoteJobData * > CFDcaseInstance::getRelevantJobs()
+bool CFDcaseInstance::allListedJobsHaveDetails(QMap<QString, const RemoteJobData * > jobList)
 {
-    QMap<QString, RemoteJobData * > ret;
+    for (auto itr = jobList.begin(); itr != jobList.end(); itr++)
+    {
+        if (!(*itr)->detailsLoaded())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+QMap<QString, const RemoteJobData * > CFDcaseInstance::getRelevantJobs()
+{
+    QMap<QString, const RemoteJobData *> ret;
 
     if (caseFolder == NULL)
     {
         return ret;
     }
 
-    QMap<QString, RemoteJobData> jobs = theDriver->getJobHandler()->getRunningJobs();
+    QMap<QString, const RemoteJobData *> jobs = theDriver->getRunningCWEjobs();
 
     for (auto itr = jobs.begin(); itr != jobs.end(); itr++)
     {
-        QString jobID = (*itr).getID();
-        QString appName = (*itr).getApp();
-        if (!appName.contains("cwe-serial") && !appName.contains("cwe-parallel"))
+        QString jobID = (*itr)->getID();
+
+        if (!(*itr)->detailsLoaded())
         {
+            ret.insert(jobID, (*itr));
             continue;
         }
 
-        if (!(*itr).detailsLoaded())
-        {
-            ret.insert(jobID, &(*itr));
-            theDriver->getJobHandler()->requestJobDetails(&(*itr));
-            continue;
-        }
-
-        QString jobDir = (*itr).getParams().value("directory");
+        QString jobDir = (*itr)->getParams().value("directory");
 
         if (caseFolder->fileNameMatches(jobDir))
         {
-            ret.insert(jobID, &(*itr));
+            ret.insert(jobID, (*itr));
         }
     }
     return ret;
@@ -1091,7 +1036,7 @@ void CFDcaseInstance::state_FolderCheckStopped_fileChange_taskDone()
 }
 
 void CFDcaseInstance::state_DataLoad_fileChange_jobList()
-{//TODO: Need to check for running job
+{
     if ((myState != InternalCaseState::INIT_DATA_LOAD) && (myState != InternalCaseState::RE_DATA_LOAD)) return;
 
     if (caseDataInvalid())
@@ -1101,14 +1046,35 @@ void CFDcaseInstance::state_DataLoad_fileChange_jobList()
     }
     computeCaseType();
 
-    if (caseDataLoaded())
+    if (!caseDataLoaded())
     {
-        computeParamList();
+        enactDataReload();
+        return;
+    }
+
+    computeParamList();
+
+    QMap<QString, const RemoteJobData *> relevantJobs = getRelevantJobs();
+    if (relevantJobs.isEmpty())
+    {
         emitNewState(InternalCaseState::READY);
+        return;
+    }
+
+    if (allListedJobsHaveDetails(relevantJobs))
+    {
+        if (relevantJobs.size() > 1)
+        {
+            emitNewState(InternalCaseState::ERROR);
+            cwe_globals::displayPopup("CWE job started outside of this program. Case data now corrupted. Please do not start CWE jobs outside of CWE.", "ERROR");
+            return;
+        }
+        runningJobNode = relevantJobs.first();
+        emitNewState(InternalCaseState::RUNNING_JOB_YESRECORD);
     }
     else
     {
-        enactDataReload();
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
     }
 }
 
@@ -1129,7 +1095,7 @@ void CFDcaseInstance::state_InitParam_taskDone(RequestState invokeStatus)
 
 void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
 {
-    if (myState != InternalCaseState::MAKING_FOLDER);
+    if (myState != InternalCaseState::MAKING_FOLDER) return;
 
     if (invokeStatus != RequestState::GOOD)
     {
@@ -1175,62 +1141,87 @@ void CFDcaseInstance::state_Ready_fileChange_jobList()
         enactDataReload();
         emitNewState(InternalCaseState::RE_DATA_LOAD);
     }
-    //TODO: Check if new job data is relevant
-}
 
-void CFDcaseInstance::state_RunningLinked_indvJobChange(JobListNode *theNode)
-{
-    //TODO: Redo for stage split
-    if (myState != InternalCaseState::RUNNING_JOB_LINKED) return;
-}
+    QMap<QString, const RemoteJobData *> relevantJobs = getRelevantJobs();
+    if (relevantJobs.isEmpty()) return;
 
-void CFDcaseInstance::state_RunningUnlinked_jobList()
-{
-    //TODO: Redo for stage split
-    if (myState != InternalCaseState::RUNNING_JOB_UNLINKED) return;
-
-    QMap<QString, RemoteJobData * > jobList = getRelevantJobs();
-
-    bool foundRelevantTask = false;
-
-    for (auto itr = jobList.cbegin(); (itr != jobList.cend()) && (foundRelevantTask == false); itr++)
+    if (!allListedJobsHaveDetails(relevantJobs))
     {
-        RemoteJobData * aJob = (*itr);
-        if (aJob->detailsLoaded())
-        {
-            if (caseFolder->fileNameMatches(aJob->getInputs().value("directory")))
-            {
-                foundRelevantTask = true;
-            }
-        }
-        else
-        {
-            foundRelevantTask = true;
-            theDriver->getJobHandler()->requestJobDetails(aJob);
-        }
-    }
-
-    if (foundRelevantTask == false)
-    {
-        theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
         enactDataReload();
         emitNewState(InternalCaseState::RE_DATA_LOAD);
     }
-    else
+
+    if (relevantJobs.size() > 1)
     {
-        emitNewState(InternalCaseState::RUNNING_JOB);
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("CWE job started outside of this program. Case data now corrupted. Please do not start CWE jobs outside of CWE.", "ERROR");
+        return;
+    }
+    runningJobNode = relevantJobs.first();
+    emitNewState(InternalCaseState::RUNNING_JOB_YESRECORD);
+}
+
+void CFDcaseInstance::state_RunningNoRecord_jobList()
+{
+    if (myState != InternalCaseState::RUNNING_JOB_NORECORD) return;
+
+    QMap<QString, const RemoteJobData *> relevantJobs = getRelevantJobs();
+    if (relevantJobs.contains(runningID))
+    {
+        runningJobNode = relevantJobs.value(runningID);
+        if (runningJobNode->detailsLoaded())
+        {
+            emitNewState(InternalCaseState::RUNNING_JOB_YESRECORD);
+        }
+        else
+        {
+            runningJobNode = NULL;
+        }
+        return;
+    }
+
+    runningJobNode = theDriver->getJobHandler()->findJobByID(runningID);
+    if (runningJobNode != NULL)
+    {
+        runningJobNode = NULL;
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        return;
     }
 }
 
-void CFDcaseInstance::state_StartingJob_jobInvoked()
+void CFDcaseInstance::state_RunningYesRecord_jobList()
+{
+    if (myState != InternalCaseState::RUNNING_JOB_YESRECORD) return;
+
+    QMap<QString, const RemoteJobData *> relevantJobs = getRelevantJobs();
+    if (!relevantJobs.contains(runningJobNode->getID()))
+    {
+        runningJobNode = NULL;
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        return;
+    }
+}
+
+void CFDcaseInstance::state_StartingJob_jobInvoked(QString jobID)
 {
     if (myState != InternalCaseState::STARTING_JOB) return;
 
+    //TODO: Get the data from the job JSON
+
+    if (jobID.isEmpty())
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Unable to collect job ID. Please inform developers of this bug.", "ERROR");
+        return;
+    }
+
+    runningID = jobID;
+
     theDriver->getJobHandler()->demandJobDataRefresh();
-    emitNewState(InternalCaseState::RUNNING_JOB_UNLINKED);
+    emitNewState(InternalCaseState::RUNNING_JOB_NORECORD);
 }
 
-void CFDcaseInstance::state_StoppingJob_jobInvoked()
+void CFDcaseInstance::state_StoppingJob_jobKilled()
 {
     if (myState != InternalCaseState::STOPPING_JOB) return;
 

@@ -62,7 +62,7 @@ enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
                              TYPE_SELECTED, EMPTY_CASE, INIT_DATA_LOAD,
                              MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD, READY,
                              USER_PARAM_UPLOAD, WAITING_FOLDER_DEL, RE_DATA_LOAD,
-                             STARTING_JOB, STOPPING_JOB, RUNNING_JOB_UNLINKED, RUNNING_JOB_LINKED,
+                             STARTING_JOB, STOPPING_JOB, RUNNING_JOB_NORECORD, RUNNING_JOB_YESRECORD,
                              FOLDER_CHECK_STOPPED_JOB, DOWNLOAD};
 
 class CFDcaseInstance : public QObject
@@ -106,8 +106,8 @@ private slots:
     void underlyingFilesUpdated();
     void jobListUpdated();
     void fileTaskDone(RequestState invokeStatus);
-    void individualJobChange(JobListNode * theNode);
-    void jobInvoked(RequestState invokeStatus);
+    void jobInvoked(RequestState invokeStatus, QJsonDocument* jobData);
+    void jobKilled(RequestState invokeStatus);
 
     void caseFolderRemoved();
 
@@ -115,15 +115,14 @@ private:
     void emitNewState(InternalCaseState newState);
     void enactDataReload();
     bool caseDataLoaded();
-    bool outstandingJobDataFound();
-    void assignJobPointer();
     bool caseDataInvalid();
     void computeCaseType();
 
     bool stageStatesEqual(QMap<QString, StageState> * list1, QMap<QString, StageState> * list2);
     QMap<QString, StageState> computeStageStates();
     void computeParamList();
-    QMap<QString, RemoteJobData * > getRelevantJobs();
+    bool allListedJobsHaveDetails(QMap<QString, const RemoteJobData * > jobList);
+    QMap<QString, const RemoteJobData *> getRelevantJobs();
 
     QByteArray produceJSONparams(QMap<QString, QString> paramList);
 
@@ -135,10 +134,10 @@ private:
     void state_InitParam_taskDone(RequestState invokeStatus);
     void state_MakingFolder_taskDone(RequestState invokeStatus);
     void state_Ready_fileChange_jobList();
-    void state_RunningLinked_indvJobChange(JobListNode * theNode);
-    void state_RunningUnlinked_jobList();
-    void state_StartingJob_jobInvoked();
-    void state_StoppingJob_jobInvoked();
+    void state_RunningNoRecord_jobList();
+    void state_RunningYesRecord_jobList();
+    void state_StartingJob_jobInvoked(QString jobID);
+    void state_StoppingJob_jobKilled();
     void state_UserParamUpload_taskDone(RequestState invokeStatus);
     void state_WaitingFolderDel_taskDone(RequestState invokeStatus);
 
@@ -146,8 +145,9 @@ private:
     QMap<QString, StageState> storedStageStates;
     QMap<QString, QString> storedParamList;
     QMap<QString, QString> prospectiveNewParamList;
+    QString runningID;
     QString runningStage;
-    JobListNode * runningJobNode = NULL;
+    const RemoteJobData * runningJobNode = NULL;
     InternalCaseState myState = InternalCaseState::ERROR;
 
     VWTinterfaceDriver * theDriver;
