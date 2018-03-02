@@ -37,6 +37,7 @@
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
 #include "../AgaveClientInterface/agaveInterfaces/agavetaskreply.h"
+#include "../AgaveClientInterface/remotejobdata.h"
 
 #include "../AgaveExplorer/utilFuncs/authform.h"
 
@@ -118,6 +119,8 @@ void VWTinterfaceDriver::closeAuthScreen()
     myFileHandle = new FileOperator(theConnector,this);
 
     myJobHandle->demandJobDataRefresh();
+    QObject::connect(myJobHandle, SIGNAL(newJobData()), this, SLOT(processNewJobInfo()));
+
     myFileHandle->resetFileData();
 
     mainWindow->runSetupSteps();
@@ -244,6 +247,33 @@ void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appL
     {
         fatalInterfaceError("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
     }
+}
+
+void VWTinterfaceDriver::processNewJobInfo()
+{
+    QMap<QString, RemoteJobData> runningJobs = getRunningCWEjobs();
+    for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
+    {
+        if (!(*itr).detailsLoaded())
+        {
+            getJobHandler()->requestJobDetails(*itr);
+        }
+    }
+}
+
+QMap<QString, RemoteJobData> VWTinterfaceDriver::getRunningCWEjobs()
+{
+    QMap<QString, RemoteJobData> ret;
+    QMap<QString, RemoteJobData> runningJobs = getJobHandler()->getRunningJobs();
+    for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
+    {
+        QString theApp = (*itr).getApp();
+        if ((theApp == "cwe-serial") || (theApp == "cwe-parallel"))
+        {
+            ret.insert(itr.key(),*itr);
+        }
+    }
+    return ret;
 }
 
 bool VWTinterfaceDriver::inOfflineMode()
