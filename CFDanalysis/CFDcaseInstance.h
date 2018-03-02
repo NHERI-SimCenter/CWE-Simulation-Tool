@@ -64,7 +64,6 @@ enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
                              USER_PARAM_UPLOAD, WAITING_FOLDER_DEL, RE_DATA_LOAD,
                              STARTING_JOB, STOPPING_JOB, RUNNING_JOB_UNLINKED, RUNNING_JOB_LINKED,
                              FOLDER_CHECK_STOPPED_JOB, DOWNLOAD};
-enum class StateChangeType {NEW_FILE_DATA, REMOTE_OP_DONE, NEW_JOB_LIST, INDIV_JOB_CHANGE};
 
 class CFDcaseInstance : public QObject
 {
@@ -106,14 +105,14 @@ signals:
 private slots:
     void underlyingFilesUpdated();
     void jobListUpdated();
-    void agaveTaskDone(RequestState invokeStatus);
+    void fileTaskDone(RequestState invokeStatus);
     void individualJobChange(JobListNode * theNode);
+    void jobInvoked(RequestState invokeStatus);
 
     void caseFolderRemoved();
 
 private:
     void emitNewState(InternalCaseState newState);
-    void processInternalStateInput(StateChangeType theChange, RequestState invokeStatus, JobListNode * changedNode = NULL);
     void enactDataReload();
     bool caseDataLoaded();
     bool outstandingJobDataFound();
@@ -127,6 +126,21 @@ private:
     QMap<QString, RemoteJobData * > getRelevantJobs();
 
     QByteArray produceJSONparams(QMap<QString, QString> paramList);
+
+    //The various state change functions:
+    void state_CopyingFolder_taskDone(RequestState invokeStatus);
+    void state_Download_fileChange();
+    void state_FolderCheckStopped_fileChange_taskDone();
+    void state_DataLoad_fileChange_jobList();
+    void state_InitParam_taskDone(RequestState invokeStatus);
+    void state_MakingFolder_taskDone(RequestState invokeStatus);
+    void state_Ready_fileChange_jobList();
+    void state_RunningLinked_indvJobChange(JobListNode * theNode);
+    void state_RunningUnlinked_jobList();
+    void state_StartingJob_jobInvoked();
+    void state_StoppingJob_jobInvoked();
+    void state_UserParamUpload_taskDone(RequestState invokeStatus);
+    void state_WaitingFolderDel_taskDone(RequestState invokeStatus);
 
     bool defunct = false;
     QMap<QString, StageState> storedStageStates;

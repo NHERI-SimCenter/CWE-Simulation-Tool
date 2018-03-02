@@ -61,7 +61,7 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
     QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
-                     this, SLOT(agaveTaskDone(RequestState)));
+                     this, SLOT(fileTaskDone(RequestState)));
 
     if (theDriver->inOfflineMode())
     {
@@ -98,7 +98,7 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
     QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
-                     this, SLOT(agaveTaskDone(RequestState)));
+                     this, SLOT(fileTaskDone(RequestState)));
 
     if (theDriver->inOfflineMode())
     {
@@ -118,7 +118,7 @@ CFDcaseInstance::CFDcaseInstance(VWTinterfaceDriver *mainDriver):
     QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
-                     this, SLOT(agaveTaskDone(RequestState)));
+                     this, SLOT(fileTaskDone(RequestState)));
 
     if (theDriver->inOfflineMode())
     {
@@ -302,7 +302,7 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 }
 
 void CFDcaseInstance::startStageApp(QString stageID)
-{
+{//TODO: Redo for new job ops
     if (defunct) return;
     if (caseFolder == NULL) return;
     if (myType == NULL) return;
@@ -337,7 +337,7 @@ void CFDcaseInstance::startStageApp(QString stageID)
     runningStage = stageID;
     runningJobNode = NULL; //Note: job nodes are managed and cleaned up by the job handler
     QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(agaveTaskDone(RequestState)));
+                     this, SLOT(jobInvoked(RequestState)));
     emitNewState(InternalCaseState::STARTING_JOB);
 }
 
@@ -389,7 +389,7 @@ void CFDcaseInstance::downloadCase(QString destLocalFile)
 }
 
 void CFDcaseInstance::stopJob(QString stage)
-{
+{//TODO: Redo for new job ops
     if (defunct) return;
     if (caseFolder == NULL) return;
     if ((myState != InternalCaseState::RUNNING_JOB_LINKED) &&
@@ -416,7 +416,7 @@ void CFDcaseInstance::stopJob(QString stage)
         }
 
         QObject::connect(jobHandle, SIGNAL(haveStoppedJob(RequestState)),
-                         this, SLOT(agaveTaskDone(RequestState)));
+                         this, SLOT(jobInvoked(RequestState)));
 
         emitNewState(InternalCaseState::STOPPING_JOB);
         return;
@@ -472,7 +472,7 @@ void CFDcaseInstance::stopJob(QString stage)
     }
 
     QObject::connect(jobHandle, SIGNAL(haveStoppedJob(RequestState)),
-                     this, SLOT(agaveTaskDone(RequestState)));
+                     this, SLOT(jobInvoked(RequestState)));
 
     emitNewState(InternalCaseState::STOPPING_JOB);
 }
@@ -480,25 +480,138 @@ void CFDcaseInstance::stopJob(QString stage)
 void CFDcaseInstance::underlyingFilesUpdated()
 {
     if (defunct) return;
-    processInternalStateInput(StateChangeType::NEW_FILE_DATA, RequestState::GOOD);
+
+    InternalCaseState activeState = myState;
+
+    switch (activeState)
+    {
+    case InternalCaseState::DOWNLOAD:
+        state_Download_fileChange(); return;
+
+    case InternalCaseState::FOLDER_CHECK_STOPPED_JOB:
+        state_FolderCheckStopped_fileChange_taskDone(); return;
+
+    case InternalCaseState::INIT_DATA_LOAD:
+    case InternalCaseState::RE_DATA_LOAD:
+        state_DataLoad_fileChange_jobList(); return;
+
+    case InternalCaseState::READY:
+        state_Ready_fileChange_jobList(); return;
+
+    default:
+        return;
+    }
 }
 
 void CFDcaseInstance::jobListUpdated()
 {
     if (defunct) return;
-    processInternalStateInput(StateChangeType::NEW_JOB_LIST, RequestState::GOOD);
+
+    InternalCaseState activeState = myState;
+
+    switch (activeState)
+    {
+    case InternalCaseState::INIT_DATA_LOAD:
+    case InternalCaseState::RE_DATA_LOAD:
+        state_DataLoad_fileChange_jobList(); return;
+
+    case InternalCaseState::READY:
+        state_Ready_fileChange_jobList(); return;
+
+    case InternalCaseState::RUNNING_JOB_UNLINKED:
+        state_RunningUnlinked_jobList(); return;
+
+    default:
+        return;
+    }
 }
 
-void CFDcaseInstance::agaveTaskDone(RequestState invokeStatus)
+void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
 {
     if (defunct) return;
-    processInternalStateInput(StateChangeType::REMOTE_OP_DONE, invokeStatus);
+
+    if (invokeStatus == RequestState::NO_CONNECT)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Lost connection to DesignSafe. Please check network and try again.", "Network Connection Error");
+        return;
+    }
+
+    InternalCaseState activeState = myState;
+
+    switch (activeState)
+    {
+    case InternalCaseState::COPYING_FOLDER:
+        state_CopyingFolder_taskDone(invokeStatus); return;
+
+    case InternalCaseState::FOLDER_CHECK_STOPPED_JOB:
+        state_FolderCheckStopped_fileChange_taskDone(); return;
+
+    case InternalCaseState::INIT_PARAM_UPLOAD:
+        state_InitParam_taskDone(invokeStatus); return;
+
+    case InternalCaseState::MAKING_FOLDER:
+        state_MakingFolder_taskDone(invokeStatus); return;
+
+    case InternalCaseState::USER_PARAM_UPLOAD:
+        state_UserParamUpload_taskDone(invokeStatus); return;
+
+    case InternalCaseState::WAITING_FOLDER_DEL:
+        state_WaitingFolderDel_taskDone(invokeStatus); return;
+
+    default:
+        return;
+    }
 }
 
 void CFDcaseInstance::individualJobChange(JobListNode * theNode)
 {
     if (defunct) return;
-    processInternalStateInput(StateChangeType::INDIV_JOB_CHANGE, RequestState::GOOD, theNode);
+
+    InternalCaseState activeState = myState;
+
+    switch (activeState)
+    {
+    case InternalCaseState::RUNNING_JOB_LINKED:
+        state_RunningLinked_indvJobChange(theNode); return;
+
+    default:
+        return;
+    }
+}
+
+void CFDcaseInstance::jobInvoked(RequestState invokeStatus)
+{
+    if (defunct) return;
+
+    if (invokeStatus == RequestState::NO_CONNECT)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Lost connection to DesignSafe. Please check network and try again.", "Network Connection Error");
+        return;
+    }
+
+    if (invokeStatus == RequestState::FAIL)
+    {
+        cwe_globals::displayPopup("Unable to start/stop requested job. Reloading Case", "Network Connection Error");
+        enactDataReload();
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        return;
+    }
+
+    InternalCaseState activeState = myState;
+
+    switch (activeState)
+    {
+    case InternalCaseState::STARTING_JOB:
+        state_StartingJob_jobInvoked(); return;
+
+    case InternalCaseState::STOPPING_JOB:
+        state_StoppingJob_jobInvoked(); return;
+
+    default:
+        return;
+    }
 }
 
 void CFDcaseInstance::caseFolderRemoved()
@@ -530,276 +643,6 @@ void CFDcaseInstance::emitNewState(InternalCaseState newState)
     if (!stageStatesEqual(&oldStageStates, &storedStageStates))
     {
         emit haveNewStageStates();
-    }
-}
-
-void CFDcaseInstance::processInternalStateInput(StateChangeType theChange, RequestState invokeStatus, JobListNode * changedNode)
-{
-    if (defunct) return;
-
-    if (invokeStatus != RequestState::GOOD)
-    {
-        emitNewState(InternalCaseState::ERROR);
-        cwe_globals::displayPopup("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.", "Network Issue");
-        return;
-    }
-
-    if (myState == InternalCaseState::COPYING_FOLDER)
-    {
-        if (theChange == StateChangeType::REMOTE_OP_DONE)
-        {
-            theDriver->getFileHandler()->speculateNodeWithName(expectedNewCaseFolder, true);
-            caseFolder = theDriver->getFileHandler()->getNodeFromName(expectedNewCaseFolder);
-            if (caseFolder == NULL)
-            {
-                emitNewState(InternalCaseState::ERROR);
-                cwe_globals::displayPopup("Unable to find case folder info. Please reset and try again.", "Network Issue");
-                return;
-            }
-            expectedNewCaseFolder.clear();
-            QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
-                             this, SLOT(caseFolderRemoved()));
-            QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                             this, SLOT(underlyingFilesUpdated()));
-
-            enactDataReload();
-            emitNewState(InternalCaseState::INIT_DATA_LOAD);
-        }
-        return;
-    }
-
-    if (myState == InternalCaseState::DOWNLOAD)
-    {
-        //TODO: Recursive download
-        return;
-    }
-
-    if (myState == InternalCaseState::FOLDER_CHECK_STOPPED_JOB)
-    {
-        if ((theChange == StateChangeType::NEW_FILE_DATA) ||
-            (theChange == StateChangeType::REMOTE_OP_DONE))
-        {
-            if ((caseFolder->getNodeState() == NodeState::FOLDER_KNOWN_CONTENTS_NOT) ||
-                    (caseFolder->getNodeState() == NodeState::FOLDER_SPECULATE_IDLE))
-            {
-                theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
-                return;
-            }
-
-            if (caseFolder->getNodeState() == NodeState::FOLDER_CONTENTS_LOADED)
-            {
-                if (runningStage.isEmpty())
-                {
-                    enactDataReload();
-                    emitNewState(InternalCaseState::RE_DATA_LOAD);
-                    return;
-                }
-
-                FileTreeNode * folderToRemove = caseFolder->getChildNodeWithName(runningStage);
-                if (folderToRemove == NULL)
-                {
-                    enactDataReload();
-                    emitNewState(InternalCaseState::RE_DATA_LOAD);
-                    return;
-                }
-
-                if (theDriver->getFileHandler()->operationIsPending())
-                {
-                    return;
-                }
-
-                theDriver->getFileHandler()->sendDeleteReq(folderToRemove);
-                if (!theDriver->getFileHandler()->operationIsPending())
-                {
-                    emitNewState(InternalCaseState::ERROR);
-                    cwe_globals::displayPopup("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.", "Network Issue");
-                    return;
-                }
-                emitNewState(InternalCaseState::WAITING_FOLDER_DEL);
-            }
-        }
-        return;
-    }
-
-    if ((myState == InternalCaseState::INIT_DATA_LOAD) || (myState == InternalCaseState::RE_DATA_LOAD))
-    {//TODO: Need to check for running job
-        if ((theChange == StateChangeType::NEW_FILE_DATA) || (theChange == StateChangeType::NEW_JOB_LIST))
-        {
-            if (caseDataInvalid())
-            {
-                emitNewState(InternalCaseState::INVALID);
-                return;
-            }
-            computeCaseType();
-
-            if (caseDataLoaded())
-            {
-                computeParamList();
-                emitNewState(InternalCaseState::READY);
-            }
-            else
-            {
-                enactDataReload();
-            }
-        }
-        return;
-    }
-
-    if (myState == InternalCaseState::INIT_PARAM_UPLOAD)
-    {
-        if (theChange == StateChangeType::NEW_FILE_DATA)
-        {
-            FileTreeNode * paramNode = caseFolder->getChildNodeWithName(caseParamFileName);
-            if (paramNode == NULL)
-            {
-                if (!theDriver->getFileHandler()->operationIsPending())
-                {
-                    emitNewState(InternalCaseState::ERROR);
-                    cwe_globals::displayPopup("Unable to upload parameter to new case. Please check connection try again with new case.", "Network ERROR");
-                }
-                return;
-            }
-
-            enactDataReload();
-            emitNewState(InternalCaseState::INIT_DATA_LOAD);
-        }
-        return;
-    }
-
-    if (myState == InternalCaseState::MAKING_FOLDER)
-    {
-        if (theChange == StateChangeType::REMOTE_OP_DONE)
-        {
-            theDriver->getFileHandler()->speculateNodeWithName(expectedNewCaseFolder, true);
-            caseFolder = theDriver->getFileHandler()->getNodeFromName(expectedNewCaseFolder);
-            if (caseFolder == NULL)
-            {
-                emitNewState(InternalCaseState::ERROR);
-                cwe_globals::displayPopup("Error: Internal record of new case folder does not exist. Please contact developer to fix bug.", "Internal ERROR");
-                return;
-            }
-            expectedNewCaseFolder.clear();
-            QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
-                             this, SLOT(caseFolderRemoved()));
-            QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                             this, SLOT(underlyingFilesUpdated()));
-
-            QMap<QString, QString> allVars;
-            QByteArray newFile = produceJSONparams(allVars);
-
-            theDriver->getFileHandler()->sendUploadBuffReq(caseFolder, newFile, caseParamFileName);
-
-            if (!theDriver->getFileHandler()->operationIsPending())
-            {
-                emitNewState(InternalCaseState::ERROR);
-                cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-                return;
-            }
-            emitNewState(InternalCaseState::INIT_PARAM_UPLOAD);
-        }
-        return;
-    }
-
-    if (myState == InternalCaseState::READY)
-    {
-        //Note: We may want to consider more fully what happens if underlying files changed outside of CWE
-        if ((theChange == StateChangeType::NEW_FILE_DATA) && (!caseDataLoaded()))
-        {
-            enactDataReload();
-            emitNewState(InternalCaseState::RE_DATA_LOAD);
-        }
-    }
-
-    if (myState == InternalCaseState::RUNNING_JOB_LINKED)
-    {//TODO: Redo for stage split
-        if (theChange == StateChangeType::NEW_JOB_LIST)
-        {
-            QMap<QString, RemoteJobData * > jobList = getRelevantJobs();
-
-            bool foundRelevantTask = false;
-
-            for (auto itr = jobList.cbegin(); (itr != jobList.cend()) && (foundRelevantTask == false); itr++)
-            {
-                RemoteJobData * aJob = (*itr);
-                if (aJob->detailsLoaded())
-                {
-                    if (caseFolder->fileNameMatches(aJob->getInputs().value("directory")))
-                    {
-                        foundRelevantTask = true;
-                    }
-                }
-                else
-                {
-                    foundRelevantTask = true;
-                    theDriver->getJobHandler()->requestJobDetails(aJob);
-                }
-            }
-
-            if (foundRelevantTask == false)
-            {
-                theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
-                enactDataReload();
-                emitNewState(InternalCaseState::RE_DATA_LOAD);
-            }
-            else
-            {
-                emitNewState(InternalCaseState::RUNNING_JOB);
-            }
-        }
-        return;
-    }
-
-    if (myState == InternalCaseState::RUNNING_JOB_UNLINKED)
-    {
-        //TODO: Finish for new state
-        return;
-    }
-
-    if (myState == InternalCaseState::STARTING_JOB)
-    {
-        //TODO: Change for state split
-        if (theChange == StateChangeType::REMOTE_OP_DONE)
-        {
-            theDriver->getJobHandler()->demandJobDataRefresh();
-            emitNewState(InternalCaseState::RUNNING_JOB);
-        }
-        return;
-    }
-
-    if (myState == InternalCaseState::STOPPING_JOB)
-    {
-        if (theChange == StateChangeType::REMOTE_OP_DONE)
-        {
-            theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
-            emitNewState(InternalCaseState::FOLDER_CHECK_STOPPED_JOB);
-        }
-        return;
-    }
-
-    if (myState == InternalCaseState::USER_PARAM_UPLOAD)
-    {
-        if (theChange == StateChangeType::REMOTE_OP_DONE)
-        {
-            FileTreeNode * paramNode = caseFolder->getChildNodeWithName(caseParamFileName);
-            if (paramNode != NULL)
-            {
-                paramNode->setFileBuffer(NULL);
-            }
-            enactDataReload();
-            emitNewState(InternalCaseState::RE_DATA_LOAD);
-        }
-        return;
-    }
-
-    if (myState == InternalCaseState::WAITING_FOLDER_DEL)
-    {
-        if (theChange == StateChangeType::REMOTE_OP_DONE)
-        {
-            theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
-            enactDataReload();
-            emitNewState(InternalCaseState::RE_DATA_LOAD);
-        }
-        return;
     }
 }
 
@@ -1166,3 +1009,266 @@ QByteArray CFDcaseInstance::produceJSONparams(QMap<QString, QString> paramList)
     return ret.toJson();
 }
 
+void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
+{
+    if (myState != InternalCaseState::COPYING_FOLDER) return;
+
+    if (invokeStatus != RequestState::GOOD)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Unable to create new folder for case. Please try again.", "Error");
+        return;
+    }
+
+    theDriver->getFileHandler()->speculateNodeWithName(expectedNewCaseFolder, true);
+    caseFolder = theDriver->getFileHandler()->getNodeFromName(expectedNewCaseFolder);
+    if (caseFolder == NULL)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Unable to find case folder info. Please reset and try again.", "Network Issue");
+        return;
+    }
+    expectedNewCaseFolder.clear();
+    QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
+                     this, SLOT(caseFolderRemoved()));
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
+                     this, SLOT(underlyingFilesUpdated()));
+
+    enactDataReload();
+    emitNewState(InternalCaseState::INIT_DATA_LOAD);
+}
+
+void CFDcaseInstance::state_Download_fileChange()
+{
+    if (myState != InternalCaseState::DOWNLOAD) return;
+
+    //TODO: Recursive buffer download
+    //TODO: Once all buffers downloaded, output to files
+    return;
+}
+
+void CFDcaseInstance::state_FolderCheckStopped_fileChange_taskDone()
+{
+    if (myState != InternalCaseState::FOLDER_CHECK_STOPPED_JOB) return;
+
+    if ((caseFolder->getNodeState() == NodeState::FOLDER_KNOWN_CONTENTS_NOT) ||
+            (caseFolder->getNodeState() == NodeState::FOLDER_SPECULATE_IDLE))
+    {
+        theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+        return;
+    }
+
+    if (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED) return;
+
+    if (runningStage.isEmpty())
+    {
+        enactDataReload();
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        return;
+    }
+
+    FileTreeNode * folderToRemove = caseFolder->getChildNodeWithName(runningStage);
+    if (folderToRemove == NULL)
+    {
+        enactDataReload();
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        return;
+    }
+
+    if (theDriver->getFileHandler()->operationIsPending())
+    {
+        return;
+    }
+
+    theDriver->getFileHandler()->sendDeleteReq(folderToRemove);
+    if (!theDriver->getFileHandler()->operationIsPending())
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.", "Network Issue");
+        return;
+    }
+    emitNewState(InternalCaseState::WAITING_FOLDER_DEL);
+}
+
+void CFDcaseInstance::state_DataLoad_fileChange_jobList()
+{//TODO: Need to check for running job
+    if ((myState != InternalCaseState::INIT_DATA_LOAD) && (myState != InternalCaseState::RE_DATA_LOAD)) return;
+
+    if (caseDataInvalid())
+    {
+        emitNewState(InternalCaseState::INVALID);
+        return;
+    }
+    computeCaseType();
+
+    if (caseDataLoaded())
+    {
+        computeParamList();
+        emitNewState(InternalCaseState::READY);
+    }
+    else
+    {
+        enactDataReload();
+    }
+}
+
+void CFDcaseInstance::state_InitParam_taskDone(RequestState invokeStatus)
+{
+    if (myState != InternalCaseState::INIT_PARAM_UPLOAD) return;
+
+    if (invokeStatus != RequestState::GOOD)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Unable to upload parameters to new case. Please check connection try again with new case.", "Network Error");
+        return;
+    }
+
+    enactDataReload();
+    emitNewState(InternalCaseState::INIT_DATA_LOAD);
+}
+
+void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
+{
+    if (myState != InternalCaseState::MAKING_FOLDER);
+
+    if (invokeStatus != RequestState::GOOD)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Error: Unable to create folder for new case. Please check your new folder name and try again.", "Remote Filesystem error");
+        return;
+    }
+
+    theDriver->getFileHandler()->speculateNodeWithName(expectedNewCaseFolder, true);
+    caseFolder = theDriver->getFileHandler()->getNodeFromName(expectedNewCaseFolder);
+    if (caseFolder == NULL)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Error: Internal record of new case folder does not exist. Please contact developer to fix bug.", "Internal ERROR");
+        return;
+    }
+    expectedNewCaseFolder.clear();
+    QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
+                     this, SLOT(caseFolderRemoved()));
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
+                     this, SLOT(underlyingFilesUpdated()));
+
+    QMap<QString, QString> allVars;
+    QByteArray newFile = produceJSONparams(allVars);
+
+    theDriver->getFileHandler()->sendUploadBuffReq(caseFolder, newFile, caseParamFileName);
+
+    if (!theDriver->getFileHandler()->operationIsPending())
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Unable to contact DesignSafe. Please wait and try again.", "Network Issue");
+        return;
+    }
+    emitNewState(InternalCaseState::INIT_PARAM_UPLOAD);
+}
+
+void CFDcaseInstance::state_Ready_fileChange_jobList()
+{
+    if (myState != InternalCaseState::READY) return;
+
+    if (!caseDataLoaded())
+    {
+        enactDataReload();
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+    }
+    //TODO: Check if new job data is relevant
+}
+
+void CFDcaseInstance::state_RunningLinked_indvJobChange(JobListNode *theNode)
+{
+    //TODO: Redo for stage split
+    if (myState != InternalCaseState::RUNNING_JOB_LINKED) return;
+}
+
+void CFDcaseInstance::state_RunningUnlinked_jobList()
+{
+    //TODO: Redo for stage split
+    if (myState != InternalCaseState::RUNNING_JOB_UNLINKED) return;
+
+    QMap<QString, RemoteJobData * > jobList = getRelevantJobs();
+
+    bool foundRelevantTask = false;
+
+    for (auto itr = jobList.cbegin(); (itr != jobList.cend()) && (foundRelevantTask == false); itr++)
+    {
+        RemoteJobData * aJob = (*itr);
+        if (aJob->detailsLoaded())
+        {
+            if (caseFolder->fileNameMatches(aJob->getInputs().value("directory")))
+            {
+                foundRelevantTask = true;
+            }
+        }
+        else
+        {
+            foundRelevantTask = true;
+            theDriver->getJobHandler()->requestJobDetails(aJob);
+        }
+    }
+
+    if (foundRelevantTask == false)
+    {
+        theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
+        enactDataReload();
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+    }
+    else
+    {
+        emitNewState(InternalCaseState::RUNNING_JOB);
+    }
+}
+
+void CFDcaseInstance::state_StartingJob_jobInvoked()
+{
+    if (myState != InternalCaseState::STARTING_JOB) return;
+
+    theDriver->getJobHandler()->demandJobDataRefresh();
+    emitNewState(InternalCaseState::RUNNING_JOB_UNLINKED);
+}
+
+void CFDcaseInstance::state_StoppingJob_jobInvoked()
+{
+    if (myState != InternalCaseState::STOPPING_JOB) return;
+
+    theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
+    emitNewState(InternalCaseState::FOLDER_CHECK_STOPPED_JOB);
+}
+
+void CFDcaseInstance::state_UserParamUpload_taskDone(RequestState invokeStatus)
+{
+    if (myState != InternalCaseState::USER_PARAM_UPLOAD) return;
+
+    if (invokeStatus != RequestState::GOOD)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Error: Unable to change parameters. Please reset and try again.", "Remote Filesystem error");
+        return;
+    }
+
+    FileTreeNode * paramNode = caseFolder->getChildNodeWithName(caseParamFileName);
+    if (paramNode != NULL)
+    {
+        paramNode->setFileBuffer(NULL);
+    }
+    enactDataReload();
+    emitNewState(InternalCaseState::RE_DATA_LOAD);
+}
+
+void CFDcaseInstance::state_WaitingFolderDel_taskDone(RequestState invokeStatus)
+{
+    if (myState != InternalCaseState::WAITING_FOLDER_DEL) return;
+    if (invokeStatus != RequestState::GOOD)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Error: Unable to clean up canceled task. Please reset and try again.", "Remote Filesystem error");
+        return;
+    }
+
+    theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
+    enactDataReload();
+    emitNewState(InternalCaseState::RE_DATA_LOAD);
+}
