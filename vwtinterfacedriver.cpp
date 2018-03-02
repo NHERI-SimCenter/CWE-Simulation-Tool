@@ -251,23 +251,23 @@ void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appL
 
 void VWTinterfaceDriver::processNewJobInfo()
 {
-    QMap<QString, RemoteJobData> runningJobs = getRunningCWEjobs();
+    QMap<QString, const RemoteJobData *> runningJobs = getRunningCWEjobs();
     for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
     {
-        if (!(*itr).detailsLoaded())
+        if (!(*itr)->detailsLoaded())
         {
             getJobHandler()->requestJobDetails(*itr);
         }
     }
 }
 
-QMap<QString, RemoteJobData> VWTinterfaceDriver::getRunningCWEjobs()
+QMap<QString, const RemoteJobData *> VWTinterfaceDriver::getRunningCWEjobs()
 {
-    QMap<QString, RemoteJobData> ret;
-    QMap<QString, RemoteJobData> runningJobs = getJobHandler()->getRunningJobs();
+    QMap<QString, const RemoteJobData * > ret;
+    QMap<QString, const RemoteJobData *> runningJobs = getJobHandler()->getRunningJobs();
     for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
     {
-        QString theApp = (*itr).getApp();
+        QString theApp = (*itr)->getApp();
         if ((theApp == "cwe-serial") || (theApp == "cwe-parallel"))
         {
             ret.insert(itr.key(),*itr);

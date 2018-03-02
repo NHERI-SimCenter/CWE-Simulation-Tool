@@ -68,6 +68,8 @@ public:
 
     bool inOfflineMode();
 
+    QMap<QString, const RemoteJobData *> getRunningCWEjobs();
+
 signals:
     void haveNewCase();
 
@@ -77,8 +79,6 @@ private slots:
     void processNewJobInfo();
 
 private:
-    QMap<QString, RemoteJobData> getRunningCWEjobs();
-
     CWE_MainWindow * mainWindow;
     QList<CFDanalysisType *> templateList;
 
