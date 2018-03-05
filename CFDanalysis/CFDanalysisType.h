@@ -37,6 +37,7 @@
 
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QIcon>
 #include <QFile>
 
@@ -52,6 +53,7 @@ public:
     QString getExtraInput(QString stageName);
 
     QStringList getStageNames();
+    QStringList getStageSequence();
     QString translateStageId(QString stageId);
 
     QIcon * getIcon();

@@ -102,6 +102,24 @@ QStringList CFDanalysisType::getStageNames()
     return stageList.keys();
 }
 
+QStringList CFDanalysisType::getStageSequence()
+{
+    QJsonObject obj = myConfiguration.object();
+    QJsonArray stages = obj["sequence"].toArray();
+
+    QStringList ret;
+    for (auto itr = stages.constBegin(); itr != stages.constEnd(); itr++)
+    {
+        QString aStage = (*itr).toString();
+        if (!aStage.isEmpty())
+        {
+            ret.append(aStage);
+        }
+    }
+
+    return ret;
+}
+
 QString CFDanalysisType::translateStageId(QString stageId)
 {
     QJsonObject obj = myConfiguration.object();

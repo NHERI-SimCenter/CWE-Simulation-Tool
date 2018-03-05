@@ -44,6 +44,7 @@
 class CWE_MainWindow;
 class CFDanalysisType;
 class CFDcaseInstance;
+class RemoteJobData;
 
 class VWTinterfaceDriver : public AgaveSetupDriver
 {
@@ -51,6 +52,7 @@ class VWTinterfaceDriver : public AgaveSetupDriver
 
 public:
     explicit VWTinterfaceDriver(QObject *parent = nullptr, bool debug = false);
+    ~VWTinterfaceDriver();
     virtual void startup();
     virtual void closeAuthScreen();
 
@@ -66,12 +68,15 @@ public:
 
     bool inOfflineMode();
 
+    QMap<QString, const RemoteJobData *> getRunningCWEjobs();
+
 signals:
     void haveNewCase();
 
 private slots:
     void currentCaseInvalidated();
     void checkAppList(RequestState replyState, QJsonArray * appList);
+    void processNewJobInfo();
 
 private:
     CWE_MainWindow * mainWindow;

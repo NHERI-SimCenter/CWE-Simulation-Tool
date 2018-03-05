@@ -56,7 +56,7 @@ enum class SimCenterViewState { visible,
  * SimCenterButtonMode_CANCEL    0000 0000 0000 0010
  * SimCenterButtonMode_RESET     0000 0000 0000 0100
  * SimCenterButtonMode_RESULTS   0000 0000 0000 1000
- * SimCenterButtonMode_ALL       0000 0000 0000 1111
+ * SimCenterButtonMode_ALL       0000 0001 0000 1111
  * SimCenterButtonMode_SAVE_ALL  0000 0001 0000 0000
  */
 
@@ -65,7 +65,7 @@ enum class SimCenterViewState { visible,
 #define SimCenterButtonMode_CANCEL    0x0002u
 #define SimCenterButtonMode_RESET     0x0004u
 #define SimCenterButtonMode_RESULTS   0x0008u
-#define SimCenterButtonMode_ALL       0x000fu
+#define SimCenterButtonMode_ALL       0x010fu
 #define SimCenterButtonMode_SAVE_ALL  0x0100u
 
 enum class SimCenterDataType { integer,
