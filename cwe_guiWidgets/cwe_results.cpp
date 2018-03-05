@@ -241,16 +241,24 @@ void CWE_Results::newCaseState(CaseState newState)
     case CaseState::INVALID:
     case CaseState::OFFLINE:
         resetViewInfo();
+        ui->downloadEntireCaseButton->setDisabled(true);
         return; //These states should be handled elsewhere
         break;
     case CaseState::DOWNLOAD:
     case CaseState::LOADING:
     case CaseState::OP_INVOKE:
+        ui->downloadEntireCaseButton->setDisabled(true);
         resetViewInfo();
         return;
         break;
     case CaseState::RUNNING:
+        ui->downloadEntireCaseButton->setDisabled(true);
+        resetViewInfo();
+        populateResultsScreen();
+        return;
+        break;
     case CaseState::READY:
+        ui->downloadEntireCaseButton->setEnabled(true);
         resetViewInfo();
         populateResultsScreen();
         return;
