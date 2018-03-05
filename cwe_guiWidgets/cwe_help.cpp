@@ -65,11 +65,11 @@ void CWE_help::setOverview()
     ui->textBrowser_overview->setOpenLinks(false);
     ui->helpTabs->setTabsClosable(true);
 
-    QObject::connect(ui->textBrowser_overview, SIGNAL(anchorClicked(const QUrl &)),
-                     this, SLOT(on_Overview_anchorClicked(const QUrl &)));
+    QObject::connect(ui->textBrowser_overview, SIGNAL(anchorClicked(QUrl)),
+                     this, SLOT(overview_anchor_clicked(QUrl)));
 }
 
-void CWE_help::on_Overview_anchorClicked(const QUrl &link)
+void CWE_help::overview_anchor_clicked(const QUrl &link)
 {
     QFile helpText(link.toLocalFile());
     if (!helpText.open(QIODevice::ReadOnly | QIODevice::Text))

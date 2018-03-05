@@ -52,7 +52,7 @@ public:
     void setOverview();
 
 public slots:
-    void on_Overview_anchorClicked(const QUrl &);
+    void overview_anchor_clicked(const QUrl &);
 
 private:
     Ui::CWE_help *ui;

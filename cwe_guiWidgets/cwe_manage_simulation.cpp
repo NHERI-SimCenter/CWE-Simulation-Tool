@@ -111,7 +111,7 @@ void CWE_manage_simulation::newCaseGiven()
 
 void CWE_manage_simulation::newCaseState(CaseState newState)
 {
-    if (newState == CaseState::OP_INVOKE)
+    if (newState == CaseState::DOWNLOAD)
     {
         //TODO: This should be visible but unclickable
         ui->treeView->setEnabled(false);
@@ -142,7 +142,7 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         return;
     }
 
-    if ((newState == CaseState::JOB_RUN) || (newState == CaseState::READY))
+    if ((newState == CaseState::RUNNING) || (newState == CaseState::READY))
     {
         ui->pb_viewParameters->setEnabled(true);
         ui->pb_viewResults->setEnabled(true);
@@ -202,14 +202,22 @@ void CWE_manage_simulation::showSelectView()
 
 QString CWE_manage_simulation::getStateText(StageState theState)
 {
+    if (theState == StageState::DOWNLOADING)
+        return "Downloading Case";
     if (theState == StageState::ERROR)
         return "*** ERROR ***";
     if (theState == StageState::FINISHED)
         return "Finished";
+    if (theState == StageState::FINISHED_PREREQ)
+        return "Finished";
     if (theState == StageState::LOADING)
         return "Loading ...";
+    if (theState == StageState::OFFLINE)
+        return "Offline (Debug)";
     if (theState == StageState::RUNNING)
         return "Running ...";
+    if (theState == StageState::UNREADY)
+        return "Needs Prev. Stage";
     if (theState == StageState::UNRUN)
         return "Not Yet Run";
     return "*** TOTAL ERROR ***";

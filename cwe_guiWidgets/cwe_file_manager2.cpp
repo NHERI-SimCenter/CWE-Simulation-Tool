@@ -266,8 +266,6 @@ void CWE_file_manager2::customFileMenu(const QPoint &pos)
     FileMetaData theFileData = targetNode->getFileData();
 
     if (theFileData.getFileType() == FileType::INVALID) return;
-    if (theFileData.getFileType() == FileType::UNLOADED) return;
-    if (theFileData.getFileType() == FileType::EMPTY_FOLDER) return;
 
     fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
     fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
