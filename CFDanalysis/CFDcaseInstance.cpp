@@ -62,6 +62,8 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
                      this, SLOT(fileTaskDone(RequestState)));
+    QObject::connect(theDriver->getFileHandler(), SIGNAL(recursiveProcessFinished(bool,QString)),
+                     this, SLOT(recursiveFileOpDone(bool,QString)));
 
     if (theDriver->inOfflineMode())
     {
@@ -99,6 +101,8 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
                      this, SLOT(fileTaskDone(RequestState)));
+    QObject::connect(theDriver->getFileHandler(), SIGNAL(recursiveProcessFinished(bool,QString)),
+                     this, SLOT(recursiveFileOpDone(bool,QString)));
 
     if (theDriver->inOfflineMode())
     {
@@ -119,6 +123,8 @@ CFDcaseInstance::CFDcaseInstance(VWTinterfaceDriver *mainDriver):
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
                      this, SLOT(fileTaskDone(RequestState)));
+    QObject::connect(theDriver->getFileHandler(), SIGNAL(recursiveProcessFinished(bool,QString)),
+                     this, SLOT(recursiveFileOpDone(bool,QString)));
 
     if (theDriver->inOfflineMode())
     {
@@ -378,14 +384,37 @@ void CFDcaseInstance::killCaseConnection()
 
 void CFDcaseInstance::downloadCase(QString destLocalFile)
 {
+    if (defunct) return;
+    if (caseFolder == NULL) return;
+    if (myState != InternalCaseState::READY) return;
+    if (myType == NULL) return;
+    if (theDriver->getFileHandler()->operationIsPending()) return;
+
     if (!cwe_globals::isValidLocalFolder(destLocalFile))
     {
         cwe_globals::displayPopup("Please select a valid local folder for download", "I/O Error");
         return;
     }
 
-    cwe_globals::displayPopup("Download debug message", "DEBUG: TODO");
-    //TODO : Recursive download
+    FileTreeNode * lastCompleteNode = NULL;
+
+    for (QString aStage : myType->getStageSequence())
+    {
+        FileTreeNode * testNode = caseFolder->getChildNodeWithName(aStage);
+        if (testNode != NULL)
+        {
+            lastCompleteNode = testNode;
+        }
+    }
+
+    if (lastCompleteNode == NULL)
+    {
+        cwe_globals::displayPopup("Results cannot be downloaded until a stage is run.", "Download Error");
+        return;
+    }
+
+    emitNewState(InternalCaseState::DOWNLOAD);
+    theDriver->getFileHandler()->enactRecursiveDownload(lastCompleteNode, destLocalFile);
 }
 
 void CFDcaseInstance::stopJob(QString stage)
@@ -439,9 +468,6 @@ void CFDcaseInstance::underlyingFilesUpdated()
 
     switch (activeState)
     {
-    case InternalCaseState::DOWNLOAD:
-        state_Download_fileChange(); return;
-
     case InternalCaseState::FOLDER_CHECK_STOPPED_JOB:
         state_FolderCheckStopped_fileChange_taskDone(); return;
 
@@ -585,6 +611,30 @@ void CFDcaseInstance::jobKilled(RequestState invokeStatus)
     }
 }
 
+void CFDcaseInstance::recursiveFileOpDone(bool opSuccess, QString message)
+{
+    if (defunct) return;
+
+    if (opSuccess == false)
+    {
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        cwe_globals::displayPopup(message, "File Operation Failed");
+        enactDataReload();
+        return;
+    }
+
+    InternalCaseState activeState = myState;
+
+    switch (activeState)
+    {
+    case InternalCaseState::DOWNLOAD:
+        state_Download_recursiveOpDone(); return;
+
+    default:
+        return;
+    }
+}
+
 void CFDcaseInstance::caseFolderRemoved()
 {
     killCaseConnection();
@@ -613,7 +663,7 @@ void CFDcaseInstance::emitNewState(InternalCaseState newState)
 
     if (!stageStatesEqual(&oldStageStates, &storedStageStates))
     {
-        emit haveNewStageStates();
+        emit haveNewState(getCaseState());
     }
 }
 
@@ -920,7 +970,7 @@ QMap<QString, const RemoteJobData * > CFDcaseInstance::getRelevantJobs()
             continue;
         }
 
-        QString jobDir = (*itr)->getParams().value("directory");
+        QString jobDir = (*itr)->getInputs().value("directory");
 
         if (caseFolder->fileNameMatches(jobDir))
         {
@@ -981,15 +1031,6 @@ void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
 
     enactDataReload();
     emitNewState(InternalCaseState::INIT_DATA_LOAD);
-}
-
-void CFDcaseInstance::state_Download_fileChange()
-{
-    if (myState != InternalCaseState::DOWNLOAD) return;
-
-    //TODO: Recursive buffer download
-    //TODO: Once all buffers downloaded, output to files
-    return;
 }
 
 void CFDcaseInstance::state_FolderCheckStopped_fileChange_taskDone()
@@ -1143,7 +1184,11 @@ void CFDcaseInstance::state_Ready_fileChange_jobList()
     }
 
     QMap<QString, const RemoteJobData *> relevantJobs = getRelevantJobs();
-    if (relevantJobs.isEmpty()) return;
+    if (relevantJobs.isEmpty())
+    {
+        emitNewState(InternalCaseState::READY);
+        return;
+    }
 
     if (!allListedJobsHaveDetails(relevantJobs))
     {
@@ -1165,27 +1210,20 @@ void CFDcaseInstance::state_RunningNoRecord_jobList()
 {
     if (myState != InternalCaseState::RUNNING_JOB_NORECORD) return;
 
-    QMap<QString, const RemoteJobData *> relevantJobs = getRelevantJobs();
-    if (relevantJobs.contains(runningID))
-    {
-        runningJobNode = relevantJobs.value(runningID);
-        if (runningJobNode->detailsLoaded())
-        {
-            emitNewState(InternalCaseState::RUNNING_JOB_YESRECORD);
-        }
-        else
-        {
-            runningJobNode = NULL;
-        }
-        return;
-    }
+    const RemoteJobData * aNode = theDriver->getJobHandler()->findJobByID(runningID);
+    if (aNode == NULL) return;
 
-    runningJobNode = theDriver->getJobHandler()->findJobByID(runningID);
-    if (runningJobNode != NULL)
+    if ((aNode->getState() == "FINISHED") ||
+            (aNode->getState() == "FAILED"))
     {
         runningJobNode = NULL;
         emitNewState(InternalCaseState::RE_DATA_LOAD);
-        return;
+    }
+
+    if ((aNode != NULL) && aNode->detailsLoaded())
+    {
+        runningJobNode = aNode;
+        emitNewState(InternalCaseState::RUNNING_JOB_YESRECORD);
     }
 }
 
@@ -1197,6 +1235,8 @@ void CFDcaseInstance::state_RunningYesRecord_jobList()
     if (!relevantJobs.contains(runningJobNode->getID()))
     {
         runningJobNode = NULL;
+        theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
+        enactDataReload();
         emitNewState(InternalCaseState::RE_DATA_LOAD);
         return;
     }
@@ -1205,8 +1245,6 @@ void CFDcaseInstance::state_RunningYesRecord_jobList()
 void CFDcaseInstance::state_StartingJob_jobInvoked(QString jobID)
 {
     if (myState != InternalCaseState::STARTING_JOB) return;
-
-    //TODO: Get the data from the job JSON
 
     if (jobID.isEmpty())
     {
@@ -1262,4 +1300,12 @@ void CFDcaseInstance::state_WaitingFolderDel_taskDone(RequestState invokeStatus)
     theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
     enactDataReload();
     emitNewState(InternalCaseState::RE_DATA_LOAD);
+}
+
+void CFDcaseInstance::state_Download_recursiveOpDone()
+{
+    if (myState != InternalCaseState::DOWNLOAD) return;
+    enactDataReload();
+    emitNewState(InternalCaseState::RE_DATA_LOAD);
+    cwe_globals::displayPopup("Case results successfully downloaded.", "Download Complete");
 }

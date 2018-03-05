@@ -111,6 +111,13 @@ void CWE_Parameters::newCaseState(CaseState newState)
         return;
     }
 
+    //Sets the listed states of the stage tabs
+    QMap<QString, StageState> stageStates = myDriver->getCurrentCase()->getStageStates();
+    for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
+    {
+        ui->theTabWidget->setTabStage(*itr, itr.key());
+    }
+
     switch (newState)
     {
     case CaseState::DEFUNCT:
@@ -148,7 +155,6 @@ void CWE_Parameters::setButtonsAccordingToStage()
     QMap<QString, StageState> stageStates = myDriver->getCurrentCase()->getStageStates();
     for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
     {
-        ui->theTabWidget->setTabStage(*itr, itr.key());
         switch (*itr)
         {
         case StageState::ERROR:

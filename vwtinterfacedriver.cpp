@@ -268,7 +268,7 @@ QMap<QString, const RemoteJobData *> VWTinterfaceDriver::getRunningCWEjobs()
     for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
     {
         QString theApp = (*itr)->getApp();
-        if ((theApp == "cwe-serial") || (theApp == "cwe-parallel"))
+        if (theApp.startsWith("cwe-serial") || theApp.startsWith("cwe-parallel"))
         {
             ret.insert(itr.key(),*itr);
         }

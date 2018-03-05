@@ -100,7 +100,6 @@ public:
 signals:
     void detachCase();
     void haveNewState(CaseState newState);
-    void haveNewStageStates(); //New Stage states are implied by having a new state
 
 private slots:
     void underlyingFilesUpdated();
@@ -108,6 +107,7 @@ private slots:
     void fileTaskDone(RequestState invokeStatus);
     void jobInvoked(RequestState invokeStatus, QJsonDocument* jobData);
     void jobKilled(RequestState invokeStatus);
+    void recursiveFileOpDone(bool opSuccess, QString message);
 
     void caseFolderRemoved();
 
@@ -128,7 +128,6 @@ private:
 
     //The various state change functions:
     void state_CopyingFolder_taskDone(RequestState invokeStatus);
-    void state_Download_fileChange();
     void state_FolderCheckStopped_fileChange_taskDone();
     void state_DataLoad_fileChange_jobList();
     void state_InitParam_taskDone(RequestState invokeStatus);
@@ -140,6 +139,7 @@ private:
     void state_StoppingJob_jobKilled();
     void state_UserParamUpload_taskDone(RequestState invokeStatus);
     void state_WaitingFolderDel_taskDone(RequestState invokeStatus);
+    void state_Download_recursiveOpDone();
 
     bool defunct = false;
     QMap<QString, StageState> storedStageStates;
