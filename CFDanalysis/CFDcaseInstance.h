@@ -44,11 +44,12 @@
 class FileTreeNode;
 class CFDanalysisType;
 class RemoteJobData;
+class JobListNode;
 enum class RequestState;
 
 class VWTinterfaceDriver;
 
-enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
+enum class StageState {UNREADY, UNRUN, RUNNING, FINISHED, FINISHED_PREREQ, LOADING, ERROR, DOWNLOADING, OFFLINE};
 //Stages:
 //UNRUN: Parameters changeable, RUN button active
 //LOADING: Parameters frozen(visible), no buttons
@@ -56,13 +57,13 @@ enum class StageState {UNRUN, RUNNING, FINISHED, LOADING, ERROR};
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, JOB_RUN, OP_INVOKE, OFFLINE};
-//LOADING: Reloading file info to determine case stats
-//JOB_RUN: Running long-running tasks
-//OP_INVOKE: Running short file operations
-
-enum class PendingCFDrequest {NONE, CREATE_MKDIR, CREATE_UPLOAD, DUP_COPY, PARAM_UPLOAD,
-                             APP_INVOKE, APP_RUN, ROLLBACK_DEL, STOP_JOB};
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, OP_INVOKE, RUNNING, DOWNLOAD, OFFLINE};
+enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
+                             TYPE_SELECTED, EMPTY_CASE, INIT_DATA_LOAD,
+                             MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD, READY,
+                             USER_PARAM_UPLOAD, WAITING_FOLDER_DEL, RE_DATA_LOAD,
+                             STARTING_JOB, STOPPING_JOB, RUNNING_JOB_NORECORD, RUNNING_JOB_YESRECORD,
+                             FOLDER_CHECK_STOPPED_JOB, DOWNLOAD};
 
 class CFDcaseInstance : public QObject
 {
@@ -71,13 +72,12 @@ class CFDcaseInstance : public QObject
 public:
     CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
     CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
-    CFDcaseInstance(VWTinterfaceDriver * mainDriver);
+    CFDcaseInstance(VWTinterfaceDriver * mainDriver); // For duplications
 
     bool isDefunct();
     CaseState getCaseState();
     QString getCaseFolder();
     QString getCaseName();
-    QString currentAgaveRequest();
 
     //Note: For these, it can always answer "I don't know"
     //But that should only happen in the LOADING/ERROR state
@@ -104,22 +104,51 @@ signals:
 private slots:
     void underlyingFilesUpdated();
     void jobListUpdated();
-    void appInvokeDone(RequestState invokeStatus);
-    void agaveTaskDone(RequestState invokeStatus);
+    void fileTaskDone(RequestState invokeStatus);
+    void jobInvoked(RequestState invokeStatus, QJsonDocument* jobData);
+    void jobKilled(RequestState invokeStatus);
+    void recursiveFileOpDone(bool opSuccess, QString message);
 
     void caseFolderRemoved();
 
 private:
-    void emitNewState(CaseState newState);
+    void emitNewState(InternalCaseState newState);
+    void enactDataReload();
+    bool caseDataLoaded();
+    bool caseDataInvalid();
+    void computeCaseType();
 
-    QMap<QString, RemoteJobData * > getRelevantJobs();
+    bool stageStatesEqual(QMap<QString, StageState> * list1, QMap<QString, StageState> * list2);
+    QMap<QString, StageState> computeStageStates();
+    void computeParamList();
+    bool allListedJobsHaveDetails(QMap<QString, const RemoteJobData * > jobList);
+    QMap<QString, const RemoteJobData *> getRelevantJobs();
 
     QByteArray produceJSONparams(QMap<QString, QString> paramList);
 
+    //The various state change functions:
+    void state_CopyingFolder_taskDone(RequestState invokeStatus);
+    void state_FolderCheckStopped_fileChange_taskDone();
+    void state_DataLoad_fileChange_jobList();
+    void state_InitParam_taskDone(RequestState invokeStatus);
+    void state_MakingFolder_taskDone(RequestState invokeStatus);
+    void state_Ready_fileChange_jobList();
+    void state_RunningNoRecord_jobList();
+    void state_RunningYesRecord_jobList();
+    void state_StartingJob_jobInvoked(QString jobID);
+    void state_StoppingJob_jobKilled();
+    void state_UserParamUpload_taskDone(RequestState invokeStatus);
+    void state_WaitingFolderDel_taskDone(RequestState invokeStatus);
+    void state_Download_recursiveOpDone();
+
     bool defunct = false;
-    CaseState myState = CaseState::LOADING;
-    PendingCFDrequest currentReq = PendingCFDrequest::NONE;
-    bool requestDataBeingRefreshed = false;
+    QMap<QString, StageState> storedStageStates;
+    QMap<QString, QString> storedParamList;
+    QMap<QString, QString> prospectiveNewParamList;
+    QString runningID;
+    QString runningStage;
+    const RemoteJobData * runningJobNode = NULL;
+    InternalCaseState myState = InternalCaseState::ERROR;
 
     VWTinterfaceDriver * theDriver;
 
@@ -128,6 +157,8 @@ private:
 
     QString expectedNewCaseFolder;
     QString downloadDest;
+
+    QString caseParamFileName = ".caseParams";
 };
 
 #endif // CFDCASEINSTANCE_H

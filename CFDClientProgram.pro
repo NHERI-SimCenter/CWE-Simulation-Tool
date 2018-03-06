@@ -86,7 +86,6 @@ SOURCES += main.cpp \
     ../AgaveExplorer/remoteFileOps/joboperator.cpp \
     ../AgaveExplorer/remoteFileOps/remotefiletree.cpp \
     ../AgaveExplorer/remoteFileOps/remotejoblister.cpp \
-    ../AgaveExplorer/remoteFileOps/remotejobentry.cpp \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.cpp \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.cpp \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.cpp \
@@ -100,7 +99,9 @@ SOURCES += main.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp \
     cwe_guiWidgets/cwe_result_popup.cpp \
     cwe_guiWidgets/cwe_job_list.cpp \
-    cwe_guiWidgets/cwe_file_manager2.cpp
+    cwe_guiWidgets/cwe_file_manager2.cpp \
+    ../AgaveExplorer/utilFuncs/linkedstandarditem.cpp \
+    ../AgaveExplorer/remoteFileOps/joblistnode.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -140,7 +141,6 @@ HEADERS  += \
     ../AgaveExplorer/remoteFileOps/joboperator.h \
     ../AgaveExplorer/remoteFileOps/remotefiletree.h \
     ../AgaveExplorer/remoteFileOps/remotejoblister.h \
-    ../AgaveExplorer/remoteFileOps/remotejobentry.h \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.h \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.h \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.h \
@@ -154,7 +154,9 @@ HEADERS  += \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h \
     cwe_guiWidgets/cwe_result_popup.h \
     cwe_guiWidgets/cwe_job_list.h \
-    cwe_guiWidgets/cwe_file_manager2.h
+    cwe_guiWidgets/cwe_file_manager2.h \
+    ../AgaveExplorer/utilFuncs/linkedstandarditem.h \
+    ../AgaveExplorer/remoteFileOps/joblistnode.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
