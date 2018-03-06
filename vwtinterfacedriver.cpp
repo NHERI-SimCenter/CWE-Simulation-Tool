@@ -37,6 +37,7 @@
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
 #include "../AgaveClientInterface/agaveInterfaces/agavetaskreply.h"
+#include "../AgaveClientInterface/remotejobdata.h"
 
 #include "../AgaveExplorer/utilFuncs/authform.h"
 
@@ -84,6 +85,20 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetup
     }
 }
 
+VWTinterfaceDriver::~VWTinterfaceDriver()
+{
+    if (mainWindow != NULL)
+    {
+        delete mainWindow;
+        mainWindow = NULL;
+    }
+    if (authWindow != NULL)
+    {
+        delete authWindow;
+        authWindow = NULL;
+    }
+}
+
 void VWTinterfaceDriver::startup()
 {
     authWindow = new AuthForm(this);
@@ -104,6 +119,8 @@ void VWTinterfaceDriver::closeAuthScreen()
     myFileHandle = new FileOperator(theConnector,this);
 
     myJobHandle->demandJobDataRefresh();
+    QObject::connect(myJobHandle, SIGNAL(newJobData()), this, SLOT(processNewJobInfo()));
+
     myFileHandle->resetFileData();
 
     mainWindow->runSetupSteps();
@@ -155,7 +172,7 @@ QString VWTinterfaceDriver::getBanner()
 
 QString VWTinterfaceDriver::getVersion()
 {
-    return "Version: 0.2.1";
+    return "Version: 0.3.0";
 }
 
 QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()
@@ -230,6 +247,33 @@ void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appL
     {
         fatalInterfaceError("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
     }
+}
+
+void VWTinterfaceDriver::processNewJobInfo()
+{
+    QMap<QString, const RemoteJobData *> runningJobs = getRunningCWEjobs();
+    for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
+    {
+        if (!(*itr)->detailsLoaded())
+        {
+            getJobHandler()->requestJobDetails(*itr);
+        }
+    }
+}
+
+QMap<QString, const RemoteJobData *> VWTinterfaceDriver::getRunningCWEjobs()
+{
+    QMap<QString, const RemoteJobData * > ret;
+    QMap<QString, const RemoteJobData *> runningJobs = getJobHandler()->getRunningJobs();
+    for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
+    {
+        QString theApp = (*itr)->getApp();
+        if (theApp.startsWith("cwe-serial") || theApp.startsWith("cwe-parallel"))
+        {
+            ret.insert(itr.key(),*itr);
+        }
+    }
+    return ret;
 }
 
 bool VWTinterfaceDriver::inOfflineMode()
