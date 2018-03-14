@@ -238,11 +238,11 @@
             "type":"choose",
             "default":"Laminar",
             "options":{
-                "Laminar":"Laminar Flow model",
+                "laminar":"Laminar Flow model",
                 "SpalartAllmaras":"S-A one equation model (RANS)",
                 "kEpsilon":"k-epsilon model (RANS)",
-                "Smagorinsky":"Smagorinsky turbulence model (LES)",
-                "dynOneEqEddy":"Dynamic One Equation model (LES)"
+                "Smagorinsky":"Smagorinsky SGS model (LES)",
+                "kEqn":"One equation eddy-viscosity model (LES)"
             }
         },
         "pisoCorrectors":{
