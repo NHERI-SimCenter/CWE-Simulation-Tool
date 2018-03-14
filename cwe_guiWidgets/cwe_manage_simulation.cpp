@@ -40,7 +40,7 @@
 
 #include "mainWindow/cwe_mainwindow.h"
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
     CWE_Super(parent),
@@ -61,13 +61,9 @@ CWE_manage_simulation::~CWE_manage_simulation()
     delete ui;
 }
 
-void CWE_manage_simulation::linkDriver(VWTinterfaceDriver * theDriver)
+void CWE_manage_simulation::linkDriver(CWE_InterfaceDriver * theDriver)
 {
     CWE_Super::linkDriver(theDriver);
-    if (!theDriver->inOfflineMode())
-    {
-        ui->treeView->setFileOperator(theDriver->getFileHandler());
-    }
     QObject::connect(myDriver, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
 }

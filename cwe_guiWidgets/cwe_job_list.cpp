@@ -36,7 +36,7 @@
 #include "cwe_job_list.h"
 #include "ui_cwe_job_list.h"
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 CWE_job_list::CWE_job_list(QWidget *parent) :
     CWE_Super(parent),
@@ -65,13 +65,4 @@ CWE_job_list::CWE_job_list(QWidget *parent) :
 CWE_job_list::~CWE_job_list()
 {
     delete ui;
-}
-
-void CWE_job_list::linkDriver(VWTinterfaceDriver * theDriver)
-{
-    CWE_Super::linkDriver(theDriver);
-    if (!theDriver->inOfflineMode())
-    {
-        ui->tableView_jobs->setJobHandle(theDriver->getJobHandler());
-    }
 }

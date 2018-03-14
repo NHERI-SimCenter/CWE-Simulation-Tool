@@ -41,7 +41,7 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "mainWindow/cwe_mainwindow.h"
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 #include "cwe_globals.h"
 
@@ -59,15 +59,13 @@ CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
     delete ui;
 }
 
-void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
+void CWE_Create_Copy_Simulation::linkDriver(CWE_InterfaceDriver * theDriver)
 {
     CWE_Super::linkDriver(theDriver);
     this->populateCaseTypes();
     if (!theDriver->inOfflineMode())
     {
-        ui->primary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
         ui->primary_remoteFileTree->setupFileView();
-        ui->secondary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
         ui->secondary_remoteFileTree->setupFileView();
     }
 }

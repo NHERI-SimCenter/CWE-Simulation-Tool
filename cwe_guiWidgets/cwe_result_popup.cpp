@@ -43,10 +43,10 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 #include "visualUtils/cfdglcanvas.h"
 #include "visualUtils/decompresswrapper.h"
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
-CWE_Result_Popup::CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, VWTinterfaceDriver * theDriver, bool downloadResult, QWidget *parent) :
+CWE_Result_Popup::CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, CWE_InterfaceDriver * theDriver, bool downloadResult, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CWE_Result_Popup)
 {

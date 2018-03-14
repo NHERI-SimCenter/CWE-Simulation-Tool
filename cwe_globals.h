@@ -38,12 +38,14 @@
 
 #include "../AgaveExplorer/ae_globals.h"
 
-class VWTinterfaceDriver;
+class CWE_InterfaceDriver;
 
 class cwe_globals : public ae_globals
 {
 public:
     cwe_globals();
+
+    static CWE_InterfaceDriver * get_CWE_Driver();
 };
 
 #endif // CWE_GLOBALS_H

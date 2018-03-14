@@ -44,7 +44,7 @@ class CWE_MainWindow;
 }
 
 class cwe_state_label;
-class VWTinterfaceDriver;
+class CWE_InterfaceDriver;
 enum class CaseState;
 
 class CWE_MainWindow : public QMainWindow
@@ -52,7 +52,7 @@ class CWE_MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent = 0);
+    explicit CWE_MainWindow(CWE_InterfaceDriver *newDriver, QWidget *parent = 0);
     ~CWE_MainWindow();
 
     void runSetupSteps();
@@ -77,7 +77,7 @@ private:
 
     Ui::CWE_MainWindow *ui;
 
-    VWTinterfaceDriver     *myDriver;
+    CWE_InterfaceDriver     *myDriver;
     cwe_state_label        *stateLabel = NULL;
 };
 

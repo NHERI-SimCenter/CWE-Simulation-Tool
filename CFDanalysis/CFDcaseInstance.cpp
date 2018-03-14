@@ -45,10 +45,10 @@
 #include "../AgaveClientInterface/remotedatainterface.h"
 #include "../AgaveClientInterface/remotejobdata.h"
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
-CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver):
+CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, CWE_InterfaceDriver * mainDriver):
     QObject((QObject *) mainDriver)
 {
     caseFolder = newCaseFolder;
@@ -91,7 +91,7 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
     enactDataReload();
 }
 
-CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver *mainDriver):
+CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, CWE_InterfaceDriver *mainDriver):
     QObject((QObject *) mainDriver)
 {
     myType = caseType;
@@ -114,7 +114,7 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
     }
 }
 
-CFDcaseInstance::CFDcaseInstance(VWTinterfaceDriver *mainDriver):
+CFDcaseInstance::CFDcaseInstance(CWE_InterfaceDriver *mainDriver):
     QObject((QObject *) mainDriver)
 {
     theDriver = mainDriver;
