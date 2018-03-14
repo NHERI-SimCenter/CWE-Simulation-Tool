@@ -234,7 +234,7 @@ void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFo
 {
     if (defunct) return;
 
-    if (myState == InternalCaseState::EMPTY_CASE) return;
+    if (myState != InternalCaseState::EMPTY_CASE) return;
     if (containingFolder == NULL) return;
     if (oldCase == NULL) return;
     if (theDriver->getFileHandler()->operationIsPending()) return;

@@ -56,7 +56,9 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
     if (!myDriver->inDebugMode())
     {
+        //Tabs only appearing in debug mode should be listed here
         ui->tab_debug->deleteLater();
+        ui->tab_files2->deleteLater();
     }
 
     changeParamsAndResultsEnabled(false);

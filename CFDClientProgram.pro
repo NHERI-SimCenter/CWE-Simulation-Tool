@@ -101,7 +101,9 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_job_list.cpp \
     cwe_guiWidgets/cwe_file_manager2.cpp \
     ../AgaveExplorer/utilFuncs/linkedstandarditem.cpp \
-    ../AgaveExplorer/remoteFileOps/joblistnode.cpp
+    ../AgaveExplorer/remoteFileOps/joblistnode.cpp \
+    visualUtils/resultvisualbase.cpp \
+    ../AgaveExplorer/ae_globals.cpp
 
 HEADERS  += \
     vwtinterfacedriver.h \
@@ -156,7 +158,9 @@ HEADERS  += \
     cwe_guiWidgets/cwe_job_list.h \
     cwe_guiWidgets/cwe_file_manager2.h \
     ../AgaveExplorer/utilFuncs/linkedstandarditem.h \
-    ../AgaveExplorer/remoteFileOps/joblistnode.h
+    ../AgaveExplorer/remoteFileOps/joblistnode.h \
+    visualUtils/resultvisualbase.h \
+    ../AgaveExplorer/ae_globals.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
