@@ -46,7 +46,7 @@
 
 #include "cwe_globals.h"
 
-CWE_ParamPanel::CWE_ParamPanel(VWTinterfaceDriver * theDriver, QWidget *parent) :
+CWE_ParamPanel::CWE_ParamPanel(CWE_InterfaceDriver * theDriver, QWidget *parent) :
     QFrame(parent)
 {
     myDriver = theDriver;

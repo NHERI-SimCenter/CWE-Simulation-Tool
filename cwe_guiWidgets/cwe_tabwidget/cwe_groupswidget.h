@@ -44,14 +44,14 @@
 class CWE_StageStatusTab;
 class CWE_ParamTab;
 class SCtrMasterDataWidget;
-class VWTinterfaceDriver;
+class CWE_InterfaceDriver;
 enum class SimCenterViewState;
 enum class StageState;
 
 class CWE_GroupsWidget : public QTabWidget
 {
 public:
-    CWE_GroupsWidget(VWTinterfaceDriver *theDriver, QWidget *parent = NULL);
+    CWE_GroupsWidget(CWE_InterfaceDriver *theDriver, QWidget *parent = NULL);
     ~CWE_GroupsWidget();
     void setCorrespondingTab(CWE_StageStatusTab * newTab);
 
@@ -76,7 +76,7 @@ private:
     QJsonObject m_obj;
 
     CWE_StageStatusTab * myTab;
-    VWTinterfaceDriver * myDriver;
+    CWE_InterfaceDriver * myDriver;
 
     QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
 };

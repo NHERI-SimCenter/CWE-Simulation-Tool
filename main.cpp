@@ -40,7 +40,7 @@
 
 #include "../AgaveClientInterface/remotedatainterface.h"
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
 
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
         qInstallMessageHandler(emptyMessageHandler);
     }
 
-    VWTinterfaceDriver programDriver(nullptr, debugLoggingEnabled);
+    CWE_InterfaceDriver programDriver(nullptr, debugLoggingEnabled);
     if (QSslSocket::supportsSsl() == false)
     {
         programDriver.fatalInterfaceError("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");

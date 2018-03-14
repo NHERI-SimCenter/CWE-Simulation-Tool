@@ -61,7 +61,7 @@ public:
     explicit CWE_Create_Copy_Simulation(QWidget *parent = 0);
     ~CWE_Create_Copy_Simulation();
 
-    virtual void linkDriver(VWTinterfaceDriver * theDriver);
+    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
 
 private slots:
     void on_pBtn_create_copy_clicked();

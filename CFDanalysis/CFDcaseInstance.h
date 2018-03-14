@@ -47,7 +47,7 @@ class RemoteJobData;
 class JobListNode;
 enum class RequestState;
 
-class VWTinterfaceDriver;
+class CWE_InterfaceDriver;
 
 enum class StageState {UNREADY, UNRUN, RUNNING, FINISHED, FINISHED_PREREQ, LOADING, ERROR, DOWNLOADING, OFFLINE};
 //Stages:
@@ -70,9 +70,9 @@ class CFDcaseInstance : public QObject
     Q_OBJECT
 
 public:
-    CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
-    CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
-    CFDcaseInstance(VWTinterfaceDriver * mainDriver); // For duplications
+    CFDcaseInstance(FileTreeNode * newCaseFolder, CWE_InterfaceDriver * mainDriver);
+    CFDcaseInstance(CFDanalysisType * caseType, CWE_InterfaceDriver * mainDriver); //For new cases
+    CFDcaseInstance(CWE_InterfaceDriver * mainDriver); // For duplications
 
     bool isDefunct();
     CaseState getCaseState();
@@ -150,7 +150,7 @@ private:
     const RemoteJobData * runningJobNode = NULL;
     InternalCaseState myState = InternalCaseState::ERROR;
 
-    VWTinterfaceDriver * theDriver;
+    CWE_InterfaceDriver * theDriver;
 
     FileTreeNode * caseFolder = NULL;
     CFDanalysisType * myType = NULL;

@@ -35,6 +35,14 @@
 
 #include "cwe_globals.h"
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 cwe_globals::cwe_globals() {}
+
+CWE_InterfaceDriver * cwe_globals::get_CWE_Driver()
+{
+    AgaveSetupDriver * theDriver = ae_globals::get_Driver();
+    if (theDriver == NULL) return NULL;
+
+    return qobject_cast<CWE_InterfaceDriver *>(theDriver);
+}

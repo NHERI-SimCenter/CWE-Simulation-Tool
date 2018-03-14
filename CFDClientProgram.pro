@@ -51,7 +51,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp \
     mainWindow/cwe_mainwindow.cpp \
-    vwtinterfacedriver.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
@@ -103,10 +102,10 @@ SOURCES += main.cpp \
     ../AgaveExplorer/utilFuncs/linkedstandarditem.cpp \
     ../AgaveExplorer/remoteFileOps/joblistnode.cpp \
     visualUtils/resultvisualbase.cpp \
-    ../AgaveExplorer/ae_globals.cpp
+    ../AgaveExplorer/ae_globals.cpp \
+    cwe_interfacedriver.cpp
 
 HEADERS  += \
-    vwtinterfacedriver.h \
     CFDanalysis/CFDanalysisType.h \
     CFDanalysis/CFDcaseInstance.h \
     visualUtils/cfdglcanvas.h \
@@ -160,7 +159,8 @@ HEADERS  += \
     ../AgaveExplorer/utilFuncs/linkedstandarditem.h \
     ../AgaveExplorer/remoteFileOps/joblistnode.h \
     visualUtils/resultvisualbase.h \
-    ../AgaveExplorer/ae_globals.h
+    ../AgaveExplorer/ae_globals.h \
+    cwe_interfacedriver.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \

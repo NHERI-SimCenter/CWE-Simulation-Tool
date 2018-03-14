@@ -55,7 +55,7 @@ public:
     explicit CWE_manage_simulation(QWidget *parent = 0);
     ~CWE_manage_simulation();
 
-    virtual void linkDriver(VWTinterfaceDriver * theDriver);
+    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
 
 private slots:
     void newFileSelected(FileTreeNode * newFile);

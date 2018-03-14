@@ -46,13 +46,13 @@ class CFDanalysisType;
 class CFDcaseInstance;
 class RemoteJobData;
 
-class VWTinterfaceDriver : public AgaveSetupDriver
+class CWE_InterfaceDriver : public AgaveSetupDriver
 {
     Q_OBJECT
 
 public:
-    explicit VWTinterfaceDriver(QObject *parent = nullptr, bool debug = false);
-    ~VWTinterfaceDriver();
+    explicit CWE_InterfaceDriver(QObject *parent = nullptr, bool debug = false);
+    ~CWE_InterfaceDriver();
     virtual void startup();
     virtual void closeAuthScreen();
 
