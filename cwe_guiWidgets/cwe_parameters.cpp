@@ -35,7 +35,7 @@
 #include "cwe_parameters.h"
 #include "ui_cwe_parameters.h"
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
@@ -56,7 +56,7 @@ CWE_Parameters::~CWE_Parameters()
     delete ui;
 }
 
-void CWE_Parameters::linkDriver(VWTinterfaceDriver * newDriver)
+void CWE_Parameters::linkDriver(CWE_InterfaceDriver * newDriver)
 {
     CWE_Super::linkDriver(newDriver);
     QObject::connect(myDriver, SIGNAL(haveNewCase()),

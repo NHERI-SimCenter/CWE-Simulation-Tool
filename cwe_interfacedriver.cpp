@@ -33,7 +33,7 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
 #include "../AgaveClientInterface/agaveInterfaces/agavetaskreply.h"
@@ -49,7 +49,7 @@
 
 #include "mainWindow/cwe_mainwindow.h"
 
-VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent, debug)
+CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent, debug)
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
     tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
@@ -85,7 +85,7 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetup
     }
 }
 
-VWTinterfaceDriver::~VWTinterfaceDriver()
+CWE_InterfaceDriver::~CWE_InterfaceDriver()
 {
     if (mainWindow != NULL)
     {
@@ -99,8 +99,10 @@ VWTinterfaceDriver::~VWTinterfaceDriver()
     }
 }
 
-void VWTinterfaceDriver::startup()
+void CWE_InterfaceDriver::startup()
 {
+    myJobHandle = new JobOperator(this);
+    myFileHandle = new FileOperator(this);
     authWindow = new AuthForm(this);
     authWindow->show();
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
@@ -108,15 +110,12 @@ void VWTinterfaceDriver::startup()
     mainWindow = new CWE_MainWindow(this);
 }
 
-void VWTinterfaceDriver::closeAuthScreen()
+void CWE_InterfaceDriver::closeAuthScreen()
 {
     if (mainWindow == NULL)
     {
         fatalInterfaceError("Fatal Error: Main window not found");
     }
-
-    myJobHandle = new JobOperator(theConnector,this);
-    myFileHandle = new FileOperator(theConnector,this);
 
     myJobHandle->demandJobDataRefresh();
     QObject::connect(myJobHandle, SIGNAL(newJobData()), this, SLOT(processNewJobInfo()));
@@ -148,14 +147,12 @@ void VWTinterfaceDriver::closeAuthScreen()
     }
 }
 
-void VWTinterfaceDriver::startOffline()
+void CWE_InterfaceDriver::startOffline()
 {
     offlineMode = true;
-
+    myJobHandle = new JobOperator(this);
+    myFileHandle = new FileOperator(this);
     mainWindow = new CWE_MainWindow(this);
-
-    myJobHandle = new JobOperator(theConnector,this);
-    myFileHandle = new FileOperator(theConnector,this);
 
     setCurrentCase(new CFDcaseInstance(templateList.at(0),this));
 
@@ -165,27 +162,27 @@ void VWTinterfaceDriver::startOffline()
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 }
 
-QString VWTinterfaceDriver::getBanner()
+QString CWE_InterfaceDriver::getBanner()
 {
     return "SimCenter CWE CFD Client Program";
 }
 
-QString VWTinterfaceDriver::getVersion()
+QString CWE_InterfaceDriver::getVersion()
 {
     return "Version: 0.3.1";
 }
 
-QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()
+QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()
 {
     return &templateList;
 }
 
-CFDcaseInstance * VWTinterfaceDriver::getCurrentCase()
+CFDcaseInstance * CWE_InterfaceDriver::getCurrentCase()
 {
     return currentCFDCase;
 }
 
-void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
+void CWE_InterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
 {
     if (newCase == currentCFDCase) return;
 
@@ -209,17 +206,17 @@ void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
     emit haveNewCase();
 }
 
-CWE_MainWindow * VWTinterfaceDriver::getMainWindow()
+CWE_MainWindow * CWE_InterfaceDriver::getMainWindow()
 {
     return mainWindow;
 }
 
-void VWTinterfaceDriver::currentCaseInvalidated()
+void CWE_InterfaceDriver::currentCaseInvalidated()
 {
     setCurrentCase(NULL);
 }
 
-void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appList)
+void CWE_InterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appList)
 {
     if (replyState != RequestState::GOOD)
     {
@@ -249,7 +246,7 @@ void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appL
     }
 }
 
-void VWTinterfaceDriver::processNewJobInfo()
+void CWE_InterfaceDriver::processNewJobInfo()
 {
     QMap<QString, const RemoteJobData *> runningJobs = getRunningCWEjobs();
     for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
@@ -261,7 +258,7 @@ void VWTinterfaceDriver::processNewJobInfo()
     }
 }
 
-QMap<QString, const RemoteJobData *> VWTinterfaceDriver::getRunningCWEjobs()
+QMap<QString, const RemoteJobData *> CWE_InterfaceDriver::getRunningCWEjobs()
 {
     QMap<QString, const RemoteJobData * > ret;
     QMap<QString, const RemoteJobData *> runningJobs = getJobHandler()->getRunningJobs();
@@ -276,7 +273,7 @@ QMap<QString, const RemoteJobData *> VWTinterfaceDriver::getRunningCWEjobs()
     return ret;
 }
 
-bool VWTinterfaceDriver::inOfflineMode()
+bool CWE_InterfaceDriver::inOfflineMode()
 {
     return offlineMode;
 }

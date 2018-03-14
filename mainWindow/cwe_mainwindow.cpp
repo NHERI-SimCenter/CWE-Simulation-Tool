@@ -39,10 +39,10 @@
 #include "cwe_guiWidgets/cwe_state_label.h"
 
 #include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
-CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
+CWE_MainWindow::CWE_MainWindow(CWE_InterfaceDriver *newDriver, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CWE_MainWindow)
 {

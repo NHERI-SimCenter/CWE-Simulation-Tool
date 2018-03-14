@@ -38,7 +38,7 @@
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 class RemoteFileTree;
-class VWTinterfaceDriver;
+class CWE_InterfaceDriver;
 
 //TODO: Need to write visibilty method
 
@@ -46,7 +46,7 @@ class SCtrFileDataWidget: public SCtrMasterDataWidget
 {
 public:
     SCtrFileDataWidget(QWidget *parent);
-    SCtrFileDataWidget(VWTinterfaceDriver* theDriver, QWidget *parent);
+    SCtrFileDataWidget(CWE_InterfaceDriver* theDriver, QWidget *parent);
     void setData(QJsonObject &obj);
     QString toString();
     bool toBool();
@@ -57,7 +57,7 @@ private slots:
     virtual void newFileSelected(FileTreeNode *);
 
 private:
-    VWTinterfaceDriver * myDriver;
+    CWE_InterfaceDriver * myDriver;
     RemoteFileTree * myFileTree = NULL;
     QLabel * selectedFile = NULL;
     QLabel * explainText = NULL;
