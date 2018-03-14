@@ -54,7 +54,7 @@ public:
     explicit CWE_file_manager(QWidget *parent = 0);
     ~CWE_file_manager();
 
-    virtual void linkDriver(VWTinterfaceDriver * theDriver);
+    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
 
 private slots:
     void on_pb_upload_clicked();

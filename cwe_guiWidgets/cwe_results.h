@@ -56,7 +56,7 @@ public:
     explicit CWE_Results(QWidget *parent = 0);
     ~CWE_Results();
 
-    virtual void linkDriver(VWTinterfaceDriver * newDriver);
+    virtual void linkDriver(CWE_InterfaceDriver * newDriver);
     void resetViewInfo();
 
 private slots:
