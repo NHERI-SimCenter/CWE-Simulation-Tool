@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
-** Copyright (c) 2018 The Regents of the University of California
+** Copyright (c) 2017 The University of Notre Dame
+** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -33,17 +33,37 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_GLOBALS_H
-#define CWE_GLOBALS_H
+#ifndef RESULTVISUALBASE_H
+#define RESULTVISUALBASE_H
 
-#include "../AgaveExplorer/ae_globals.h"
+#include <QObject>
+#include <QMap>
 
-class VWTinterfaceDriver;
+class FileTreeNode;
 
-class cwe_globals : public ae_globals
+class ResultVisualBase : public QObject
 {
+    Q_OBJECT
 public:
-    cwe_globals();
+    explicit ResultVisualBase(QObject *parent = nullptr);
+    ~ResultVisualBase();
+
+    void initializeWithNeededFiles(FileTreeNode * baseFolder, QList<QString> neededFiles);
+
+protected:
+    virtual void setupInitDisplay() = 0;
+    virtual void neededFileMissing() = 0;
+    virtual void allFilesLoaded(QMap<QString, QByteArray *> fileDataList) = 0;
+    virtual void dataLostError() = 0;
+
+private slots:
+    void baseFolderRemoved();
+    void fileRecordsChanged();
+
+private:
+    FileTreeNode * myBaseFolder;
+    QList<QString> myFileList;
+
 };
 
-#endif // CWE_GLOBALS_H
+#endif // RESULTVISUALBASE_H

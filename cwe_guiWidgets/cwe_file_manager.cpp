@@ -262,17 +262,16 @@ void CWE_file_manager::customFileMenu(const QPoint &pos)
 
     //If we did not click anything, we should return
     if (targetNode == NULL) return;
-    if (targetNode->isRootNode()) return;
     FileMetaData theFileData = targetNode->getFileData();
 
     if (theFileData.getFileType() == FileType::INVALID) return;
 
-    fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
-    fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
-    fileMenu.addAction("Rename",this, SLOT(renameMenuItem()));
-    //We don't let the user delete the username folder
-    if (!(targetNode->getParentNode()->isRootNode()))
+    if (!(targetNode->isRootNode()))
     {
+        //We don't let the user mess up the username folder
+        fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
+        fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
+        fileMenu.addAction("Rename",this, SLOT(renameMenuItem()));
         fileMenu.addSeparator();
         fileMenu.addAction("Delete",this, SLOT(deleteMenuItem()));
         fileMenu.addSeparator();
