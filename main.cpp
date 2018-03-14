@@ -38,6 +38,8 @@
 #include <QSslSocket>
 #include <QtGlobal>
 
+#include "../AgaveClientInterface/remotedatainterface.h"
+
 #include "vwtinterfacedriver.h"
 
 void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
@@ -48,6 +50,7 @@ int main(int argc, char *argv[])
 
     bool debugLoggingEnabled = false;
     bool runOffline = false;
+    bool logRawOutput = false;
     for (int i = 0; i < argc; i++)
     {
         if (strcmp(argv[i],"enableDebugLogging") == 0)
@@ -57,6 +60,10 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i],"offlineMode") == 0)
         {
             runOffline = true;
+        }
+        if (strcmp(argv[i],"logRawOutput") == 0)
+        {
+            logRawOutput = true;
         }
     }
 
@@ -100,6 +107,12 @@ int main(int argc, char *argv[])
     else
     {
         programDriver.startup();
+    }
+
+    if (debugLoggingEnabled && logRawOutput)
+    {
+        qDebug("NOTE: Debugging text including raw remote output.");
+        programDriver.getDataConnection()->setRawDebugOutput(true);
     }
 
     return mainRunLoop.exec();

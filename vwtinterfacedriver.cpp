@@ -172,7 +172,7 @@ QString VWTinterfaceDriver::getBanner()
 
 QString VWTinterfaceDriver::getVersion()
 {
-    return "Version: 0.3.0";
+    return "Version: 0.3.1";
 }
 
 QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()

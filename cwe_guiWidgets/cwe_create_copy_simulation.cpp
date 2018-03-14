@@ -132,7 +132,7 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
             cwe_globals::displayPopup("Please select a folder to duplicate.");
             return;
         }
-        CFDcaseInstance * tempCase = new CFDcaseInstance(selectedNode, myDriver);
+        CFDcaseInstance * tempCase = new CFDcaseInstance(secondNode, myDriver);
         CaseState dupState = tempCase->getCaseState();
         tempCase->deleteLater();
 

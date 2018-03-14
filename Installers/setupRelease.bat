@@ -10,7 +10,7 @@ SET GENERATOR_DIR=%~dp0
 
 rem ----- adjust user settings -----------------------------
 
-SET QT_WIN_DEPLOY=D:\QT\5.10.0\msvc2017_64\bin\windeployqt
+SET QT_WIN_DEPLOY=D:\QT\5.10.1\msvc2017_64\bin\windeployqt
 SET QT_BIN_CREATE=D:\QT\Tools\QtInstallerFramework\3.0\bin\binarycreator.exe
 
 rem ----- do not modify below here -------------------------
