@@ -103,7 +103,7 @@ CWE_Result_Popup::CWE_Result_Popup(QString caseName, QString caseType, QMap<QStr
     resultFrameLayout->addWidget(loadingLabel);
     ui->displayFrame->setLayout(resultFrameLayout);
 
-    QObject::connect(myDriver->getFileHandler(),SIGNAL(fileSystemChange()),
+    QObject::connect(myDriver->getFileHandler(),SIGNAL(fileSystemChange(FileTreeNode *)),
                      this, SLOT(newFileInfo()));
 
     newFileInfo();
@@ -125,7 +125,7 @@ CWE_Result_Popup::~CWE_Result_Popup()
 void CWE_Result_Popup::closeButtonClicked()
 {
     this->deleteLater();
-    QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange()),
+    QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange(FileTreeNode *)),
                      this, SLOT(newFileInfo()));
 }
 
@@ -237,7 +237,7 @@ void CWE_Result_Popup::newFileInfo()
             loadingLabel = NULL;
             ui->displayFrame->layout()->addWidget(myCanvas);
 
-            QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange()),
+            QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange(FileTreeNode *)),
                              this, SLOT(newFileInfo()));
         }
         else if (resultType == "GLdata")
@@ -362,7 +362,7 @@ void CWE_Result_Popup::newFileInfo()
             loadingLabel = NULL;
             ui->displayFrame->layout()->addWidget(myCanvas);
 
-            QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange()),
+            QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange(FileTreeNode *)),
                              this, SLOT(newFileInfo()));
         }
         else
@@ -429,7 +429,7 @@ void CWE_Result_Popup::newFileInfo()
             ui->displayFrame->layout()->addWidget(myCanvas);
         }
 
-        QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange()),
+        QObject::disconnect(myDriver->getFileHandler(),SIGNAL(fileSystemChange(FileTreeNode *)),
                          this, SLOT(newFileInfo()));
     }
     else

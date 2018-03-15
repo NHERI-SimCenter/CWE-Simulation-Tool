@@ -102,7 +102,7 @@ signals:
     void haveNewState(CaseState newState);
 
 private slots:
-    void underlyingFilesUpdated();
+    void underlyingFilesUpdated(FileTreeNode * changedFile);
     void jobListUpdated();
     void fileTaskDone(RequestState invokeStatus);
     void jobInvoked(RequestState invokeStatus, QJsonDocument* jobData);

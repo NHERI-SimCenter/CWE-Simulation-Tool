@@ -34,6 +34,7 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 #include "resultvisualbase.h"
+#include "cwe_globals.h"
 
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 
@@ -47,50 +48,19 @@ ResultVisualBase::~ResultVisualBase()
 
 }
 
-void ResultVisualBase::initializeWithNeededFiles(FileTreeNode * baseFolder, QList<QString> neededFiles)
+void ResultVisualBase::initializeWithNeededFiles(FileTreeNode * baseFolder, QMap<QString, QString> neededFiles)
 {
 
+}
 
-    fileRecordsChanged();
+QMap<QString, FileTreeNode *> ResultVisualBase::getFileList()
+{
+    return myFileList;
 }
 
 void ResultVisualBase::baseFolderRemoved()
 {
-    QObject::disconnect(this); //TODO: Make specific to given signal
-    dataLostError();
-}
-
-void ResultVisualBase::fileRecordsChanged()
-{
-    bool fileMissing = false;
-    QMap<QString, QByteArray *> rawFileData;
-
-    for (auto itr = myFileList.cbegin(); itr != myFileList.cend(); itr++)
-    {
-        QString filePath = *itr;
-
-        FileTreeNode * theDataNode = myBaseFolder->getNodeReletiveToNodeWithName(filePath);
-
-        if (theDataNode == NULL)
-        {
-            fileMissing = true;
-        }
-        else if (theDataNode->getFileBuffer() == NULL)
-        {
-            fileMissing = true;
-
-        }
-        else
-        {
-            rawFileData.insert(filePath, theDataNode->getFileBuffer());
-        }
-    }
-
-    if (!fileMissing)
-    {
-        QObject::disconnect(this); //TODO: Make specific to given signal
-        allFilesLoaded(rawFileData);
-        return;
-    }
-
+    QObject::disconnect(this);
+    cwe_globals::displayPopup("Underlying case for displayed result has been deleted.");
+    this->deleteLater();
 }
