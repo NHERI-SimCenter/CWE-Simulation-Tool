@@ -48,21 +48,21 @@ public:
     explicit ResultVisualBase(QObject *parent = nullptr);
     ~ResultVisualBase();
 
-    void initializeWithNeededFiles(FileTreeNode * baseFolder, QList<QString> neededFiles);
+    void initializeWithNeededFiles(FileTreeNode * baseFolder, QMap<QString, QString> neededFiles);
+    //Note: needed files is a map: internalID => path relative to base folder
 
 protected:
-    virtual void setupInitDisplay() = 0;
-    virtual void neededFileMissing() = 0;
-    virtual void allFilesLoaded(QMap<QString, QByteArray *> fileDataList) = 0;
-    virtual void dataLostError() = 0;
+    virtual void allFilesLoaded() = 0;
+    QMap<QString, FileTreeNode *> getFileList();
 
-private slots:
-    void baseFolderRemoved();
-    void fileRecordsChanged();
+protected slots:
+    virtual void fileChanged(FileTreeNode * changedFile) = 0;
+    virtual void fileRemoved(FileTreeNode * removedFile) = 0;
+    virtual void baseFolderRemoved();
 
 private:
     FileTreeNode * myBaseFolder;
-    QList<QString> myFileList;
+    QMap<QString, FileTreeNode *> myFileList;
 
 };
 

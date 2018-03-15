@@ -56,7 +56,7 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, CWE_InterfaceDriv
 
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged(FileTreeNode *)),
                      this, SLOT(underlyingFilesUpdated()));
     QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
                      this, SLOT(jobListUpdated()));
@@ -460,7 +460,7 @@ void CFDcaseInstance::stopJob(QString stage)
     return;
 }
 
-void CFDcaseInstance::underlyingFilesUpdated()
+void CFDcaseInstance::underlyingFilesUpdated(FileTreeNode *)
 {
     if (defunct) return;
 
@@ -1026,7 +1026,7 @@ void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
     expectedNewCaseFolder.clear();
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged(FileTreeNode *)),
                      this, SLOT(underlyingFilesUpdated()));
 
     enactDataReload();
@@ -1156,7 +1156,7 @@ void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
     expectedNewCaseFolder.clear();
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged(FileTreeNode *)),
                      this, SLOT(underlyingFilesUpdated()));
 
     QMap<QString, QString> allVars;
