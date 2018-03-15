@@ -40,10 +40,6 @@
 #include <QWidget>
 #include "visualUtils/resultvisualpopup.h"
 
-#include <QLabel>
-#include <QHBoxLayout>
-
-class CFDcaseInstance;
 class CFDglCanvas;
 
 class ResultMesh2dWindow : public ResultVisualPopup
@@ -57,17 +53,6 @@ public:
 
 private:
     virtual void allFilesLoaded();
-    virtual void underlyingDataChanged(FileTreeNode * changedFile, bool fileStillExtant);
-    virtual void initialFailure();
-
-    CFDcaseInstance * myCase;
-    QMap<QString, QString> resultObj;
-    QMap<QString, QByteArray *> fileBuffers;
-
-    QLabel * loadingLabel = NULL;
-    QHBoxLayout * resultFrameLayout = NULL;
-    CFDglCanvas * myCanvas = NULL;
-
 };
 
 #endif // RESULTMESH2DWINDOW_H

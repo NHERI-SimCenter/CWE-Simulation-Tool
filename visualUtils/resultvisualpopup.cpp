@@ -36,18 +36,53 @@
 #include "resultvisualpopup.h"
 #include "ui_resultvisualpopup.h"
 
-ResultVisualPopup::ResultVisualPopup(QWidget *parent) :
+#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+
+#include "CFDanalysis/CFDcaseInstance.h"
+#include "CFDanalysis/CFDanalysisType.h"
+#include "cwe_globals.h"
+
+ResultVisualPopup::ResultVisualPopup(CFDcaseInstance *theCase, QMap<QString, QString> resultDesc, QWidget *parent) :
     ResultProcureBase(parent),
     ui(new Ui::ResultVisualPopup)
 {
     ui->setupUi(this);
 
     setAttribute(Qt::WA_DeleteOnClose, true);
+
+    myCase = theCase;
+    if (myCase == NULL)
+    {
+        cwe_globals::displayFatalPopup("Internal error: Empty case passed to result display");
+        return;
+    }
+
+    resultObj = resultDesc;
+
+    displayFrameTenant = new QLabel("Loading result data. Please Wait.",this);
+    resultFrameLayout = new QHBoxLayout(ui->displayFrame);
+    resultFrameLayout->addWidget(displayFrameTenant);
 }
 
 ResultVisualPopup::~ResultVisualPopup()
 {
+    if (displayFrameTenant != NULL) delete displayFrameTenant;
+    if (resultFrameLayout != NULL) delete resultFrameLayout;
     delete ui;
+}
+
+void ResultVisualPopup::performStandardInit(QMap<QString, QString> neededFiles)
+{
+    FileTreeNode * trueBaseFolder = myCase->getCaseFolderNode()->getChildNodeWithName(resultObj["stage"]);
+    if (trueBaseFolder == NULL)
+    {
+        cwe_globals::displayPopup("ERROR: Result requested for stage that is not yet complete.");
+        this->deleteLater();
+        return;
+    }
+
+    setupResultDisplay(myCase->getCaseName(), myCase->getMyType()->getName(), resultObj["name"]);
+    initializeWithNeededFiles(trueBaseFolder, neededFiles);
 }
 
 void ResultVisualPopup::setupResultDisplay(QString caseName, QString caseType, QString resultName)
@@ -58,9 +93,27 @@ void ResultVisualPopup::setupResultDisplay(QString caseName, QString caseType, Q
     this->show();
 }
 
-QFrame * ResultVisualPopup::getDisplayFrame()
+void ResultVisualPopup::changeDisplayFrameTenant(QWidget * newDisplay)
 {
-    return ui->displayFrame;
+    if (displayFrameTenant != NULL)
+    {
+        displayFrameTenant->deleteLater();
+    }
+    displayFrameTenant = newDisplay;
+
+    if (displayFrameTenant == NULL) return;
+    resultFrameLayout->addWidget(displayFrameTenant);
+    displayFrameTenant->show();
+}
+
+void ResultVisualPopup::underlyingDataChanged(FileTreeNode * , bool)
+{
+    //Note: This is deliberately blank. This result popup is static once the image displays.
+}
+
+void ResultVisualPopup::initialFailure()
+{
+    changeDisplayFrameTenant(new QLabel("Error: Data for this result not available."));
 }
 
 void ResultVisualPopup::closeButtonClicked()

@@ -38,7 +38,11 @@
 
 #include <QWidget>
 #include <QFrame>
+#include <QLabel>
+#include <QHBoxLayout>
 #include "resultprocurebase.h"
+
+class CFDcaseInstance;
 
 namespace Ui {
 class ResultVisualPopup;
@@ -48,14 +52,17 @@ class ResultVisualPopup : public ResultProcureBase
 {
     Q_OBJECT
 public:
-    explicit ResultVisualPopup(QWidget *parent = nullptr);
+    explicit ResultVisualPopup(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent = nullptr);
     ~ResultVisualPopup();
 
     virtual void initializeView() = 0;
+    void performStandardInit(QMap<QString, QString> neededFiles);
 
 protected:
     void setupResultDisplay(QString caseName, QString caseType, QString resultName);
-    QFrame * getDisplayFrame();
+    void changeDisplayFrameTenant(QWidget * newDisplay);
+    virtual void initialFailure();
+    virtual void underlyingDataChanged(FileTreeNode * changedFile, bool fileStillExtant);
 
 private slots:
     void closeButtonClicked();
@@ -63,6 +70,11 @@ private slots:
 private:
     Ui::ResultVisualPopup *ui;
 
+    CFDcaseInstance * myCase;
+    QMap<QString, QString> resultObj;
+
+    QWidget * displayFrameTenant = NULL;
+    QHBoxLayout * resultFrameLayout = NULL;
 };
 
 #endif // RESULTVISUALPOPUP_H

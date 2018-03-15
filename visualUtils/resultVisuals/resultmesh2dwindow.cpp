@@ -35,38 +35,14 @@
 
 #include "resultmesh2dwindow.h"
 
-#include "CFDanalysis/CFDcaseInstance.h"
-#include "CFDanalysis/CFDanalysisType.h"
-#include "cwe_globals.h"
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
-
 #include "../cfdglcanvas.h"
 
 ResultMesh2dWindow::ResultMesh2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
-    ResultVisualPopup(parent)
-{
-    myCase = theCase;
-    if (myCase == NULL)
-    {
-        cwe_globals::displayFatalPopup("Internal error: Empty case passed to result object");
-        return;
-    }
-
-    resultObj = resultDesc;
-
-    loadingLabel = new QLabel("Loading result data. Please Wait.",this);
-    resultFrameLayout = new QHBoxLayout(this->getDisplayFrame());
-    resultFrameLayout->addWidget(loadingLabel);
-}
+    ResultVisualPopup(theCase, resultDesc, parent) {}
 
 ResultMesh2dWindow::~ResultMesh2dWindow()
 {
-    if (loadingLabel != NULL) delete loadingLabel;
-    if (resultFrameLayout != NULL) delete resultFrameLayout;
-    for (auto itr = fileBuffers.cbegin(); itr != fileBuffers.cend(); itr++)
-    {
-        delete (*itr);
-    }
+    changeDisplayFrameTenant(NULL);
 }
 
 void ResultMesh2dWindow::initializeView()
@@ -76,46 +52,24 @@ void ResultMesh2dWindow::initializeView()
     neededFiles["faces"] = "/constant/polyMesh/faces.gz";
     neededFiles["owner"] = "/constant/polyMesh/owner.gz";
 
-    FileTreeNode * trueBaseFolder = myCase->getCaseFolderNode()->getChildNodeWithName(resultObj["stage"]);
-    if (trueBaseFolder == NULL)
-    {
-        cwe_globals::displayPopup("ERROR: Result requested for stage that is not yet complete.");
-        this->deleteLater();
-        return;
-    }
-
-    initializeWithNeededFiles(trueBaseFolder, neededFiles);
-    setupResultDisplay(myCase->getCaseName(), myCase->getMyType()->getName(), "2D Mesh");
+    performStandardInit(neededFiles);
 }
 
 void ResultMesh2dWindow::allFilesLoaded()
 {
     QObject::disconnect(this);
-    fileBuffers = getFileBuffers();
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-    if (myCanvas != NULL) myCanvas->deleteLater();
-    myCanvas = new CFDglCanvas();
+    CFDglCanvas * myCanvas;
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
+
     myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
     if (!myCanvas->haveMeshData())
     {
-        loadingLabel->setText("Error: Data for 2D mesh result is unreadable. Please reset and try again.");
+        changeDisplayFrameTenant(new QLabel("Error: Data for 2D mesh result is unreadable. Please reset and try again."));
+        return;
     }
 
-    loadingLabel->deleteLater();
-    loadingLabel = NULL;
-    getDisplayFrame()->layout()->addWidget(myCanvas);
-
     myCanvas->setDisplayState(CFDDisplayState::MESH);
-    myCanvas->show();
-}
-
-void ResultMesh2dWindow::underlyingDataChanged(FileTreeNode * , bool)
-{
-    //Note: This is deliberately blank. This result popup is static once the image displays.
-}
-
-void ResultMesh2dWindow::initialFailure()
-{
-    loadingLabel->setText("Error: Data for this result not available.");
 }

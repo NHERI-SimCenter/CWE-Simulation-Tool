@@ -44,13 +44,19 @@
 
 ResultProcureBase::ResultProcureBase(QWidget *parent) : QWidget(parent) {}
 
-ResultProcureBase::~ResultProcureBase() {}
+ResultProcureBase::~ResultProcureBase()
+{
+    for (auto itr = myBufferList.cbegin(); itr != myBufferList.cend(); itr++)
+    {
+        delete (*itr);
+    }
+}
 
 void ResultProcureBase::initializeWithNeededFiles(FileTreeNode * baseFolder, QMap<QString, QString> neededFiles)
 {
     if (!myFileList.empty() || initLoadDone)
     {
-        cwe_globals::displayPopup("Internal Error: Attempt made to double initialize result display.");
+        cwe_globals::displayPopup("Internal Error: Attempt made to double-initialize result display.");
         return;
     }
 
@@ -98,7 +104,23 @@ QMap<QString, FileTreeNode *> ResultProcureBase::getFileList()
 
 QMap<QString, QByteArray *> ResultProcureBase::getFileBuffers()
 {
-    QMap<QString, QByteArray *> ret;
+    if (!initLoadDone)
+    {
+        qDebug("ERROR: File buffer compute request before files retrieved.");
+        QMap<QString, QByteArray *> empty;
+        return empty;
+    }
+
+    if (myBufferList.isEmpty())
+    {
+        computeFileBuffers();
+    }
+    return myBufferList;
+}
+
+void ResultProcureBase::computeFileBuffers()
+{
+    myBufferList.clear();
 
     for (QString fileID : myFileList.keys())
     {
@@ -106,7 +128,7 @@ QMap<QString, QByteArray *> ResultProcureBase::getFileBuffers()
         if (theFile == NULL)
         {
             cwe_globals::displayFatalPopup("Internal Error: result file not loaded after load");
-            return ret;
+            return;
         }
         QByteArray * rawBuffer = NULL;
 
@@ -123,12 +145,10 @@ QMap<QString, QByteArray *> ResultProcureBase::getFileBuffers()
         if (rawBuffer == NULL)
         {
             cwe_globals::displayFatalPopup("Internal Error: result buffer not loaded after load");
-            return ret;
+            return;
         }
-        ret[fileID] = rawBuffer;
+        myBufferList[fileID] = rawBuffer;
     }
-
-    return ret;
 }
 
 void ResultProcureBase::fileChanged(FileTreeNode * changedFile)
