@@ -77,6 +77,7 @@ public:
     bool isDefunct();
     CaseState getCaseState();
     QString getCaseFolder();
+    FileTreeNode * getCaseFolderNode();
     QString getCaseName();
 
     //Note: For these, it can always answer "I don't know"

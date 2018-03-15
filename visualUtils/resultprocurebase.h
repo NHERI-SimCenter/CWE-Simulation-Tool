@@ -36,17 +36,17 @@
 #ifndef RESULTVISUALBASE_H
 #define RESULTVISUALBASE_H
 
-#include <QObject>
+#include <QWidget>
 #include <QMap>
 
 class FileTreeNode;
 
-class ResultVisualBase : public QObject
+class ResultProcureBase : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ResultVisualBase(QObject *parent = nullptr);
-    ~ResultVisualBase();
+    explicit ResultProcureBase(QWidget *parent = nullptr);
+    ~ResultProcureBase();
 
     void initializeWithNeededFiles(FileTreeNode * baseFolder, QMap<QString, QString> neededFiles);
     //Note: needed files is a map: internalID => path relative to base folder
@@ -54,15 +54,21 @@ public:
 protected:
     virtual void allFilesLoaded() = 0;
     QMap<QString, FileTreeNode *> getFileList();
+    QMap<QString, QByteArray *> getFileBuffers();
+    virtual void underlyingDataChanged(FileTreeNode * changedFile, bool fileStillExtant) = 0;
+    virtual void initialFailure() = 0;
 
 protected slots:
-    virtual void fileChanged(FileTreeNode * changedFile) = 0;
-    virtual void fileRemoved(FileTreeNode * removedFile) = 0;
     virtual void baseFolderRemoved();
+
+private slots:
+    void fileChanged(FileTreeNode * changedFile);
+    void fileRemoved();
 
 private:
     FileTreeNode * myBaseFolder;
     QMap<QString, FileTreeNode *> myFileList;
+    bool initLoadDone = false;
 
 };
 

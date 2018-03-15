@@ -31,48 +31,40 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_RESULT_POPUP_H
-#define CWE_RESULT_POPUP_H
+#include "resultvisualpopup.h"
+#include "ui_resultvisualpopup.h"
 
-#include <QWidget>
+ResultVisualPopup::ResultVisualPopup(QWidget *parent) :
+    ResultProcureBase(parent),
+    ui(new Ui::ResultVisualPopup)
+{
+    ui->setupUi(this);
 
-#include <QLabel>
-#include <QPlainTextEdit>
-#include <QFileDialog>
-
-class CWE_InterfaceDriver;
-class CFDglCanvas;
-
-namespace Ui {
-class CWE_Result_Popup;
+    setAttribute(Qt::WA_DeleteOnClose, true);
 }
 
-class CWE_Result_Popup : public QWidget
+ResultVisualPopup::~ResultVisualPopup()
 {
-    Q_OBJECT
+    delete ui;
+}
 
-public:
-    explicit CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, CWE_InterfaceDriver * theDriver, bool downloadResult = false, QWidget *parent = 0);
-    ~CWE_Result_Popup();
+void ResultVisualPopup::setupResultDisplay(QString caseName, QString caseType, QString resultName)
+{
+    ui->label_theName->setText(caseName);
+    ui->label_theType->setText(caseType);
+    ui->label_theResult->setText(resultName);
+    this->show();
+}
 
-private slots:
-    void closeButtonClicked();
-    void newFileInfo();
+QFrame * ResultVisualPopup::getDisplayFrame()
+{
+    return ui->displayFrame;
+}
 
-private:
-    Ui::CWE_Result_Popup *ui;
-    CWE_InterfaceDriver * myDriver;
-    bool download;
-    QMap<QString, QString> myResult;
-
-    QString resultType;
-    QString targetFolder;
-    QString targetFile;
-
-    QLabel * loadingLabel = NULL;
-    CFDglCanvas * myCanvas = NULL;
-    QPlainTextEdit * textBox = NULL;
-};
-
-#endif // CWE_RESULT_POPUP_H
+void ResultVisualPopup::closeButtonClicked()
+{
+    QObject::disconnect(this);
+    this->deleteLater();
+}
