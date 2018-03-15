@@ -42,6 +42,7 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "visualUtils/resultVisuals/resultmesh2dwindow.h"
+#include "visualUtils/resultVisuals/resultfield2dwindow.h"
 
 CWE_Results::CWE_Results(QWidget *parent) :
     CWE_Super(parent),
@@ -159,24 +160,15 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
     }
     else if (resultType == "GLdata")
     {
-        //TODO: Redo with new result objects
-        /*
-        if (theItem->column() != showCol)
-        {
-            return;
-        }
-        CWE_Result_Popup * resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
-                             currentCase->getMyType()->getName(),
-                             resultObject, myDriver);
-        resultPopup->show();
-        */
+        if (theItem->column() != showCol) return;
+
+        ResultField2dWindow * resultPopup = new ResultField2dWindow(currentCase, resultObject, NULL);
+        resultPopup->initializeView();
     }
     else if (resultType == "GLmesh")
     {
-        if (theItem->column() != showCol)
-        {
-            return;
-        }
+        if (theItem->column() != showCol) return;
+
         ResultMesh2dWindow * resultPopup = new ResultMesh2dWindow(currentCase, resultObject, NULL);
         resultPopup->initializeView();
     }

@@ -40,10 +40,7 @@
 ResultMesh2dWindow::ResultMesh2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}
 
-ResultMesh2dWindow::~ResultMesh2dWindow()
-{
-    changeDisplayFrameTenant(NULL);
-}
+ResultMesh2dWindow::~ResultMesh2dWindow(){}
 
 void ResultMesh2dWindow::initializeView()
 {
