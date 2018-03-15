@@ -54,7 +54,10 @@ public:
 protected:
     virtual void allFilesLoaded() = 0;
     QMap<QString, FileTreeNode *> getFileList();
+
     QMap<QString, QByteArray *> getFileBuffers();
+    void computeFileBuffers();
+
     virtual void underlyingDataChanged(FileTreeNode * changedFile, bool fileStillExtant) = 0;
     virtual void initialFailure() = 0;
 
@@ -68,6 +71,7 @@ private slots:
 private:
     FileTreeNode * myBaseFolder;
     QMap<QString, FileTreeNode *> myFileList;
+    QMap<QString, QByteArray *> myBufferList;
     bool initLoadDone = false;
 
 };
