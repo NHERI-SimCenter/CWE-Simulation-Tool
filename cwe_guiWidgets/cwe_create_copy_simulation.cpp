@@ -41,7 +41,7 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "mainWindow/cwe_mainwindow.h"
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 #include "cwe_globals.h"
 
@@ -59,15 +59,13 @@ CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
     delete ui;
 }
 
-void CWE_Create_Copy_Simulation::linkDriver(VWTinterfaceDriver * theDriver)
+void CWE_Create_Copy_Simulation::linkDriver(CWE_InterfaceDriver * theDriver)
 {
     CWE_Super::linkDriver(theDriver);
     this->populateCaseTypes();
     if (!theDriver->inOfflineMode())
     {
-        ui->primary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
         ui->primary_remoteFileTree->setupFileView();
-        ui->secondary_remoteFileTree->setFileOperator(theDriver->getFileHandler());
         ui->secondary_remoteFileTree->setupFileView();
     }
 }
@@ -132,7 +130,7 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
             cwe_globals::displayPopup("Please select a folder to duplicate.");
             return;
         }
-        CFDcaseInstance * tempCase = new CFDcaseInstance(selectedNode, myDriver);
+        CFDcaseInstance * tempCase = new CFDcaseInstance(secondNode, myDriver);
         CaseState dupState = tempCase->getCaseState();
         tempCase->deleteLater();
 

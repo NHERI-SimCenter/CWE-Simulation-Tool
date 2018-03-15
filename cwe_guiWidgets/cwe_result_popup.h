@@ -41,7 +41,7 @@
 #include <QPlainTextEdit>
 #include <QFileDialog>
 
-class VWTinterfaceDriver;
+class CWE_InterfaceDriver;
 class CFDglCanvas;
 
 namespace Ui {
@@ -53,7 +53,7 @@ class CWE_Result_Popup : public QWidget
     Q_OBJECT
 
 public:
-    explicit CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, VWTinterfaceDriver * theDriver, bool downloadResult = false, QWidget *parent = 0);
+    explicit CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, CWE_InterfaceDriver * theDriver, bool downloadResult = false, QWidget *parent = 0);
     ~CWE_Result_Popup();
 
 private slots:
@@ -62,7 +62,7 @@ private slots:
 
 private:
     Ui::CWE_Result_Popup *ui;
-    VWTinterfaceDriver * myDriver;
+    CWE_InterfaceDriver * myDriver;
     bool download;
     QMap<QString, QString> myResult;
 

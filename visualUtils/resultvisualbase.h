@@ -33,53 +33,37 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef VWTINTERFACEDRIVER_H
-#define VWTINTERFACEDRIVER_H
+#ifndef RESULTVISUALBASE_H
+#define RESULTVISUALBASE_H
 
-#include "../AgaveExplorer/utilFuncs/agavesetupdriver.h"
+#include <QObject>
+#include <QMap>
 
-#include <QWindow>
-#include <QDir>
+class FileTreeNode;
 
-class CWE_MainWindow;
-class CFDanalysisType;
-class CFDcaseInstance;
-
-class VWTinterfaceDriver : public AgaveSetupDriver
+class ResultVisualBase : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit VWTinterfaceDriver(QObject *parent = nullptr, bool debug = false);
-    virtual void startup();
-    virtual void closeAuthScreen();
+    explicit ResultVisualBase(QObject *parent = nullptr);
+    ~ResultVisualBase();
 
-    virtual void startOffline();
+    void initializeWithNeededFiles(FileTreeNode * baseFolder, QList<QString> neededFiles);
 
-    virtual QString getBanner();
-    virtual QString getVersion();
-
-    QList<CFDanalysisType *> * getTemplateList();
-    CFDcaseInstance * getCurrentCase();
-    void setCurrentCase(CFDcaseInstance * newCase);
-    CWE_MainWindow * getMainWindow();
-
-    bool inOfflineMode();
-
-signals:
-    void haveNewCase();
+protected:
+    virtual void setupInitDisplay() = 0;
+    virtual void neededFileMissing() = 0;
+    virtual void allFilesLoaded(QMap<QString, QByteArray *> fileDataList) = 0;
+    virtual void dataLostError() = 0;
 
 private slots:
-    void currentCaseInvalidated();
-    void checkAppList(RequestState replyState, QJsonArray * appList);
+    void baseFolderRemoved();
+    void fileRecordsChanged();
 
 private:
-    CWE_MainWindow * mainWindow;
-    QList<CFDanalysisType *> templateList;
+    FileTreeNode * myBaseFolder;
+    QList<QString> myFileList;
 
-    CFDcaseInstance * currentCFDCase = NULL;
-
-    bool offlineMode = false;
 };
 
-#endif // VWTINTERFACEDRIVER_H
+#endif // RESULTVISUALBASE_H

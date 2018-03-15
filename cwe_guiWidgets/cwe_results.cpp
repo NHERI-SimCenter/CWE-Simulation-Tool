@@ -35,7 +35,7 @@
 #include "cwe_results.h"
 #include "ui_cwe_results.h"
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
 #include "CFDanalysis/CFDanalysisType.h"
@@ -60,7 +60,7 @@ CWE_Results::~CWE_Results()
     delete ui;
 }
 
-void CWE_Results::linkDriver(VWTinterfaceDriver * newDriver)
+void CWE_Results::linkDriver(CWE_InterfaceDriver * newDriver)
 {
     CWE_Super::linkDriver(newDriver);
     QObject::connect(myDriver, SIGNAL(haveNewCase()),
@@ -108,10 +108,7 @@ void CWE_Results::newCaseGiven()
     {
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
-
-        if (newCase->getMyType() == NULL) return;
-
-        populateResultsScreen();
+        newCaseState(newCase->getCaseState());
     }
 }
 
@@ -199,7 +196,9 @@ QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
     {
         QString stageName = itr.key();
-        if (currentStates.value(stageName, StageState::ERROR) != StageState::FINISHED)
+        StageState theStageState = currentStates.value(stageName, StageState::ERROR);
+        if ((theStageState != StageState::FINISHED) &&
+                (theStageState != StageState::FINISHED_PREREQ))
         {
             continue;
         }
@@ -242,16 +241,27 @@ void CWE_Results::newCaseState(CaseState newState)
     case CaseState::INVALID:
     case CaseState::OFFLINE:
         resetViewInfo();
+        ui->downloadEntireCaseButton->setDisabled(true);
         return; //These states should be handled elsewhere
         break;
+    case CaseState::DOWNLOAD:
     case CaseState::LOADING:
     case CaseState::OP_INVOKE:
+        ui->downloadEntireCaseButton->setDisabled(true);
         resetViewInfo();
+        return;
         break;
-    case CaseState::JOB_RUN:
-    case CaseState::READY:
+    case CaseState::RUNNING:
+        ui->downloadEntireCaseButton->setDisabled(true);
         resetViewInfo();
         populateResultsScreen();
+        return;
+        break;
+    case CaseState::READY:
+        ui->downloadEntireCaseButton->setEnabled(true);
+        resetViewInfo();
+        populateResultsScreen();
+        return;
         break;
     default:
         myDriver->fatalInterfaceError("Remote case has unhandled state");
@@ -294,7 +304,9 @@ void CWE_Results::populateResultsScreen()
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
     {
         QString stageName = itr.key();
-        if (currentStates.value(stageName, StageState::ERROR) != StageState::FINISHED)
+        StageState theStageState = currentStates.value(stageName, StageState::ERROR);
+        if ((theStageState != StageState::FINISHED) &&
+                (theStageState != StageState::FINISHED_PREREQ))
         {
             continue;
         }

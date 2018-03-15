@@ -51,8 +51,6 @@ public:
     explicit CWE_job_list(QWidget *parent = 0);
     ~CWE_job_list();
 
-    virtual void linkDriver(VWTinterfaceDriver * theDriver);
-
 private slots:
 
 private:

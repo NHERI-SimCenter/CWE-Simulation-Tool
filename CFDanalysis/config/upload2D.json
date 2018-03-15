@@ -7,6 +7,8 @@
     "stages":{
         "mesh":{
             "name":"Mesh",
+            "app":"cwe-serial",
+            "app_input":"geoFile",
             "groups":[
                 "Building Geometry",
                 "Mesh Density",
@@ -22,6 +24,7 @@
         },
         "sim":{
             "name":"Simulation",
+            "app":"cwe-parallel",
             "groups":[
                 "Simulation Control",
                 "Advanced"
@@ -47,56 +50,75 @@
             ]
         }
     },
-    "varGroups":{
-        "Building Geometry":[
-            "geoFile",
-            "slicePlane",
-            "sliceAngle"
-        ],
-        "Mesh Density":[
-            "inPad",
-            "outPad",
-            "topPad",
-            "bottomPad",
-            "meshDensity",
-            "meshDensityFar"
-        ],
-        "Subdomains":[
-            "innerDomains",
-            "inPadDom1",
-            "outPadDom1",
-            "topPadDom1",
-            "bottomPadDom1",
-            "meshDensityDom1",
-            "inPadDom2",
-            "outPadDom2",
-            "topPadDom2",
-            "bottomPadDom2",
-            "meshDensityDom2",
-            "inPadDom3",
-            "outPadDom3",
-            "topPadDom3",
-            "bottomPadDom3",
-            "meshDensityDom3"
-        ],
-        "Boundaries":[
-            "lowYPlane",
-            "highYPlane"
-        ],
-        "Simulation Control":[
-            "endTime",
-            "deltaT",
-            "velocity",
-            "nu"
-        ],
-        "Advanced":[
-            "turbModel",
-            "useForceCoeffs",
-            "useFieldUmean",
-            "useFieldPmean",
-            "pisoCorrectors",
-            "pisoNonOrthCorrect"
-        ]
+    "groups":{
+        "Building Geometry":{
+            "name":"Building Geometry",
+            "vars":[
+                "geoFile",
+                "slicePlane",
+                "sliceAngle"
+                ],
+            "image":"placeholderIcon.png"
+        },
+        "Mesh Density":{
+            "name":"Mesh Density",
+            "vars":[
+                "inPad",
+                "outPad",
+                "topPad",
+                "bottomPad",
+                "meshDensity",
+                "meshDensityFar"
+            ]
+        },
+        "Subdomains":{
+            "name":"Subdomains",
+            "vars":[
+                "innerDomains",
+                "inPadDom1",
+                "outPadDom1",
+                "topPadDom1",
+                "bottomPadDom1",
+                "meshDensityDom1",
+                "inPadDom2",
+                "outPadDom2",
+                "topPadDom2",
+                "bottomPadDom2",
+                "meshDensityDom2",
+                "inPadDom3",
+                "outPadDom3",
+                "topPadDom3",
+                "bottomPadDom3",
+                "meshDensityDom3"
+            ]
+        },
+        "Boundaries":{
+            "name":"Boundaries",
+            "vars":[
+                "lowYPlane",
+                "highYPlane"
+            ]
+        },
+        "Simulation Control":{
+            "name":"Simulation Control",
+            "vars":[
+                "endTime",
+                "deltaT",
+                "velocity",
+                "nu"
+            ]
+        },
+        "Advanced":{
+            "name":"Advanced",
+            "vars":[
+                "turbModel",
+                "useForceCoeffs",
+                "useFieldUmean",
+                "useFieldPmean",
+                "pisoCorrectors",
+                "pisoNonOrthCorrect"
+            ]
+        }
     },
     "vars":{
         "geoFile":{
@@ -235,11 +257,11 @@
             "type":"choose",
             "default":"Laminar",
             "options":{
-                "Laminar":"Laminar Flow model",
+                "laminar":"Laminar Flow model",
                 "SpalartAllmaras":"S-A one equation model (RANS)",
                 "kEpsilon":"k-epsilon model (RANS)",
-                "Smagorinsky":"Smagorinsky turbulence model (LES)",
-                "dynOneEqEddy":"Dynamic One Equation model (LES)"
+                "Smagorinsky":"Smagorinsky SGS model (LES)",
+                "kEqn":"One equation eddy-viscosity model (LES)"
             }
         },
         "pisoCorrectors":{

@@ -33,10 +33,11 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 #include "../AgaveClientInterface/agaveInterfaces/agavehandler.h"
 #include "../AgaveClientInterface/agaveInterfaces/agavetaskreply.h"
+#include "../AgaveClientInterface/remotejobdata.h"
 
 #include "../AgaveExplorer/utilFuncs/authform.h"
 
@@ -48,18 +49,14 @@
 
 #include "mainWindow/cwe_mainwindow.h"
 
-VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent, debug)
+CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent, debug)
 {
     AgaveHandler * tmpHandle = new AgaveHandler(this);
     tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
     tmpHandle->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
-    tmpHandle->registerAgaveAppInfo("openfoam","openfoam-2.4.0u11",{"solver"},{"inputDirectory"},"inputDirectory");
 
-    //The following are being debuged:
-    tmpHandle->registerAgaveAppInfo("FileEcho", "fileEcho-0.1.0",{"directory","NewFile", "EchoText"},{},"directory");
-    tmpHandle->registerAgaveAppInfo("cwe-mesh", "cwe-mesh-0.1.0", {"directory"}, {}, "directory");
-    tmpHandle->registerAgaveAppInfo("cwe-sim", "cwe-sim-2.4.0", {}, {"directory"}, "directory");
-    tmpHandle->registerAgaveAppInfo("cwe-post", "cwe-post-0.1.0", {"directory"}, {}, "directory");
+    tmpHandle->registerAgaveAppInfo("cwe-serial", "cwe-serial-0.1.0", {"stage"}, {"directory", "file_input"}, "directory");
+    tmpHandle->registerAgaveAppInfo("cwe-parallel", "cwe-parallel-0.1.0", {"stage"}, {"directory", "file_input"}, "directory");
 
     theConnector = (RemoteDataInterface *) tmpHandle;
     QObject::connect(theConnector, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(fatalInterfaceError(QString)));
@@ -88,8 +85,24 @@ VWTinterfaceDriver::VWTinterfaceDriver(QObject *parent, bool debug) : AgaveSetup
     }
 }
 
-void VWTinterfaceDriver::startup()
+CWE_InterfaceDriver::~CWE_InterfaceDriver()
 {
+    if (mainWindow != NULL)
+    {
+        delete mainWindow;
+        mainWindow = NULL;
+    }
+    if (authWindow != NULL)
+    {
+        delete authWindow;
+        authWindow = NULL;
+    }
+}
+
+void CWE_InterfaceDriver::startup()
+{
+    myJobHandle = new JobOperator(this);
+    myFileHandle = new FileOperator(this);
     authWindow = new AuthForm(this);
     authWindow->show();
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
@@ -97,17 +110,16 @@ void VWTinterfaceDriver::startup()
     mainWindow = new CWE_MainWindow(this);
 }
 
-void VWTinterfaceDriver::closeAuthScreen()
+void CWE_InterfaceDriver::closeAuthScreen()
 {
     if (mainWindow == NULL)
     {
         fatalInterfaceError("Fatal Error: Main window not found");
     }
 
-    myJobHandle = new JobOperator(theConnector,this);
-    myFileHandle = new FileOperator(theConnector,this);
-
     myJobHandle->demandJobDataRefresh();
+    QObject::connect(myJobHandle, SIGNAL(newJobData()), this, SLOT(processNewJobInfo()));
+
     myFileHandle->resetFileData();
 
     mainWindow->runSetupSteps();
@@ -135,14 +147,12 @@ void VWTinterfaceDriver::closeAuthScreen()
     }
 }
 
-void VWTinterfaceDriver::startOffline()
+void CWE_InterfaceDriver::startOffline()
 {
     offlineMode = true;
-
+    myJobHandle = new JobOperator(this);
+    myFileHandle = new FileOperator(this);
     mainWindow = new CWE_MainWindow(this);
-
-    myJobHandle = new JobOperator(theConnector,this);
-    myFileHandle = new FileOperator(theConnector,this);
 
     setCurrentCase(new CFDcaseInstance(templateList.at(0),this));
 
@@ -152,27 +162,27 @@ void VWTinterfaceDriver::startOffline()
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 }
 
-QString VWTinterfaceDriver::getBanner()
+QString CWE_InterfaceDriver::getBanner()
 {
     return "SimCenter CWE CFD Client Program";
 }
 
-QString VWTinterfaceDriver::getVersion()
+QString CWE_InterfaceDriver::getVersion()
 {
-    return "Version: 0.1.3";
+    return "Version: 0.3.1";
 }
 
-QList<CFDanalysisType *> * VWTinterfaceDriver::getTemplateList()
+QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()
 {
     return &templateList;
 }
 
-CFDcaseInstance * VWTinterfaceDriver::getCurrentCase()
+CFDcaseInstance * CWE_InterfaceDriver::getCurrentCase()
 {
     return currentCFDCase;
 }
 
-void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
+void CWE_InterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
 {
     if (newCase == currentCFDCase) return;
 
@@ -196,17 +206,17 @@ void VWTinterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
     emit haveNewCase();
 }
 
-CWE_MainWindow * VWTinterfaceDriver::getMainWindow()
+CWE_MainWindow * CWE_InterfaceDriver::getMainWindow()
 {
     return mainWindow;
 }
 
-void VWTinterfaceDriver::currentCaseInvalidated()
+void CWE_InterfaceDriver::currentCaseInvalidated()
 {
     setCurrentCase(NULL);
 }
 
-void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appList)
+void CWE_InterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appList)
 {
     if (replyState != RequestState::GOOD)
     {
@@ -214,7 +224,7 @@ void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appL
         return;
     }
 
-    QList<QString> neededApps = {"cwe-mesh", "cwe-sim", "cwe-post"};
+    QList<QString> neededApps = {"cwe-serial", "cwe-parallel"};
 
     for (auto itr = appList->constBegin(); itr != appList->constEnd(); itr++)
     {
@@ -236,7 +246,34 @@ void VWTinterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appL
     }
 }
 
-bool VWTinterfaceDriver::inOfflineMode()
+void CWE_InterfaceDriver::processNewJobInfo()
+{
+    QMap<QString, const RemoteJobData *> runningJobs = getRunningCWEjobs();
+    for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
+    {
+        if (!(*itr)->detailsLoaded())
+        {
+            getJobHandler()->requestJobDetails(*itr);
+        }
+    }
+}
+
+QMap<QString, const RemoteJobData *> CWE_InterfaceDriver::getRunningCWEjobs()
+{
+    QMap<QString, const RemoteJobData * > ret;
+    QMap<QString, const RemoteJobData *> runningJobs = getJobHandler()->getRunningJobs();
+    for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
+    {
+        QString theApp = (*itr)->getApp();
+        if (theApp.startsWith("cwe-serial") || theApp.startsWith("cwe-parallel"))
+        {
+            ret.insert(itr.key(),*itr);
+        }
+    }
+    return ret;
+}
+
+bool CWE_InterfaceDriver::inOfflineMode()
 {
     return offlineMode;
 }

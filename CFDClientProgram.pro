@@ -51,7 +51,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp \
     mainWindow/cwe_mainwindow.cpp \
-    vwtinterfacedriver.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
@@ -86,7 +85,6 @@ SOURCES += main.cpp \
     ../AgaveExplorer/remoteFileOps/joboperator.cpp \
     ../AgaveExplorer/remoteFileOps/remotefiletree.cpp \
     ../AgaveExplorer/remoteFileOps/remotejoblister.cpp \
-    ../AgaveExplorer/remoteFileOps/remotejobentry.cpp \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.cpp \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.cpp \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.cpp \
@@ -99,10 +97,15 @@ SOURCES += main.cpp \
     cwe_globals.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp \
     cwe_guiWidgets/cwe_result_popup.cpp \
-    cwe_guiWidgets/cwe_job_list.cpp
+    cwe_guiWidgets/cwe_job_list.cpp \
+    cwe_guiWidgets/cwe_file_manager2.cpp \
+    ../AgaveExplorer/utilFuncs/linkedstandarditem.cpp \
+    ../AgaveExplorer/remoteFileOps/joblistnode.cpp \
+    visualUtils/resultvisualbase.cpp \
+    ../AgaveExplorer/ae_globals.cpp \
+    cwe_interfacedriver.cpp
 
 HEADERS  += \
-    vwtinterfacedriver.h \
     CFDanalysis/CFDanalysisType.h \
     CFDanalysis/CFDcaseInstance.h \
     visualUtils/cfdglcanvas.h \
@@ -139,7 +142,6 @@ HEADERS  += \
     ../AgaveExplorer/remoteFileOps/joboperator.h \
     ../AgaveExplorer/remoteFileOps/remotefiletree.h \
     ../AgaveExplorer/remoteFileOps/remotejoblister.h \
-    ../AgaveExplorer/remoteFileOps/remotejobentry.h \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.h \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.h \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.h \
@@ -152,7 +154,13 @@ HEADERS  += \
     cwe_globals.h \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h \
     cwe_guiWidgets/cwe_result_popup.h \
-    cwe_guiWidgets/cwe_job_list.h
+    cwe_guiWidgets/cwe_job_list.h \
+    cwe_guiWidgets/cwe_file_manager2.h \
+    ../AgaveExplorer/utilFuncs/linkedstandarditem.h \
+    ../AgaveExplorer/remoteFileOps/joblistnode.h \
+    visualUtils/resultvisualbase.h \
+    ../AgaveExplorer/ae_globals.h \
+    cwe_interfacedriver.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -171,11 +179,10 @@ FORMS    += \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
     cwe_guiWidgets/cwe_result_popup.ui \
-    cwe_guiWidgets/cwe_job_list.ui
+    cwe_guiWidgets/cwe_job_list.ui \
+    cwe_guiWidgets/cwe_file_manager2.ui
 
 RESOURCES += \
     cwe_resources.qrc \
     ../AgaveExplorer/SimCenterCommon/commonResources.qrc \
     CFDanalysis/config/cfdconfig.qrc
-
-DISTFILES +=

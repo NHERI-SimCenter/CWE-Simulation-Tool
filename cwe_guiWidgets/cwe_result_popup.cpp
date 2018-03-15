@@ -43,10 +43,10 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 #include "visualUtils/cfdglcanvas.h"
 #include "visualUtils/decompresswrapper.h"
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
-CWE_Result_Popup::CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, VWTinterfaceDriver * theDriver, bool downloadResult, QWidget *parent) :
+CWE_Result_Popup::CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, CWE_InterfaceDriver * theDriver, bool downloadResult, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CWE_Result_Popup)
 {
@@ -150,7 +150,7 @@ void CWE_Result_Popup::newFileInfo()
             return;
         }
 
-        if (folderNode->childIsUnloaded())
+        if (folderNode->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED)
         {
             myDriver->getFileHandler()->lsClosestNode(targetFolder);
             return;
@@ -258,7 +258,7 @@ void CWE_Result_Popup::newFileInfo()
                 return;
             }
 
-            if (baseFolderNode->childIsUnloaded())
+            if (baseFolderNode->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED)
             {
                 myDriver->getFileHandler()->lsClosestNode(targetFile);
                 return;
@@ -266,8 +266,8 @@ void CWE_Result_Popup::newFileInfo()
 
             double biggestNum = -1;
             FileTreeNode * targetChild = NULL;
-            QList<FileTreeNode *> * childList = baseFolderNode->getChildList();
-            for (auto itr = childList->cbegin(); itr != childList->cend(); itr++)
+            QList<FileTreeNode *> childList = baseFolderNode->getChildList();
+            for (auto itr = childList.cbegin(); itr != childList.cend(); itr++)
             {
                 if ((*itr)->getFileData().getFileType() != FileType::DIR)
                 {
@@ -295,7 +295,7 @@ void CWE_Result_Popup::newFileInfo()
                 return;
             }
 
-            if (targetChild->childIsUnloaded())
+            if (targetChild->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED)
             {
                 myDriver->getFileHandler()->lsClosestNode(targetChild->getFileData().getFullPath());
                 return;
@@ -380,7 +380,7 @@ void CWE_Result_Popup::newFileInfo()
         {
             fileNode = myDriver->getFileHandler()->getClosestNodeFromName(targetFile);
 
-            if ((fileNode == NULL) || (!fileNode->childIsUnloaded())) //TODO: This check needs to go everywhere on file re-write
+            if ((fileNode == NULL) || (fileNode->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED)) //TODO: This check needs to go everywhere on file re-write
             {
                 cwe_globals::displayPopup("Error: Data for result display is unavailable. Please reset and try again.");
                 this->deleteLater();

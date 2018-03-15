@@ -41,7 +41,7 @@
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/utilFuncs/singlelinedialog.h"
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
 CWE_file_manager::CWE_file_manager(QWidget *parent) :
@@ -70,12 +70,11 @@ CWE_file_manager::~CWE_file_manager()
     delete ui;
 }
 
-void CWE_file_manager::linkDriver(VWTinterfaceDriver * theDriver)
+void CWE_file_manager::linkDriver(CWE_InterfaceDriver * theDriver)
 {
     CWE_Super::linkDriver(theDriver);
     if (!myDriver->inOfflineMode())
     {
-        ui->remoteTreeView->setFileOperator(myDriver->getFileHandler());
         ui->remoteTreeView->setupFileView();
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
@@ -173,7 +172,7 @@ void CWE_file_manager::copyMenuItem()
         return;
     }
 
-    ui->remoteTreeView->getFileOperator()->sendCopyReq(targetNode, newNamePopup.getInputText());
+    ae_globals::get_Driver()->getFileHandler()->sendCopyReq(targetNode, newNamePopup.getInputText());
 }
 
 void CWE_file_manager::moveMenuItem()
@@ -185,7 +184,7 @@ void CWE_file_manager::moveMenuItem()
         return;
     }
 
-    ui->remoteTreeView->getFileOperator()->sendMoveReq(targetNode,newNamePopup.getInputText());
+    ae_globals::get_Driver()->getFileHandler()->sendMoveReq(targetNode,newNamePopup.getInputText());
 }
 
 void CWE_file_manager::renameMenuItem()
@@ -197,14 +196,14 @@ void CWE_file_manager::renameMenuItem()
         return;
     }
 
-    ui->remoteTreeView->getFileOperator()->sendRenameReq(targetNode, newNamePopup.getInputText());
+    ae_globals::get_Driver()->getFileHandler()->sendRenameReq(targetNode, newNamePopup.getInputText());
 }
 
 void CWE_file_manager::deleteMenuItem()
 {
-    if (ui->remoteTreeView->getFileOperator()->deletePopup(targetNode))
+    if (ae_globals::get_Driver()->getFileHandler()->deletePopup(targetNode))
     {
-        ui->remoteTreeView->getFileOperator()->sendDeleteReq(targetNode);
+        ae_globals::get_Driver()->getFileHandler()->sendDeleteReq(targetNode);
     }
 }
 
@@ -216,27 +215,27 @@ void CWE_file_manager::createFolderMenuItem()
     {
         return;
     }
-    ui->remoteTreeView->getFileOperator()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
+    ae_globals::get_Driver()->getFileHandler()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
 }
 
 void CWE_file_manager::compressMenuItem()
 {
-    ui->remoteTreeView->getFileOperator()->sendCompressReq(targetNode);
+    ae_globals::get_Driver()->getFileHandler()->sendCompressReq(targetNode);
 }
 
 void CWE_file_manager::decompressMenuItem()
 {
-    ui->remoteTreeView->getFileOperator()->sendDecompressReq(targetNode);
+    ae_globals::get_Driver()->getFileHandler()->sendDecompressReq(targetNode);
 }
 
 void CWE_file_manager::refreshMenuItem()
 {
-    ui->remoteTreeView->getFileOperator()->enactFolderRefresh(targetNode);
+    ae_globals::get_Driver()->getFileHandler()->enactFolderRefresh(targetNode);
 }
 
 void CWE_file_manager::downloadBufferItem()
 {
-    ui->remoteTreeView->getFileOperator()->sendDownloadBuffReq(targetNode);
+    ae_globals::get_Driver()->getFileHandler()->sendDownloadBuffReq(targetNode);
 }
 
 void CWE_file_manager::remoteOpDone()
@@ -248,7 +247,7 @@ void CWE_file_manager::remoteOpDone()
 void CWE_file_manager::customFileMenu(const QPoint &pos)
 {
     QMenu fileMenu;
-    if (ui->remoteTreeView->getFileOperator()->operationIsPending())
+    if (ae_globals::get_Driver()->getFileHandler()->operationIsPending())
     {
         fileMenu.addAction("File Operation In Progress . . .");
         fileMenu.exec(QCursor::pos());
@@ -262,19 +261,16 @@ void CWE_file_manager::customFileMenu(const QPoint &pos)
 
     //If we did not click anything, we should return
     if (targetNode == NULL) return;
-    if (targetNode->isRootNode()) return;
     FileMetaData theFileData = targetNode->getFileData();
 
     if (theFileData.getFileType() == FileType::INVALID) return;
-    if (theFileData.getFileType() == FileType::UNLOADED) return;
-    if (theFileData.getFileType() == FileType::EMPTY_FOLDER) return;
 
-    fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
-    fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
-    fileMenu.addAction("Rename",this, SLOT(renameMenuItem()));
-    //We don't let the user delete the username folder
-    if (!(targetNode->getParentNode()->isRootNode()))
+    if (!(targetNode->isRootNode()))
     {
+        //We don't let the user mess up the username folder
+        fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
+        fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
+        fileMenu.addAction("Rename",this, SLOT(renameMenuItem()));
         fileMenu.addSeparator();
         fileMenu.addAction("Delete",this, SLOT(deleteMenuItem()));
         fileMenu.addSeparator();

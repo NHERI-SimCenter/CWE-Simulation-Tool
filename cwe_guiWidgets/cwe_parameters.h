@@ -56,11 +56,13 @@ public:
     explicit CWE_Parameters(QWidget *parent = 0);
     ~CWE_Parameters();
 
-    virtual void linkDriver(VWTinterfaceDriver * newDriver);
+    virtual void linkDriver(CWE_InterfaceDriver * newDriver);
     void resetViewInfo();
 
     void switchToResults();
     void performCaseCommand(QString stage, CaseCommand toEnact);
+    void setSaveAllButtonDisabled(bool newSetting);
+    void setSaveAllButtonEnabled(bool newSetting);
 
 private slots:
     void on_pbtn_saveAllParameters_clicked();
