@@ -41,7 +41,7 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
-#include "cwe_result_popup.h"
+#include "visualUtils/resultVisuals/resultmesh2dwindow.h"
 
 CWE_Results::CWE_Results(QWidget *parent) :
     CWE_Super(parent),
@@ -139,6 +139,8 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
     QString resultType = resultObject.value("type");
     if (resultType == "text")
     {
+        //TODO: Redo with new result objects
+        /*
         CWE_Result_Popup * resultPopup = NULL;
         if (theItem->column() == showCol)
         {
@@ -153,9 +155,12 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
                                  resultObject, myDriver, true);
         }
         resultPopup->show();
+        */
     }
     else if (resultType == "GLdata")
     {
+        //TODO: Redo with new result objects
+        /*
         if (theItem->column() != showCol)
         {
             return;
@@ -164,6 +169,7 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
                              currentCase->getMyType()->getName(),
                              resultObject, myDriver);
         resultPopup->show();
+        */
     }
     else if (resultType == "GLmesh")
     {
@@ -171,10 +177,8 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
         {
             return;
         }
-        CWE_Result_Popup * resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
-                             currentCase->getMyType()->getName(),
-                             resultObject, myDriver);
-        resultPopup->show();
+        ResultMesh2dWindow * resultPopup = new ResultMesh2dWindow(currentCase, resultObject, NULL);
+        resultPopup->initializeView();
     }
 }
 

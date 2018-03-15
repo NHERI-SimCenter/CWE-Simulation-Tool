@@ -33,34 +33,41 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "resultvisualbase.h"
-#include "cwe_globals.h"
+#ifndef RESULTMESH2DWINDOW_H
+#define RESULTMESH2DWINDOW_H
 
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include <QObject>
+#include <QWidget>
+#include "visualUtils/resultvisualpopup.h"
 
-ResultVisualBase::ResultVisualBase(QObject *parent) : QObject(parent)
+#include <QLabel>
+#include <QHBoxLayout>
+
+class CFDcaseInstance;
+class CFDglCanvas;
+
+class ResultMesh2dWindow : public ResultVisualPopup
 {
+    Q_OBJECT
+public:
+    ResultMesh2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent = 0);
+    ~ResultMesh2dWindow();
 
-}
+    virtual void initializeView();
 
-ResultVisualBase::~ResultVisualBase()
-{
+private:
+    virtual void allFilesLoaded();
+    virtual void underlyingDataChanged(FileTreeNode * changedFile, bool fileStillExtant);
+    virtual void initialFailure();
 
-}
+    CFDcaseInstance * myCase;
+    QMap<QString, QString> resultObj;
+    QMap<QString, QByteArray *> fileBuffers;
 
-void ResultVisualBase::initializeWithNeededFiles(FileTreeNode * baseFolder, QMap<QString, QString> neededFiles)
-{
+    QLabel * loadingLabel = NULL;
+    QHBoxLayout * resultFrameLayout = NULL;
+    CFDglCanvas * myCanvas = NULL;
 
-}
+};
 
-QMap<QString, FileTreeNode *> ResultVisualBase::getFileList()
-{
-    return myFileList;
-}
-
-void ResultVisualBase::baseFolderRemoved()
-{
-    QObject::disconnect(this);
-    cwe_globals::displayPopup("Underlying case for displayed result has been deleted.");
-    this->deleteLater();
-}
+#endif // RESULTMESH2DWINDOW_H
