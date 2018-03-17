@@ -33,46 +33,21 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "resultfield2dwindow.h"
+#ifndef RESULTTEXTDISP_H
+#define RESULTTEXTDISP_H
 
-#include "../cfdglcanvas.h"
+#include "visualUtils/resultvisualpopup.h"
 
-ResultField2dWindow::ResultField2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
-    ResultVisualPopup(theCase, resultDesc, parent) {}
-
-ResultField2dWindow::~ResultField2dWindow(){}
-
-void ResultField2dWindow::initializeView()
+class ResultTextDisplay : public ResultVisualPopup
 {
-    QMap<QString, QString> neededFiles;
-    neededFiles["points"] = "/constant/polyMesh/points.gz";
-    neededFiles["faces"] = "/constant/polyMesh/faces.gz";
-    neededFiles["owner"] = "/constant/polyMesh/owner.gz";
+public:
+    ResultTextDisplay(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent = 0);
+    ~ResultTextDisplay();
 
-    QString fieldName = getResultObj()["file"];
-    QString fieldFile = "[final]/";
-    fieldFile.append(fieldName).append(".gz");
-    neededFiles["data"] = fieldFile;
+    virtual void initializeView();
 
-    performStandardInit(neededFiles);
-}
+private:
+    virtual void allFilesLoaded();
+};
 
-void ResultField2dWindow::allFilesLoaded()
-{
-    QObject::disconnect(this);
-    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
-
-    CFDglCanvas * myCanvas;
-    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
-
-    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
-
-    if (!myCanvas->haveMeshData())
-    {
-        changeDisplayFrameTenant(new QLabel("Error: Data for 2D mesh is unreadable. Please reset and try again."));
-        return;
-    }
-
-    myCanvas->loadFieldData(fileBuffers["data"], getResultObj()["values"]);
-    myCanvas->setDisplayState(CFDDisplayState::FIELD);
-}
+#endif // RESULTTEXTDISP_H
