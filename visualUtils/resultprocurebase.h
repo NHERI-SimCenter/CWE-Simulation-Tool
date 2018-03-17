@@ -53,12 +53,16 @@ public:
 
 protected:
     virtual void allFilesLoaded() = 0;
-    QMap<QString, FileTreeNode *> getFileList();
 
+    QMap<QString, FileTreeNode *> getFileNodes();
     QMap<QString, QByteArray *> getFileBuffers();
+
     void computeFileBuffers();
 
-    virtual void underlyingDataChanged(FileTreeNode * changedFile, bool fileStillExtant) = 0;
+    virtual void underlyingDataChanged(QString fileID) = 0;
+    //Note: input to the above method might be an empty string
+    //This can be used for force a re-load of the data
+
     virtual void initialFailure() = 0;
 
 protected slots:
@@ -66,14 +70,19 @@ protected slots:
 
 private slots:
     void fileChanged(FileTreeNode * changedFile);
-    void fileRemoved();
+    void fileRemoved(QObject *destroyedObj);
 
 private:
+    bool checkForAndSeekFiles(); //Returns true if all files loaded
+    FileTreeNode * getFinalResultFolder();
+    QString getIDfromNode(QObject *fileNode);
+
     FileTreeNode * myBaseFolder;
-    QMap<QString, FileTreeNode *> myFileList;
+
+    QMap<QString, QString> myFileNames;
+    QMap<QString, FileTreeNode *> myFileNodes;
     QMap<QString, QByteArray *> myBufferList;
     bool initLoadDone = false;
-
 };
 
 #endif // RESULTVISUALBASE_H

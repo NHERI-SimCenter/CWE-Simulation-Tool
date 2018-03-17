@@ -106,9 +106,20 @@ void ResultVisualPopup::changeDisplayFrameTenant(QWidget * newDisplay)
     displayFrameTenant->show();
 }
 
-void ResultVisualPopup::underlyingDataChanged(FileTreeNode * , bool)
+void ResultVisualPopup::underlyingDataChanged(QString )
 {
     //Note: This is deliberately blank. This result popup is static once the image displays.
+}
+
+QMap<QString, QString> ResultVisualPopup::getResultObj()
+{
+    return resultObj;
+}
+
+void ResultVisualPopup::baseFolderRemoved()
+{
+    QObject::disconnect(this);
+    changeDisplayFrameTenant(new QLabel("Underlying case data is no longer available."));
 }
 
 void ResultVisualPopup::initialFailure()

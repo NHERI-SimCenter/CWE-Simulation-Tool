@@ -43,6 +43,7 @@
 #include <QJsonArray>
 
 enum class CaseState;
+class ResultProcureBase;
 
 namespace Ui {
 class CWE_Results;
