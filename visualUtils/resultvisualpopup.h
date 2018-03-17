@@ -62,7 +62,12 @@ protected:
     void setupResultDisplay(QString caseName, QString caseType, QString resultName);
     void changeDisplayFrameTenant(QWidget * newDisplay);
     virtual void initialFailure();
-    virtual void underlyingDataChanged(FileTreeNode * changedFile, bool fileStillExtant);
+    virtual void underlyingDataChanged(QString fileID);
+
+    QMap<QString, QString> getResultObj();
+
+protected slots:
+    virtual void baseFolderRemoved();
 
 private slots:
     void closeButtonClicked();

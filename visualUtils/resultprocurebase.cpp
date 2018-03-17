@@ -54,7 +54,7 @@ ResultProcureBase::~ResultProcureBase()
 
 void ResultProcureBase::initializeWithNeededFiles(FileTreeNode * baseFolder, QMap<QString, QString> neededFiles)
 {
-    if (!myFileList.empty() || initLoadDone)
+    if (!myFileNames.empty() || initLoadDone)
     {
         cwe_globals::displayPopup("Internal Error: Attempt made to double-initialize result display.");
         return;
@@ -66,40 +66,23 @@ void ResultProcureBase::initializeWithNeededFiles(FileTreeNode * baseFolder, QMa
         return;
     }
 
-    QObject::connect(baseFolder, SIGNAL(destroyed(QObject*)),
+    myBaseFolder = baseFolder;
+    myFileNames = neededFiles;
+
+    for (QString fileID : myFileNames.keys())
+    {
+        myFileNodes[fileID] = NULL;
+    }
+
+    QObject::connect(myBaseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(baseFolderRemoved()));
 
-    for (QString fileID: neededFiles.keys())
-    {
-        QString fileName = neededFiles.value(fileID);
-
-        FileTreeNode * targetFileNode = cwe_globals::get_file_handle()->speculateNodeWithName(baseFolder, fileName, false);
-
-        if ((targetFileNode == NULL) && fileName.endsWith(".gz"))
-        {
-            fileName.chop(3);
-            targetFileNode = cwe_globals::get_file_handle()->speculateNodeWithName(baseFolder, fileName, false);
-        }
-
-        if ((targetFileNode == NULL) || !targetFileNode->isFile())
-        {
-            myFileList.clear();
-            QObject::disconnect(this);
-            initialFailure();
-            return;
-        }
-        myFileList.insert(fileID,targetFileNode);
-        QObject::connect(targetFileNode, SIGNAL(fileDataChanged(FileTreeNode*)),
-                         this, SLOT(fileChanged(FileTreeNode*)));
-        QObject::connect(targetFileNode, SIGNAL(destroyed(QObject*)),
-                         this, SLOT(fileRemoved()));
-    }
     fileChanged(NULL);
 }
 
-QMap<QString, FileTreeNode *> ResultProcureBase::getFileList()
+QMap<QString, FileTreeNode *> ResultProcureBase::getFileNodes()
 {
-    return myFileList;
+    return myFileNodes;
 }
 
 QMap<QString, QByteArray *> ResultProcureBase::getFileBuffers()
@@ -122,9 +105,9 @@ void ResultProcureBase::computeFileBuffers()
 {
     myBufferList.clear();
 
-    for (QString fileID : myFileList.keys())
+    for (QString fileID : myFileNodes.keys())
     {
-        FileTreeNode * theFile = myFileList.value(fileID);
+        FileTreeNode * theFile = myFileNodes.value(fileID);
         if (theFile == NULL)
         {
             cwe_globals::displayFatalPopup("Internal Error: result file not loaded after load");
@@ -153,80 +136,164 @@ void ResultProcureBase::computeFileBuffers()
 
 void ResultProcureBase::fileChanged(FileTreeNode * changedFile)
 {
+    QString idChanged = getIDfromNode(changedFile);
+
     if (initLoadDone)
     {
-        underlyingDataChanged(changedFile, true);
+        underlyingDataChanged(idChanged);
         return;
     }
-    bool foundAll = true;
-    for (FileTreeNode * aFile: myFileList.values())
-    {
-        NodeState theFileState = aFile->getNodeState();
-        if ((theFileState == NodeState::FILE_SPECULATE_IDLE) ||
-                (theFileState == NodeState::FILE_KNOWN))
-        {
-            cwe_globals::get_file_handle()->sendDownloadBuffReq(aFile);
-        }
-        if (theFileState != NodeState::FILE_BUFF_LOADED)
-        {
-            foundAll = false;
-        }
-    }
-    if (foundAll)
+
+    if (checkForAndSeekFiles())
     {
         initLoadDone = true;
         allFilesLoaded();
     }
 }
 
-void ResultProcureBase::fileRemoved()
+void ResultProcureBase::fileRemoved(QObject * destroyedObj)
 {
-    FileTreeNode * removedFile = qobject_cast<FileTreeNode *>(QObject::sender());
-    if (removedFile == NULL)
-    {
-        cwe_globals::displayFatalPopup("Internal Error: signal to result screen is mismatched object");
-        return;
-    }
+    QString idToLose = getIDfromNode(destroyedObj);
+    if (idToLose.isEmpty()) return;
+
+    myFileNodes[idToLose] = NULL;
 
     if (initLoadDone)
     {
-        underlyingDataChanged(removedFile, false);
+        underlyingDataChanged(idToLose);
         return;
     }
 
-    QString fileToLose = removedFile->getFileData().getFullPath();
-    if (fileToLose.endsWith(".gz"))
+    if (checkForAndSeekFiles())
     {
-        fileToLose.chop(3);
-        FileTreeNode * newNode = cwe_globals::get_file_handle()->speculateNodeWithName(fileToLose, false);
-
-        if (newNode == NULL)
-        {
-            QObject::disconnect(this);
-            initialFailure();
-            return;
-        }
-
-        for (QString fileID: myFileList.keys())
-        {
-            FileTreeNode * searchNode = myFileList.value(fileID);
-            if (searchNode == removedFile)
-            {
-                myFileList[fileID] = newNode;
-                fileChanged(newNode);
-                return;
-            }
-        }
+        initLoadDone = true;
+        allFilesLoaded();
     }
-
-    QObject::disconnect(this);
-    initialFailure();
-    return;
 }
 
 void ResultProcureBase::baseFolderRemoved()
 {
     QObject::disconnect(this);
-    cwe_globals::displayPopup("Underlying case for displayed result has been deleted.");
     this->deleteLater();
+}
+
+bool ResultProcureBase::checkForAndSeekFiles()
+{
+    //Return true if all files found
+    //Invoke initial failure if files not extant
+    //else return false
+
+    for (QString fileID: myFileNames.keys())
+    {
+        QString fileName = myFileNames.value(fileID);
+        FileTreeNode * fileNode = myFileNodes.value(fileID);
+
+        if (fileNode == NULL)
+        {
+            FileTreeNode * targetFileNode = NULL;
+
+            if (fileName.startsWith("[final]"))
+            {
+                if (myBaseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED)
+                {
+                    cwe_globals::get_file_handle()->enactFolderRefresh(myBaseFolder);
+                    continue;
+                }
+
+                fileName.remove(0,7); //TODO: this is wrong
+                FileTreeNode * lastResult = getFinalResultFolder();
+
+                if (lastResult == NULL)
+                {
+                    QObject::disconnect(this);
+                    initialFailure();
+                    return false;
+                }
+
+                targetFileNode = cwe_globals::get_file_handle()->speculateNodeWithName(lastResult, fileName, false);
+            }
+            else if (fileName.endsWith(".gz"))
+            {
+                targetFileNode = cwe_globals::get_file_handle()->speculateNodeWithName(myBaseFolder, fileName, false);
+
+                if (targetFileNode == NULL)
+                {
+                    fileName.chop(3);
+                    targetFileNode = cwe_globals::get_file_handle()->speculateNodeWithName(myBaseFolder, fileName, false);
+                }
+            }
+            else
+            {
+                targetFileNode = cwe_globals::get_file_handle()->speculateNodeWithName(myBaseFolder, fileName, false);
+            }
+
+            if (targetFileNode == NULL)
+            {
+                QObject::disconnect(this);
+                initialFailure();
+                return false;
+            }
+
+            myFileNodes[fileID] = targetFileNode;
+            QObject::connect(targetFileNode, SIGNAL(fileDataChanged(FileTreeNode*)),
+                             this, SLOT(fileChanged(FileTreeNode*)));
+            QObject::connect(targetFileNode, SIGNAL(destroyed(QObject*)),
+                             this, SLOT(fileRemoved(QObject*)));
+            fileNode = targetFileNode;
+        }
+
+        if (fileNode->getFileBuffer() == NULL)
+        {
+            cwe_globals::get_file_handle()->sendDownloadBuffReq(fileNode);
+        }
+    }
+
+    for (FileTreeNode * aNode : myFileNodes)
+    {
+        if (aNode == NULL) return false;
+        if (aNode->getFileBuffer() == NULL) return false;
+    }
+
+    return true;
+}
+
+FileTreeNode * ResultProcureBase::getFinalResultFolder()
+{
+    double biggestNum = -1.0;
+    FileTreeNode * targetChild = NULL;
+
+    for (FileTreeNode * childNode : myBaseFolder->getChildList())
+    {
+        if (!childNode->isFolder()) continue;
+
+        QString childName = childNode->getFileData().getFileName();
+        if (childName == "0") continue;
+
+        bool isNum = false;
+        double childVal = childName.toDouble(&isNum);
+        if (!isNum) continue;
+        {
+            if (biggestNum < childVal)
+            {
+                biggestNum = childVal;
+                targetChild = childNode;
+            }
+        }
+    }
+
+    return targetChild;
+}
+
+QString ResultProcureBase::getIDfromNode(QObject * fileNode)
+{
+    QString ret;
+    if (fileNode == NULL) return ret;
+
+    for (QString anID : myFileNodes.keys())
+    {
+        FileTreeNode * aNode = myFileNodes[anID];
+
+        if (((QObject *)aNode) == fileNode) return anID;
+    }
+    return ret;
 }
