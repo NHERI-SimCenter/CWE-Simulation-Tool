@@ -33,16 +33,16 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "resultfield2dwindow.h"
+#include "resulttextdisp.h"
 
 #include "../cfdglcanvas.h"
 
-ResultField2dWindow::ResultField2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+ResultTextDisplay::ResultTextDisplay(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}
 
-ResultField2dWindow::~ResultField2dWindow(){}
+ResultTextDisplay::~ResultTextDisplay(){}
 
-void ResultField2dWindow::initializeView()
+void ResultTextDisplay::initializeView()
 {
     QMap<QString, QString> neededFiles;
     neededFiles["points"] = "/constant/polyMesh/points.gz";
@@ -57,7 +57,7 @@ void ResultField2dWindow::initializeView()
     performStandardInit(neededFiles);
 }
 
-void ResultField2dWindow::allFilesLoaded()
+void ResultTextDisplay::allFilesLoaded()
 {
     QObject::disconnect(this);
     QMap<QString, QByteArray *> fileBuffers = getFileBuffers();

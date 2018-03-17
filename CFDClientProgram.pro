@@ -105,7 +105,8 @@ SOURCES += main.cpp \
     visualUtils/resultVisuals/resultmesh2dwindow.cpp \
     visualUtils/resultprocurebase.cpp \
     visualUtils/resultvisualpopup.cpp \
-    visualUtils/resultVisuals/resultfield2dwindow.cpp
+    visualUtils/resultVisuals/resultfield2dwindow.cpp \
+    visualUtils/resultVisuals/resulttextdisp.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -164,7 +165,8 @@ HEADERS  += \
     visualUtils/resultVisuals/resultmesh2dwindow.h \
     visualUtils/resultprocurebase.h \
     visualUtils/resultvisualpopup.h \
-    visualUtils/resultVisuals/resultfield2dwindow.h
+    visualUtils/resultVisuals/resultfield2dwindow.h \
+    visualUtils/resultVisuals/resulttextdisp.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
