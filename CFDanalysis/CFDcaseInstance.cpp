@@ -56,8 +56,8 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, CWE_InterfaceDriv
 
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                     this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged(FileTreeNode *)),
+                     this, SLOT(underlyingFilesUpdated(FileTreeNode*)));
     QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
@@ -177,6 +177,11 @@ QString CFDcaseInstance::getCaseFolder()
     QString ret;
     if (caseFolder == NULL) return ret;
     return caseFolder->getFileData().getFullPath();
+}
+
+FileTreeNode * CFDcaseInstance::getCaseFolderNode()
+{
+    return caseFolder;
 }
 
 QString CFDcaseInstance::getCaseName()
@@ -460,7 +465,7 @@ void CFDcaseInstance::stopJob(QString stage)
     return;
 }
 
-void CFDcaseInstance::underlyingFilesUpdated()
+void CFDcaseInstance::underlyingFilesUpdated(FileTreeNode *)
 {
     if (defunct) return;
 
@@ -1026,8 +1031,8 @@ void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
     expectedNewCaseFolder.clear();
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                     this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged(FileTreeNode *)),
+                     this, SLOT(underlyingFilesUpdated(FileTreeNode*)));
 
     enactDataReload();
     emitNewState(InternalCaseState::INIT_DATA_LOAD);
@@ -1156,8 +1161,8 @@ void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
     expectedNewCaseFolder.clear();
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                     this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged(FileTreeNode *)),
+                     this, SLOT(underlyingFilesUpdated(FileTreeNode*)));
 
     QMap<QString, QString> allVars;
     QByteArray newFile = produceJSONparams(allVars);
