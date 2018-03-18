@@ -45,14 +45,7 @@ ResultTextDisplay::~ResultTextDisplay(){}
 void ResultTextDisplay::initializeView()
 {
     QMap<QString, QString> neededFiles;
-    neededFiles["points"] = "/constant/polyMesh/points.gz";
-    neededFiles["faces"] = "/constant/polyMesh/faces.gz";
-    neededFiles["owner"] = "/constant/polyMesh/owner.gz";
-
-    QString fieldName = getResultObj()["file"];
-    QString fieldFile = "[final]/";
-    fieldFile.append(fieldName).append(".gz");
-    neededFiles["data"] = fieldFile;
+    neededFiles["text"] = getResultObj()["file"];
 
     performStandardInit(neededFiles);
 }
@@ -62,17 +55,9 @@ void ResultTextDisplay::allFilesLoaded()
     QObject::disconnect(this);
     QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-    CFDglCanvas * myCanvas;
-    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
+    QPlainTextEdit * myDisplay;
 
-    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
-
-    if (!myCanvas->haveMeshData())
-    {
-        changeDisplayFrameTenant(new QLabel("Error: Data for 2D mesh is unreadable. Please reset and try again."));
-        return;
-    }
-
-    myCanvas->loadFieldData(fileBuffers["data"], getResultObj()["values"]);
-    myCanvas->setDisplayState(CFDDisplayState::FIELD);
+    QString theText = QString::fromLatin1(*(fileBuffers["text"]));
+    changeDisplayFrameTenant(myDisplay = new QPlainTextEdit(theText));
+    myDisplay->setReadOnly(true);
 }
