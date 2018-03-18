@@ -43,6 +43,7 @@
 #include <QJsonArray>
 
 enum class CaseState;
+class ResultProcureBase;
 
 namespace Ui {
 class CWE_Results;
@@ -56,7 +57,7 @@ public:
     explicit CWE_Results(QWidget *parent = 0);
     ~CWE_Results();
 
-    virtual void linkDriver(VWTinterfaceDriver * newDriver);
+    virtual void linkDriver(CWE_InterfaceDriver * newDriver);
     void resetViewInfo();
 
 private slots:
@@ -69,6 +70,7 @@ private slots:
 private:
     QMap<QString, QString> getResultObjectFromName(QString name);
     void populateResultsScreen();
+    void performSingleFileDownload(QString filePathToDownload, QString stage);
 
     Ui::CWE_Results    *ui;
     QStandardItemModel *model;

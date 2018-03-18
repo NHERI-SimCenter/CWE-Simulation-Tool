@@ -37,19 +37,19 @@
 
 #include <QFrame>
 
-class VWTinterfaceDriver;
+class CWE_InterfaceDriver;
 
 class CWE_Super : public QFrame
 {
     Q_OBJECT
 public:
     explicit CWE_Super(QWidget *parent = nullptr);
-    virtual void linkDriver(VWTinterfaceDriver * theDriver);
+    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
 
-    VWTinterfaceDriver * getDriver();
+    CWE_InterfaceDriver * getDriver();
 
 protected:
-    VWTinterfaceDriver * myDriver = NULL;
+    CWE_InterfaceDriver * myDriver = NULL;
 };
 
 #endif // CWE_SUPER_H

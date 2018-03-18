@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
-** Copyright (c) 2018 The Regents of the University of California
+** Copyright (c) 2017 The University of Notre Dame
+** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -31,54 +31,60 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_GROUPSWIDGET_H
-#define CWE_GROUPSWIDGET_H
+#ifndef VWTINTERFACEDRIVER_H
+#define VWTINTERFACEDRIVER_H
 
-#include <QTabWidget>
+#include "../AgaveExplorer/utilFuncs/agavesetupdriver.h"
 
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QScrollArea>
+#include <QWindow>
+#include <QDir>
 
-class CWE_StageStatusTab;
-class CWE_ParamTab;
-class SCtrMasterDataWidget;
-class CWE_InterfaceDriver;
-enum class SimCenterViewState;
-enum class StageState;
+class CWE_MainWindow;
+class CFDanalysisType;
+class CFDcaseInstance;
+class RemoteJobData;
 
-class CWE_GroupsWidget : public QTabWidget
+class CWE_InterfaceDriver : public AgaveSetupDriver
 {
+    Q_OBJECT
+
 public:
-    CWE_GroupsWidget(CWE_InterfaceDriver *theDriver, QWidget *parent = NULL);
-    ~CWE_GroupsWidget();
-    void setCorrespondingTab(CWE_StageStatusTab * newTab);
+    explicit CWE_InterfaceDriver(QObject *parent = nullptr, bool debug = false);
+    ~CWE_InterfaceDriver();
+    virtual void startup();
+    virtual void closeAuthScreen();
 
-    void setViewState(SimCenterViewState);  // set the view state
-    void addVSpacer(const QString &key, const QString &label);
-    void addVarsToTab(QString key, const QString &label, QJsonArray *, QJsonObject *, QMap<QString,QString> * );
+    virtual void startOffline();
 
-    void setParameterConfig(QString key, QJsonObject &obj);
-    void linkWidget(CWE_StageStatusTab *tab);
-    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
+    virtual QString getBanner();
+    virtual QString getVersion();
 
-    void initQuickParameterPtr();
-    void updateParameterValues(QMap<QString, QString> );
-    int collectParamData(QMap<QString, QString> &);
+    QList<CFDanalysisType *> * getTemplateList();
+    CFDcaseInstance * getCurrentCase();
+    void setCurrentCase(CFDcaseInstance * newCase);
+    CWE_MainWindow * getMainWindow();
 
+    bool inOfflineMode();
 
-protected:
-    CWE_ParamTab *getGroupTab();  // returns pointer to group tab widget
+    QMap<QString, const RemoteJobData *> getRunningCWEjobs();
+
+signals:
+    void haveNewCase();
+
+private slots:
+    void currentCaseInvalidated();
+    void checkAppList(RequestState replyState, QJsonArray * appList);
+    void processNewJobInfo();
 
 private:
-    SimCenterViewState m_viewState;
-    QJsonObject m_obj;
+    CWE_MainWindow * mainWindow;
+    QList<CFDanalysisType *> templateList;
 
-    CWE_StageStatusTab * myTab;
-    CWE_InterfaceDriver * myDriver;
+    CFDcaseInstance * currentCFDCase = NULL;
 
-    QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
+    bool offlineMode = false;
 };
 
-#endif // CWE_GROUPSWIDGET_H
+#endif // VWTINTERFACEDRIVER_H

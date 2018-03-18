@@ -42,7 +42,9 @@
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 
-CWE_GroupsWidget::CWE_GroupsWidget(VWTinterfaceDriver * theDriver, QWidget *parent) : QTabWidget(parent)
+#include "cwe_globals.h"
+
+CWE_GroupsWidget::CWE_GroupsWidget(CWE_InterfaceDriver * theDriver, QWidget *parent) : QTabWidget(parent)
 {
     quickParameterPtr = new QMap<QString, SCtrMasterDataWidget *>();
     myDriver = theDriver;
@@ -75,6 +77,7 @@ void CWE_GroupsWidget::setParameterConfig(QString key, QJsonObject &obj)
 {
     /* find all groups and create a tab per group */
     QJsonArray groups = obj.value(QString("stages")).toObject().value(key).toObject().value(QString("groups")).toArray();
+    QJsonObject allVars  = obj.value(QString("vars")).toObject();
 
     foreach (QJsonValue group, groups)
     {
@@ -87,8 +90,15 @@ void CWE_GroupsWidget::setParameterConfig(QString key, QJsonObject &obj)
         this->addTab(scrollArea, groupName);
 
         /* now add the parameter tabs */
-        QJsonArray groupVars = obj.value(QString("varGroups")).toObject().value(groupName).toArray();
-        QJsonObject allVars  = obj.value(QString("vars")).toObject();
+        QJsonObject groupList = obj.value(QString("groups")).toObject();
+        if (!groupList.contains(groupName))
+        {
+            cwe_globals::displayFatalPopup("Template configuration error: in groups");
+        }
+        QJsonObject theGroup = groupList.value(groupName).toObject();
+        QJsonArray groupVars  = theGroup.value(QString("vars")).toArray();
+
+        //TODO: If has image, need to display
         panel->addParameterConfig(groupVars, allVars);
     }
 }

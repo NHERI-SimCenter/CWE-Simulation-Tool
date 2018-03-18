@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
-** Copyright (c) 2018 The Regents of the University of California
+** Copyright (c) 2017 The University of Notre Dame
+** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -31,54 +31,33 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_GROUPSWIDGET_H
-#define CWE_GROUPSWIDGET_H
+#include "resulttextdisp.h"
 
-#include <QTabWidget>
+#include "../cfdglcanvas.h"
 
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QScrollArea>
+ResultTextDisplay::ResultTextDisplay(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
 
-class CWE_StageStatusTab;
-class CWE_ParamTab;
-class SCtrMasterDataWidget;
-class CWE_InterfaceDriver;
-enum class SimCenterViewState;
-enum class StageState;
+ResultTextDisplay::~ResultTextDisplay(){}
 
-class CWE_GroupsWidget : public QTabWidget
+void ResultTextDisplay::initializeView()
 {
-public:
-    CWE_GroupsWidget(CWE_InterfaceDriver *theDriver, QWidget *parent = NULL);
-    ~CWE_GroupsWidget();
-    void setCorrespondingTab(CWE_StageStatusTab * newTab);
+    QMap<QString, QString> neededFiles;
+    neededFiles["text"] = getResultObj()["file"];
 
-    void setViewState(SimCenterViewState);  // set the view state
-    void addVSpacer(const QString &key, const QString &label);
-    void addVarsToTab(QString key, const QString &label, QJsonArray *, QJsonObject *, QMap<QString,QString> * );
+    performStandardInit(neededFiles);
+}
 
-    void setParameterConfig(QString key, QJsonObject &obj);
-    void linkWidget(CWE_StageStatusTab *tab);
-    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
+void ResultTextDisplay::allFilesLoaded()
+{
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-    void initQuickParameterPtr();
-    void updateParameterValues(QMap<QString, QString> );
-    int collectParamData(QMap<QString, QString> &);
+    QPlainTextEdit * myDisplay;
 
-
-protected:
-    CWE_ParamTab *getGroupTab();  // returns pointer to group tab widget
-
-private:
-    SimCenterViewState m_viewState;
-    QJsonObject m_obj;
-
-    CWE_StageStatusTab * myTab;
-    CWE_InterfaceDriver * myDriver;
-
-    QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
-};
-
-#endif // CWE_GROUPSWIDGET_H
+    QString theText = QString::fromLatin1(*(fileBuffers["text"]));
+    changeDisplayFrameTenant(myDisplay = new QPlainTextEdit(theText));
+    myDisplay->setReadOnly(true);
+}

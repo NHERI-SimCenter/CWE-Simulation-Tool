@@ -51,7 +51,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp \
     mainWindow/cwe_mainwindow.cpp \
-    vwtinterfacedriver.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
@@ -97,14 +96,19 @@ SOURCES += main.cpp \
     SimCenter_widgets/sctrfiledatawidget.cpp \
     cwe_globals.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp \
-    cwe_guiWidgets/cwe_result_popup.cpp \
     cwe_guiWidgets/cwe_job_list.cpp \
     cwe_guiWidgets/cwe_file_manager2.cpp \
     ../AgaveExplorer/utilFuncs/linkedstandarditem.cpp \
-    ../AgaveExplorer/remoteFileOps/joblistnode.cpp
+    ../AgaveExplorer/remoteFileOps/joblistnode.cpp \
+    ../AgaveExplorer/ae_globals.cpp \
+    cwe_interfacedriver.cpp \
+    visualUtils/resultVisuals/resultmesh2dwindow.cpp \
+    visualUtils/resultprocurebase.cpp \
+    visualUtils/resultvisualpopup.cpp \
+    visualUtils/resultVisuals/resultfield2dwindow.cpp \
+    visualUtils/resultVisuals/resulttextdisp.cpp
 
 HEADERS  += \
-    vwtinterfacedriver.h \
     CFDanalysis/CFDanalysisType.h \
     CFDanalysis/CFDcaseInstance.h \
     visualUtils/cfdglcanvas.h \
@@ -152,11 +156,17 @@ HEADERS  += \
     SimCenter_widgets/sctrfiledatawidget.h \
     cwe_globals.h \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h \
-    cwe_guiWidgets/cwe_result_popup.h \
     cwe_guiWidgets/cwe_job_list.h \
     cwe_guiWidgets/cwe_file_manager2.h \
     ../AgaveExplorer/utilFuncs/linkedstandarditem.h \
-    ../AgaveExplorer/remoteFileOps/joblistnode.h
+    ../AgaveExplorer/remoteFileOps/joblistnode.h \
+    ../AgaveExplorer/ae_globals.h \
+    cwe_interfacedriver.h \
+    visualUtils/resultVisuals/resultmesh2dwindow.h \
+    visualUtils/resultprocurebase.h \
+    visualUtils/resultvisualpopup.h \
+    visualUtils/resultVisuals/resultfield2dwindow.h \
+    visualUtils/resultVisuals/resulttextdisp.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -174,9 +184,9 @@ FORMS    += \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
-    cwe_guiWidgets/cwe_result_popup.ui \
     cwe_guiWidgets/cwe_job_list.ui \
-    cwe_guiWidgets/cwe_file_manager2.ui
+    cwe_guiWidgets/cwe_file_manager2.ui \
+    visualUtils/resultvisualpopup.ui
 
 RESOURCES += \
     cwe_resources.qrc \

@@ -48,7 +48,7 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "cwe_guiWidgets/cwe_parameters.h"
-#include "../CFDClientProgram/vwtinterfacedriver.h"
+#include "../CFDClientProgram/cwe_interfacedriver.h"
 
 CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     QFrame(parent),

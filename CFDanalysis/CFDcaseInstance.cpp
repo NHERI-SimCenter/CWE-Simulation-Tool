@@ -45,10 +45,10 @@
 #include "../AgaveClientInterface/remotedatainterface.h"
 #include "../AgaveClientInterface/remotejobdata.h"
 
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
-CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver):
+CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, CWE_InterfaceDriver * mainDriver):
     QObject((QObject *) mainDriver)
 {
     caseFolder = newCaseFolder;
@@ -56,8 +56,8 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
 
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                     this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged(FileTreeNode *)),
+                     this, SLOT(underlyingFilesUpdated(FileTreeNode*)));
     QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
                      this, SLOT(jobListUpdated()));
     QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
@@ -91,7 +91,7 @@ CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDrive
     enactDataReload();
 }
 
-CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver *mainDriver):
+CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, CWE_InterfaceDriver *mainDriver):
     QObject((QObject *) mainDriver)
 {
     myType = caseType;
@@ -114,7 +114,7 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver 
     }
 }
 
-CFDcaseInstance::CFDcaseInstance(VWTinterfaceDriver *mainDriver):
+CFDcaseInstance::CFDcaseInstance(CWE_InterfaceDriver *mainDriver):
     QObject((QObject *) mainDriver)
 {
     theDriver = mainDriver;
@@ -179,6 +179,11 @@ QString CFDcaseInstance::getCaseFolder()
     return caseFolder->getFileData().getFullPath();
 }
 
+FileTreeNode * CFDcaseInstance::getCaseFolderNode()
+{
+    return caseFolder;
+}
+
 QString CFDcaseInstance::getCaseName()
 {
     QString ret;
@@ -234,7 +239,7 @@ void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFo
 {
     if (defunct) return;
 
-    if (myState == InternalCaseState::EMPTY_CASE) return;
+    if (myState != InternalCaseState::EMPTY_CASE) return;
     if (containingFolder == NULL) return;
     if (oldCase == NULL) return;
     if (theDriver->getFileHandler()->operationIsPending()) return;
@@ -460,7 +465,7 @@ void CFDcaseInstance::stopJob(QString stage)
     return;
 }
 
-void CFDcaseInstance::underlyingFilesUpdated()
+void CFDcaseInstance::underlyingFilesUpdated(FileTreeNode *)
 {
     if (defunct) return;
 
@@ -1026,8 +1031,8 @@ void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
     expectedNewCaseFolder.clear();
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                     this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged(FileTreeNode *)),
+                     this, SLOT(underlyingFilesUpdated(FileTreeNode*)));
 
     enactDataReload();
     emitNewState(InternalCaseState::INIT_DATA_LOAD);
@@ -1156,8 +1161,8 @@ void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
     expectedNewCaseFolder.clear();
     QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                     this, SLOT(underlyingFilesUpdated()));
+    QObject::connect(caseFolder, SIGNAL(fileDataChanged(FileTreeNode *)),
+                     this, SLOT(underlyingFilesUpdated(FileTreeNode*)));
 
     QMap<QString, QString> allVars;
     QByteArray newFile = produceJSONparams(allVars);

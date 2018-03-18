@@ -36,18 +36,16 @@
 #ifndef CWE_GLOBALS_H
 #define CWE_GLOBALS_H
 
-#include <QString>
-#include <QMessageBox>
+#include "../AgaveExplorer/ae_globals.h"
 
-class cwe_globals
+class CWE_InterfaceDriver;
+
+class cwe_globals : public ae_globals
 {
 public:
     cwe_globals();
-    static void displayPopup(QString message, QString header);
-    static void displayPopup(QString message);
 
-    static bool isValidFolderName(QString folderName);
-    static bool isValidLocalFolder(QString folderName);
+    static CWE_InterfaceDriver * get_CWE_Driver();
 };
 
 #endif // CWE_GLOBALS_H

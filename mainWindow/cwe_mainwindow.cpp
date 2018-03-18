@@ -39,10 +39,10 @@
 #include "cwe_guiWidgets/cwe_state_label.h"
 
 #include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 
-CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
+CWE_MainWindow::CWE_MainWindow(CWE_InterfaceDriver *newDriver, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CWE_MainWindow)
 {
@@ -56,7 +56,9 @@ CWE_MainWindow::CWE_MainWindow(VWTinterfaceDriver *newDriver, QWidget *parent) :
 
     if (!myDriver->inDebugMode())
     {
+        //Tabs only appearing in debug mode should be listed here
         ui->tab_debug->deleteLater();
+        ui->tab_files2->deleteLater();
     }
 
     changeParamsAndResultsEnabled(false);

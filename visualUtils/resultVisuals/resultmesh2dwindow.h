@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
-** Copyright (c) 2018 The Regents of the University of California
+** Copyright (c) 2017 The University of Notre Dame
+** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -31,54 +31,28 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_GROUPSWIDGET_H
-#define CWE_GROUPSWIDGET_H
+#ifndef RESULTMESH2DWINDOW_H
+#define RESULTMESH2DWINDOW_H
 
-#include <QTabWidget>
+#include <QObject>
+#include <QWidget>
+#include "visualUtils/resultvisualpopup.h"
 
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QScrollArea>
+class CFDglCanvas;
 
-class CWE_StageStatusTab;
-class CWE_ParamTab;
-class SCtrMasterDataWidget;
-class CWE_InterfaceDriver;
-enum class SimCenterViewState;
-enum class StageState;
-
-class CWE_GroupsWidget : public QTabWidget
+class ResultMesh2dWindow : public ResultVisualPopup
 {
+    Q_OBJECT
 public:
-    CWE_GroupsWidget(CWE_InterfaceDriver *theDriver, QWidget *parent = NULL);
-    ~CWE_GroupsWidget();
-    void setCorrespondingTab(CWE_StageStatusTab * newTab);
+    ResultMesh2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent = 0);
+    ~ResultMesh2dWindow();
 
-    void setViewState(SimCenterViewState);  // set the view state
-    void addVSpacer(const QString &key, const QString &label);
-    void addVarsToTab(QString key, const QString &label, QJsonArray *, QJsonObject *, QMap<QString,QString> * );
-
-    void setParameterConfig(QString key, QJsonObject &obj);
-    void linkWidget(CWE_StageStatusTab *tab);
-    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
-
-    void initQuickParameterPtr();
-    void updateParameterValues(QMap<QString, QString> );
-    int collectParamData(QMap<QString, QString> &);
-
-
-protected:
-    CWE_ParamTab *getGroupTab();  // returns pointer to group tab widget
+    virtual void initializeView();
 
 private:
-    SimCenterViewState m_viewState;
-    QJsonObject m_obj;
-
-    CWE_StageStatusTab * myTab;
-    CWE_InterfaceDriver * myDriver;
-
-    QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
+    virtual void allFilesLoaded();
 };
 
-#endif // CWE_GROUPSWIDGET_H
+#endif // RESULTMESH2DWINDOW_H

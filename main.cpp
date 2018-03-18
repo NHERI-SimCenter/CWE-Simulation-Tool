@@ -38,7 +38,9 @@
 #include <QSslSocket>
 #include <QtGlobal>
 
-#include "vwtinterfacedriver.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
+
+#include "cwe_interfacedriver.h"
 
 void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
 
@@ -48,6 +50,7 @@ int main(int argc, char *argv[])
 
     bool debugLoggingEnabled = false;
     bool runOffline = false;
+    bool logRawOutput = false;
     for (int i = 0; i < argc; i++)
     {
         if (strcmp(argv[i],"enableDebugLogging") == 0)
@@ -57,6 +60,10 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i],"offlineMode") == 0)
         {
             runOffline = true;
+        }
+        if (strcmp(argv[i],"logRawOutput") == 0)
+        {
+            logRawOutput = true;
         }
     }
 
@@ -74,7 +81,7 @@ int main(int argc, char *argv[])
         qInstallMessageHandler(emptyMessageHandler);
     }
 
-    VWTinterfaceDriver programDriver(nullptr, debugLoggingEnabled);
+    CWE_InterfaceDriver programDriver(nullptr, debugLoggingEnabled);
     if (QSslSocket::supportsSsl() == false)
     {
         programDriver.fatalInterfaceError("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
@@ -100,6 +107,12 @@ int main(int argc, char *argv[])
     else
     {
         programDriver.startup();
+    }
+
+    if (debugLoggingEnabled && logRawOutput)
+    {
+        qDebug("NOTE: Debugging text including raw remote output.");
+        programDriver.getDataConnection()->setRawDebugOutput(true);
     }
 
     return mainRunLoop.exec();
