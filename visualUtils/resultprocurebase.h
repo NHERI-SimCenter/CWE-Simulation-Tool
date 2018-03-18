@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,21 +31,58 @@
 ***********************************************************************************/
 
 // Contributors:
-// Peter Mackenzie-Helnwein, UW Seattle
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_job_list.h"
-#include "ui_cwe_job_list.h"
+#ifndef RESULTVISUALBASE_H
+#define RESULTVISUALBASE_H
 
-#include "cwe_interfacedriver.h"
+#include <QWidget>
+#include <QMap>
 
-CWE_job_list::CWE_job_list(QWidget *parent) :
-    CWE_Super(parent),
-    ui(new Ui::CWE_job_list)
+class FileTreeNode;
+
+class ResultProcureBase : public QWidget
 {
-    ui->setupUi(this);
-}
+    Q_OBJECT
+public:
+    explicit ResultProcureBase(QWidget *parent = nullptr);
+    ~ResultProcureBase();
 
-CWE_job_list::~CWE_job_list()
-{
-    delete ui;
-}
+    void initializeWithNeededFiles(FileTreeNode * baseFolder, QMap<QString, QString> neededFiles);
+    //Note: needed files is a map: internalID => path relative to base folder
+
+protected:
+    virtual void allFilesLoaded() = 0;
+
+    QMap<QString, FileTreeNode *> getFileNodes();
+    QMap<QString, QByteArray *> getFileBuffers();
+
+    void computeFileBuffers();
+
+    virtual void underlyingDataChanged(QString fileID) = 0;
+    //Note: input to the above method might be an empty string
+    //This can be used for force a re-load of the data
+
+    virtual void initialFailure() = 0;
+
+protected slots:
+    virtual void baseFolderRemoved();
+
+private slots:
+    void fileChanged(FileTreeNode * changedFile);
+    void fileRemoved(QObject *destroyedObj);
+
+private:
+    bool checkForAndSeekFiles(); //Returns true if all files loaded
+    FileTreeNode * getFinalResultFolder();
+    QString getIDfromNode(QObject *fileNode);
+
+    FileTreeNode * myBaseFolder;
+
+    QMap<QString, QString> myFileNames;
+    QMap<QString, FileTreeNode *> myFileNodes;
+    QMap<QString, QByteArray *> myBufferList;
+    bool initLoadDone = false;
+};
+
+#endif // RESULTVISUALBASE_H

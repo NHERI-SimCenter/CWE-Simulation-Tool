@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,21 +31,33 @@
 ***********************************************************************************/
 
 // Contributors:
-// Peter Mackenzie-Helnwein, UW Seattle
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_job_list.h"
-#include "ui_cwe_job_list.h"
+#include "resulttextdisp.h"
 
-#include "cwe_interfacedriver.h"
+#include "../cfdglcanvas.h"
 
-CWE_job_list::CWE_job_list(QWidget *parent) :
-    CWE_Super(parent),
-    ui(new Ui::CWE_job_list)
+ResultTextDisplay::ResultTextDisplay(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
+
+ResultTextDisplay::~ResultTextDisplay(){}
+
+void ResultTextDisplay::initializeView()
 {
-    ui->setupUi(this);
+    QMap<QString, QString> neededFiles;
+    neededFiles["text"] = getResultObj()["file"];
+
+    performStandardInit(neededFiles);
 }
 
-CWE_job_list::~CWE_job_list()
+void ResultTextDisplay::allFilesLoaded()
 {
-    delete ui;
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
+
+    QPlainTextEdit * myDisplay;
+
+    QString theText = QString::fromLatin1(*(fileBuffers["text"]));
+    changeDisplayFrameTenant(myDisplay = new QPlainTextEdit(theText));
+    myDisplay->setReadOnly(true);
 }

@@ -33,64 +33,46 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "resultvisualbase.h"
+#include "resultfield2dwindow.h"
 
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "../cfdglcanvas.h"
 
-ResultVisualBase::ResultVisualBase(QObject *parent) : QObject(parent)
+ResultField2dWindow::ResultField2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
+
+ResultField2dWindow::~ResultField2dWindow(){}
+
+void ResultField2dWindow::initializeView()
 {
+    QMap<QString, QString> neededFiles;
+    neededFiles["points"] = "/constant/polyMesh/points.gz";
+    neededFiles["faces"] = "/constant/polyMesh/faces.gz";
+    neededFiles["owner"] = "/constant/polyMesh/owner.gz";
 
+    QString fieldName = getResultObj()["file"];
+    QString fieldFile = "[final]/";
+    fieldFile.append(fieldName).append(".gz");
+    neededFiles["data"] = fieldFile;
+
+    performStandardInit(neededFiles);
 }
 
-ResultVisualBase::~ResultVisualBase()
+void ResultField2dWindow::allFilesLoaded()
 {
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-}
+    CFDglCanvas * myCanvas;
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
-void ResultVisualBase::initializeWithNeededFiles(FileTreeNode * baseFolder, QList<QString> neededFiles)
-{
+    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
-
-    fileRecordsChanged();
-}
-
-void ResultVisualBase::baseFolderRemoved()
-{
-    QObject::disconnect(this); //TODO: Make specific to given signal
-    dataLostError();
-}
-
-void ResultVisualBase::fileRecordsChanged()
-{
-    bool fileMissing = false;
-    QMap<QString, QByteArray *> rawFileData;
-
-    for (auto itr = myFileList.cbegin(); itr != myFileList.cend(); itr++)
+    if (!myCanvas->haveMeshData())
     {
-        QString filePath = *itr;
-
-        FileTreeNode * theDataNode = myBaseFolder->getNodeReletiveToNodeWithName(filePath);
-
-        if (theDataNode == NULL)
-        {
-            fileMissing = true;
-        }
-        else if (theDataNode->getFileBuffer() == NULL)
-        {
-            fileMissing = true;
-
-        }
-        else
-        {
-            rawFileData.insert(filePath, theDataNode->getFileBuffer());
-        }
-    }
-
-    if (!fileMissing)
-    {
-        QObject::disconnect(this); //TODO: Make specific to given signal
-        allFilesLoaded(rawFileData);
+        changeDisplayFrameTenant(new QLabel("Error: Data for 2D mesh is unreadable. Please reset and try again."));
         return;
     }
 
+    myCanvas->loadFieldData(fileBuffers["data"], getResultObj()["values"]);
+    myCanvas->setDisplayState(CFDDisplayState::FIELD);
 }

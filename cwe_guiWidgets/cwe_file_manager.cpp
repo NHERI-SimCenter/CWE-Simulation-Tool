@@ -172,7 +172,7 @@ void CWE_file_manager::copyMenuItem()
         return;
     }
 
-    ae_globals::get_Driver()->getFileHandler()->sendCopyReq(targetNode, newNamePopup.getInputText());
+    ae_globals::get_file_handle()->sendCopyReq(targetNode, newNamePopup.getInputText());
 }
 
 void CWE_file_manager::moveMenuItem()
@@ -184,7 +184,7 @@ void CWE_file_manager::moveMenuItem()
         return;
     }
 
-    ae_globals::get_Driver()->getFileHandler()->sendMoveReq(targetNode,newNamePopup.getInputText());
+    ae_globals::get_file_handle()->sendMoveReq(targetNode,newNamePopup.getInputText());
 }
 
 void CWE_file_manager::renameMenuItem()
@@ -196,14 +196,14 @@ void CWE_file_manager::renameMenuItem()
         return;
     }
 
-    ae_globals::get_Driver()->getFileHandler()->sendRenameReq(targetNode, newNamePopup.getInputText());
+    ae_globals::get_file_handle()->sendRenameReq(targetNode, newNamePopup.getInputText());
 }
 
 void CWE_file_manager::deleteMenuItem()
 {
-    if (ae_globals::get_Driver()->getFileHandler()->deletePopup(targetNode))
+    if (ae_globals::get_file_handle()->deletePopup(targetNode))
     {
-        ae_globals::get_Driver()->getFileHandler()->sendDeleteReq(targetNode);
+        ae_globals::get_file_handle()->sendDeleteReq(targetNode);
     }
 }
 
@@ -215,27 +215,27 @@ void CWE_file_manager::createFolderMenuItem()
     {
         return;
     }
-    ae_globals::get_Driver()->getFileHandler()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
+    ae_globals::get_file_handle()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
 }
 
 void CWE_file_manager::compressMenuItem()
 {
-    ae_globals::get_Driver()->getFileHandler()->sendCompressReq(targetNode);
+    ae_globals::get_file_handle()->sendCompressReq(targetNode);
 }
 
 void CWE_file_manager::decompressMenuItem()
 {
-    ae_globals::get_Driver()->getFileHandler()->sendDecompressReq(targetNode);
+    ae_globals::get_file_handle()->sendDecompressReq(targetNode);
 }
 
 void CWE_file_manager::refreshMenuItem()
 {
-    ae_globals::get_Driver()->getFileHandler()->enactFolderRefresh(targetNode);
+    ae_globals::get_file_handle()->enactFolderRefresh(targetNode);
 }
 
 void CWE_file_manager::downloadBufferItem()
 {
-    ae_globals::get_Driver()->getFileHandler()->sendDownloadBuffReq(targetNode);
+    ae_globals::get_file_handle()->sendDownloadBuffReq(targetNode);
 }
 
 void CWE_file_manager::remoteOpDone()
@@ -247,7 +247,7 @@ void CWE_file_manager::remoteOpDone()
 void CWE_file_manager::customFileMenu(const QPoint &pos)
 {
     QMenu fileMenu;
-    if (ae_globals::get_Driver()->getFileHandler()->operationIsPending())
+    if (ae_globals::get_file_handle()->operationIsPending())
     {
         fileMenu.addAction("File Operation In Progress . . .");
         fileMenu.exec(QCursor::pos());

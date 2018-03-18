@@ -87,16 +87,7 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
 
 CWE_InterfaceDriver::~CWE_InterfaceDriver()
 {
-    if (mainWindow != NULL)
-    {
-        delete mainWindow;
-        mainWindow = NULL;
-    }
-    if (authWindow != NULL)
-    {
-        delete authWindow;
-        authWindow = NULL;
-    }
+    if (mainWindow != NULL) delete mainWindow;
 }
 
 void CWE_InterfaceDriver::startup()

@@ -33,37 +33,40 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef RESULTVISUALBASE_H
-#define RESULTVISUALBASE_H
+#include "resultmesh2dwindow.h"
 
-#include <QObject>
-#include <QMap>
+#include "../cfdglcanvas.h"
 
-class FileTreeNode;
+ResultMesh2dWindow::ResultMesh2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
 
-class ResultVisualBase : public QObject
+ResultMesh2dWindow::~ResultMesh2dWindow(){}
+
+void ResultMesh2dWindow::initializeView()
 {
-    Q_OBJECT
-public:
-    explicit ResultVisualBase(QObject *parent = nullptr);
-    ~ResultVisualBase();
+    QMap<QString, QString> neededFiles;
+    neededFiles["points"] = "/constant/polyMesh/points.gz";
+    neededFiles["faces"] = "/constant/polyMesh/faces.gz";
+    neededFiles["owner"] = "/constant/polyMesh/owner.gz";
 
-    void initializeWithNeededFiles(FileTreeNode * baseFolder, QList<QString> neededFiles);
+    performStandardInit(neededFiles);
+}
 
-protected:
-    virtual void setupInitDisplay() = 0;
-    virtual void neededFileMissing() = 0;
-    virtual void allFilesLoaded(QMap<QString, QByteArray *> fileDataList) = 0;
-    virtual void dataLostError() = 0;
+void ResultMesh2dWindow::allFilesLoaded()
+{
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-private slots:
-    void baseFolderRemoved();
-    void fileRecordsChanged();
+    CFDglCanvas * myCanvas;
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
-private:
-    FileTreeNode * myBaseFolder;
-    QList<QString> myFileList;
+    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
-};
+    if (!myCanvas->haveMeshData())
+    {
+        changeDisplayFrameTenant(new QLabel("Error: Data for 2D mesh result is unreadable. Please reset and try again."));
+        return;
+    }
 
-#endif // RESULTVISUALBASE_H
+    myCanvas->setDisplayState(CFDDisplayState::MESH);
+}
