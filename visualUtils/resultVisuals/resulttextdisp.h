@@ -36,6 +36,8 @@
 #ifndef RESULTTEXTDISP_H
 #define RESULTTEXTDISP_H
 
+#include <QPlainTextEdit>
+
 #include "visualUtils/resultvisualpopup.h"
 
 class ResultTextDisplay : public ResultVisualPopup

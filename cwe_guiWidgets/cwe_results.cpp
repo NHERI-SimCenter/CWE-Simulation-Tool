@@ -35,6 +35,8 @@
 #include "cwe_results.h"
 #include "ui_cwe_results.h"
 
+#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
+#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
@@ -43,6 +45,7 @@
 
 #include "visualUtils/resultVisuals/resultmesh2dwindow.h"
 #include "visualUtils/resultVisuals/resultfield2dwindow.h"
+#include "visualUtils/resultVisuals/resulttextdisp.h"
 
 CWE_Results::CWE_Results(QWidget *parent) :
     CWE_Super(parent),
@@ -140,23 +143,15 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
     QString resultType = resultObject.value("type");
     if (resultType == "text")
     {
-        //TODO: Redo with new result objects
-        /*
-        CWE_Result_Popup * resultPopup = NULL;
         if (theItem->column() == showCol)
         {
-            resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
-                                 currentCase->getMyType()->getName(),
-                                 resultObject, myDriver);
+            ResultTextDisplay * resultPopup = new ResultTextDisplay(currentCase, resultObject, NULL);
+            resultPopup->initializeView();;
         }
         else if (theItem->column() == downloadCol)
         {
-            resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
-                                 currentCase->getMyType()->getName(),
-                                 resultObject, myDriver, true);
+            performSingleFileDownload(resultObject["file"], resultObject["stage"]);
         }
-        resultPopup->show();
-        */
     }
     else if (resultType == "GLdata")
     {
@@ -330,6 +325,28 @@ void CWE_Results::populateResultsScreen()
             }
         }
     }
+}
+
+void CWE_Results::performSingleFileDownload(QString filePathToDownload, QString stage)
+{
+    if (filePathToDownload.isEmpty()) return;
+    QString localfileName = QFileDialog::getSaveFileName(this, "Save Downloaded File:");
+    if (localfileName.isEmpty()) {return;}
+
+    FileTreeNode * targetNode = myDriver->getCurrentCase()->getCaseFolderNode()->getChildNodeWithName(stage);
+    if (targetNode == NULL)
+    {
+        cwe_globals::displayPopup("The stage for this download has not been completed. Please check your case and try again.");
+        return;
+    }
+
+    targetNode = myDriver->getFileHandler()->speculateNodeWithName(targetNode, filePathToDownload, false);
+    if (targetNode == NULL)
+    {
+        cwe_globals::displayPopup("The result to be downloaded does not exist. Please check your case and try again.");
+        return;
+    }
+    myDriver->getFileHandler()->sendDownloadReq(targetNode, localfileName);
 }
 
 void CWE_Results::addResult(QString name, bool showeye, bool download, QString type)
