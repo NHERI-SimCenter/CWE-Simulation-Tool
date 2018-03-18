@@ -47,7 +47,7 @@ class RemoteJobData;
 class JobListNode;
 enum class RequestState;
 
-class VWTinterfaceDriver;
+class CWE_InterfaceDriver;
 
 enum class StageState {UNREADY, UNRUN, RUNNING, FINISHED, FINISHED_PREREQ, LOADING, ERROR, DOWNLOADING, OFFLINE};
 //Stages:
@@ -70,13 +70,14 @@ class CFDcaseInstance : public QObject
     Q_OBJECT
 
 public:
-    CFDcaseInstance(FileTreeNode * newCaseFolder, VWTinterfaceDriver * mainDriver);
-    CFDcaseInstance(CFDanalysisType * caseType, VWTinterfaceDriver * mainDriver); //For new cases
-    CFDcaseInstance(VWTinterfaceDriver * mainDriver); // For duplications
+    CFDcaseInstance(FileTreeNode * newCaseFolder, CWE_InterfaceDriver * mainDriver);
+    CFDcaseInstance(CFDanalysisType * caseType, CWE_InterfaceDriver * mainDriver); //For new cases
+    CFDcaseInstance(CWE_InterfaceDriver * mainDriver); // For duplications
 
     bool isDefunct();
     CaseState getCaseState();
     QString getCaseFolder();
+    FileTreeNode * getCaseFolderNode();
     QString getCaseName();
 
     //Note: For these, it can always answer "I don't know"
@@ -102,7 +103,7 @@ signals:
     void haveNewState(CaseState newState);
 
 private slots:
-    void underlyingFilesUpdated();
+    void underlyingFilesUpdated(FileTreeNode * changedFile);
     void jobListUpdated();
     void fileTaskDone(RequestState invokeStatus);
     void jobInvoked(RequestState invokeStatus, QJsonDocument* jobData);
@@ -150,7 +151,7 @@ private:
     const RemoteJobData * runningJobNode = NULL;
     InternalCaseState myState = InternalCaseState::ERROR;
 
-    VWTinterfaceDriver * theDriver;
+    CWE_InterfaceDriver * theDriver;
 
     FileTreeNode * caseFolder = NULL;
     CFDanalysisType * myType = NULL;

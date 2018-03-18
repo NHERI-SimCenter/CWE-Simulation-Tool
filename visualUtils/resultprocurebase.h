@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
-** Copyright (c) 2018 The Regents of the University of California
+** Copyright (c) 2017 The University of Notre Dame
+** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -31,54 +31,58 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_GROUPSWIDGET_H
-#define CWE_GROUPSWIDGET_H
+#ifndef RESULTVISUALBASE_H
+#define RESULTVISUALBASE_H
 
-#include <QTabWidget>
+#include <QWidget>
+#include <QMap>
 
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QScrollArea>
+class FileTreeNode;
 
-class CWE_StageStatusTab;
-class CWE_ParamTab;
-class SCtrMasterDataWidget;
-class CWE_InterfaceDriver;
-enum class SimCenterViewState;
-enum class StageState;
-
-class CWE_GroupsWidget : public QTabWidget
+class ResultProcureBase : public QWidget
 {
+    Q_OBJECT
 public:
-    CWE_GroupsWidget(CWE_InterfaceDriver *theDriver, QWidget *parent = NULL);
-    ~CWE_GroupsWidget();
-    void setCorrespondingTab(CWE_StageStatusTab * newTab);
+    explicit ResultProcureBase(QWidget *parent = nullptr);
+    ~ResultProcureBase();
 
-    void setViewState(SimCenterViewState);  // set the view state
-    void addVSpacer(const QString &key, const QString &label);
-    void addVarsToTab(QString key, const QString &label, QJsonArray *, QJsonObject *, QMap<QString,QString> * );
-
-    void setParameterConfig(QString key, QJsonObject &obj);
-    void linkWidget(CWE_StageStatusTab *tab);
-    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
-
-    void initQuickParameterPtr();
-    void updateParameterValues(QMap<QString, QString> );
-    int collectParamData(QMap<QString, QString> &);
-
+    void initializeWithNeededFiles(FileTreeNode * baseFolder, QMap<QString, QString> neededFiles);
+    //Note: needed files is a map: internalID => path relative to base folder
 
 protected:
-    CWE_ParamTab *getGroupTab();  // returns pointer to group tab widget
+    virtual void allFilesLoaded() = 0;
+
+    QMap<QString, FileTreeNode *> getFileNodes();
+    QMap<QString, QByteArray *> getFileBuffers();
+
+    void computeFileBuffers();
+
+    virtual void underlyingDataChanged(QString fileID) = 0;
+    //Note: input to the above method might be an empty string
+    //This can be used for force a re-load of the data
+
+    virtual void initialFailure() = 0;
+
+protected slots:
+    virtual void baseFolderRemoved();
+
+private slots:
+    void fileChanged(FileTreeNode * changedFile);
+    void fileRemoved(QObject *destroyedObj);
 
 private:
-    SimCenterViewState m_viewState;
-    QJsonObject m_obj;
+    bool checkForAndSeekFiles(); //Returns true if all files loaded
+    FileTreeNode * getFinalResultFolder();
+    QString getIDfromNode(QObject *fileNode);
 
-    CWE_StageStatusTab * myTab;
-    CWE_InterfaceDriver * myDriver;
+    FileTreeNode * myBaseFolder;
 
-    QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
+    QMap<QString, QString> myFileNames;
+    QMap<QString, FileTreeNode *> myFileNodes;
+    QMap<QString, QByteArray *> myBufferList;
+    bool initLoadDone = false;
 };
 
-#endif // CWE_GROUPSWIDGET_H
+#endif // RESULTVISUALBASE_H

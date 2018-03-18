@@ -56,7 +56,7 @@ public:
     explicit CWE_Parameters(QWidget *parent = 0);
     ~CWE_Parameters();
 
-    virtual void linkDriver(VWTinterfaceDriver * newDriver);
+    virtual void linkDriver(CWE_InterfaceDriver * newDriver);
     void resetViewInfo();
 
     void switchToResults();

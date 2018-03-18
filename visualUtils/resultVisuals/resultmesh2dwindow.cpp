@@ -33,58 +33,40 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef VWTINTERFACEDRIVER_H
-#define VWTINTERFACEDRIVER_H
+#include "resultmesh2dwindow.h"
 
-#include "../AgaveExplorer/utilFuncs/agavesetupdriver.h"
+#include "../cfdglcanvas.h"
 
-#include <QWindow>
-#include <QDir>
+ResultMesh2dWindow::ResultMesh2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
 
-class CWE_MainWindow;
-class CFDanalysisType;
-class CFDcaseInstance;
-class RemoteJobData;
+ResultMesh2dWindow::~ResultMesh2dWindow(){}
 
-class VWTinterfaceDriver : public AgaveSetupDriver
+void ResultMesh2dWindow::initializeView()
 {
-    Q_OBJECT
+    QMap<QString, QString> neededFiles;
+    neededFiles["points"] = "/constant/polyMesh/points.gz";
+    neededFiles["faces"] = "/constant/polyMesh/faces.gz";
+    neededFiles["owner"] = "/constant/polyMesh/owner.gz";
 
-public:
-    explicit VWTinterfaceDriver(QObject *parent = nullptr, bool debug = false);
-    ~VWTinterfaceDriver();
-    virtual void startup();
-    virtual void closeAuthScreen();
+    performStandardInit(neededFiles);
+}
 
-    virtual void startOffline();
+void ResultMesh2dWindow::allFilesLoaded()
+{
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-    virtual QString getBanner();
-    virtual QString getVersion();
+    CFDglCanvas * myCanvas;
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
-    QList<CFDanalysisType *> * getTemplateList();
-    CFDcaseInstance * getCurrentCase();
-    void setCurrentCase(CFDcaseInstance * newCase);
-    CWE_MainWindow * getMainWindow();
+    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
-    bool inOfflineMode();
+    if (!myCanvas->haveMeshData())
+    {
+        changeDisplayFrameTenant(new QLabel("Error: Data for 2D mesh result is unreadable. Please reset and try again."));
+        return;
+    }
 
-    QMap<QString, const RemoteJobData *> getRunningCWEjobs();
-
-signals:
-    void haveNewCase();
-
-private slots:
-    void currentCaseInvalidated();
-    void checkAppList(RequestState replyState, QJsonArray * appList);
-    void processNewJobInfo();
-
-private:
-    CWE_MainWindow * mainWindow;
-    QList<CFDanalysisType *> templateList;
-
-    CFDcaseInstance * currentCFDCase = NULL;
-
-    bool offlineMode = false;
-};
-
-#endif // VWTINTERFACEDRIVER_H
+    myCanvas->setDisplayState(CFDDisplayState::MESH);
+}

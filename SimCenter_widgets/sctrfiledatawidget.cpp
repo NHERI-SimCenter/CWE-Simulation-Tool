@@ -37,7 +37,7 @@
 #include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "../AgaveClientInterface/filemetadata.h"
-#include "vwtinterfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 SCtrFileDataWidget::SCtrFileDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)
@@ -45,7 +45,7 @@ SCtrFileDataWidget::SCtrFileDataWidget(QWidget *parent):
 
 }
 
-SCtrFileDataWidget::SCtrFileDataWidget(VWTinterfaceDriver *theDriver, QWidget *parent):
+SCtrFileDataWidget::SCtrFileDataWidget(CWE_InterfaceDriver *theDriver, QWidget *parent):
     SCtrMasterDataWidget(parent)
 {
     myDriver = theDriver;
@@ -83,7 +83,6 @@ void SCtrFileDataWidget::setData(QJsonObject &obj)
     layout->setMargin(0);
 
     myFileTree = new RemoteFileTree(this);
-    myFileTree->setFileOperator(myDriver->getFileHandler());
     myFileTree->setEditTriggers(QTreeView::NoEditTriggers);
     layout->insertWidget(1, myFileTree, 4);
 

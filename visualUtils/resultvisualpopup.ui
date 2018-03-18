@@ -35,8 +35,8 @@
 
 // Contributors:
  </comment>
- <class>CWE_Result_Popup</class>
- <widget class="QWidget" name="CWE_Result_Popup">
+ <class>ResultVisualPopup</class>
+ <widget class="QWidget" name="ResultVisualPopup">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -117,14 +117,14 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_location">
+       <widget class="QLabel" name="label_result">
         <property name="text">
          <string>Result:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_result">
+       <widget class="QLabel" name="label_theResult">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>1</horstretch>
@@ -180,7 +180,7 @@
   <connection>
    <sender>closeButton</sender>
    <signal>clicked()</signal>
-   <receiver>CWE_Result_Popup</receiver>
+   <receiver>ResultVisualPopup</receiver>
    <slot>closeButtonClicked()</slot>
    <hints>
     <hint type="sourcelabel">

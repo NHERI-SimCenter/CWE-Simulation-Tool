@@ -31,48 +31,55 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_RESULT_POPUP_H
-#define CWE_RESULT_POPUP_H
+#ifndef RESULTVISUALPOPUP_H
+#define RESULTVISUALPOPUP_H
 
 #include <QWidget>
-
+#include <QFrame>
 #include <QLabel>
-#include <QPlainTextEdit>
-#include <QFileDialog>
+#include <QHBoxLayout>
+#include "resultprocurebase.h"
 
-class VWTinterfaceDriver;
-class CFDglCanvas;
+class CFDcaseInstance;
 
 namespace Ui {
-class CWE_Result_Popup;
+class ResultVisualPopup;
 }
 
-class CWE_Result_Popup : public QWidget
+class ResultVisualPopup : public ResultProcureBase
 {
     Q_OBJECT
-
 public:
-    explicit CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, VWTinterfaceDriver * theDriver, bool downloadResult = false, QWidget *parent = 0);
-    ~CWE_Result_Popup();
+    explicit ResultVisualPopup(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent = nullptr);
+    ~ResultVisualPopup();
+
+    virtual void initializeView() = 0;
+    void performStandardInit(QMap<QString, QString> neededFiles);
+
+protected:
+    void setupResultDisplay(QString caseName, QString caseType, QString resultName);
+    void changeDisplayFrameTenant(QWidget * newDisplay);
+    virtual void initialFailure();
+    virtual void underlyingDataChanged(QString fileID);
+
+    QMap<QString, QString> getResultObj();
+
+protected slots:
+    virtual void baseFolderRemoved();
 
 private slots:
     void closeButtonClicked();
-    void newFileInfo();
 
 private:
-    Ui::CWE_Result_Popup *ui;
-    VWTinterfaceDriver * myDriver;
-    bool download;
-    QMap<QString, QString> myResult;
+    Ui::ResultVisualPopup *ui;
 
-    QString resultType;
-    QString targetFolder;
-    QString targetFile;
+    CFDcaseInstance * myCase;
+    QMap<QString, QString> resultObj;
 
-    QLabel * loadingLabel = NULL;
-    CFDglCanvas * myCanvas = NULL;
-    QPlainTextEdit * textBox = NULL;
+    QWidget * displayFrameTenant = NULL;
+    QHBoxLayout * resultFrameLayout = NULL;
 };
 
-#endif // CWE_RESULT_POPUP_H
+#endif // RESULTVISUALPOPUP_H
