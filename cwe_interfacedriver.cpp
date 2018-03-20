@@ -145,7 +145,7 @@ void CWE_InterfaceDriver::startOffline()
     myFileHandle = new FileOperator(this);
     mainWindow = new CWE_MainWindow(this);
 
-    setCurrentCase(new CFDcaseInstance(templateList.at(0),this));
+    setCurrentCase(new CFDcaseInstance(templateList.at(0)));
 
     mainWindow->runSetupSteps();
     mainWindow->show();
@@ -189,11 +189,6 @@ void CWE_InterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
         }
     }
 
-    if (newCase != NULL)
-    {
-        QObject::connect(newCase, SIGNAL(detachCase()),
-                         this, SLOT(currentCaseInvalidated()));
-    }
     emit haveNewCase();
 }
 
@@ -262,6 +257,11 @@ QMap<QString, const RemoteJobData *> CWE_InterfaceDriver::getRunningCWEjobs()
         }
     }
     return ret;
+}
+
+void CWE_InterfaceDriver::caseDetached(CFDcaseInstance * lostCase)
+{
+    //TODO
 }
 
 bool CWE_InterfaceDriver::inOfflineMode()
