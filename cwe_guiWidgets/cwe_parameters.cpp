@@ -35,6 +35,10 @@
 #include "cwe_parameters.h"
 #include "ui_cwe_parameters.h"
 
+#include "../AgaveClientInterface/filemetadata.h"
+
+#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+
 #include "cwe_interfacedriver.h"
 
 #include "CFDanalysis/CFDanalysisType.h"
@@ -42,6 +46,8 @@
 
 #include "mainWindow/cwe_mainwindow.h"
 #include "cwe_tabwidget/cwe_tabwidget.h"
+
+#include "cwe_globals.h"
 
 CWE_Parameters::CWE_Parameters(QWidget *parent) :
     CWE_Super(parent),
@@ -79,9 +85,11 @@ void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
 void CWE_Parameters::saveAllParams()
 {
     CFDcaseInstance * linkedCFDCase = myDriver->getCurrentCase();
-    if (linkedCFDCase != NULL)
+    if (linkedCFDCase == NULL) return;
+
+    if (!linkedCFDCase->changeParameters(ui->theTabWidget->collectParamData()))
     {
-        linkedCFDCase->changeParameters(ui->theTabWidget->collectParamData());
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
     }
 }
 
@@ -217,13 +225,13 @@ void CWE_Parameters::createUnderlyingParamWidgets()
 
     if (newCase == NULL) return;
     if (newCase->getMyType() == NULL) return;
-    if (newCase->getCaseFolder().isEmpty()) return;
+    if (newCase->getCaseFolder() == NULL) return;
 
     QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
 
     ui->label_theName->setText(newCase->getCaseName());
     ui->label_theType->setText(newCase->getMyType()->getName());
-    ui->label_theLocation->setText(newCase->getCaseFolder());
+    ui->label_theLocation->setText(newCase->getCaseFolder()->getFileData().getFullPath());
 
     ui->theTabWidget->setParameterConfig(rawConfig);
     ui->theTabWidget->setViewState(SimCenterViewState::visible);
@@ -247,15 +255,27 @@ void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
 
     if (toEnact == CaseCommand::CANCEL)
     {
-        myDriver->getCurrentCase()->stopJob(stage);
+        if (!myDriver->getCurrentCase()->stopJob(stage))
+        {
+            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+            return;
+        }
     }
     else if (toEnact == CaseCommand::ROLLBACK)
     {
-        myDriver->getCurrentCase()->rollBack(stage);
+        if (!myDriver->getCurrentCase()->rollBack(stage))
+        {
+            cwe_globals::displayPopup("Unable to rool back this stage, please check that this stage is done and check your network connection.", "Network Issue");
+            return;
+        }
     }
     else if (toEnact == CaseCommand::RUN)
     {
-        myDriver->getCurrentCase()->startStageApp(stage);
+        if (!myDriver->getCurrentCase()->startStageApp(stage))
+        {
+            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+            return;
+        }
     }
 }
 

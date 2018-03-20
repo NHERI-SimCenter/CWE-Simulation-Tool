@@ -76,7 +76,7 @@ void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
         return;
     }
 
-    myDriver->setCurrentCase(new CFDcaseInstance(newFile, myDriver));
+    myDriver->setCurrentCase(new CFDcaseInstance(newFile));
 }
 
 void CWE_manage_simulation::newCaseGiven()

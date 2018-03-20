@@ -70,6 +70,8 @@ public:
 
     QMap<QString, const RemoteJobData *> getRunningCWEjobs();
 
+    void caseDetached(CFDcaseInstance * lostCase);
+
 signals:
     void haveNewCase();
 
