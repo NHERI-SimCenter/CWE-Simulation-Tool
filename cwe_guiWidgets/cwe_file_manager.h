@@ -32,8 +32,8 @@
 
 // Contributors:
 
-#ifndef CWE_FILE_MANAGER_H
-#define CWE_FILE_MANAGER_H
+#ifndef CWE_FILE_MANAGER2_H
+#define CWE_FILE_MANAGER2_H
 
 #include "cwe_super.h"
 
@@ -75,6 +75,14 @@ private slots:
 
     void remoteOpDone();
 
+    void on_localButton_newFolder_clicked();
+    void on_localButton_deleteFolder_clicked();
+    void on_localButton_deleteFile_clicked();
+
+    void on_remoteButton_newFolder_clicked();
+    void on_remoteButton_deleteFolder_clicked();
+    void on_remoteButton_deleteFile_clicked();
+
 private:
     Ui::CWE_file_manager *ui;
     QFileSystemModel *localFileModel;
@@ -82,4 +90,4 @@ private:
     FileTreeNode * targetNode = NULL;
 };
 
-#endif // CWE_FILE_MANAGER_H
+#endif // CWE_FILE_MANAGER2_H

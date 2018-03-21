@@ -131,7 +131,7 @@ private:
     //The various state change functions:
     void state_CopyingFolder_taskDone(RequestState invokeStatus);
     void state_FolderCheckStopped_fileChange_taskDone();
-    void state_DataLoad_fileChange_jobList();
+    void state_DataLoad_fileChange_jobList(FileTreeNode *changedNode);
     void state_InitParam_taskDone(RequestState invokeStatus);
     void state_MakingFolder_taskDone(RequestState invokeStatus);
     void state_Ready_fileChange_jobList();

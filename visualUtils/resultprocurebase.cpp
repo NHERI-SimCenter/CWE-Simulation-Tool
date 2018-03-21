@@ -77,7 +77,7 @@ void ResultProcureBase::initializeWithNeededFiles(FileTreeNode * baseFolder, QMa
     QObject::connect(myBaseFolder, SIGNAL(destroyed(QObject*)),
                      this, SLOT(baseFolderRemoved()));
 
-    fileChanged(NULL);
+    fileChanged(NULL, FileSystemChange::FILE_MODIFY);
 }
 
 QMap<QString, FileTreeNode *> ResultProcureBase::getFileNodes()
@@ -134,33 +134,29 @@ void ResultProcureBase::computeFileBuffers()
     }
 }
 
-void ResultProcureBase::fileChanged(FileTreeNode * changedFile)
+void ResultProcureBase::fileChanged(FileTreeNode * changedFile, FileSystemChange theChange)
 {
+    if (changedFile == NULL)
+    {
+        if (initLoadDone) return;
+        if (checkForAndSeekFiles())
+        {
+            initLoadDone = true;
+            allFilesLoaded();
+        }
+    }
+
     QString idChanged = getIDfromNode(changedFile);
+    if (idChanged.isEmpty()) return;
+
+    if (theChange == FileSystemChange::FILE_DELETE)
+    {
+        myFileNodes[idChanged] = NULL;
+    }
 
     if (initLoadDone)
     {
         underlyingDataChanged(idChanged);
-        return;
-    }
-
-    if (checkForAndSeekFiles())
-    {
-        initLoadDone = true;
-        allFilesLoaded();
-    }
-}
-
-void ResultProcureBase::fileRemoved(QObject * destroyedObj)
-{
-    QString idToLose = getIDfromNode(destroyedObj);
-    if (idToLose.isEmpty()) return;
-
-    myFileNodes[idToLose] = NULL;
-
-    if (initLoadDone)
-    {
-        underlyingDataChanged(idToLose);
         return;
     }
 
@@ -235,10 +231,9 @@ bool ResultProcureBase::checkForAndSeekFiles()
             }
 
             myFileNodes[fileID] = targetFileNode;
-            QObject::connect(targetFileNode, SIGNAL(fileDataChanged(FileTreeNode*)),
-                             this, SLOT(fileChanged(FileTreeNode*)));
-            QObject::connect(targetFileNode, SIGNAL(destroyed(QObject*)),
-                             this, SLOT(fileRemoved(QObject*)));
+            QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileTreeNode*,FileSystemChange)),
+                             this, SLOT(fileChanged(FileTreeNode*, FileSystemChange)),
+                             Qt::QueuedConnection);
             fileNode = targetFileNode;
         }
 
