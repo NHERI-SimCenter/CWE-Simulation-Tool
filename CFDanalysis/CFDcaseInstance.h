@@ -56,10 +56,11 @@ enum class StageState {UNREADY, UNRUN, RUNNING, FINISHED, FINISHED_PREREQ, LOADI
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, OP_INVOKE, RUNNING, DOWNLOAD, OFFLINE};
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, OP_INVOKE, EXTERN_OP, RUNNING, DOWNLOAD, OFFLINE};
 enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
                              TYPE_SELECTED, EMPTY_CASE, INIT_DATA_LOAD,
-                             MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD, READY,
+                             MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD,
+                             READY, EXTERN_FILE_OP,
                              USER_PARAM_UPLOAD, WAITING_FOLDER_DEL, RE_DATA_LOAD,
                              STARTING_JOB, STOPPING_JOB, RUNNING_JOB_NORECORD, RUNNING_JOB_YESRECORD,
                              FOLDER_CHECK_STOPPED_JOB, DOWNLOAD};
@@ -103,6 +104,7 @@ private slots:
     void underlyingFilesUpdated(FileTreeNode * changedFile, FileSystemChange theChange);
     void jobListUpdated();
     void fileTaskDone(RequestState invokeStatus, QString opMessage);
+    void fileTaskStarted();
     void chainedStateTransition();
 
     void jobInvoked(RequestState invokeStatus, QJsonDocument* jobData);
@@ -132,6 +134,7 @@ private:
     void state_CopyingFolder_taskDone(RequestState invokeStatus);
     void state_FolderCheckStopped_fileChange_taskDone();
     void state_DataLoad_fileChange_jobList(FileTreeNode *changedNode);
+    void state_ExternOp_taskDone();
     void state_InitParam_taskDone(RequestState invokeStatus);
     void state_MakingFolder_taskDone(RequestState invokeStatus);
     void state_Ready_fileChange_jobList();

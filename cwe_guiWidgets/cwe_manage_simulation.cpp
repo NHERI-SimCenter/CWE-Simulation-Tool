@@ -138,7 +138,9 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         return;
     }
 
-    if ((newState == CaseState::RUNNING) || (newState == CaseState::READY))
+    if ((newState == CaseState::RUNNING) ||
+            (newState == CaseState::READY) ||
+            (newState == CaseState::EXTERN_OP))
     {
         ui->pb_viewParameters->setEnabled(true);
         ui->pb_viewResults->setEnabled(true);

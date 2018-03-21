@@ -239,6 +239,7 @@ void CWE_Results::newCaseState(CaseState newState)
         break;
     case CaseState::DOWNLOAD:
     case CaseState::LOADING:
+    case CaseState::EXTERN_OP:
     case CaseState::OP_INVOKE:
         ui->downloadEntireCaseButton->setDisabled(true);
         resetViewInfo();

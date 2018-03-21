@@ -137,6 +137,7 @@ void CWE_Parameters::newCaseState(CaseState newState)
         return; //These states should be handled elsewhere
         break;
     case CaseState::LOADING:
+    case CaseState::EXTERN_OP:
         ui->theTabWidget->setViewState(SimCenterViewState::visible);
         ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
         break;

@@ -87,6 +87,7 @@ CaseState CFDcaseInstance::getCaseState()
     case InternalCaseState::OFFLINE : return CaseState::OFFLINE;
     case InternalCaseState::READY : return CaseState::READY;
     case InternalCaseState::INVALID : return CaseState::INVALID;
+    case InternalCaseState::EXTERN_FILE_OP : return CaseState::EXTERN_OP;
     case InternalCaseState::EMPTY_CASE :
     case InternalCaseState::INIT_DATA_LOAD :
     case InternalCaseState::RE_DATA_LOAD :
@@ -463,6 +464,9 @@ void CFDcaseInstance::fileTaskDone(RequestState invokeStatus, QString opMessage)
     case InternalCaseState::FOLDER_CHECK_STOPPED_JOB:
         state_FolderCheckStopped_fileChange_taskDone(); return;
 
+    case InternalCaseState::EXTERN_FILE_OP:
+        state_ExternOp_taskDone(); return;
+
     case InternalCaseState::INIT_PARAM_UPLOAD:
         state_InitParam_taskDone(invokeStatus); return;
 
@@ -483,6 +487,22 @@ void CFDcaseInstance::fileTaskDone(RequestState invokeStatus, QString opMessage)
     }
 }
 
+void CFDcaseInstance::fileTaskStarted()
+{
+    if (defunct) return;
+
+    InternalCaseState activeState = myState;
+
+    switch (activeState)
+    {
+    case InternalCaseState::READY:
+        state_Ready_fileChange_jobList(); return;
+
+    default:
+        return;
+    }
+}
+
 void CFDcaseInstance::chainedStateTransition()
 {
     if (defunct) return;
@@ -493,6 +513,9 @@ void CFDcaseInstance::chainedStateTransition()
     {
     case InternalCaseState::FOLDER_CHECK_STOPPED_JOB:
         state_FolderCheckStopped_fileChange_taskDone(); return;
+
+    case InternalCaseState::EXTERN_FILE_OP:
+        state_ExternOp_taskDone(); return;
 
     case InternalCaseState::INIT_DATA_LOAD:
     case InternalCaseState::RE_DATA_LOAD:
@@ -988,6 +1011,9 @@ void CFDcaseInstance::connectCaseSignals()
     QObject::connect(this, SIGNAL(haveNewState(CaseState)),
                      this, SLOT(chainedStateTransition()),
                      Qt::QueuedConnection);
+    QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpStarted()),
+                     this, SLOT(fileTaskStarted()),
+                     Qt::QueuedConnection);
 }
 
 void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
@@ -1111,6 +1137,16 @@ void CFDcaseInstance::state_DataLoad_fileChange_jobList(FileTreeNode * deletedNo
     }
 }
 
+void CFDcaseInstance::state_ExternOp_taskDone()
+{
+    if (myState != InternalCaseState::EXTERN_FILE_OP) return;
+
+    if (!cwe_globals::get_file_handle()->operationIsPending())
+    {
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+    }
+}
+
 void CFDcaseInstance::state_InitParam_taskDone(RequestState invokeStatus)
 {
     if (myState != InternalCaseState::INIT_PARAM_UPLOAD) return;
@@ -1173,6 +1209,13 @@ void CFDcaseInstance::state_Ready_fileChange_jobList()
     {
         enactDataReload();
         emitNewState(InternalCaseState::RE_DATA_LOAD);
+        return;
+    }
+
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        emitNewState(InternalCaseState::EXTERN_FILE_OP);
+        return;
     }
 
     QMap<QString, const RemoteJobData *> relevantJobs = getRelevantJobs();
@@ -1186,6 +1229,7 @@ void CFDcaseInstance::state_Ready_fileChange_jobList()
     {
         enactDataReload();
         emitNewState(InternalCaseState::RE_DATA_LOAD);
+        return;
     }
 
     if (relevantJobs.size() > 1)
