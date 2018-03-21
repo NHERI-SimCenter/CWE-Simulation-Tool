@@ -980,9 +980,6 @@ void CFDcaseInstance::connectCaseSignals()
     QObject::connect(this, SIGNAL(haveNewState(CaseState)),
                      this, SLOT(chainedStateTransition()),
                      Qt::QueuedConnection);
-    QObject::connect(this, SIGNAL(destroyed(QObject*)),
-                     cwe_globals::get_CWE_Driver(), SLOT(caseDeleted(QObject*)),
-                     Qt::QueuedConnection);
 }
 
 void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)

@@ -72,11 +72,11 @@ void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
 {
     if (newFile == NULL)
     {
-        myDriver->setCurrentCase(NULL);
+        myDriver->setCurrentCase();
         return;
     }
 
-    myDriver->setCurrentCase(new CFDcaseInstance(newFile));
+    myDriver->setCurrentCase(newFile);
 }
 
 void CWE_manage_simulation::newCaseGiven()
