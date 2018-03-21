@@ -74,7 +74,7 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
 {
     if (myDriver->inOfflineMode())
     {
-        myDriver->setCurrentCase(new CFDcaseInstance(selectedTemplate));
+        myDriver->createNewCase(selectedTemplate);
         myDriver->getMainWindow()->switchToParameterTab();
         return;
     }
@@ -112,7 +112,7 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
             cwe_globals::displayPopup("Please select a valid case type.");
             return;
         }
-        newCase = new CFDcaseInstance(selectedTemplate);
+        newCase = myDriver->createNewCase(selectedTemplate);
         if (!newCase->createCase(newCaseName, selectedNode))
         {
             cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
@@ -134,9 +134,8 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
             cwe_globals::displayPopup("Please select a folder to duplicate.");
             return;
         }
-        CFDcaseInstance * tempCase = new CFDcaseInstance(secondNode);
+        CFDcaseInstance * tempCase = myDriver->getCaseFromFolder(secondNode);
         CaseState dupState = tempCase->getCaseState();
-        tempCase->deleteLater();
 
         if (dupState == CaseState::INVALID)
         {
@@ -154,7 +153,7 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
             return;
         }
 
-        newCase = new CFDcaseInstance();
+        newCase = myDriver->createNewCase(NULL);
         if (!newCase->duplicateCase(newCaseName, selectedNode, secondNode))
         {
             cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
