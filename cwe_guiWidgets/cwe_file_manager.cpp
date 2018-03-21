@@ -78,7 +78,7 @@ void CWE_file_manager::linkDriver(CWE_InterfaceDriver * theDriver)
         ui->remoteTreeView->setupFileView();
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
-        QObject::connect(myDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
+        QObject::connect(myDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState, QString)),
                          this, SLOT(remoteOpDone()));
     }
 }
@@ -172,7 +172,7 @@ void CWE_file_manager::copyMenuItem()
         return;
     }
 
-    ae_globals::get_file_handle()->sendCopyReq(targetNode, newNamePopup.getInputText());
+    cwe_globals::get_file_handle()->sendCopyReq(targetNode, newNamePopup.getInputText());
 }
 
 void CWE_file_manager::moveMenuItem()
@@ -184,7 +184,7 @@ void CWE_file_manager::moveMenuItem()
         return;
     }
 
-    ae_globals::get_file_handle()->sendMoveReq(targetNode,newNamePopup.getInputText());
+    cwe_globals::get_file_handle()->sendMoveReq(targetNode,newNamePopup.getInputText());
 }
 
 void CWE_file_manager::renameMenuItem()
@@ -196,14 +196,14 @@ void CWE_file_manager::renameMenuItem()
         return;
     }
 
-    ae_globals::get_file_handle()->sendRenameReq(targetNode, newNamePopup.getInputText());
+    cwe_globals::get_file_handle()->sendRenameReq(targetNode, newNamePopup.getInputText());
 }
 
 void CWE_file_manager::deleteMenuItem()
 {
-    if (ae_globals::get_file_handle()->deletePopup(targetNode))
+    if (cwe_globals::get_file_handle()->deletePopup(targetNode))
     {
-        ae_globals::get_file_handle()->sendDeleteReq(targetNode);
+        cwe_globals::get_file_handle()->sendDeleteReq(targetNode);
     }
 }
 
@@ -215,27 +215,27 @@ void CWE_file_manager::createFolderMenuItem()
     {
         return;
     }
-    ae_globals::get_file_handle()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
+    cwe_globals::get_file_handle()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
 }
 
 void CWE_file_manager::compressMenuItem()
 {
-    ae_globals::get_file_handle()->sendCompressReq(targetNode);
+    cwe_globals::get_file_handle()->sendCompressReq(targetNode);
 }
 
 void CWE_file_manager::decompressMenuItem()
 {
-    ae_globals::get_file_handle()->sendDecompressReq(targetNode);
+    cwe_globals::get_file_handle()->sendDecompressReq(targetNode);
 }
 
 void CWE_file_manager::refreshMenuItem()
 {
-    ae_globals::get_file_handle()->enactFolderRefresh(targetNode);
+    cwe_globals::get_file_handle()->enactFolderRefresh(targetNode);
 }
 
 void CWE_file_manager::downloadBufferItem()
 {
-    ae_globals::get_file_handle()->sendDownloadBuffReq(targetNode);
+    cwe_globals::get_file_handle()->sendDownloadBuffReq(targetNode);
 }
 
 void CWE_file_manager::remoteOpDone()
@@ -247,7 +247,7 @@ void CWE_file_manager::remoteOpDone()
 void CWE_file_manager::customFileMenu(const QPoint &pos)
 {
     QMenu fileMenu;
-    if (ae_globals::get_file_handle()->operationIsPending())
+    if (cwe_globals::get_file_handle()->operationIsPending())
     {
         fileMenu.addAction("File Operation In Progress . . .");
         fileMenu.exec(QCursor::pos());
@@ -261,16 +261,17 @@ void CWE_file_manager::customFileMenu(const QPoint &pos)
 
     //If we did not click anything, we should return
     if (targetNode == NULL) return;
+    if (targetNode->isRootNode()) return;
     FileMetaData theFileData = targetNode->getFileData();
 
     if (theFileData.getFileType() == FileType::INVALID) return;
 
-    if (!(targetNode->isRootNode()))
+    fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
+    fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
+    fileMenu.addAction("Rename",this, SLOT(renameMenuItem()));
+    //We don't let the user delete the username folder
+    if (!(targetNode->getParentNode()->isRootNode()))
     {
-        //We don't let the user mess up the username folder
-        fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
-        fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
-        fileMenu.addAction("Rename",this, SLOT(renameMenuItem()));
         fileMenu.addSeparator();
         fileMenu.addAction("Delete",this, SLOT(deleteMenuItem()));
         fileMenu.addSeparator();
@@ -292,4 +293,34 @@ void CWE_file_manager::customFileMenu(const QPoint &pos)
     }
 
     fileMenu.exec(QCursor::pos());
+}
+
+void CWE_file_manager::on_localButton_newFolder_clicked()
+{
+
+}
+
+void CWE_file_manager::on_localButton_deleteFolder_clicked()
+{
+
+}
+
+void CWE_file_manager::on_localButton_deleteFile_clicked()
+{
+
+}
+
+void CWE_file_manager::on_remoteButton_newFolder_clicked()
+{
+
+}
+
+void CWE_file_manager::on_remoteButton_deleteFolder_clicked()
+{
+
+}
+
+void CWE_file_manager::on_remoteButton_deleteFile_clicked()
+{
+
 }

@@ -58,7 +58,6 @@ CWE_MainWindow::CWE_MainWindow(CWE_InterfaceDriver *newDriver, QWidget *parent) 
     {
         //Tabs only appearing in debug mode should be listed here
         ui->tab_debug->deleteLater();
-        ui->tab_files2->deleteLater();
     }
 
     changeParamsAndResultsEnabled(false);

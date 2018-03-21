@@ -382,7 +382,11 @@ void CFDcaseInstance::underlyingFilesUpdated(FileTreeNode * changedNode, FileSys
         return;
     }
 
-    if (!changedNode->isChildOf(caseFolder)) return;
+    //TODO: Remove commented lines when sure that node erase does not have a race condition
+    //if (theChange != FileSystemChange::FILE_DELETE)
+    //{
+        if (!changedNode->isChildOf(caseFolder)) return;
+    //}
 
     InternalCaseState activeState = myState;
 
@@ -393,7 +397,11 @@ void CFDcaseInstance::underlyingFilesUpdated(FileTreeNode * changedNode, FileSys
 
     case InternalCaseState::INIT_DATA_LOAD:
     case InternalCaseState::RE_DATA_LOAD:
-        state_DataLoad_fileChange_jobList(); return;
+        if (theChange == FileSystemChange::FILE_DELETE)
+        {
+            state_DataLoad_fileChange_jobList(changedNode); return;
+        }
+        state_DataLoad_fileChange_jobList(NULL); return;
 
     case InternalCaseState::READY:
         state_Ready_fileChange_jobList(); return;
@@ -413,7 +421,7 @@ void CFDcaseInstance::jobListUpdated()
     {
     case InternalCaseState::INIT_DATA_LOAD:
     case InternalCaseState::RE_DATA_LOAD:
-        state_DataLoad_fileChange_jobList(); return;
+        state_DataLoad_fileChange_jobList(NULL); return;
 
     case InternalCaseState::READY:
         state_Ready_fileChange_jobList(); return;
@@ -488,7 +496,7 @@ void CFDcaseInstance::chainedStateTransition()
 
     case InternalCaseState::INIT_DATA_LOAD:
     case InternalCaseState::RE_DATA_LOAD:
-        state_DataLoad_fileChange_jobList(); return;
+        state_DataLoad_fileChange_jobList(NULL); return;
 
     case InternalCaseState::READY:
         state_Ready_fileChange_jobList(); return;
@@ -1054,7 +1062,7 @@ void CFDcaseInstance::state_FolderCheckStopped_fileChange_taskDone()
     emitNewState(InternalCaseState::WAITING_FOLDER_DEL);
 }
 
-void CFDcaseInstance::state_DataLoad_fileChange_jobList()
+void CFDcaseInstance::state_DataLoad_fileChange_jobList(FileTreeNode * deletedNode)
 {
     if ((myState != InternalCaseState::INIT_DATA_LOAD) && (myState != InternalCaseState::RE_DATA_LOAD)) return;
 
@@ -1063,6 +1071,12 @@ void CFDcaseInstance::state_DataLoad_fileChange_jobList()
         emitNewState(InternalCaseState::INVALID);
         return;
     }
+    if ((deletedNode != NULL) && (deletedNode->parent() == caseFolder) && (deletedNode->getFileData().getFileName() == caseParamFileName))
+    {
+        emitNewState(InternalCaseState::INVALID);
+        return;
+    }
+
     computeCaseType();
 
     if (!caseDataLoaded())
