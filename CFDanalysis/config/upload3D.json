@@ -29,64 +29,83 @@
             ]
         }
     },
-    "varGroups":{
-        "Building Geometry":[
-            "geoFile"
-        ],
-        "Mesh Density":[
-            "inPad",
-            "outPad",
-            "lowYPad",
-            "highYPad",
-            "lowZPad",
-            "highZPad",
-            "meshDensity",
-            "meshDensityFar"
-        ],
-        "Subdomains":[
-            "innerDomains",
-            "inPadDom1",
-            "outPadDom1",
-            "lowYDom1",
-            "highYDom1",
-            "lowZDom1",
-            "highZDom1",
-            "meshDensityDom1",
-            "inPadDom2",
-            "outPadDom2",
-            "lowYDom2",
-            "highYDom2",
-            "lowZDom2",
-            "highZDom2",
-            "meshDensityDom2",
-            "inPadDom3",
-            "outPadDom3",
-            "lowYDom3",
-            "highYDom3",
-            "lowZDom3",
-            "highZDom3",
-            "meshDensityDom3"
-        ],
-        "Boundaries":[
-            "lowYPlane",
-            "highYPlane",
-            "lowZPlane",
-            "highZPlane"
-        ],
-        "Simulation Control":[
-            "endTime",
-            "deltaT",
-            "velocity",
-            "nu"
-        ],
-        "Advanced":[
-            "turbModel",
-            "useForceCoeffs",
-            "useFieldUmean",
-            "useFieldPmean",
-            "pisoCorrectors",
-            "pisoNonOrthCorrect"
-        ]
+    "groups":{
+        "Building Geometry":{
+            "name":"Building Geometry",
+            "vars":[
+                "geoFile"
+                ],
+            "image":"placeholderIcon.png"
+        },
+        "Mesh Density":{
+            "name":"Mesh Density",
+            "vars":[
+                "inPad",
+                "outPad",
+                "lowYPad",
+                "highYPad",
+                "lowZPad",
+                "highZPad",
+                "meshDensity",
+                "meshDensityFar"
+            ]
+        },
+        "Subdomains":{
+            "name":"Subdomains",
+            "vars":[
+                "innerDomains",
+                "inPadDom1",
+                "outPadDom1",
+                "lowYDom1",
+                "highYDom1",
+                "lowZDom1",
+                "highZDom1",
+                "meshDensityDom1",
+                "inPadDom2",
+                "outPadDom2",
+                "lowYDom2",
+                "highYDom2",
+                "lowZDom2",
+                "highZDom2",
+                "meshDensityDom2",
+                "inPadDom3",
+                "outPadDom3",
+                "lowYDom3",
+                "highYDom3",
+                "lowZDom3",
+                "highZDom3",
+                "meshDensityDom3"
+            ]
+        },
+        "Boundaries":{
+            "name":"Boundaries",
+            "vars":[
+                "lowYPlane",
+                "highYPlane",
+                "lowZPlane",
+                "highZPlane"
+            ]
+        },
+        "Simulation Control":{
+            "name":"Simulation Control",
+            "vars":[
+                "endTime",
+                "deltaT",
+                "velocity",
+                "nu"
+            ]
+        },
+        "Advanced":{
+            "name":"Advanced",
+            "vars":[
+                "turbModel",
+                "useForceCoeffs",
+                "useFieldUmean",
+                "useFieldPmean",
+                "pisoCorrectors",
+                "pisoNonOrthCorrect"
+            ]
+        }
     },
     "vars":{
         "geoFile":{
