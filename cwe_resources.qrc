@@ -15,7 +15,6 @@
     </qresource>
     <qresource prefix="/">
         <file>copyText.txt</file>
-        <file>cweStyle.qss</file>
         <file>images/Overview/CWEFlow1.png</file>
         <file>images/Overview/CWEFlow2.png</file>
         <file>images/Overview/CWEFlow3.png</file>
@@ -205,5 +204,9 @@
         <file>help/clone_case.html</file>
         <file>help/continue_case.html</file>
         <file>help/create_case.html</file>
+        <file>styleSheets/cweLinux.qss</file>
+        <file>styleSheets/cweMac.qss</file>
+        <file>styleSheets/cweStyle.qss</file>
+        <file>styleSheets/cweWin.qss</file>
     </qresource>
 </RCC>

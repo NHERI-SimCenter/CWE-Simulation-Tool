@@ -35,6 +35,8 @@
 #include "cwe_results.h"
 #include "ui_cwe_results.h"
 
+#include "../AgaveClientInterface/filemetadata.h"
+
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "cwe_interfacedriver.h"
@@ -176,7 +178,7 @@ QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
     if (!viewIsValid) return ret;
     CFDcaseInstance * currentCase = myDriver->getCurrentCase();
     if (currentCase == NULL) return ret;
-    if (currentCase->getCaseFolder().isEmpty()) return ret;
+    if (currentCase->getCaseFolder() == NULL) return ret;
     CFDanalysisType * theTemplate = currentCase->getMyType();
     if (theTemplate == NULL) return ret;
     QJsonObject configobj    = theTemplate->getRawConfig()->object();
@@ -237,6 +239,7 @@ void CWE_Results::newCaseState(CaseState newState)
         break;
     case CaseState::DOWNLOAD:
     case CaseState::LOADING:
+    case CaseState::EXTERN_OP:
     case CaseState::OP_INVOKE:
         ui->downloadEntireCaseButton->setDisabled(true);
         resetViewInfo();
@@ -266,7 +269,7 @@ void CWE_Results::populateResultsScreen()
     if (viewIsValid) return;
     CFDcaseInstance * currentCase = myDriver->getCurrentCase();
     if (currentCase == NULL) return;
-    if (currentCase->getCaseFolder().isEmpty()) return;
+    if (currentCase->getCaseFolder() == NULL) return;
     CFDanalysisType * theTemplate = currentCase->getMyType();
     if (theTemplate == NULL) return;
     QJsonObject configobj    = theTemplate->getRawConfig()->object();
@@ -290,7 +293,7 @@ void CWE_Results::populateResultsScreen()
 
     ui->label_theName->setText(currentCase->getCaseName());
     ui->label_theType->setText(theTemplate->getName());
-    ui->label_theLocation->setText(currentCase->getCaseFolder());
+    ui->label_theLocation->setText(currentCase->getCaseFolder()->getFileData().getFullPath());
 
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
     {
@@ -333,7 +336,7 @@ void CWE_Results::performSingleFileDownload(QString filePathToDownload, QString 
     QString localfileName = QFileDialog::getSaveFileName(this, "Save Downloaded File:");
     if (localfileName.isEmpty()) {return;}
 
-    FileTreeNode * targetNode = myDriver->getCurrentCase()->getCaseFolderNode()->getChildNodeWithName(stage);
+    FileTreeNode * targetNode = myDriver->getCurrentCase()->getCaseFolder()->getChildNodeWithName(stage);
     if (targetNode == NULL)
     {
         cwe_globals::displayPopup("The stage for this download has not been completed. Please check your case and try again.");

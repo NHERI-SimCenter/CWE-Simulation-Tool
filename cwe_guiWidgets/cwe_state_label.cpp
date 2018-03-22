@@ -97,6 +97,11 @@ void cwe_state_label::setNewState(CaseState newState)
         this->setText("Getting remote data  . . . Please Wait");
         return;
     }
+    if (newState == CaseState::EXTERN_OP)
+    {
+        this->setText("File Operation in Progress . . . Please Wait");
+        return;
+    }
     if (newState == CaseState::READY)
     {
         this->setText("Ready for user input");
