@@ -72,11 +72,11 @@ void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
 {
     if (newFile == NULL)
     {
-        myDriver->setCurrentCase(NULL);
+        myDriver->setCurrentCase();
         return;
     }
 
-    myDriver->setCurrentCase(new CFDcaseInstance(newFile, myDriver));
+    myDriver->setCurrentCase(newFile);
 }
 
 void CWE_manage_simulation::newCaseGiven()
@@ -138,7 +138,9 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         return;
     }
 
-    if ((newState == CaseState::RUNNING) || (newState == CaseState::READY))
+    if ((newState == CaseState::RUNNING) ||
+            (newState == CaseState::READY) ||
+            (newState == CaseState::EXTERN_OP))
     {
         ui->pb_viewParameters->setEnabled(true);
         ui->pb_viewResults->setEnabled(true);

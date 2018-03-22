@@ -55,7 +55,6 @@ SOURCES += main.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
     cwe_guiWidgets/cwe_super.cpp \
-    cwe_guiWidgets/cwe_file_manager.cpp \
     cwe_guiWidgets/cwe_help.cpp \
     cwe_guiWidgets/cwe_manage_simulation.cpp \
     cwe_guiWidgets/cwe_welcome_screen.cpp \
@@ -97,7 +96,6 @@ SOURCES += main.cpp \
     cwe_globals.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp \
     cwe_guiWidgets/cwe_job_list.cpp \
-    cwe_guiWidgets/cwe_file_manager2.cpp \
     ../AgaveExplorer/utilFuncs/linkedstandarditem.cpp \
     ../AgaveExplorer/remoteFileOps/joblistnode.cpp \
     ../AgaveExplorer/ae_globals.cpp \
@@ -106,7 +104,8 @@ SOURCES += main.cpp \
     visualUtils/resultprocurebase.cpp \
     visualUtils/resultvisualpopup.cpp \
     visualUtils/resultVisuals/resultfield2dwindow.cpp \
-    visualUtils/resultVisuals/resulttextdisp.cpp
+    visualUtils/resultVisuals/resulttextdisp.cpp \
+    cwe_guiWidgets/cwe_file_manager.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -116,7 +115,6 @@ HEADERS  += \
     visualUtils/decompresswrapper.h \
     mainWindow/cwe_mainwindow.h \
     cwe_guiWidgets/cwe_super.h \
-    cwe_guiWidgets/cwe_file_manager.h \
     cwe_guiWidgets/cwe_help.h \
     cwe_guiWidgets/cwe_manage_simulation.h \
     cwe_guiWidgets/cwe_welcome_screen.h \
@@ -157,7 +155,6 @@ HEADERS  += \
     cwe_globals.h \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h \
     cwe_guiWidgets/cwe_job_list.h \
-    cwe_guiWidgets/cwe_file_manager2.h \
     ../AgaveExplorer/utilFuncs/linkedstandarditem.h \
     ../AgaveExplorer/remoteFileOps/joblistnode.h \
     ../AgaveExplorer/ae_globals.h \
@@ -166,11 +163,11 @@ HEADERS  += \
     visualUtils/resultprocurebase.h \
     visualUtils/resultvisualpopup.h \
     visualUtils/resultVisuals/resultfield2dwindow.h \
-    visualUtils/resultVisuals/resulttextdisp.h
+    visualUtils/resultVisuals/resulttextdisp.h \
+    cwe_guiWidgets/cwe_file_manager.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
-    cwe_guiWidgets/cwe_file_manager.ui \
     cwe_guiWidgets/cwe_help.ui \
     cwe_guiWidgets/cwe_manage_simulation.ui \
     cwe_guiWidgets/cwe_welcome_screen.ui \
@@ -185,8 +182,8 @@ FORMS    += \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
     cwe_guiWidgets/cwe_job_list.ui \
-    cwe_guiWidgets/cwe_file_manager2.ui \
-    visualUtils/resultvisualpopup.ui
+    visualUtils/resultvisualpopup.ui \
+    cwe_guiWidgets/cwe_file_manager.ui
 
 RESOURCES += \
     cwe_resources.qrc \

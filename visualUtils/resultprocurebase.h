@@ -40,6 +40,7 @@
 #include <QMap>
 
 class FileTreeNode;
+enum class FileSystemChange;
 
 class ResultProcureBase : public QWidget
 {
@@ -69,8 +70,7 @@ protected slots:
     virtual void baseFolderRemoved();
 
 private slots:
-    void fileChanged(FileTreeNode * changedFile);
-    void fileRemoved(QObject *destroyedObj);
+    void fileChanged(FileTreeNode * changedFile, FileSystemChange theChange);
 
 private:
     bool checkForAndSeekFiles(); //Returns true if all files loaded

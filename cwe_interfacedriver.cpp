@@ -51,6 +51,8 @@
 
 CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent, debug)
 {
+    qRegisterMetaType<CaseState>("CaseState");
+
     AgaveHandler * tmpHandle = new AgaveHandler(this);
     tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
     tmpHandle->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
@@ -145,7 +147,7 @@ void CWE_InterfaceDriver::startOffline()
     myFileHandle = new FileOperator(this);
     mainWindow = new CWE_MainWindow(this);
 
-    setCurrentCase(new CFDcaseInstance(templateList.at(0),this));
+    setCurrentCase(new CFDcaseInstance(templateList.at(0)));
 
     mainWindow->runSetupSteps();
     mainWindow->show();
@@ -160,7 +162,7 @@ QString CWE_InterfaceDriver::getBanner()
 
 QString CWE_InterfaceDriver::getVersion()
 {
-    return "Version: 0.3.1";
+    return "Version: 0.3.2";
 }
 
 QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()
@@ -173,38 +175,95 @@ CFDcaseInstance * CWE_InterfaceDriver::getCurrentCase()
     return currentCFDCase;
 }
 
+void CWE_InterfaceDriver::setCurrentCase()
+{
+    if (currentCFDCase == NULL) return;
+
+    disconnectCaseFromInterface(currentCFDCase);
+    currentCFDCase = NULL;
+}
+
 void CWE_InterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
 {
     if (newCase == currentCFDCase) return;
-
-    CFDcaseInstance * oldCase = currentCFDCase;
+    disconnectCaseFromInterface(currentCFDCase);
     currentCFDCase = newCase;
-
-    if (oldCase != NULL)
+    if (!caseList.contains(currentCFDCase))
     {
-        QObject::disconnect(oldCase,0,0,0);
-        if (!oldCase->isDefunct())
+        caseList.append(currentCFDCase);
+    }
+
+    emit haveNewCase();
+}
+
+void CWE_InterfaceDriver::setCurrentCase(FileTreeNode * caseNode)
+{
+    CFDcaseInstance * newCase = getCaseFromFolder(caseNode);
+    if (newCase == NULL)
+    {
+        setCurrentCase();
+        return;
+    }
+    setCurrentCase(newCase);
+}
+
+CFDcaseInstance * CWE_InterfaceDriver::getCaseFromFolder(FileTreeNode * caseNode)
+{
+    for (CFDcaseInstance * aCase : caseList)
+    {
+        if (aCase->getCaseFolder() == caseNode)
         {
-            oldCase->killCaseConnection();
+            return aCase;
         }
     }
 
-    if (newCase != NULL)
+    CFDcaseInstance * newCase = new CFDcaseInstance(caseNode);
+    QObject::connect(newCase,SIGNAL(haveNewState(CaseState)),
+                     this, SLOT(caseHasNewState(CaseState)),
+                     Qt::QueuedConnection);
+
+    return newCase;
+}
+
+CFDcaseInstance * CWE_InterfaceDriver::createNewCase(CFDanalysisType * caseType)
+{
+    CFDcaseInstance * ret;
+    if (caseType == NULL)
     {
-        QObject::connect(newCase, SIGNAL(detachCase()),
-                         this, SLOT(currentCaseInvalidated()));
+        ret = new CFDcaseInstance();
     }
-    emit haveNewCase();
+    else
+    {
+        ret = new CFDcaseInstance(caseType);
+    }
+    QObject::connect(ret,SIGNAL(haveNewState(CaseState)),
+                     this, SLOT(caseHasNewState(CaseState)),
+                     Qt::QueuedConnection);
+    setCurrentCase(ret);
+    return ret;
+}
+
+void CWE_InterfaceDriver::disconnectCaseFromInterface(CFDcaseInstance * oldCase)
+{
+    if (oldCase == NULL) return;
+
+    QObject::disconnect(oldCase,0,0,0);
+    QObject::connect(oldCase,SIGNAL(haveNewState(CaseState)),
+                     this, SLOT(caseHasNewState(CaseState)),
+                     Qt::QueuedConnection);
+
+    CaseState theState = oldCase->getCaseState();
+    if ((theState == CaseState::ERROR) || (theState == CaseState::INVALID))
+    {
+        caseList.removeAll(oldCase);
+        oldCase->deleteLater();
+        return;
+    }
 }
 
 CWE_MainWindow * CWE_InterfaceDriver::getMainWindow()
 {
     return mainWindow;
-}
-
-void CWE_InterfaceDriver::currentCaseInvalidated()
-{
-    setCurrentCase(NULL);
 }
 
 void CWE_InterfaceDriver::checkAppList(RequestState replyState, QJsonArray * appList)
@@ -249,6 +308,23 @@ void CWE_InterfaceDriver::processNewJobInfo()
     }
 }
 
+void CWE_InterfaceDriver::caseHasNewState(CaseState newState)
+{
+    QObject * theSender = sender();
+    CFDcaseInstance * theCase = (CFDcaseInstance *) theSender;
+
+    if (theCase == currentCFDCase)
+    {
+        return;
+    }
+
+    if ((newState == CaseState::ERROR) || (newState == CaseState::INVALID))
+    {
+        caseList.removeAll(theCase);
+        theSender->deleteLater();
+    }
+}
+
 QMap<QString, const RemoteJobData *> CWE_InterfaceDriver::getRunningCWEjobs()
 {
     QMap<QString, const RemoteJobData * > ret;
@@ -262,6 +338,17 @@ QMap<QString, const RemoteJobData *> CWE_InterfaceDriver::getRunningCWEjobs()
         }
     }
     return ret;
+}
+
+void CWE_InterfaceDriver::caseDetached(CFDcaseInstance * lostCase)
+{
+    caseList.removeAll(lostCase);
+    lostCase->deleteLater();
+
+    if (lostCase == currentCFDCase)
+    {
+        setCurrentCase();
+    }
 }
 
 bool CWE_InterfaceDriver::inOfflineMode()
