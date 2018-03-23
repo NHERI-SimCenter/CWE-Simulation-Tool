@@ -256,7 +256,7 @@ void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
 
     if (toEnact == CaseCommand::CANCEL)
     {
-        if (!myDriver->getCurrentCase()->stopJob(stage))
+        if (!myDriver->getCurrentCase()->stopJob())
         {
             cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
             return;

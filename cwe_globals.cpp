@@ -37,6 +37,8 @@
 
 #include "cwe_interfacedriver.h"
 
+CWEjobAccountant * cwe_globals::theJobAccountant = NULL;
+
 cwe_globals::cwe_globals() {}
 
 CWE_InterfaceDriver * cwe_globals::get_CWE_Driver()
@@ -45,4 +47,19 @@ CWE_InterfaceDriver * cwe_globals::get_CWE_Driver()
     if (theDriver == NULL) return NULL;
 
     return qobject_cast<CWE_InterfaceDriver *>(theDriver);
+}
+
+void cwe_globals::set_CWE_Job_Accountant(CWEjobAccountant * theAccountant)
+{
+    if (theJobAccountant != NULL)
+    {
+        displayFatalPopup("Job Accountant object has multiple definitions. Please note the circumstances of this error and report it to the developers.", "Internal Error");
+        return;
+    }
+    theJobAccountant = theAccountant;
+}
+
+CWEjobAccountant * cwe_globals::get_CWE_Job_Accountant()
+{
+    return theJobAccountant;
 }
