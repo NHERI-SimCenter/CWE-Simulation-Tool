@@ -46,6 +46,7 @@
 
 #include "CFDanalysis/CFDcaseInstance.h"
 #include "CFDanalysis/CFDanalysisType.h"
+#include "CFDanalysis/cwejobaccountant.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
@@ -96,6 +97,7 @@ void CWE_InterfaceDriver::startup()
 {
     myJobHandle = new JobOperator(this);
     myFileHandle = new FileOperator(this);
+    myJobAccountant = new CWEjobAccountant(this);
     authWindow = new AuthForm(this);
     authWindow->show();
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
@@ -145,6 +147,7 @@ void CWE_InterfaceDriver::startOffline()
     offlineMode = true;
     myJobHandle = new JobOperator(this);
     myFileHandle = new FileOperator(this);
+    myJobAccountant = new CWEjobAccountant(this);
     mainWindow = new CWE_MainWindow(this);
 
     setCurrentCase(new CFDcaseInstance(templateList.at(0)));
@@ -296,18 +299,6 @@ void CWE_InterfaceDriver::checkAppList(RequestState replyState, QJsonArray * app
     }
 }
 
-void CWE_InterfaceDriver::processNewJobInfo()
-{
-    QMap<QString, const RemoteJobData *> runningJobs = getRunningCWEjobs();
-    for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
-    {
-        if (!(*itr)->detailsLoaded())
-        {
-            getJobHandler()->requestJobDetails(*itr);
-        }
-    }
-}
-
 void CWE_InterfaceDriver::caseHasNewState(CaseState newState)
 {
     QObject * theSender = sender();
@@ -323,21 +314,6 @@ void CWE_InterfaceDriver::caseHasNewState(CaseState newState)
         caseList.removeAll(theCase);
         theSender->deleteLater();
     }
-}
-
-QMap<QString, const RemoteJobData *> CWE_InterfaceDriver::getRunningCWEjobs()
-{
-    QMap<QString, const RemoteJobData * > ret;
-    QMap<QString, const RemoteJobData *> runningJobs = getJobHandler()->getRunningJobs();
-    for (auto itr = runningJobs.cbegin(); itr != runningJobs.cend(); itr++)
-    {
-        QString theApp = (*itr)->getApp();
-        if (theApp.startsWith("cwe-serial") || theApp.startsWith("cwe-parallel"))
-        {
-            ret.insert(itr.key(),*itr);
-        }
-    }
-    return ret;
 }
 
 void CWE_InterfaceDriver::caseDetached(CFDcaseInstance * lostCase)

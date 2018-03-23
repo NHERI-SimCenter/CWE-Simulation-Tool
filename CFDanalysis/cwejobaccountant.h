@@ -1,7 +1,6 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -33,71 +32,34 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef VWTINTERFACEDRIVER_H
-#define VWTINTERFACEDRIVER_H
+#ifndef CWEJOBACCOUNTANT_H
+#define CWEJOBACCOUNTANT_H
 
-#include "../AgaveExplorer/utilFuncs/agavesetupdriver.h"
+#include <QObject>
+#include <QMap>
 
-#include <QWindow>
-#include <QDir>
-
-class CWE_MainWindow;
-class CFDanalysisType;
-class CFDcaseInstance;
 class RemoteJobData;
-class FileTreeNode;
-class CWEjobAccountant;
-enum class CaseState;
 
-class CWE_InterfaceDriver : public AgaveSetupDriver
+class CWEjobAccountant : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit CWE_InterfaceDriver(QObject *parent = nullptr, bool debug = false);
-    ~CWE_InterfaceDriver();
-    virtual void startup();
-    virtual void closeAuthScreen();
-
-    virtual void startOffline();
-
-    virtual QString getBanner();
-    virtual QString getVersion();
-
-    QList<CFDanalysisType *> * getTemplateList();
-
-    CFDcaseInstance * getCurrentCase();
-    void setCurrentCase();
-    void setCurrentCase(CFDcaseInstance * newCase);
-    void setCurrentCase(FileTreeNode * caseNode);
-    CFDcaseInstance * getCaseFromFolder(FileTreeNode * caseNode);
-
-    CFDcaseInstance *createNewCase(CFDanalysisType *caseType);
-
-    CWE_MainWindow * getMainWindow();
-
-    bool inOfflineMode();
-
-    void caseDetached(CFDcaseInstance * lostCase);
+    explicit CWEjobAccountant(QObject *parent = nullptr);
+    const RemoteJobData * getJobByID(QString IDstr);
+    const RemoteJobData * getJobByFolder(QString folderName);
+    bool allRunningDetailsLoaded();
 
 signals:
-    void haveNewCase();
+    void haveNewJobInfo();
 
-private slots:
-    void checkAppList(RequestState replyState, QJsonArray * appList);
-    void caseHasNewState(CaseState newState);
+public slots:
+    void reloadJobLists();
 
 private:
-    void disconnectCaseFromInterface(CFDcaseInstance * oldCase);
+    QMap<QString, const RemoteJobData *> detailedRunningJobs;
+    QMap<QString, const RemoteJobData *> undetailedRunningJobs;
+    QMap<QString, const RemoteJobData *> terminatedJobs;
 
-    CWE_MainWindow * mainWindow;
-    QList<CFDanalysisType *> templateList;
-
-    CFDcaseInstance * currentCFDCase = NULL;
-    QList<CFDcaseInstance *> caseList;
-    CWEjobAccountant * myJobAccountant = NULL;
-
-    bool offlineMode = false;
 };
 
-#endif // VWTINTERFACEDRIVER_H
+#endif // CWEJOBACCOUNTANT_H

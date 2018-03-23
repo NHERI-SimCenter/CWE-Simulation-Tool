@@ -62,7 +62,7 @@ enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
                              MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD,
                              READY, EXTERN_FILE_OP,
                              USER_PARAM_UPLOAD, WAITING_FOLDER_DEL, RE_DATA_LOAD,
-                             STARTING_JOB, STOPPING_JOB, RUNNING_JOB_NORECORD, RUNNING_JOB_YESRECORD,
+                             STARTING_JOB, STOPPING_JOB, RUNNING_JOB,
                              FOLDER_CHECK_STOPPED_JOB, DOWNLOAD};
 
 class CFDcaseInstance : public QObject
@@ -92,7 +92,7 @@ public:
     bool changeParameters(QMap<QString, QString> paramList);
     bool startStageApp(QString stageID);
     bool rollBack(QString stageToDelete);
-    bool stopJob(QString stage);
+    bool stopJob();
     bool downloadCase(QString destLocalFile);
 
     void killCaseConnection();
@@ -123,8 +123,6 @@ private:
     bool updateStageStatesIfNew(QMap<QString, StageState> * newStageStates);
     bool recomputeStageStates();
     void computeParamList();
-    bool allListedJobsHaveDetails(QMap<QString, const RemoteJobData * > jobList);
-    QMap<QString, const RemoteJobData *> getRelevantJobs();
 
     QByteArray produceJSONparams(QMap<QString, QString> paramList);
 
@@ -138,8 +136,7 @@ private:
     void state_InitParam_taskDone(RequestState invokeStatus);
     void state_MakingFolder_taskDone(RequestState invokeStatus);
     void state_Ready_fileChange_jobList();
-    void state_RunningNoRecord_jobList();
-    void state_RunningYesRecord_jobList();
+    void state_Running_jobList();
     void state_StartingJob_jobInvoked(QString jobID);
     void state_StoppingJob_jobKilled();
     void state_UserParamUpload_taskDone(RequestState invokeStatus);
@@ -152,7 +149,6 @@ private:
     QMap<QString, QString> prospectiveNewParamList;
     QString runningID;
     QString runningStage;
-    const RemoteJobData * runningJobNode = NULL;
     InternalCaseState myState = InternalCaseState::ERROR;
 
     FileTreeNode * caseFolder = NULL;
