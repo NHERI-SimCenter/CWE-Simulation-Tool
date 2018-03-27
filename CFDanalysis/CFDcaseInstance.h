@@ -40,8 +40,10 @@
 #include <QMap>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QList>
 
-class FileTreeNode;
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+
 class CFDanalysisType;
 class RemoteJobData;
 class JobListNode;
@@ -70,13 +72,13 @@ class CFDcaseInstance : public QObject
     Q_OBJECT
 
 public:
-    CFDcaseInstance(FileTreeNode * newCaseFolder);
+    CFDcaseInstance(const FileNodeRef &newCaseFolder);
     CFDcaseInstance(CFDanalysisType * caseType); //For new cases
     CFDcaseInstance(); // For duplications
 
     bool isDefunct();
     CaseState getCaseState();
-    FileTreeNode * getCaseFolder();
+    const FileNodeRef getCaseFolder();
     QString getCaseName();
 
     //Note: For these, it can always answer "I don't know"
@@ -87,21 +89,19 @@ public:
 
     //Of the following, only one enacted at a time
     //Return true if enacted, false if not
-    bool createCase(QString newName, FileTreeNode * containingFolder);
-    bool duplicateCase(QString newName, FileTreeNode * containingFolder, FileTreeNode * oldCase);
+    bool createCase(QString newName, const FileNodeRef &containingFolder);
+    bool duplicateCase(QString newName, const FileNodeRef &containingFolder, const FileNodeRef &oldCase);
     bool changeParameters(QMap<QString, QString> paramList);
     bool startStageApp(QString stageID);
     bool rollBack(QString stageToDelete);
     bool stopJob();
     bool downloadCase(QString destLocalFile);
 
-    void killCaseConnection();
-
 signals:
     void haveNewState(CaseState newState);
 
 private slots:
-    void underlyingFilesUpdated(FileTreeNode * changedFile, FileSystemChange theChange);
+    void underlyingFilesUpdated(FileNodeRef changedFile, FileSystemChange theChange);
     void jobListUpdated();
     void fileTaskDone(RequestState invokeStatus, QString opMessage);
     void fileTaskStarted();
@@ -131,7 +131,7 @@ private:
     //The various state change functions:
     void state_CopyingFolder_taskDone(RequestState invokeStatus);
     void state_FolderCheckStopped_fileChange_taskDone();
-    void state_DataLoad_fileChange_jobList(FileTreeNode *changedNode);
+    void state_DataLoad_fileChange_jobList();
     void state_ExternOp_taskDone();
     void state_InitParam_taskDone(RequestState invokeStatus);
     void state_MakingFolder_taskDone(RequestState invokeStatus);
@@ -151,7 +151,7 @@ private:
     QString runningStage;
     InternalCaseState myState = InternalCaseState::ERROR;
 
-    FileTreeNode * caseFolder = NULL;
+    FileNodeRef caseFolder;
     CFDanalysisType * myType = NULL;
 
     QString expectedNewCaseFolder;

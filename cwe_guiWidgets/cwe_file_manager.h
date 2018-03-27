@@ -37,6 +37,8 @@
 
 #include "cwe_super.h"
 
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+
 #include <QFileSystemModel>
 #include <QMenu>
 
@@ -87,7 +89,7 @@ private:
     Ui::CWE_file_manager *ui;
     QFileSystemModel *localFileModel;
 
-    FileTreeNode * targetNode = NULL;
+    FileNodeRef targetNode;
 };
 
 #endif // CWE_FILE_MANAGER2_H

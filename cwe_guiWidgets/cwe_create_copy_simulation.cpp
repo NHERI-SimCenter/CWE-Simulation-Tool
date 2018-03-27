@@ -80,13 +80,13 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
     }
 
     /* take emergency exit if nothing has been selected */
-    FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
-    if (selectedNode == NULL)
+    FileNodeRef selectedNode = ui->primary_remoteFileTree->getSelectedFile();
+    if (selectedNode.isNil())
     {
         cwe_globals::displayPopup("Please select a folder to place the new case.");
         return;
     }
-    if (!selectedNode->isFolder())
+    if (selectedNode.getFileType() != FileType::DIR)
     {
         cwe_globals::displayPopup("Please select a folder to place the new case.");
         return;
@@ -123,13 +123,13 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
     {
         /* we are cloning from an existing case */
 
-        FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
-        if (selectedNode == NULL)
+        FileNodeRef secondNode = ui->secondary_remoteFileTree->getSelectedFile();
+        if (selectedNode.isNil())
         {
             cwe_globals::displayPopup("Please select a folder to duplicate.");
             return;
         }
-        if (!selectedNode->isFolder())
+        if (selectedNode.getFileType() != FileType::DIR)
         {
             cwe_globals::displayPopup("Please select a folder to duplicate.");
             return;

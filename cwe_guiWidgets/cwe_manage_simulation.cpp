@@ -48,8 +48,8 @@ CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QObject::connect(ui->treeView, SIGNAL(newFileSelected(FileTreeNode*)),
-                             this, SLOT(newFileSelected(FileTreeNode*)));
+    QObject::connect(ui->treeView, SIGNAL(newFileSelected(FileNodeRef)),
+                             this, SLOT(newFileSelected(FileNodeRef)));
 
     clearSelectView();
 
@@ -68,9 +68,9 @@ void CWE_manage_simulation::linkDriver(CWE_InterfaceDriver * theDriver)
                      this, SLOT(newCaseGiven()));
 }
 
-void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
+void CWE_manage_simulation::newFileSelected(FileNodeRef newFile)
 {
-    if (newFile == NULL)
+    if (!newFile.fileNodeExtant())
     {
         myDriver->setCurrentCase();
         return;
@@ -82,6 +82,14 @@ void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
 void CWE_manage_simulation::newCaseGiven()
 {
     CFDcaseInstance * newCase = myDriver->getCurrentCase();
+
+    //TODO: This code is to fix problem with inconsistant case selection
+    //Should clear slection if new case is not same as already selected folder
+    //if ((newCase->getCaseFolder().fileNodeExtant()) &&
+    //    (newCase->getCaseFolder() != ui->treeView->getSelectedFile()))
+    //{
+    //    ui->treeView->selectFileByNode(newCase->getCaseFolder());
+    //}
 
     ui->label_caseStatus->setCurrentCase(newCase);    
 

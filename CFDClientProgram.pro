@@ -106,7 +106,8 @@ SOURCES += main.cpp \
     visualUtils/resultVisuals/resultfield2dwindow.cpp \
     visualUtils/resultVisuals/resulttextdisp.cpp \
     cwe_guiWidgets/cwe_file_manager.cpp \
-    CFDanalysis/cwejobaccountant.cpp
+    CFDanalysis/cwejobaccountant.cpp \
+    ../AgaveExplorer/remoteFileOps/filenoderef.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -166,7 +167,8 @@ HEADERS  += \
     visualUtils/resultVisuals/resultfield2dwindow.h \
     visualUtils/resultVisuals/resulttextdisp.h \
     cwe_guiWidgets/cwe_file_manager.h \
-    CFDanalysis/cwejobaccountant.h
+    CFDanalysis/cwejobaccountant.h \
+    ../AgaveExplorer/remoteFileOps/filenoderef.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
