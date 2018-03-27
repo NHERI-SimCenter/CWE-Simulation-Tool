@@ -39,7 +39,7 @@
 
 #include <QStandardItemModel>
 
-class FileTreeNode;
+class FileNodeRef;
 enum class CaseState;
 enum class StageState;
 
@@ -58,7 +58,7 @@ public:
     virtual void linkDriver(CWE_InterfaceDriver * theDriver);
 
 private slots:
-    void newFileSelected(FileTreeNode * newFile);
+    void newFileSelected(FileNodeRef newFile);
 
     void newCaseGiven();
     void newCaseState(CaseState newState);

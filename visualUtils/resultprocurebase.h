@@ -39,7 +39,11 @@
 #include <QWidget>
 #include <QMap>
 
-class FileTreeNode;
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+
+//TODO: Need to deal with situation when bsae folder is removed
+
+class FileNodeRef;
 enum class FileSystemChange;
 
 class ResultProcureBase : public QWidget
@@ -49,13 +53,13 @@ public:
     explicit ResultProcureBase(QWidget *parent = nullptr);
     ~ResultProcureBase();
 
-    void initializeWithNeededFiles(FileTreeNode * baseFolder, QMap<QString, QString> neededFiles);
+    void initializeWithNeededFiles(FileNodeRef baseFolder, QMap<QString, QString> neededFiles);
     //Note: needed files is a map: internalID => path relative to base folder
 
 protected:
     virtual void allFilesLoaded() = 0;
 
-    QMap<QString, FileTreeNode *> getFileNodes();
+    QMap<QString, FileNodeRef> getFileNodes();
     QMap<QString, QByteArray *> getFileBuffers();
 
     void computeFileBuffers();
@@ -66,21 +70,18 @@ protected:
 
     virtual void initialFailure() = 0;
 
-protected slots:
-    virtual void baseFolderRemoved();
-
 private slots:
-    void fileChanged(FileTreeNode * changedFile, FileSystemChange theChange);
+    void fileChanged(FileNodeRef changedFile, FileSystemChange theChange);
 
 private:
     bool checkForAndSeekFiles(); //Returns true if all files loaded
-    FileTreeNode * getFinalResultFolder();
-    QString getIDfromNode(QObject *fileNode);
+    FileNodeRef getFinalResultFolder();
+    QString getIDfromNode(FileNodeRef fileNode);
 
-    FileTreeNode * myBaseFolder;
+    FileNodeRef myBaseFolder;
 
     QMap<QString, QString> myFileNames;
-    QMap<QString, FileTreeNode *> myFileNodes;
+    QMap<QString, FileNodeRef> myFileNodes;
     QMap<QString, QByteArray *> myBufferList;
     bool initLoadDone = false;
 };

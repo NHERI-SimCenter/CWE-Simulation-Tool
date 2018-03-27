@@ -45,7 +45,7 @@ class CWE_MainWindow;
 class CFDanalysisType;
 class CFDcaseInstance;
 class RemoteJobData;
-class FileTreeNode;
+class FileNodeRef;
 class CWEjobAccountant;
 enum class CaseState;
 
@@ -69,16 +69,14 @@ public:
     CFDcaseInstance * getCurrentCase();
     void setCurrentCase();
     void setCurrentCase(CFDcaseInstance * newCase);
-    void setCurrentCase(FileTreeNode * caseNode);
-    CFDcaseInstance * getCaseFromFolder(FileTreeNode * caseNode);
+    void setCurrentCase(const FileNodeRef &caseNode);
+    CFDcaseInstance * getCaseFromFolder(const FileNodeRef &caseNode);
 
     CFDcaseInstance *createNewCase(CFDanalysisType *caseType);
 
     CWE_MainWindow * getMainWindow();
 
     bool inOfflineMode();
-
-    void caseDetached(CFDcaseInstance * lostCase);
 
 signals:
     void haveNewCase();
@@ -88,7 +86,7 @@ private slots:
     void caseHasNewState(CaseState newState);
 
 private:
-    void disconnectCaseFromInterface(CFDcaseInstance * oldCase);
+    void deactivateCurrentCase();
 
     CWE_MainWindow * mainWindow;
     QList<CFDanalysisType *> templateList;

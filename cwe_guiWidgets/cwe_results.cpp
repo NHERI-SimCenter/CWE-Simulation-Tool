@@ -178,7 +178,7 @@ QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
     if (!viewIsValid) return ret;
     CFDcaseInstance * currentCase = myDriver->getCurrentCase();
     if (currentCase == NULL) return ret;
-    if (currentCase->getCaseFolder() == NULL) return ret;
+    if (currentCase->getCaseFolder().isNil()) return ret;
     CFDanalysisType * theTemplate = currentCase->getMyType();
     if (theTemplate == NULL) return ret;
     QJsonObject configobj    = theTemplate->getRawConfig()->object();
@@ -269,7 +269,7 @@ void CWE_Results::populateResultsScreen()
     if (viewIsValid) return;
     CFDcaseInstance * currentCase = myDriver->getCurrentCase();
     if (currentCase == NULL) return;
-    if (currentCase->getCaseFolder() == NULL) return;
+    if (currentCase->getCaseFolder().isNil()) return;
     CFDanalysisType * theTemplate = currentCase->getMyType();
     if (theTemplate == NULL) return;
     QJsonObject configobj    = theTemplate->getRawConfig()->object();
@@ -293,7 +293,7 @@ void CWE_Results::populateResultsScreen()
 
     ui->label_theName->setText(currentCase->getCaseName());
     ui->label_theType->setText(theTemplate->getName());
-    ui->label_theLocation->setText(currentCase->getCaseFolder()->getFileData().getFullPath());
+    ui->label_theLocation->setText(currentCase->getCaseFolder().getFullPath());
 
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
     {
@@ -336,15 +336,15 @@ void CWE_Results::performSingleFileDownload(QString filePathToDownload, QString 
     QString localfileName = QFileDialog::getSaveFileName(this, "Save Downloaded File:");
     if (localfileName.isEmpty()) {return;}
 
-    FileTreeNode * targetNode = myDriver->getCurrentCase()->getCaseFolder()->getChildNodeWithName(stage);
-    if (targetNode == NULL)
+    FileNodeRef targetNode = myDriver->getCurrentCase()->getCaseFolder().getChildWithName(stage);
+    if (targetNode.isNil())
     {
         cwe_globals::displayPopup("The stage for this download has not been completed. Please check your case and try again.");
         return;
     }
 
-    targetNode = myDriver->getFileHandler()->speculateNodeWithName(targetNode, filePathToDownload, false);
-    if (targetNode == NULL)
+    targetNode = myDriver->getFileHandler()->speculateFileWithName(targetNode, filePathToDownload, false);
+    if (targetNode.isNil())
     {
         cwe_globals::displayPopup("The result to be downloaded does not exist. Please check your case and try again.");
         return;
