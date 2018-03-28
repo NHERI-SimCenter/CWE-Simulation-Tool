@@ -68,7 +68,7 @@
     <number>6</number>
    </property>
    <item row="3" column="1">
-    <widget class="RemoteFileTree" name="primary_remoteFileTree" native="true">
+    <widget class="RemoteFileTree" name="primary_remoteFileTree">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>1</horstretch>
@@ -139,7 +139,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>302</width>
+            <width>308</width>
             <height>430</height>
            </rect>
           </property>
@@ -166,7 +166,7 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <widget class="RemoteFileTree" name="secondary_remoteFileTree" native="true"/>
+        <widget class="RemoteFileTree" name="secondary_remoteFileTree"/>
        </item>
       </layout>
      </widget>
@@ -227,8 +227,8 @@
  <customwidgets>
   <customwidget>
    <class>RemoteFileTree</class>
-   <extends>QWidget</extends>
-   <header>../AgaveExplorer/remoteFileOps/remotefiletree.h</header>
+   <extends>QTreeView</extends>
+   <header>../AgaveExplorer/remoteModelViews/remotefiletree.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
