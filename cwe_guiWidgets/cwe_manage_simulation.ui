@@ -239,7 +239,7 @@
   <customwidget>
    <class>RemoteFileTree</class>
    <extends>QTreeView</extends>
-   <header>../AgaveExplorer/remoteFileOps/remotefiletree.h</header>
+   <header>../AgaveExplorer/remoteModelViews/remotefiletree.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

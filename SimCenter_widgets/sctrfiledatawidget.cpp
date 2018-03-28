@@ -34,7 +34,7 @@
 
 #include "sctrfiledatawidget.h"
 
-#include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
+#include "../AgaveExplorer/remoteModelViews/remotefiletree.h"
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "../AgaveClientInterface/filemetadata.h"
 #include "cwe_interfacedriver.h"

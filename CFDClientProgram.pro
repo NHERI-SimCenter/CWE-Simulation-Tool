@@ -82,8 +82,6 @@ SOURCES += main.cpp \
     ../AgaveExplorer/remoteFileOps/fileoperator.cpp \
     ../AgaveExplorer/remoteFileOps/filetreenode.cpp \
     ../AgaveExplorer/remoteFileOps/joboperator.cpp \
-    ../AgaveExplorer/remoteFileOps/remotefiletree.cpp \
-    ../AgaveExplorer/remoteFileOps/remotejoblister.cpp \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.cpp \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.cpp \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.cpp \
@@ -96,7 +94,6 @@ SOURCES += main.cpp \
     cwe_globals.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp \
     cwe_guiWidgets/cwe_job_list.cpp \
-    ../AgaveExplorer/utilFuncs/linkedstandarditem.cpp \
     ../AgaveExplorer/remoteFileOps/joblistnode.cpp \
     ../AgaveExplorer/ae_globals.cpp \
     cwe_interfacedriver.cpp \
@@ -107,7 +104,11 @@ SOURCES += main.cpp \
     visualUtils/resultVisuals/resulttextdisp.cpp \
     cwe_guiWidgets/cwe_file_manager.cpp \
     CFDanalysis/cwejobaccountant.cpp \
-    ../AgaveExplorer/remoteFileOps/filenoderef.cpp
+    ../AgaveExplorer/remoteFileOps/filenoderef.cpp \
+    ../AgaveExplorer/remoteModelViews/linkedstandarditem.cpp \
+    ../AgaveExplorer/remoteModelViews/remotefilemodel.cpp \
+    ../AgaveExplorer/remoteModelViews/remotefiletree.cpp \
+    ../AgaveExplorer/remoteModelViews/remotejoblister.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -143,8 +144,6 @@ HEADERS  += \
     ../AgaveExplorer/remoteFileOps/fileoperator.h \
     ../AgaveExplorer/remoteFileOps/filetreenode.h \
     ../AgaveExplorer/remoteFileOps/joboperator.h \
-    ../AgaveExplorer/remoteFileOps/remotefiletree.h \
-    ../AgaveExplorer/remoteFileOps/remotejoblister.h \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.h \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.h \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.h \
@@ -157,7 +156,6 @@ HEADERS  += \
     cwe_globals.h \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h \
     cwe_guiWidgets/cwe_job_list.h \
-    ../AgaveExplorer/utilFuncs/linkedstandarditem.h \
     ../AgaveExplorer/remoteFileOps/joblistnode.h \
     ../AgaveExplorer/ae_globals.h \
     cwe_interfacedriver.h \
@@ -168,7 +166,11 @@ HEADERS  += \
     visualUtils/resultVisuals/resulttextdisp.h \
     cwe_guiWidgets/cwe_file_manager.h \
     CFDanalysis/cwejobaccountant.h \
-    ../AgaveExplorer/remoteFileOps/filenoderef.h
+    ../AgaveExplorer/remoteFileOps/filenoderef.h \
+    ../AgaveExplorer/remoteModelViews/linkedstandarditem.h \
+    ../AgaveExplorer/remoteModelViews/remotefilemodel.h \
+    ../AgaveExplorer/remoteModelViews/remotefiletree.h \
+    ../AgaveExplorer/remoteModelViews/remotejoblister.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
