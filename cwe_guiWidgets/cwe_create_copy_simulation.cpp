@@ -66,6 +66,7 @@ void CWE_Create_Copy_Simulation::linkDriver(CWE_InterfaceDriver * theDriver)
     if (!theDriver->inOfflineMode())
     {
         ui->primary_remoteFileTree->setupFileView();
+        ui->primary_remoteFileTree->header()->resizeSection(0,200);
         ui->secondary_remoteFileTree->setupFileView();
     }
 }
