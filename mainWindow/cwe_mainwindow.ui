@@ -88,7 +88,7 @@
       </widget>
       <widget class="CWE_job_list" name="tab_jobs_page">
        <attribute name="title">
-        <string>Running Jobs</string>
+        <string>Jobs</string>
        </attribute>
       </widget>
       <widget class="CWE_Create_Copy_Simulation" name="tab_create_new">
@@ -98,12 +98,12 @@
       </widget>
       <widget class="CWE_manage_simulation" name="tab_manage_and_run">
        <attribute name="title">
-        <string>Select Case</string>
+        <string>Cases</string>
        </attribute>
       </widget>
       <widget class="CWE_file_manager" name="tab_files">
        <attribute name="title">
-        <string>Files</string>
+        <string>Geometry Files</string>
        </attribute>
       </widget>
       <widget class="QWidget" name="tab_spacer_2">
