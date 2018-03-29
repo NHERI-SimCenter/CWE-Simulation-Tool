@@ -41,7 +41,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>559</width>
+    <width>659</width>
     <height>435</height>
    </rect>
   </property>
@@ -49,6 +49,12 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>12</number>
+   </property>
+   <property name="rightMargin">
+    <number>12</number>
+   </property>
    <property name="verticalSpacing">
     <number>-1</number>
    </property>
@@ -61,6 +67,12 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridlayout_4">
+      <property name="leftMargin">
+       <number>12</number>
+      </property>
+      <property name="rightMargin">
+       <number>12</number>
+      </property>
       <property name="horizontalSpacing">
        <number>0</number>
       </property>
@@ -148,7 +160,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>86</width>
+             <width>110</width>
              <height>20</height>
             </size>
            </property>
