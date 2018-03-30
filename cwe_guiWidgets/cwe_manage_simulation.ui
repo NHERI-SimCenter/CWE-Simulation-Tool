@@ -56,7 +56,7 @@
     <number>12</number>
    </property>
    <property name="verticalSpacing">
-    <number>-1</number>
+    <number>6</number>
    </property>
    <item row="0" column="0" colspan="2">
     <widget class="QFrame" name="frame_2">
@@ -417,8 +417,26 @@
  <resources>
   <include location="../cwe_resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pb_createNewCase</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>CWE_manage_simulation</receiver>
+   <slot>create_new_case_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>398</x>
+     <y>31</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>329</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
  <slots>
   <slot>on_pb_viewParameters_clicked()</slot>
+  <slot>create_new_case_clicked()</slot>
  </slots>
 </ui>
