@@ -51,7 +51,7 @@ CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->tabWidget->setCurrentIndex(0);
+//    ui->tabWidget->setCurrentIndex(0);
 }
 
 CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
@@ -66,7 +66,8 @@ void CWE_Create_Copy_Simulation::linkDriver(CWE_InterfaceDriver * theDriver)
     if (!theDriver->inOfflineMode())
     {
         ui->primary_remoteFileTree->setupFileView();
-        ui->secondary_remoteFileTree->setupFileView();
+        ui->primary_remoteFileTree->header()->resizeSection(0,200);
+//        ui->secondary_remoteFileTree->setupFileView();
     }
 }
 
@@ -103,7 +104,8 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
         return;
     }
 
-    if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
+//    if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
+    if (true)
     {
         /* we are creating a new case */
 
@@ -119,47 +121,47 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
             return;
         }
     }
-    else
-    {
-        /* we are cloning from an existing case */
+//    else
+//    {
+//        /* we are cloning from an existing case */
 
-        FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
-        if (selectedNode == NULL)
-        {
-            cwe_globals::displayPopup("Please select a folder to duplicate.");
-            return;
-        }
-        if (!selectedNode->isFolder())
-        {
-            cwe_globals::displayPopup("Please select a folder to duplicate.");
-            return;
-        }
-        CFDcaseInstance * tempCase = myDriver->getCaseFromFolder(secondNode);
-        CaseState dupState = tempCase->getCaseState();
+//        FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
+//        if (selectedNode == NULL)
+//        {
+//            cwe_globals::displayPopup("Please select a folder to duplicate.");
+//            return;
+//        }
+//        if (!selectedNode->isFolder())
+//        {
+//            cwe_globals::displayPopup("Please select a folder to duplicate.");
+//            return;
+//        }
+//        CFDcaseInstance * tempCase = myDriver->getCaseFromFolder(secondNode);
+//        CaseState dupState = tempCase->getCaseState();
 
-        if (dupState == CaseState::INVALID)
-        {
-            cwe_globals::displayPopup("ERROR: Can only duplicate CFD cases managed by CWE. Please select a valid folder containing a case for duplication.");
-            return;
-        }
-        if (dupState == CaseState::LOADING)
-        {
-            cwe_globals::displayPopup("Please wait for case folder to load before attempting to duplicate.");
-            return;
-        }
-        if (dupState != CaseState::READY)
-        {
-            cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
-            return;
-        }
+//        if (dupState == CaseState::INVALID)
+//        {
+//            cwe_globals::displayPopup("ERROR: Can only duplicate CFD cases managed by CWE. Please select a valid folder containing a case for duplication.");
+//            return;
+//        }
+//        if (dupState == CaseState::LOADING)
+//        {
+//            cwe_globals::displayPopup("Please wait for case folder to load before attempting to duplicate.");
+//            return;
+//        }
+//        if (dupState != CaseState::READY)
+//        {
+//            cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
+//            return;
+//        }
 
-        newCase = myDriver->createNewCase(NULL);
-        if (!newCase->duplicateCase(newCaseName, selectedNode, secondNode))
-        {
-            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-            return;
-        }
-    }
+//        newCase = myDriver->createNewCase(NULL);
+//        if (!newCase->duplicateCase(newCaseName, selectedNode, secondNode))
+//        {
+//            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+//            return;
+//        }
+//    }
 
     if (newCase->getCaseState() != CaseState::OP_INVOKE)
     {
@@ -185,8 +187,9 @@ void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
         ui->pBtn_create_copy->setText(tr("Duplicate && Edit"));
         break;
     default:
+        break;
         // this one should not happen.
-        ui->tabWidget->setCurrentIndex(0);
+//        ui->tabWidget->setCurrentIndex(0);
     }
 }
 
