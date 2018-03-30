@@ -183,7 +183,8 @@ FORMS    += \
     cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
     cwe_guiWidgets/cwe_job_list.ui \
     visualUtils/resultvisualpopup.ui \
-    cwe_guiWidgets/cwe_file_manager.ui
+    cwe_guiWidgets/cwe_file_manager.ui \
+    cwe_guiWidgets/cwe_duplicate_dialog.ui
 
 RESOURCES += \
     cwe_resources.qrc \

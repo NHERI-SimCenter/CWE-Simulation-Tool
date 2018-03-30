@@ -59,6 +59,7 @@ CWE_file_manager::CWE_file_manager(QWidget *parent) :
 
     // Attach the model to the view
     ui->localTreeView->setModel(localFileModel);
+    ui->localTreeView->header()->resizeSection(0,200);
 
     // QFileSystemModel requires root path
     localFileModel->setRootPath(QDir::homePath());
