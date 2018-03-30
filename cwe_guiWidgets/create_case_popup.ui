@@ -6,28 +6,49 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>834</width>
+    <height>355</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>834</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <widget class="QFrame" name="cCreateCancelFrame">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>317</y>
-      <width>626</width>
+      <width>810</width>
       <height>26</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
     <property name="minimumSize">
      <size>
-      <width>0</width>
+      <width>810</width>
       <height>0</height>
      </size>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
     </property>
     <property name="lineWidth">
      <number>0</number>
@@ -91,15 +112,18 @@
      <rect>
       <x>10</x>
       <y>40</y>
-      <width>626</width>
+      <width>810</width>
       <height>271</height>
      </rect>
     </property>
     <property name="minimumSize">
      <size>
-      <width>0</width>
+      <width>810</width>
       <height>60</height>
      </size>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <property name="leftMargin">
@@ -115,15 +139,18 @@
       <widget class="QFrame" name="verticalFrame">
        <property name="minimumSize">
         <size>
-         <width>60</width>
+         <width>390</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>390</width>
+         <width>16777215</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="leftMargin">
@@ -147,6 +174,15 @@
         </item>
         <item>
          <widget class="QScrollArea" name="scrollArea">
+          <property name="minimumSize">
+           <size>
+            <width>390</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -155,7 +191,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>304</width>
+             <width>388</width>
              <height>245</height>
             </rect>
            </property>
@@ -167,11 +203,26 @@
      </item>
      <item>
       <widget class="QFrame" name="verticalFrame1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
-         <width>60</width>
+         <width>410</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <property name="spacing">
@@ -204,6 +255,12 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>410</width>
+            <height>0</height>
+           </size>
+          </property>
          </widget>
         </item>
        </layout>
@@ -216,13 +273,19 @@
      <rect>
       <x>10</x>
       <y>8</y>
-      <width>626</width>
+      <width>810</width>
       <height>26</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
     <property name="minimumSize">
      <size>
-      <width>0</width>
+      <width>810</width>
       <height>0</height>
      </size>
     </property>
