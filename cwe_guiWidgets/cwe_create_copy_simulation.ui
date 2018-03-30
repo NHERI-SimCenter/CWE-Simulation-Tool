@@ -178,8 +178,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>306</width>
-              <height>230</height>
+              <width>304</width>
+              <height>245</height>
              </rect>
             </property>
            </widget>
@@ -273,7 +273,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pBtn_cancel">
+       <widget class="QPushButton" name="button_cancel">
         <property name="minimumSize">
          <size>
           <width>100</width>
@@ -286,7 +286,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pBtn_create_copy">
+       <widget class="QPushButton" name="button_create_copy">
         <property name="minimumSize">
          <size>
           <width>200</width>
@@ -312,5 +312,41 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>button_create_copy</sender>
+   <signal>clicked()</signal>
+   <receiver>CWE_Create_Copy_Simulation</receiver>
+   <slot>button_create_copy_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>537</x>
+     <y>333</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>324</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>button_cancel</sender>
+   <signal>clicked()</signal>
+   <receiver>CWE_Create_Copy_Simulation</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>381</x>
+     <y>333</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>324</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>button_create_copy_clicked()</slot>
+ </slots>
 </ui>
