@@ -285,7 +285,7 @@ QString CWE_TabWidget::getStateText(StageState theState)
     if (theState == StageState::LOADING)        { return "Loading Data ..."; }
     if (theState == StageState::OFFLINE)        { return "Offline (Debug)"; }
     if (theState == StageState::RUNNING)        { return "Task Running"; }
-    if (theState == StageState::UNREADY)        { return "Need Prev. Stage"; }
+    if (theState == StageState::UNREADY)        { return "Need Prev. \nStage"; }
     if (theState == StageState::UNRUN)          { return "Not Yet Run"; }
     return "*** TOTAL ERROR ***";
 }
