@@ -38,6 +38,8 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "create_case_popup.h"
+
 #include "mainWindow/cwe_mainwindow.h"
 
 #include "cwe_interfacedriver.h"
@@ -178,14 +180,10 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
     }
 }
 
-void CWE_manage_simulation::on_pb_createNewCase_clicked()
+void CWE_manage_simulation::create_new_case_clicked()
 {
-    myDriver->getMainWindow()->switchToCreateTab();
-}
-
-void CWE_manage_simulation::on_pb_duplicateCase_clicked()
-{
-    myDriver->getMainWindow()->switchToCreateTab();
+    Create_Case_Popup * createCase = new Create_Case_Popup(this);
+    createCase->show();
 }
 
 void CWE_manage_simulation::on_pb_viewParameters_clicked()
