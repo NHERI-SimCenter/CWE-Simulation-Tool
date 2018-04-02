@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Create_Case_Popup</class>
- <widget class="QMainWindow" name="Create_Case_Popup">
+ <class>Duplicate_Case_Popup</class>
+ <widget class="QMainWindow" name="Duplicate_Case_Popup">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -272,7 +272,7 @@
   <connection>
    <sender>button_cancel</sender>
    <signal>clicked(bool)</signal>
-   <receiver>Create_Case_Popup</receiver>
+   <receiver>Duplicate_Case_Popup</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -288,7 +288,7 @@
   <connection>
    <sender>button_create_copy</sender>
    <signal>clicked()</signal>
-   <receiver>Create_Case_Popup</receiver>
+   <receiver>Duplicate_Case_Popup</receiver>
    <slot>button_create_copy_clicked()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -42,12 +42,6 @@
 
 class CFDanalysisType;
 
-struct CASE_TYPE_DATA {
-    QRadioButton         *radioBtn;
-    QPushButton          *pbtn;
-    CFDanalysisType      *templateData;
-};
-
 namespace Ui {
 class Duplicate_Case_Popup;
 }
@@ -63,16 +57,13 @@ public:
 private slots:
     void button_create_copy_clicked();
     //void on_tabWidget_currentChanged(int index);
-    void selectCaseTemplate();
 
 private:
     Ui::Duplicate_Case_Popup *ui;
-    void populateCaseTypes();
     void create_new_case_from_template(QString filename);
 
     CFDanalysisType * selectedTemplate = NULL;
 
-    QVector<CASE_TYPE_DATA> caseTypeDataList;
 };
 
 #endif // DUPLICATE_CASE_POPUP_H
