@@ -38,6 +38,7 @@
 #include <QMainWindow>
 
 #include <QDesktopWidget>
+#include <QPushButton>
 
 namespace Ui {
 class CWE_MainWindow;
@@ -61,7 +62,6 @@ public:
 
     void switchToParameterTab();
     void switchToResultsTab();
-    void switchToCreateTab();
     void switchToFilesTab();
 
 private slots:

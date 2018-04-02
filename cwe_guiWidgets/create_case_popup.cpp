@@ -32,8 +32,8 @@
 
 // Contributors:
 
-#include "cwe_create_copy_simulation.h"
-#include "ui_cwe_create_copy_simulation.h"
+#include "create_case_popup.h"
+#include "ui_create_case_popup.h"
 
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 
@@ -45,38 +45,34 @@
 
 #include "cwe_globals.h"
 
-CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
-    CWE_Super(parent),
-    ui(new Ui::CWE_Create_Copy_Simulation)
+Create_Case_Popup::Create_Case_Popup(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::Create_Case_Popup)
 {
     ui->setupUi(this);
+    populateCaseTypes();
 
-//    ui->tabWidget->setCurrentIndex(0);
-}
-
-CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
-{
-    delete ui;
-}
-
-void CWE_Create_Copy_Simulation::linkDriver(CWE_InterfaceDriver * theDriver)
-{
-    CWE_Super::linkDriver(theDriver);
-    this->populateCaseTypes();
-    if (!theDriver->inOfflineMode())
+    if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
         ui->primary_remoteFileTree->setupFileView();
         ui->primary_remoteFileTree->header()->resizeSection(0,200);
 //        ui->secondary_remoteFileTree->setupFileView();
     }
+
+//    ui->tabWidget->setCurrentIndex(0);
 }
 
-void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
+Create_Case_Popup::~Create_Case_Popup()
 {
-    if (myDriver->inOfflineMode())
+    delete ui;
+}
+
+void Create_Case_Popup::button_create_copy_clicked()
+{
+    if (cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        myDriver->createNewCase(selectedTemplate);
-        myDriver->getMainWindow()->switchToParameterTab();
+        cwe_globals::get_CWE_Driver()->createNewCase(selectedTemplate);
+        this->close();
         return;
     }
 
@@ -114,7 +110,7 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
             cwe_globals::displayPopup("Please select a valid case type.");
             return;
         }
-        newCase = myDriver->createNewCase(selectedTemplate);
+        newCase = cwe_globals::get_CWE_Driver()->createNewCase(selectedTemplate);
         if (!newCase->createCase(newCaseName, selectedNode))
         {
             cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
@@ -171,12 +167,14 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
     }
 
     //Set new case will signal the other panels so that they can get configurations
-    myDriver->setCurrentCase(newCase);
+    cwe_globals::get_CWE_Driver()->setCurrentCase(newCase);
 
     /* time to switch to the ParameterTab */
-    myDriver->getMainWindow()->switchToParameterTab();
+    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToParameterTab();
+    this->close();
 }
 
+/*
 void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
 {
     switch (index) {
@@ -192,10 +190,11 @@ void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
 //        ui->tabWidget->setCurrentIndex(0);
     }
 }
+*/
 
-void CWE_Create_Copy_Simulation::populateCaseTypes()
+void Create_Case_Popup::populateCaseTypes()
 {
-    QList<CFDanalysisType *> * templateList = myDriver->getTemplateList();
+    QList<CFDanalysisType *> * templateList = cwe_globals::get_CWE_Driver()->getTemplateList();
     QGridLayout *layout = new QGridLayout();
 
     int idx = 0;
@@ -247,7 +246,7 @@ void CWE_Create_Copy_Simulation::populateCaseTypes()
     ui->scroll_NewCase->setLayout(layout);
 }
 
-void CWE_Create_Copy_Simulation::selectCaseTemplate()
+void Create_Case_Popup::selectCaseTemplate()
 {
     QObject *sender = QObject::sender();
     QVector<CASE_TYPE_DATA>::iterator i;
