@@ -50,7 +50,6 @@ Duplicate_Case_Popup::Duplicate_Case_Popup(QWidget *parent) :
     ui(new Ui::Duplicate_Case_Popup)
 {
     ui->setupUi(this);
-    populateCaseTypes();
 
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
@@ -100,64 +99,43 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
         return;
     }
 
-//    if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
-    if (true)
+    /* we are cloning from an existing case */
+
+    FileTreeNode * secondNode = ui->primary_remoteFileTree->getSelectedNode();
+    if (selectedNode == NULL)
     {
-        /* we are creating a new case */
-
-        if (selectedTemplate == NULL)
-        {
-            cwe_globals::displayPopup("Please select a valid case type.");
-            return;
-        }
-        newCase = cwe_globals::get_CWE_Driver()->createNewCase(selectedTemplate);
-        if (!newCase->createCase(newCaseName, selectedNode))
-        {
-            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-            return;
-        }
+        cwe_globals::displayPopup("Please select a folder to duplicate.");
+        return;
     }
-//    else
-//    {
-//        /* we are cloning from an existing case */
+    if (!selectedNode->isFolder())
+    {
+        cwe_globals::displayPopup("Please select a folder to duplicate.");
+        return;
+    }
+    CFDcaseInstance * tempCase = cwe_globals::get_CWE_Driver()->getCaseFromFolder(secondNode);
+    CaseState dupState = tempCase->getCaseState();
 
-//        FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
-//        if (selectedNode == NULL)
-//        {
-//            cwe_globals::displayPopup("Please select a folder to duplicate.");
-//            return;
-//        }
-//        if (!selectedNode->isFolder())
-//        {
-//            cwe_globals::displayPopup("Please select a folder to duplicate.");
-//            return;
-//        }
-//        CFDcaseInstance * tempCase = myDriver->getCaseFromFolder(secondNode);
-//        CaseState dupState = tempCase->getCaseState();
-
-//        if (dupState == CaseState::INVALID)
-//        {
-//            cwe_globals::displayPopup("ERROR: Can only duplicate CFD cases managed by CWE. Please select a valid folder containing a case for duplication.");
-//            return;
-//        }
-//        if (dupState == CaseState::LOADING)
-//        {
-//            cwe_globals::displayPopup("Please wait for case folder to load before attempting to duplicate.");
-//            return;
-//        }
-//        if (dupState != CaseState::READY)
-//        {
-//            cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
-//            return;
-//        }
-
-//        newCase = myDriver->createNewCase(NULL);
-//        if (!newCase->duplicateCase(newCaseName, selectedNode, secondNode))
-//        {
-//            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-//            return;
-//        }
-//    }
+    if (dupState == CaseState::INVALID)
+    {
+        cwe_globals::displayPopup("ERROR: Can only duplicate CFD cases managed by CWE. Please select a valid folder containing a case for duplication.");
+        return;
+    }
+    if (dupState == CaseState::LOADING)
+    {
+        cwe_globals::displayPopup("Please wait for case folder to load before attempting to duplicate.");
+        return;
+    }
+    if (dupState != CaseState::READY)
+    {
+        cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
+        return;
+    }
+    newCase = cwe_globals::get_CWE_Driver()->createNewCase(NULL);
+    if (!newCase->duplicateCase(newCaseName, selectedNode, secondNode))
+    {
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+        return;
+    }
 
     if (newCase->getCaseState() != CaseState::OP_INVOKE)
     {
@@ -191,86 +169,3 @@ void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
     }
 }
 */
-
-void Duplicate_Case_Popup::populateCaseTypes()
-{
-    QList<CFDanalysisType *> * templateList = cwe_globals::get_CWE_Driver()->getTemplateList();
-    QGridLayout *layout = new QGridLayout();
-
-    int idx = 0;
-
-    foreach (CFDanalysisType * caseType, *templateList) {
-        /* get analysis type and name info from JSON */
-        QJsonDocument * configuration = caseType->getRawConfig();
-
-        QJsonObject confObj = configuration->object();
-        QString theName = confObj["name"].toString();
-        QString theDescription = confObj["description"].toString();
-
-        /* create UI selection block */
-        QRadioButton *radioBtn = new QRadioButton(theName, ui->scroll_NewCase);
-        QPushButton *buttonIcon = new QPushButton(ui->scroll_NewCase);
-
-        buttonIcon->setIcon(*(caseType->getIcon()));
-        buttonIcon->setIconSize(QSize(150,100));
-        buttonIcon->setMinimumSize(150, 100);
-        buttonIcon->setMaximumSize(150, 100);
-        QLabel *labelDescription = new QLabel(ui->scroll_NewCase);
-        if (theDescription == "") {
-            theDescription = "some\ndescription\nof this\ncase.";
-        }
-        labelDescription->setText(theDescription);
-
-        int cnt = layout->rowCount();
-        layout->addWidget(buttonIcon,cnt+1,1,1,1);
-        layout->addWidget(labelDescription,cnt+1,2,1,1);
-        layout->addWidget(radioBtn,cnt,1,1,2);
-
-        CASE_TYPE_DATA list;
-        list.radioBtn = radioBtn;
-        list.pbtn     = buttonIcon;
-        list.templateData = caseType;
-        caseTypeDataList.append(list);
-
-        /* create appropriate connection between signals and slots */
-
-        QObject::connect(buttonIcon, SIGNAL(pressed()),       this, SLOT(selectCaseTemplate()));
-        QObject::connect(radioBtn, SIGNAL(toggled(bool)),     this, SLOT(selectCaseTemplate()));
-
-        idx++;
-    }
-
-    QLayout *lyt = ui->scroll_NewCase->layout();
-    if (lyt != NULL) {delete lyt;}
-
-    ui->scroll_NewCase->setLayout(layout);
-}
-
-void Duplicate_Case_Popup::selectCaseTemplate()
-{
-    QObject *sender = QObject::sender();
-    QVector<CASE_TYPE_DATA>::iterator i;
-
-    for (i = caseTypeDataList.begin(); i != caseTypeDataList.end(); i++) {
-        if  (i->pbtn == (QPushButton *)sender) {
-            i->radioBtn->setChecked(true);
-
-            selectedTemplate = i->templateData;
-
-            break;
-        }
-        else if  (i->radioBtn == (void *)sender ) {
-            /* QRadioButton toggled -- Qt is taking care of this */
-            //i->radioBtn->setChecked(true);
-
-            /* initiate case */
-            selectedTemplate = i->templateData;
-
-            break;
-        }
-        else {
-            /* turn off not selected QRadioButton -- Qt is taking care of this */
-            //((QRadioButton *)(*i)[0])->setChecked(false);
-        }
-    }
-}
