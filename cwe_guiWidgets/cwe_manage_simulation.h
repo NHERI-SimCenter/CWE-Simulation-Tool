@@ -63,8 +63,12 @@ private slots:
     void newCaseGiven();
     void newCaseState(CaseState newState);
 
+    void create_new_case_clicked();
     void on_pb_viewParameters_clicked();
     void on_pb_viewResults_clicked();
+    void on_pb_downloadCase_clicked();
+
+    void on_pb_duplicateCase_clicked();
 
 private:
     void clearSelectView();

@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -32,53 +32,38 @@
 
 // Contributors:
 
-#ifndef CWE_MAINWINDOW_H
-#define CWE_MAINWINDOW_H
+#ifndef DUPLICATE_CASE_POPUP_H
+#define DUPLICATE_CASE_POPUP_H
 
 #include <QMainWindow>
-
-#include <QDesktopWidget>
 #include <QPushButton>
+#include <QRadioButton>
+#include <QJsonObject>
+
+class CFDanalysisType;
 
 namespace Ui {
-class CWE_MainWindow;
+class Duplicate_Case_Popup;
 }
 
-class cwe_state_label;
-class CWE_InterfaceDriver;
-enum class CaseState;
-
-class CWE_MainWindow : public QMainWindow
+class Duplicate_Case_Popup : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit CWE_MainWindow(CWE_InterfaceDriver *newDriver, QWidget *parent = 0);
-    ~CWE_MainWindow();
-
-    void runSetupSteps();
-
-    void setParameterConfig(QJsonDocument &obj);
-
-    void switchToParameterTab();
-    void switchToResultsTab();
-    void switchToFilesTab();
+    explicit Duplicate_Case_Popup(QWidget *parent = 0);
+    ~Duplicate_Case_Popup();
 
 private slots:
-    void newCaseGiven();
-    void newCaseState(CaseState newState);
-
-    void menuExit();
-    void menuCopyInfo();
+    void button_create_copy_clicked();
+    //void on_tabWidget_currentChanged(int index);
 
 private:
-    void changeParamsAndResultsEnabled(bool setting);
-    void changeTabEnabled(QWidget *theTab, bool newSetting);
+    Ui::Duplicate_Case_Popup *ui;
+    void create_new_case_from_template(QString filename);
 
-    Ui::CWE_MainWindow *ui;
+    CFDanalysisType * selectedTemplate = NULL;
 
-    CWE_InterfaceDriver     *myDriver;
-    cwe_state_label        *stateLabel = NULL;
 };
 
-#endif // CWE_MAINWINDOW_H
+#endif // DUPLICATE_CASE_POPUP_H

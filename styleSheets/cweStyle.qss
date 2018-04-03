@@ -1,11 +1,10 @@
 QPushButton {
-    color: white;
+    color: black;
     background-color: #64B5F6;
     border-style: outset;
     border-width: 1px;
     border-radius: 5px;
     border-color: #607D8B;
-    font: bold 15 px;
     padding: 3px;
 }
 
@@ -128,7 +127,7 @@ HeaderWidget > QLabel {
 }
 
 FooterWidget > QLabel {
-    color: #E0E0E0;
+    color: #000000;
     font: bold 15 px;
 }
 
@@ -226,3 +225,11 @@ QFrame#pushButtons {
     border:none;
 }
 */
+
+QCommandLinkButton {
+    font-size: 14px;
+}
+
+QLineEdit#lineEdit_newCaseName {
+    background-color: #FFFFFF;
+}

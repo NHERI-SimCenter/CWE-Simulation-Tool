@@ -31,7 +31,6 @@
 ***********************************************************************************/
 
 // Contributors:
-
 #include "cwe_mainwindow.h"
 #include "ui_cwe_mainwindow.h"
 
@@ -84,6 +83,8 @@ void CWE_MainWindow::runSetupSteps()
 {
     //Note: Adding widget to header will re-parent them
     stateLabel = new cwe_state_label(this);
+    stateLabel->setAlignment(Qt::AlignHCenter);
+    stateLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     ui->header->appendWidget(stateLabel);
 
     QLabel * username = new QLabel(myDriver->getDataConnection()->getUserName());
@@ -176,11 +177,6 @@ void CWE_MainWindow::switchToParameterTab()
     {
         ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
     }
-}
-
-void CWE_MainWindow::switchToCreateTab()
-{
-    ui->tabContainer->setCurrentWidget(ui->tab_create_new);
 }
 
 void CWE_MainWindow::switchToFilesTab()
