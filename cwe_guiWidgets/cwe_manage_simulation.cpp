@@ -38,6 +38,9 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "create_case_popup.h"
+#include "duplicate_case_popup.h"
+
 #include "mainWindow/cwe_mainwindow.h"
 
 #include "cwe_interfacedriver.h"
@@ -96,8 +99,10 @@ void CWE_manage_simulation::newCaseGiven()
     ui->treeView->setEnabled(true);
     clearSelectView();
 
+    ui->pb_duplicateCase->setEnabled(false);
     ui->pb_viewParameters->setEnabled(false);
     ui->pb_viewResults->setEnabled(false);
+    ui->pb_downloadCase->setEnabled(false);
 
     if (newCase != NULL)
     {
@@ -121,8 +126,10 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         ui->treeView->setEnabled(false);
 
         showSelectView();
+        ui->pb_duplicateCase->setEnabled(false);
         ui->pb_viewParameters->setEnabled(false);
         ui->pb_viewResults->setEnabled(false);
+        ui->pb_downloadCase->setEnabled(false);
         return;
     }
 
@@ -140,8 +147,10 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         if (newState != CaseState::LOADING)
         {
             clearSelectView();
+            ui->pb_duplicateCase->setEnabled(false);
             ui->pb_viewParameters->setEnabled(false);
             ui->pb_viewResults->setEnabled(false);
+            ui->pb_downloadCase->setEnabled(false);
         }
         return;
     }
@@ -150,8 +159,10 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
             (newState == CaseState::READY) ||
             (newState == CaseState::EXTERN_OP))
     {
+        ui->pb_duplicateCase->setEnabled(true);
         ui->pb_viewParameters->setEnabled(true);
         ui->pb_viewResults->setEnabled(true);
+        ui->pb_downloadCase->setEnabled(true);
 
         CFDcaseInstance * theCase = myDriver->getCurrentCase();
 
@@ -178,6 +189,12 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
     }
 }
 
+void CWE_manage_simulation::create_new_case_clicked()
+{
+    Create_Case_Popup * createCase = new Create_Case_Popup(this);
+    createCase->show();
+}
+
 void CWE_manage_simulation::on_pb_viewParameters_clicked()
 {
     // switch main window to parameters tab
@@ -187,6 +204,11 @@ void CWE_manage_simulation::on_pb_viewParameters_clicked()
 void CWE_manage_simulation::on_pb_viewResults_clicked()
 {
     // switch main window to results tab
+    myDriver->getMainWindow()->switchToResultsTab();
+}
+
+void CWE_manage_simulation::on_pb_downloadCase_clicked()
+{
     myDriver->getMainWindow()->switchToResultsTab();
 }
 
@@ -227,4 +249,10 @@ QString CWE_manage_simulation::getStateText(StageState theState)
     if (theState == StageState::UNRUN)
         return "Not Yet Run";
     return "*** TOTAL ERROR ***";
+}
+
+void CWE_manage_simulation::on_pb_duplicateCase_clicked()
+{
+    Duplicate_Case_Popup * duplicateCase = new Duplicate_Case_Popup(this);
+    duplicateCase->show();
 }

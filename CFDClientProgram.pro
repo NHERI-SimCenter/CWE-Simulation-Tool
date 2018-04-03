@@ -60,7 +60,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_welcome_screen.cpp \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
-    cwe_guiWidgets/cwe_create_copy_simulation.cpp \
     cwe_guiWidgets/cwe_debug_widget.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.cpp \
@@ -108,7 +107,9 @@ SOURCES += main.cpp \
     ../AgaveExplorer/remoteModelViews/linkedstandarditem.cpp \
     ../AgaveExplorer/remoteModelViews/remotefilemodel.cpp \
     ../AgaveExplorer/remoteModelViews/remotefiletree.cpp \
-    ../AgaveExplorer/remoteModelViews/remotejoblister.cpp
+    ../AgaveExplorer/remoteModelViews/remotejoblister.cpp \
+    cwe_guiWidgets/create_case_popup.cpp \
+    cwe_guiWidgets/duplicate_case_popup.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -123,7 +124,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_welcome_screen.h \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
-    cwe_guiWidgets/cwe_create_copy_simulation.h \
     cwe_guiWidgets/cwe_debug_widget.h \
     cwe_guiWidgets/cwe_state_label.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h \
@@ -170,7 +170,9 @@ HEADERS  += \
     ../AgaveExplorer/remoteModelViews/linkedstandarditem.h \
     ../AgaveExplorer/remoteModelViews/remotefilemodel.h \
     ../AgaveExplorer/remoteModelViews/remotefiletree.h \
-    ../AgaveExplorer/remoteModelViews/remotejoblister.h
+    ../AgaveExplorer/remoteModelViews/remotejoblister.h \
+    cwe_guiWidgets/create_case_popup.h \
+    cwe_guiWidgets/duplicate_case_popup.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -179,7 +181,6 @@ FORMS    += \
     cwe_guiWidgets/cwe_welcome_screen.ui \
     cwe_guiWidgets/cwe_results.ui \
     cwe_guiWidgets/cwe_parameters.ui \
-    cwe_guiWidgets/cwe_create_copy_simulation.ui \
     cwe_guiWidgets/cwe_debug_widget.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
@@ -189,7 +190,9 @@ FORMS    += \
     cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
     cwe_guiWidgets/cwe_job_list.ui \
     visualUtils/resultvisualpopup.ui \
-    cwe_guiWidgets/cwe_file_manager.ui
+    cwe_guiWidgets/cwe_file_manager.ui \
+    cwe_guiWidgets/create_case_popup.ui \
+    cwe_guiWidgets/duplicate_case_popup.ui \
 
 RESOURCES += \
     cwe_resources.qrc \
