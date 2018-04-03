@@ -39,6 +39,7 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "create_case_popup.h"
+#include "duplicate_case_popup.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
@@ -52,7 +53,6 @@ CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
 
     QObject::connect(ui->treeView, SIGNAL(newFileSelected(FileTreeNode*)),
                              this, SLOT(newFileSelected(FileTreeNode*)));
-
     clearSelectView();
 
     ui->stageListView->setModel(&stageListModel);
@@ -240,4 +240,10 @@ QString CWE_manage_simulation::getStateText(StageState theState)
     if (theState == StageState::UNRUN)
         return "Not Yet Run";
     return "*** TOTAL ERROR ***";
+}
+
+void CWE_manage_simulation::on_pb_duplicateCase_clicked()
+{
+    Duplicate_Case_Popup * duplicateCase = new Duplicate_Case_Popup(this);
+    duplicateCase->show();
 }

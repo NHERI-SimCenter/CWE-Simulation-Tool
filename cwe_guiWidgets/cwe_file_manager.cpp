@@ -77,6 +77,7 @@ void CWE_file_manager::linkDriver(CWE_InterfaceDriver * theDriver)
     if (!myDriver->inOfflineMode())
     {
         ui->remoteTreeView->setupFileView();
+        ui->remoteTreeView->header()->resizeSection(0,200);
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
         QObject::connect(myDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState, QString)),
