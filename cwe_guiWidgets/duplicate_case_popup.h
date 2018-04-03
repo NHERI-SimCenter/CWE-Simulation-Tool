@@ -1,12 +1,12 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -32,53 +32,38 @@
 
 // Contributors:
 
-#ifndef CWE_MANAGE_SIMULATION_H
-#define CWE_MANAGE_SIMULATION_H
+#ifndef DUPLICATE_CASE_POPUP_H
+#define DUPLICATE_CASE_POPUP_H
 
-#include "cwe_super.h"
+#include <QMainWindow>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QJsonObject>
 
-#include <QStandardItemModel>
-
-class FileTreeNode;
-enum class CaseState;
-enum class StageState;
+class CFDanalysisType;
 
 namespace Ui {
-class CWE_manage_simulation;
+class Duplicate_Case_Popup;
 }
 
-class CWE_manage_simulation : public CWE_Super
+class Duplicate_Case_Popup : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit CWE_manage_simulation(QWidget *parent = 0);
-    ~CWE_manage_simulation();
-
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
+    explicit Duplicate_Case_Popup(QWidget *parent = 0);
+    ~Duplicate_Case_Popup();
 
 private slots:
-    void newFileSelected(FileTreeNode * newFile);
-
-    void newCaseGiven();
-    void newCaseState(CaseState newState);
-
-    void create_new_case_clicked();
-    void on_pb_viewParameters_clicked();
-    void on_pb_viewResults_clicked();
-    void on_pb_downloadCase_clicked();
-
-    void on_pb_duplicateCase_clicked();
+    void button_create_copy_clicked();
+    //void on_tabWidget_currentChanged(int index);
 
 private:
-    void clearSelectView();
-    void showSelectView();
+    Ui::Duplicate_Case_Popup *ui;
+    void create_new_case_from_template(QString filename);
 
-    QString getStateText(StageState theState);
+    CFDanalysisType * selectedTemplate = NULL;
 
-    Ui::CWE_manage_simulation *ui;
-
-    QStandardItemModel stageListModel;
 };
 
-#endif // CWE_MANAGE_SIMULATION_H
+#endif // DUPLICATE_CASE_POPUP_H
