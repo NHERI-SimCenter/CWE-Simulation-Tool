@@ -54,12 +54,9 @@ Create_Case_Popup::Create_Case_Popup(QWidget *parent) :
 
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        ui->primary_remoteFileTree->setupFileView();
         ui->primary_remoteFileTree->header()->resizeSection(0,200);
-//        ui->secondary_remoteFileTree->setupFileView();
+        cwe_globals::get_CWE_Driver()->getMainWindow()->getFileModel()->linkRemoteFileTreeToModel(ui->primary_remoteFileTree);
     }
-
-//    ui->tabWidget->setCurrentIndex(0);
 }
 
 Create_Case_Popup::~Create_Case_Popup()

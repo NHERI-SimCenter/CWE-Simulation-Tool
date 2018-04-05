@@ -77,10 +77,6 @@ private slots:
 
     void remoteOpDone();
 
-    void on_localButton_newFolder_clicked();
-    void on_localButton_deleteFolder_clicked();
-    void on_localButton_deleteFile_clicked();
-
     void on_remoteButton_newFolder_clicked();
     void on_remoteButton_deleteFolder_clicked();
     void on_remoteButton_deleteFile_clicked();
