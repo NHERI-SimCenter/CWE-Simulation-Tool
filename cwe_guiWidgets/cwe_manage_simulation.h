@@ -55,7 +55,7 @@ public:
     explicit CWE_manage_simulation(QWidget *parent = 0);
     ~CWE_manage_simulation();
 
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
+    virtual void linkDriver();
 
 private slots:
     void newFileSelected(FileNodeRef newFile);
@@ -64,11 +64,9 @@ private slots:
     void newCaseState(CaseState newState);
 
     void create_new_case_clicked();
+    void duplicate_case_clicked();
     void on_pb_viewParameters_clicked();
     void on_pb_viewResults_clicked();
-    void on_pb_downloadCase_clicked();
-
-    void on_pb_duplicateCase_clicked();
 
 private:
     void clearSelectView();

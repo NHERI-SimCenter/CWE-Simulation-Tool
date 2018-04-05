@@ -100,108 +100,17 @@ void Create_Case_Popup::button_create_copy_clicked()
         return;
     }
 
-//    if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
-    if (true)
+    if (selectedTemplate == NULL)
     {
-        /* we are creating a new case */
-
-        if (selectedTemplate == NULL)
-        {
-            cwe_globals::displayPopup("Please select a valid case type.");
-            return;
-        }
-        newCase = cwe_globals::get_CWE_Driver()->createNewCase(selectedTemplate);
-        if (!newCase->createCase(newCaseName, selectedNode))
-        {
-            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-            return;
-        }
+        cwe_globals::displayPopup("Please select a valid case type.");
+        return;
     }
-<<<<<<< HEAD:cwe_guiWidgets/cwe_create_copy_simulation.cpp
-    else
+    newCase = cwe_globals::get_CWE_Driver()->createNewCase(selectedTemplate);
+    if (!newCase->createCase(newCaseName, selectedNode))
     {
-        /* we are cloning from an existing case */
-
-        FileNodeRef secondNode = ui->secondary_remoteFileTree->getSelectedFile();
-        if (selectedNode.isNil())
-        {
-            cwe_globals::displayPopup("Please select a folder to duplicate.");
-            return;
-        }
-        if (selectedNode.getFileType() != FileType::DIR)
-        {
-            cwe_globals::displayPopup("Please select a folder to duplicate.");
-            return;
-        }
-        CFDcaseInstance * tempCase = myDriver->getCaseFromFolder(secondNode);
-        CaseState dupState = tempCase->getCaseState();
-
-        if (dupState == CaseState::INVALID)
-        {
-            cwe_globals::displayPopup("ERROR: Can only duplicate CFD cases managed by CWE. Please select a valid folder containing a case for duplication.");
-            return;
-        }
-        if (dupState == CaseState::LOADING)
-        {
-            cwe_globals::displayPopup("Please wait for case folder to load before attempting to duplicate.");
-            return;
-        }
-        if (dupState != CaseState::READY)
-        {
-            cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
-            return;
-        }
-
-        newCase = myDriver->createNewCase(NULL);
-        if (!newCase->duplicateCase(newCaseName, selectedNode, secondNode))
-        {
-            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-            return;
-        }
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+        return;
     }
-=======
-//    else
-//    {
-//        /* we are cloning from an existing case */
-
-//        FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
-//        if (selectedNode == NULL)
-//        {
-//            cwe_globals::displayPopup("Please select a folder to duplicate.");
-//            return;
-//        }
-//        if (!selectedNode->isFolder())
-//        {
-//            cwe_globals::displayPopup("Please select a folder to duplicate.");
-//            return;
-//        }
-//        CFDcaseInstance * tempCase = myDriver->getCaseFromFolder(secondNode);
-//        CaseState dupState = tempCase->getCaseState();
-
-//        if (dupState == CaseState::INVALID)
-//        {
-//            cwe_globals::displayPopup("ERROR: Can only duplicate CFD cases managed by CWE. Please select a valid folder containing a case for duplication.");
-//            return;
-//        }
-//        if (dupState == CaseState::LOADING)
-//        {
-//            cwe_globals::displayPopup("Please wait for case folder to load before attempting to duplicate.");
-//            return;
-//        }
-//        if (dupState != CaseState::READY)
-//        {
-//            cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
-//            return;
-//        }
-
-//        newCase = myDriver->createNewCase(NULL);
-//        if (!newCase->duplicateCase(newCaseName, selectedNode, secondNode))
-//        {
-//            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-//            return;
-//        }
-//    }
->>>>>>> stable:cwe_guiWidgets/create_case_popup.cpp
 
     if (newCase->getCaseState() != CaseState::OP_INVOKE)
     {
@@ -217,24 +126,6 @@ void Create_Case_Popup::button_create_copy_clicked()
     cwe_globals::get_CWE_Driver()->getMainWindow()->switchToParameterTab();
     this->close();
 }
-
-/*
-void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
-{
-    switch (index) {
-    case 0: // create new case
-        ui->pBtn_create_copy->setText("Create New Simulation");
-        break;
-    case 1: // duplicate an existing case
-        ui->pBtn_create_copy->setText(tr("Duplicate && Edit"));
-        break;
-    default:
-        break;
-        // this one should not happen.
-//        ui->tabWidget->setCurrentIndex(0);
-    }
-}
-*/
 
 void Create_Case_Popup::populateCaseTypes()
 {

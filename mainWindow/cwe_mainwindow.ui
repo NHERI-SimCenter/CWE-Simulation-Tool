@@ -86,19 +86,19 @@
         <string>Page text space</string>
        </attribute>
       </widget>
-      <widget class="CWE_job_list" name="tab_jobs_page">
-       <attribute name="title">
-        <string>Jobs</string>
-       </attribute>
-      </widget>
       <widget class="CWE_manage_simulation" name="tab_manage_and_run">
        <attribute name="title">
-        <string>Cases</string>
+        <string>Simulation Cases</string>
+       </attribute>
+      </widget>
+      <widget class="CWE_job_list" name="tab_jobs_page">
+       <attribute name="title">
+        <string>Remote Jobs</string>
        </attribute>
       </widget>
       <widget class="CWE_file_manager" name="tab_files">
        <attribute name="title">
-        <string>Geometry Files</string>
+        <string>Remote Files</string>
        </attribute>
       </widget>
       <widget class="QWidget" name="tab_spacer_2">

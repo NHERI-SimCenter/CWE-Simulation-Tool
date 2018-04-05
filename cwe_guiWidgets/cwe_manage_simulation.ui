@@ -170,7 +170,7 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="RemoteFileTree" name="treeView" native="true">
+       <widget class="RemoteFileTree" name="treeView">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
@@ -379,17 +379,7 @@
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>View Results</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pb_downloadCase">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Download Entire Case</string>
+            <string>View Results/Download Case</string>
            </property>
           </widget>
          </item>
@@ -420,7 +410,7 @@
  <connections>
   <connection>
    <sender>pb_createNewCase</sender>
-   <signal>clicked(bool)</signal>
+   <signal>clicked()</signal>
    <receiver>CWE_manage_simulation</receiver>
    <slot>create_new_case_clicked()</slot>
    <hints>
@@ -434,9 +424,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pb_duplicateCase</sender>
+   <signal>clicked()</signal>
+   <receiver>CWE_manage_simulation</receiver>
+   <slot>duplicate_case_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>125</x>
+     <y>402</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_pb_viewParameters_clicked()</slot>
   <slot>create_new_case_clicked()</slot>
+  <slot>duplicate_case_clicked()</slot>
  </slots>
 </ui>

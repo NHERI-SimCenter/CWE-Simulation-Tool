@@ -108,8 +108,9 @@ SOURCES += main.cpp \
     ../AgaveExplorer/remoteModelViews/remotefilemodel.cpp \
     ../AgaveExplorer/remoteModelViews/remotefiletree.cpp \
     ../AgaveExplorer/remoteModelViews/remotejoblister.cpp \
-    cwe_guiWidgets/create_case_popup.cpp \
-    cwe_guiWidgets/duplicate_case_popup.cpp
+    popupWindows/create_case_popup.cpp \
+    popupWindows/duplicate_case_popup.cpp \
+    ../AgaveExplorer/remoteModelViews/remotefileitem.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -171,8 +172,9 @@ HEADERS  += \
     ../AgaveExplorer/remoteModelViews/remotefilemodel.h \
     ../AgaveExplorer/remoteModelViews/remotefiletree.h \
     ../AgaveExplorer/remoteModelViews/remotejoblister.h \
-    cwe_guiWidgets/create_case_popup.h \
-    cwe_guiWidgets/duplicate_case_popup.h
+    popupWindows/create_case_popup.h \
+    popupWindows/duplicate_case_popup.h \
+    ../AgaveExplorer/remoteModelViews/remotefileitem.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -191,8 +193,8 @@ FORMS    += \
     cwe_guiWidgets/cwe_job_list.ui \
     visualUtils/resultvisualpopup.ui \
     cwe_guiWidgets/cwe_file_manager.ui \
-    cwe_guiWidgets/create_case_popup.ui \
-    cwe_guiWidgets/duplicate_case_popup.ui \
+    popupWindows/create_case_popup.ui \
+    popupWindows/duplicate_case_popup.ui
 
 RESOURCES += \
     cwe_resources.qrc \

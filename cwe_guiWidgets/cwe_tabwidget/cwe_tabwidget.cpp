@@ -50,6 +50,8 @@
 #include "cwe_guiWidgets/cwe_parameters.h"
 #include "../CFDClientProgram/cwe_interfacedriver.h"
 
+#include "cwe_globals.h"
+
 CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::CWE_TabWidget)
@@ -182,7 +184,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
     QJsonObject stages   = obj.value(QString("stages")).toObject();
 
     QMap<QString, StageState> stageStates;
-    stageStates = myController->getDriver()->getCurrentCase()->getStageStates();
+    stageStates = cwe_globals::get_CWE_Driver()->getCurrentCase()->getStageStates();
 
     foreach (QJsonValue theStage, sequence)
     {
@@ -200,7 +202,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
 
         /* create a CWE_GroupsWidget */
-        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(myController->getDriver(), this);
+        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(this);
         ui->stagePanels->addWidget(groupWidget);
 
         /* link tab and groupWidget */

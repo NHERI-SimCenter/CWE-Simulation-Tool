@@ -41,6 +41,8 @@
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/utilFuncs/singlelinedialog.h"
 
+#include "mainWindow/cwe_mainwindow.h"
+
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
@@ -71,23 +73,24 @@ CWE_file_manager::~CWE_file_manager()
     delete ui;
 }
 
-void CWE_file_manager::linkDriver(CWE_InterfaceDriver * theDriver)
+void CWE_file_manager::linkDriver()
 {
-    CWE_Super::linkDriver(theDriver);
-    if (!myDriver->inOfflineMode())
+    CWE_Super::linkDriver();
+    if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
         ui->remoteTreeView->setupFileView();
         ui->remoteTreeView->header()->resizeSection(0,200);
+        cwe_globals::get_CWE_Driver()->getMainWindow()->getFileModel()->linkRemoteFileTreeToModel(ui->remoteTreeView);
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
-        QObject::connect(myDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState, QString)),
+        QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
                          this, SLOT(remoteOpDone()));
     }
 }
 
 void CWE_file_manager::on_pb_upload_clicked()
 {
-    if (myDriver->getFileHandler()->operationIsPending())
+    if (cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Currently running file operation. Please Wait.");
         return;
@@ -110,9 +113,9 @@ void CWE_file_manager::on_pb_upload_clicked()
         return;
     }
 
-    myDriver->getFileHandler()->sendUploadReq(targetFile, fileData.absoluteFilePath());
+    cwe_globals::get_file_handle()->sendUploadReq(targetFile, fileData.absoluteFilePath());
 
-    if (!myDriver->getFileHandler()->operationIsPending())
+    if (!cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Error: Unable to start file operation. Please try again.");
         return;
@@ -123,7 +126,7 @@ void CWE_file_manager::on_pb_upload_clicked()
 
 void CWE_file_manager::on_pb_download_clicked()
 {
-    if (myDriver->getFileHandler()->operationIsPending())
+    if (cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Currently running file operation. Please Wait.");
         return;
@@ -155,9 +158,9 @@ void CWE_file_manager::on_pb_download_clicked()
 
     localPath = localPath.append(targetFile.getFileName());
 
-    myDriver->getFileHandler()->sendDownloadReq(targetFile, localPath);
+    cwe_globals::get_file_handle()->sendDownloadReq(targetFile, localPath);
 
-    if (!myDriver->getFileHandler()->operationIsPending())
+    if (!cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Error: Unable to start file operation. Please check that the local file does not already exist and try again.");
         return;

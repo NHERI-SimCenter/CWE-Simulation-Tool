@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Create_Case_Popup</class>
- <widget class="QMainWindow" name="Create_Case_Popup">
+ <class>Duplicate_Case_Popup</class>
+ <widget class="QMainWindow" name="Duplicate_Case_Popup">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -136,72 +136,6 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QFrame" name="verticalFrame">
-       <property name="minimumSize">
-        <size>
-         <width>390</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QLabel" name="label_selectionType">
-          <property name="text">
-           <string>Case Selection Type:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QScrollArea" name="scrollArea">
-          <property name="minimumSize">
-           <size>
-            <width>390</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="scroll_NewCase">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>388</width>
-             <height>245</height>
-            </rect>
-           </property>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
       <widget class="QFrame" name="verticalFrame1">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -329,7 +263,7 @@
   <customwidget>
    <class>RemoteFileTree</class>
    <extends>QWidget</extends>
-   <header>../AgaveExplorer/remoteFileOps/remotefiletree.h</header>
+   <header>../AgaveExplorer/remoteModelViews/remotefiletree.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -338,7 +272,7 @@
   <connection>
    <sender>button_cancel</sender>
    <signal>clicked(bool)</signal>
-   <receiver>Create_Case_Popup</receiver>
+   <receiver>Duplicate_Case_Popup</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -354,7 +288,7 @@
   <connection>
    <sender>button_create_copy</sender>
    <signal>clicked()</signal>
-   <receiver>Create_Case_Popup</receiver>
+   <receiver>Duplicate_Case_Popup</receiver>
    <slot>button_create_copy_clicked()</slot>
    <hints>
     <hint type="sourcelabel">

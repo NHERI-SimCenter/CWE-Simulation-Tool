@@ -350,7 +350,7 @@ bool CFDcaseInstance::downloadCase(QString destLocalFile)
     return true;
 }
 
-void CFDcaseInstance::underlyingFilesUpdated(const FileNodeRef changedNode, FileSystemChange)
+void CFDcaseInstance::underlyingFilesUpdated(const FileNodeRef changedNode)
 {
     if (defunct) return;
     if (!caseFolder.fileNodeExtant())
@@ -921,8 +921,8 @@ void CFDcaseInstance::connectCaseSignals()
     QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
                      this, SLOT(fileTaskDone(RequestState, QString)),
                      Qt::QueuedConnection);
-    QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef, FileSystemChange)),
-                     this, SLOT(underlyingFilesUpdated(FileNodeRef, FileSystemChange)),
+    QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
+                     this, SLOT(underlyingFilesUpdated(FileNodeRef)),
                      Qt::QueuedConnection);
     QObject::connect(this, SIGNAL(haveNewState(CaseState)),
                      this, SLOT(chainedStateTransition()),

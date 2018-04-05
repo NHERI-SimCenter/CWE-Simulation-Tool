@@ -40,6 +40,8 @@
 #include <QRadioButton>
 #include <QJsonObject>
 
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+
 class CFDanalysisType;
 
 namespace Ui {
@@ -51,7 +53,7 @@ class Duplicate_Case_Popup : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit Duplicate_Case_Popup(QWidget *parent = 0);
+    explicit Duplicate_Case_Popup(FileNodeRef toClone, QWidget *parent = 0);
     ~Duplicate_Case_Popup();
 
 private slots:
@@ -62,8 +64,7 @@ private:
     Ui::Duplicate_Case_Popup *ui;
     void create_new_case_from_template(QString filename);
 
-    CFDanalysisType * selectedTemplate = NULL;
-
+    FileNodeRef clonedFolder;
 };
 
 #endif // DUPLICATE_CASE_POPUP_H

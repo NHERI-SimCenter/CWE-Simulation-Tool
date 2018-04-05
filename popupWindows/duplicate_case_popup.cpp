@@ -45,7 +45,7 @@
 
 #include "cwe_globals.h"
 
-Duplicate_Case_Popup::Duplicate_Case_Popup(QWidget *parent) :
+Duplicate_Case_Popup::Duplicate_Case_Popup(FileNodeRef toClone, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Duplicate_Case_Popup)
 {
@@ -55,10 +55,9 @@ Duplicate_Case_Popup::Duplicate_Case_Popup(QWidget *parent) :
     {
         ui->primary_remoteFileTree->setupFileView();
         ui->primary_remoteFileTree->header()->resizeSection(0,200);
-//        ui->secondary_remoteFileTree->setupFileView();
     }
 
-//    ui->tabWidget->setCurrentIndex(0);
+    clonedFolder = toClone;
 }
 
 Duplicate_Case_Popup::~Duplicate_Case_Popup()
@@ -70,19 +69,18 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
 {
     if (cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        cwe_globals::get_CWE_Driver()->createNewCase(selectedTemplate);
         this->close();
         return;
     }
 
     /* take emergency exit if nothing has been selected */
-    FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
-    if (selectedNode == NULL)
+    FileNodeRef selectedFile = ui->primary_remoteFileTree->getSelectedFile();
+    if (selectedFile.isNil())
     {
         cwe_globals::displayPopup("Please select a folder to place the new case.");
         return;
     }
-    if (!selectedNode->isFolder())
+    if (selectedFile.getFileType() != FileType::DIR)
     {
         cwe_globals::displayPopup("Please select a folder to place the new case.");
         return;
@@ -100,19 +98,13 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
     }
 
     /* we are cloning from an existing case */
+    if (clonedFolder.isNil())
+    {
+        cwe_globals::displayPopup("Folder to duplicated is invalid.", "ERROR");
+        return;
+    }
 
-    FileTreeNode * secondNode = ui->primary_remoteFileTree->getSelectedNode();
-    if (selectedNode == NULL)
-    {
-        cwe_globals::displayPopup("Please select a folder to duplicate.");
-        return;
-    }
-    if (!selectedNode->isFolder())
-    {
-        cwe_globals::displayPopup("Please select a folder to duplicate.");
-        return;
-    }
-    CFDcaseInstance * tempCase = cwe_globals::get_CWE_Driver()->getCaseFromFolder(secondNode);
+    CFDcaseInstance * tempCase = cwe_globals::get_CWE_Driver()->getCaseFromFolder(clonedFolder);
     CaseState dupState = tempCase->getCaseState();
 
     if (dupState == CaseState::INVALID)
@@ -131,7 +123,7 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
         return;
     }
     newCase = cwe_globals::get_CWE_Driver()->createNewCase(NULL);
-    if (!newCase->duplicateCase(newCaseName, selectedNode, secondNode))
+    if (!newCase->duplicateCase(newCaseName, selectedFile, clonedFolder))
     {
         cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;

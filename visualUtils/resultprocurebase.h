@@ -71,7 +71,7 @@ protected:
     virtual void initialFailure() = 0;
 
 private slots:
-    void fileChanged(FileNodeRef changedFile, FileSystemChange theChange);
+    void fileChanged(FileNodeRef changedFile);
 
 private:
     bool checkForAndSeekFiles(); //Returns true if all files loaded
