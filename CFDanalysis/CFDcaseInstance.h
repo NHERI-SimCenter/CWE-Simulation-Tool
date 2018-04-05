@@ -101,7 +101,7 @@ signals:
     void haveNewState(CaseState newState);
 
 private slots:
-    void underlyingFilesUpdated(FileNodeRef changedFile, FileSystemChange theChange);
+    void underlyingFilesUpdated(FileNodeRef changedFile);
     void jobListUpdated();
     void fileTaskDone(RequestState invokeStatus, QString opMessage);
     void fileTaskStarted();

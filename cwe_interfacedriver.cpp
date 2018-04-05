@@ -114,7 +114,7 @@ void CWE_InterfaceDriver::startup()
     authWindow->show();
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
-    mainWindow = new CWE_MainWindow(this);
+    mainWindow = new CWE_MainWindow();
 }
 
 void CWE_InterfaceDriver::closeAuthScreen()
@@ -158,7 +158,7 @@ void CWE_InterfaceDriver::startOffline()
     myJobHandle = new JobOperator(this);
     myFileHandle = new FileOperator(this);
     myJobAccountant = new CWEjobAccountant(this);
-    mainWindow = new CWE_MainWindow(this);
+    mainWindow = new CWE_MainWindow();
 
     setCurrentCase(new CFDcaseInstance(templateList.at(0)));
 
@@ -175,7 +175,7 @@ QString CWE_InterfaceDriver::getBanner()
 
 QString CWE_InterfaceDriver::getVersion()
 {
-    return "Version: 0.3.2";
+    return "Version: 0.5.0";
 }
 
 QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()

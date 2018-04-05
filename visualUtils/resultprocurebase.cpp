@@ -76,7 +76,7 @@ void ResultProcureBase::initializeWithNeededFiles(FileNodeRef baseFolder, QMap<Q
         myFileNodes[fileID] = nil;
     }
 
-    fileChanged(nil, FileSystemChange::FILE_MODIFY);
+    fileChanged(nil);
 }
 
 QMap<QString, FileNodeRef> ResultProcureBase::getFileNodes()
@@ -134,7 +134,7 @@ void ResultProcureBase::computeFileBuffers()
     }
 }
 
-void ResultProcureBase::fileChanged(FileNodeRef changedFile, FileSystemChange theChange)
+void ResultProcureBase::fileChanged(FileNodeRef changedFile)
 {
     if (changedFile.isNil())
     {
@@ -148,8 +148,9 @@ void ResultProcureBase::fileChanged(FileNodeRef changedFile, FileSystemChange th
 
     QString idChanged = getIDfromNode(changedFile);
     if (idChanged.isEmpty()) return;
+    NodeState fileState = changedFile.getNodeState();
 
-    if (theChange == FileSystemChange::FILE_DELETE)
+    if (fileState == NodeState::DELETING)
     {
         FileNodeRef nil;
         myFileNodes[idChanged] = nil;
@@ -226,8 +227,8 @@ bool ResultProcureBase::checkForAndSeekFiles()
             }
 
             myFileNodes[fileID] = targetFileNode;
-            QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileTreeNode*,FileSystemChange)),
-                             this, SLOT(fileChanged(FileTreeNode*, FileSystemChange)),
+            QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
+                             this, SLOT(fileChanged(FileNodeRef)),
                              Qt::QueuedConnection);
             fileNode = targetFileNode;
         }
