@@ -32,50 +32,39 @@
 
 // Contributors:
 
-#ifndef CWE_CREATE_COPY_SIMULATION_H
-#define CWE_CREATE_COPY_SIMULATION_H
+#ifndef DUPLICATE_CASE_POPUP_H
+#define DUPLICATE_CASE_POPUP_H
 
-#include "cwe_super.h"
-
+#include <QMainWindow>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QJsonObject>
 
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+
 class CFDanalysisType;
 
-struct CASE_TYPE_DATA {
-    QRadioButton         *radioBtn;
-    QPushButton          *pbtn;
-    CFDanalysisType      *templateData;
-};
-
 namespace Ui {
-class CWE_Create_Copy_Simulation;
+class Duplicate_Case_Popup;
 }
 
-class CWE_Create_Copy_Simulation : public CWE_Super
+class Duplicate_Case_Popup : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit CWE_Create_Copy_Simulation(QWidget *parent = 0);
-    ~CWE_Create_Copy_Simulation();
-
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
+    explicit Duplicate_Case_Popup(FileNodeRef toClone, QWidget *parent = 0);
+    ~Duplicate_Case_Popup();
 
 private slots:
-    void on_pBtn_create_copy_clicked();
-    void on_tabWidget_currentChanged(int index);
-    void selectCaseTemplate();
+    void button_create_copy_clicked();
+    //void on_tabWidget_currentChanged(int index);
 
 private:
-    Ui::CWE_Create_Copy_Simulation *ui;
-    void populateCaseTypes();
+    Ui::Duplicate_Case_Popup *ui;
     void create_new_case_from_template(QString filename);
 
-    CFDanalysisType * selectedTemplate = NULL;
-
-    QVector<CASE_TYPE_DATA> caseTypeDataList;
+    FileNodeRef clonedFolder;
 };
 
-#endif // CWE_CREATE_COPY_SIMULATION_H
+#endif // DUPLICATE_CASE_POPUP_H

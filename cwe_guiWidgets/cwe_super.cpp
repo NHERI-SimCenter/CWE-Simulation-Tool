@@ -39,12 +39,4 @@ CWE_Super::CWE_Super(QWidget *parent) : QFrame(parent)
 
 }
 
-void CWE_Super::linkDriver(CWE_InterfaceDriver * theDriver)
-{
-    myDriver = theDriver;
-}
-
-CWE_InterfaceDriver * CWE_Super::getDriver()
-{
-    return myDriver;
-}
+void CWE_Super::linkDriver(){}
