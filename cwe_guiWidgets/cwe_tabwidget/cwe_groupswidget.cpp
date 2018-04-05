@@ -44,11 +44,9 @@
 
 #include "cwe_globals.h"
 
-CWE_GroupsWidget::CWE_GroupsWidget(CWE_InterfaceDriver * theDriver, QWidget *parent) : QTabWidget(parent)
+CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) : QTabWidget(parent)
 {
     quickParameterPtr = new QMap<QString, SCtrMasterDataWidget *>();
-    myDriver = theDriver;
-
     this->setViewState(SimCenterViewState::visible);
 }
 

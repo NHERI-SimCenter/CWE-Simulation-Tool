@@ -179,7 +179,7 @@
         "lowZPad":{
             "displayname":"Domain Length (-Z)",
             "type":"std",
-            "default":"8",
+            "default":"0",
             "unit":"times max size of object",
             "precision":"1",
             "sign":"+"
@@ -327,7 +327,7 @@
         "lowZDom1":{
             "displayname":"Subdomain 1 Length (Z-)",
             "type":"std",
-            "default":"2",
+            "default":"0",
             "unit":"times max size of object",
             "precision":"1",
             "sign":"+"
@@ -383,7 +383,7 @@
         "lowZDom2":{
             "displayname":"Subdomain 2 Length (Z-)",
             "type":"std",
-            "default":"4",
+            "default":"0",
             "unit":"times max size of object",
             "precision":"1",
             "sign":"+"
@@ -439,7 +439,7 @@
         "lowZDom3":{
             "displayname":"Subdomain 3 Length (Z-)",
             "type":"std",
-            "default":"6",
+            "default":"0",
             "unit":"times max size of object",
             "precision":"1",
             "sign":"+"

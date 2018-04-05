@@ -45,6 +45,7 @@
 #include <QBoxLayout>
 
 #include "SimCenter_widgets/sctrstates.h"
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 
 class FileTreeNode;
 
@@ -69,7 +70,7 @@ public:
 
 private slots:
     void on_theValue_editingFinished();
-    virtual void newFileSelected(FileTreeNode *);
+    virtual void newFileSelected(FileNodeRef);
     //TODO: Need to rethink some of the polymorphism here
 
 protected:

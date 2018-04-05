@@ -86,24 +86,19 @@
         <string>Page text space</string>
        </attribute>
       </widget>
-      <widget class="CWE_job_list" name="tab_jobs_page">
-       <attribute name="title">
-        <string>Running Jobs</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_Create_Copy_Simulation" name="tab_create_new">
-       <attribute name="title">
-        <string>Create Case</string>
-       </attribute>
-      </widget>
       <widget class="CWE_manage_simulation" name="tab_manage_and_run">
        <attribute name="title">
-        <string>Select Case</string>
+        <string>Simulation Cases</string>
+       </attribute>
+      </widget>
+      <widget class="CWE_job_list" name="tab_jobs_page">
+       <attribute name="title">
+        <string>Remote Jobs</string>
        </attribute>
       </widget>
       <widget class="CWE_file_manager" name="tab_files">
        <attribute name="title">
-        <string>Files</string>
+        <string>Remote Files</string>
        </attribute>
       </widget>
       <widget class="QWidget" name="tab_spacer_2">
@@ -311,12 +306,6 @@
    <class>CWE_Parameters</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_parameters.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>CWE_Create_Copy_Simulation</class>
-   <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_create_copy_simulation.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

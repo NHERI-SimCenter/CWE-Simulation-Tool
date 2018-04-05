@@ -37,6 +37,8 @@
 
 #include "cwe_super.h"
 
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+
 #include <QFileSystemModel>
 #include <QMenu>
 
@@ -54,7 +56,7 @@ public:
     explicit CWE_file_manager(QWidget *parent = 0);
     ~CWE_file_manager();
 
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
+    virtual void linkDriver();
 
 private slots:
     void on_pb_upload_clicked();
@@ -87,7 +89,7 @@ private:
     Ui::CWE_file_manager *ui;
     QFileSystemModel *localFileModel;
 
-    FileTreeNode * targetNode = NULL;
+    FileNodeRef targetNode;
 };
 
 #endif // CWE_FILE_MANAGER2_H

@@ -51,7 +51,7 @@ enum class StageState;
 class CWE_GroupsWidget : public QTabWidget
 {
 public:
-    CWE_GroupsWidget(CWE_InterfaceDriver *theDriver, QWidget *parent = NULL);
+    CWE_GroupsWidget(QWidget *parent = NULL);
     ~CWE_GroupsWidget();
     void setCorrespondingTab(CWE_StageStatusTab * newTab);
 

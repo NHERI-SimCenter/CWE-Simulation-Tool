@@ -41,6 +41,8 @@
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/utilFuncs/singlelinedialog.h"
 
+#include "mainWindow/cwe_mainwindow.h"
+
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
@@ -59,6 +61,7 @@ CWE_file_manager::CWE_file_manager(QWidget *parent) :
 
     // Attach the model to the view
     ui->localTreeView->setModel(localFileModel);
+    ui->localTreeView->header()->resizeSection(0,200);
 
     // QFileSystemModel requires root path
     localFileModel->setRootPath(QDir::homePath());
@@ -70,30 +73,32 @@ CWE_file_manager::~CWE_file_manager()
     delete ui;
 }
 
-void CWE_file_manager::linkDriver(CWE_InterfaceDriver * theDriver)
+void CWE_file_manager::linkDriver()
 {
-    CWE_Super::linkDriver(theDriver);
-    if (!myDriver->inOfflineMode())
+    CWE_Super::linkDriver();
+    if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
         ui->remoteTreeView->setupFileView();
+        ui->remoteTreeView->header()->resizeSection(0,200);
+        cwe_globals::get_CWE_Driver()->getMainWindow()->getFileModel()->linkRemoteFileTreeToModel(ui->remoteTreeView);
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
-        QObject::connect(myDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState, QString)),
+        QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
                          this, SLOT(remoteOpDone()));
     }
 }
 
 void CWE_file_manager::on_pb_upload_clicked()
 {
-    if (myDriver->getFileHandler()->operationIsPending())
+    if (cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Currently running file operation. Please Wait.");
         return;
     }
 
-    FileTreeNode * targetFile = ui->remoteTreeView->getSelectedNode();
+    FileNodeRef targetFile = ui->remoteTreeView->getSelectedFile();
 
-    if ((targetFile == NULL) || (targetFile->getFileData().getFileType() != FileType::DIR))
+    if ((targetFile.isNil()) || (targetFile.getFileType() != FileType::DIR))
     {
         cwe_globals::displayPopup("Please select a destination folder to upload to.");
         return;
@@ -108,9 +113,9 @@ void CWE_file_manager::on_pb_upload_clicked()
         return;
     }
 
-    myDriver->getFileHandler()->sendUploadReq(targetFile, fileData.absoluteFilePath());
+    cwe_globals::get_file_handle()->sendUploadReq(targetFile, fileData.absoluteFilePath());
 
-    if (!myDriver->getFileHandler()->operationIsPending())
+    if (!cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Error: Unable to start file operation. Please try again.");
         return;
@@ -121,15 +126,15 @@ void CWE_file_manager::on_pb_upload_clicked()
 
 void CWE_file_manager::on_pb_download_clicked()
 {
-    if (myDriver->getFileHandler()->operationIsPending())
+    if (cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Currently running file operation. Please Wait.");
         return;
     }
 
-    FileTreeNode * targetFile = ui->remoteTreeView->getSelectedNode();
+    FileNodeRef targetFile = ui->remoteTreeView->getSelectedFile();
 
-    if ((targetFile == NULL) || (targetFile->getFileData().getFileType() != FileType::FILE))
+    if ((targetFile.isNil()) || (targetFile.getFileType() != FileType::FILE))
     {
         cwe_globals::displayPopup("Please select a file to download to.");
         return;
@@ -151,11 +156,11 @@ void CWE_file_manager::on_pb_download_clicked()
     localPath = localPath.append('/');
 #endif
 
-    localPath = localPath.append(targetFile->getFileData().getFileName());
+    localPath = localPath.append(targetFile.getFileName());
 
-    myDriver->getFileHandler()->sendDownloadReq(targetFile, localPath);
+    cwe_globals::get_file_handle()->sendDownloadReq(targetFile, localPath);
 
-    if (!myDriver->getFileHandler()->operationIsPending())
+    if (!cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Error: Unable to start file operation. Please check that the local file does not already exist and try again.");
         return;
@@ -230,7 +235,7 @@ void CWE_file_manager::decompressMenuItem()
 
 void CWE_file_manager::refreshMenuItem()
 {
-    cwe_globals::get_file_handle()->enactFolderRefresh(targetNode);
+    targetNode.enactFolderRefresh();
 }
 
 void CWE_file_manager::downloadBufferItem()
@@ -257,35 +262,34 @@ void CWE_file_manager::customFileMenu(const QPoint &pos)
     QModelIndex targetIndex = ui->remoteTreeView->indexAt(pos);
     ui->remoteTreeView->fileEntryTouched(targetIndex);
 
-    targetNode = ui->remoteTreeView->getSelectedNode();
+    targetNode = ui->remoteTreeView->getSelectedFile();
 
     //If we did not click anything, we should return
-    if (targetNode == NULL) return;
-    if (targetNode->isRootNode()) return;
-    FileMetaData theFileData = targetNode->getFileData();
+    if (targetNode.isNil()) return;
+    if (targetNode.isRootNode()) return;
 
-    if (theFileData.getFileType() == FileType::INVALID) return;
+    if (targetNode.getFileType() == FileType::INVALID) return;
 
     fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
     fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
     fileMenu.addAction("Rename",this, SLOT(renameMenuItem()));
     //We don't let the user delete the username folder
-    if (!(targetNode->getParentNode()->isRootNode()))
+    if (!(targetNode.getParent().isRootNode()))
     {
         fileMenu.addSeparator();
         fileMenu.addAction("Delete",this, SLOT(deleteMenuItem()));
         fileMenu.addSeparator();
     }
-    if (theFileData.getFileType() == FileType::DIR)
+    if (targetNode.getFileType() == FileType::DIR)
     {
         fileMenu.addAction("Create New Folder",this, SLOT(createFolderMenuItem()));
     }
-    if (theFileData.getFileType() == FileType::FILE)
+    if (targetNode.getFileType() == FileType::FILE)
     {
         fileMenu.addAction("Download Buffer (DEBUG)",this, SLOT(downloadBufferItem()));
     }
 
-    if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))
+    if ((targetNode.getFileType() == FileType::DIR) || (targetNode.getFileType() == FileType::FILE))
     {
         fileMenu.addSeparator();
         fileMenu.addAction("Refresh Data",this, SLOT(refreshMenuItem()));

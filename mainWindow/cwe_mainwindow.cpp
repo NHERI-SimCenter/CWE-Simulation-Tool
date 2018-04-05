@@ -31,7 +31,6 @@
 ***********************************************************************************/
 
 // Contributors:
-
 #include "cwe_mainwindow.h"
 #include "ui_cwe_mainwindow.h"
 
@@ -41,20 +40,19 @@
 #include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
 #include "cwe_interfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
+#include "cwe_globals.h"
 
-CWE_MainWindow::CWE_MainWindow(CWE_InterfaceDriver *newDriver, QWidget *parent) :
+CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CWE_MainWindow)
 {
     ui->setupUi(this);
 
     //Esablish connections with driver
-    myDriver = newDriver;
-
-    QObject::connect(myDriver, SIGNAL(haveNewCase()),
+    QObject::connect(cwe_globals::get_CWE_Driver(), SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
 
-    if (!myDriver->inDebugMode())
+    if (!cwe_globals::get_CWE_Driver()->inDebugMode())
     {
         //Tabs only appearing in debug mode should be listed here
         ui->tab_debug->deleteLater();
@@ -84,13 +82,15 @@ void CWE_MainWindow::runSetupSteps()
 {
     //Note: Adding widget to header will re-parent them
     stateLabel = new cwe_state_label(this);
+    stateLabel->setAlignment(Qt::AlignHCenter);
+    stateLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     ui->header->appendWidget(stateLabel);
 
-    QLabel * username = new QLabel(myDriver->getDataConnection()->getUserName());
+    QLabel * username = new QLabel(cwe_globals::get_connection()->getUserName());
     ui->header->appendWidget(username);
 
     QPushButton * logoutButton = new QPushButton("Logout");
-    QObject::connect(logoutButton, SIGNAL(clicked(bool)), myDriver, SLOT(shutdown()));
+    QObject::connect(logoutButton, SIGNAL(clicked(bool)), cwe_globals::get_CWE_Driver(), SLOT(shutdown()));
     ui->header->appendWidget(logoutButton);
 
     for (int i = 0; i < ui->tabContainer->count(); i++)
@@ -101,13 +101,13 @@ void CWE_MainWindow::runSetupSteps()
             continue;
         }
         CWE_Super * aWidget = (CWE_Super *) rawWidget;
-        aWidget->linkDriver(myDriver);
+        aWidget->linkDriver();
     }
 }
 
 void CWE_MainWindow::newCaseGiven()
 {
-    CFDcaseInstance * newCase = myDriver->getCurrentCase();
+    CFDcaseInstance * newCase = cwe_globals::get_CWE_Driver()->getCurrentCase();
 
     changeParamsAndResultsEnabled(false);
     if (stateLabel != NULL)
@@ -151,7 +151,7 @@ void CWE_MainWindow::menuCopyInfo()
 
 void CWE_MainWindow::menuExit()
 {
-    myDriver->shutdown();
+    cwe_globals::get_CWE_Driver()->shutdown();
 }
 
 void CWE_MainWindow::switchToResultsTab()
@@ -178,14 +178,14 @@ void CWE_MainWindow::switchToParameterTab()
     }
 }
 
-void CWE_MainWindow::switchToCreateTab()
-{
-    ui->tabContainer->setCurrentWidget(ui->tab_create_new);
-}
-
 void CWE_MainWindow::switchToFilesTab()
 {
     ui->tabContainer->setCurrentWidget(ui->tab_files);
+}
+
+RemoteFileModel * CWE_MainWindow::getFileModel()
+{
+    return &fileModel;
 }
 
 void CWE_MainWindow::changeParamsAndResultsEnabled(bool setting)
