@@ -45,7 +45,22 @@ CWE_help::CWE_help(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->setOverview();
+    QObject::connect(ui->helpBrowser, SIGNAL(anchorClicked(QUrl)),
+                     this, SLOT(browser_anchor_clicked(QUrl)));
+
+    QFile headText(":/help/common_header.html");
+    if (!headText.open(QIODevice::ReadOnly | QIODevice::Text))
+            return;
+    headerText = headText.readAll();
+    headText.close();
+
+    QFile footText(":/help/common_footer.html");
+    if (!footText.open(QIODevice::ReadOnly | QIODevice::Text))
+            return;
+    footerText = footText.readAll();
+    footText.close();
+
+    setLocalPage(":/help/index.html");
 }
 
 CWE_help::~CWE_help()
@@ -53,35 +68,41 @@ CWE_help::~CWE_help()
     delete ui;
 }
 
-void CWE_help::setOverview()
+void CWE_help::setLocalPage(QString pageName)
 {
-    QFile overview(":/help/overview.html");
-    if (!overview.open(QIODevice::ReadOnly | QIODevice::Text))
-            return;
-    QByteArray theText = overview.readAll();
-    overview.close();
-
-    ui->textBrowser_overview->setHtml(theText);
-    ui->textBrowser_overview->setOpenLinks(false);
-    ui->helpTabs->setTabsClosable(true);
-
-    QObject::connect(ui->textBrowser_overview, SIGNAL(anchorClicked(QUrl)),
-                     this, SLOT(overview_anchor_clicked(QUrl)));
-}
-
-void CWE_help::overview_anchor_clicked(const QUrl &link)
-{
-    QFile helpText(link.toLocalFile());
+    QFile helpText(pageName);
     if (!helpText.open(QIODevice::ReadOnly | QIODevice::Text))
-            return;
-    QByteArray theText = helpText.readAll();
+    {
+        if (currentPageName == pageName)
+        {
+            setLocalPage(":/help/index.html");
+        }
+        else
+        {
+            setLocalPage(currentPageName);
+        }
+        return;
+    }
+
+    currentPageName = pageName;
+    QByteArray theText;
+    theText = theText.append(headerText);
+    theText = theText.append(helpText.readAll());
+    theText = theText.append(footerText);
+
     helpText.close();
 
-    QTextBrowser *browser = new QTextBrowser(this);
-    browser->setOpenLinks(true);
-    browser->setHtml(theText);
+    ui->helpBrowser->setHtml(theText);
+}
 
-    QString theLabel = QFileInfo(link.fileName()).completeBaseName();
-    int tabIdx = ui->helpTabs->addTab(browser, theLabel);
-    ui->helpTabs->setCurrentIndex(tabIdx);
+void CWE_help::browser_anchor_clicked(const QUrl &link)
+{
+    if (link.isLocalFile())
+    {
+        setLocalPage(link.toLocalFile());
+        return;
+    }
+
+    QDesktopServices::openUrl(link);
+    setLocalPage(currentPageName);
 }
