@@ -78,7 +78,6 @@ void CWE_file_manager::linkDriver()
     CWE_Super::linkDriver();
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        ui->remoteTreeView->setupFileView();
         ui->remoteTreeView->header()->resizeSection(0,200);
         cwe_globals::get_CWE_Driver()->getMainWindow()->getFileModel()->linkRemoteFileTreeToModel(ui->remoteTreeView);
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
@@ -297,21 +296,6 @@ void CWE_file_manager::customFileMenu(const QPoint &pos)
     }
 
     fileMenu.exec(QCursor::pos());
-}
-
-void CWE_file_manager::on_localButton_newFolder_clicked()
-{
-
-}
-
-void CWE_file_manager::on_localButton_deleteFolder_clicked()
-{
-
-}
-
-void CWE_file_manager::on_localButton_deleteFile_clicked()
-{
-
 }
 
 void CWE_file_manager::on_remoteButton_newFolder_clicked()

@@ -129,39 +129,6 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="1">
-          <widget class="QCommandLinkButton" name="localButton_deleteFolder">
-           <property name="text">
-            <string>Delete Folder</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../cwe_resources.qrc">
-             <normaloff>:/icons/burst.png</normaloff>:/icons/burst.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QCommandLinkButton" name="localButton_newFolder">
-           <property name="text">
-            <string>New Folder</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../cwe_resources.qrc">
-             <normaloff>:/icons/folder.png</normaloff>:/icons/folder.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QCommandLinkButton" name="localButton_deleteFile">
-           <property name="text">
-            <string>Delete</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../cwe_resources.qrc">
-             <normaloff>:/icons/bomb.png</normaloff>:/icons/bomb.png</iconset>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
