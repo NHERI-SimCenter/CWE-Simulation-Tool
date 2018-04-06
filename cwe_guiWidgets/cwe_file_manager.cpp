@@ -77,14 +77,14 @@ void CWE_file_manager::linkDriver()
 {
     CWE_Super::linkDriver();
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
-    {
-        ui->remoteTreeView->header()->resizeSection(0,200);
+    {    
         cwe_globals::get_CWE_Driver()->getMainWindow()->getFileModel()->linkRemoteFileTreeToModel(ui->remoteTreeView);
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
         QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
                          this, SLOT(remoteOpDone()));
     }
+    //
 }
 
 void CWE_file_manager::on_pb_upload_clicked()
