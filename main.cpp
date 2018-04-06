@@ -44,6 +44,44 @@
 
 void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
 
+QString openStyleFiles(CWE_InterfaceDriver * theDriver)
+{
+    QString ret;
+    QFile mainStyleFile(":/styleSheets/cweStyle.qss");
+
+#ifdef Q_OS_WIN
+    QFile appendedStyle(":/styleSheets/cweWin.qss");
+#endif
+
+#ifdef Q_OS_MACOS
+    QFile appendedStyle(":/styleSheets/cweMac.qss");
+#endif
+
+#ifdef Q_OS_LINUX
+    QFile appendedStyle(":/styleSheets/cweLinux.qss");
+#endif
+
+    if (!mainStyleFile.open(QFile::ReadOnly))
+    {
+        theDriver->fatalInterfaceError("Unable to open main style file. Install may be corrupted.");
+        return ret;
+    }
+
+    if (!appendedStyle.open(QFile::ReadOnly))
+    {
+        theDriver->fatalInterfaceError("Unable to open platform style file. Install may be corrupted.");
+        return ret;
+    }
+
+    ret = ret.append(mainStyleFile.readAll());
+    ret = ret.append(appendedStyle.readAll());
+
+    mainStyleFile.close();
+    appendedStyle.close();
+
+    return ret;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication mainRunLoop(argc, argv);
@@ -87,14 +125,7 @@ int main(int argc, char *argv[])
         programDriver.fatalInterfaceError("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
     }
 
-    QFile styleFile(":/cweStyle.qss");
-
-    if (!styleFile.open(QFile::ReadOnly))
-    {
-        programDriver.fatalInterfaceError("Unable to open style file. Install may be corrupted.");
-    }
-    QString styleText(styleFile.readAll());
-    mainRunLoop.setStyleSheet(styleText);
+    mainRunLoop.setStyleSheet(openStyleFiles(&programDriver));
 
     mainRunLoop.setQuitOnLastWindowClosed(false);
     //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close

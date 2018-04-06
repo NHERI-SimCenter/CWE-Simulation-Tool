@@ -36,6 +36,7 @@
 #define CWE_HELP_H
 
 #include "cwe_super.h"
+#include <QDesktopServices>
 
 namespace Ui {
 class CWE_help;
@@ -49,13 +50,18 @@ public:
     explicit CWE_help(QWidget *parent = 0);
     ~CWE_help();
 
-    void setOverview();
+    void setLocalPage(QString pageName);
 
-public slots:
-    void overview_anchor_clicked(const QUrl &);
+private slots:
+    void browser_anchor_clicked(const QUrl &link);
 
 private:
     Ui::CWE_help *ui;
+
+    QString currentPageName;
+
+    QByteArray headerText;
+    QByteArray footerText;
 };
 
 #endif // CWE_HELP_H

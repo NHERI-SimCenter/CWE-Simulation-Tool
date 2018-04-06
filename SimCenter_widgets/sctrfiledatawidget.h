@@ -39,6 +39,7 @@
 
 class RemoteFileTree;
 class CWE_InterfaceDriver;
+class FileNodeRef;
 
 //TODO: Need to write visibilty method
 
@@ -54,7 +55,7 @@ public:
     virtual void initUI();
 
 private slots:
-    virtual void newFileSelected(FileTreeNode *);
+    virtual void newFileSelected(FileNodeRef);
 
 private:
     CWE_InterfaceDriver * myDriver;

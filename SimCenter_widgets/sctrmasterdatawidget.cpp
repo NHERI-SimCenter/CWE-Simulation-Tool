@@ -33,6 +33,7 @@
 // Contributors:
 
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 
 SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
     QFrame(parent)
@@ -145,7 +146,7 @@ void SCtrMasterDataWidget::on_theValue_editingFinished()
 
 }
 
-void SCtrMasterDataWidget::newFileSelected(FileTreeNode *)
+void SCtrMasterDataWidget::newFileSelected(FileNodeRef)
 {
 
 }

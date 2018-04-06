@@ -36,20 +36,16 @@
 #define CWE_SUPER_H
 
 #include <QFrame>
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 
-class CWE_InterfaceDriver;
+class RemoteFileModel;
 
 class CWE_Super : public QFrame
 {
     Q_OBJECT
 public:
     explicit CWE_Super(QWidget *parent = nullptr);
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
-
-    CWE_InterfaceDriver * getDriver();
-
-protected:
-    CWE_InterfaceDriver * myDriver = NULL;
+    virtual void linkDriver();
 };
 
 #endif // CWE_SUPER_H

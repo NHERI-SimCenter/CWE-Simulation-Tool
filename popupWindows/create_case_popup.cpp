@@ -32,8 +32,8 @@
 
 // Contributors:
 
-#include "cwe_create_copy_simulation.h"
-#include "ui_cwe_create_copy_simulation.h"
+#include "create_case_popup.h"
+#include "ui_create_case_popup.h"
 
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 
@@ -45,48 +45,45 @@
 
 #include "cwe_globals.h"
 
-CWE_Create_Copy_Simulation::CWE_Create_Copy_Simulation(QWidget *parent) :
-    CWE_Super(parent),
-    ui(new Ui::CWE_Create_Copy_Simulation)
+Create_Case_Popup::Create_Case_Popup(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::Create_Case_Popup)
 {
     ui->setupUi(this);
+    populateCaseTypes();
 
-    ui->tabWidget->setCurrentIndex(0);
+    if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
+    {
+        ui->primary_remoteFileTree->setupFileView();
+        ui->primary_remoteFileTree->header()->resizeSection(0,200);
+//        ui->secondary_remoteFileTree->setupFileView();
+    }
+
+//    ui->tabWidget->setCurrentIndex(0);
 }
 
-CWE_Create_Copy_Simulation::~CWE_Create_Copy_Simulation()
+Create_Case_Popup::~Create_Case_Popup()
 {
     delete ui;
 }
 
-void CWE_Create_Copy_Simulation::linkDriver(CWE_InterfaceDriver * theDriver)
+void Create_Case_Popup::button_create_copy_clicked()
 {
-    CWE_Super::linkDriver(theDriver);
-    this->populateCaseTypes();
-    if (!theDriver->inOfflineMode())
+    if (cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        ui->primary_remoteFileTree->setupFileView();
-        ui->secondary_remoteFileTree->setupFileView();
-    }
-}
-
-void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
-{
-    if (myDriver->inOfflineMode())
-    {
-        myDriver->setCurrentCase(new CFDcaseInstance(selectedTemplate, myDriver));
-        myDriver->getMainWindow()->switchToParameterTab();
+        cwe_globals::get_CWE_Driver()->createNewCase(selectedTemplate);
+        this->close();
         return;
     }
 
     /* take emergency exit if nothing has been selected */
-    FileTreeNode * selectedNode = ui->primary_remoteFileTree->getSelectedNode();
-    if (selectedNode == NULL)
+    FileNodeRef selectedNode = ui->primary_remoteFileTree->getSelectedFile();
+    if (selectedNode.isNil())
     {
         cwe_globals::displayPopup("Please select a folder to place the new case.");
         return;
     }
-    if (!selectedNode->isFolder())
+    if (selectedNode.getFileType() != FileType::DIR)
     {
         cwe_globals::displayPopup("Please select a folder to place the new case.");
         return;
@@ -103,55 +100,16 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
         return;
     }
 
-    if (ui->tabWidget->currentWidget() == ui->tab_NewCase)
+    if (selectedTemplate == NULL)
     {
-        /* we are creating a new case */
-
-        if (selectedTemplate == NULL)
-        {
-            cwe_globals::displayPopup("Please select a valid case type.");
-            return;
-        }
-        newCase = new CFDcaseInstance(selectedTemplate, myDriver);
-        newCase->createCase(newCaseName, selectedNode);
+        cwe_globals::displayPopup("Please select a valid case type.");
+        return;
     }
-    else
+    newCase = cwe_globals::get_CWE_Driver()->createNewCase(selectedTemplate);
+    if (!newCase->createCase(newCaseName, selectedNode))
     {
-        /* we are cloning from an existing case */
-
-        FileTreeNode * secondNode = ui->secondary_remoteFileTree->getSelectedNode();
-        if (selectedNode == NULL)
-        {
-            cwe_globals::displayPopup("Please select a folder to duplicate.");
-            return;
-        }
-        if (!selectedNode->isFolder())
-        {
-            cwe_globals::displayPopup("Please select a folder to duplicate.");
-            return;
-        }
-        CFDcaseInstance * tempCase = new CFDcaseInstance(secondNode, myDriver);
-        CaseState dupState = tempCase->getCaseState();
-        tempCase->deleteLater();
-
-        if (dupState == CaseState::INVALID)
-        {
-            cwe_globals::displayPopup("ERROR: Can only duplicate CFD cases managed by CWE. Please select a valid folder containing a case for duplication.");
-            return;
-        }
-        if (dupState == CaseState::LOADING)
-        {
-            cwe_globals::displayPopup("Please wait for case folder to load before attempting to duplicate.");
-            return;
-        }
-        if (dupState != CaseState::READY)
-        {
-            cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
-            return;
-        }
-
-        newCase = new CFDcaseInstance(myDriver);
-        newCase->duplicateCase(newCaseName, selectedNode, secondNode);
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+        return;
     }
 
     if (newCase->getCaseState() != CaseState::OP_INVOKE)
@@ -162,30 +120,16 @@ void CWE_Create_Copy_Simulation::on_pBtn_create_copy_clicked()
     }
 
     //Set new case will signal the other panels so that they can get configurations
-    myDriver->setCurrentCase(newCase);
+    cwe_globals::get_CWE_Driver()->setCurrentCase(newCase);
 
     /* time to switch to the ParameterTab */
-    myDriver->getMainWindow()->switchToParameterTab();
+    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToParameterTab();
+    this->close();
 }
 
-void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
+void Create_Case_Popup::populateCaseTypes()
 {
-    switch (index) {
-    case 0: // create new case
-        ui->pBtn_create_copy->setText("Create New Simulation");
-        break;
-    case 1: // duplicate an existing case
-        ui->pBtn_create_copy->setText(tr("Duplicate && Edit"));
-        break;
-    default:
-        // this one should not happen.
-        ui->tabWidget->setCurrentIndex(0);
-    }
-}
-
-void CWE_Create_Copy_Simulation::populateCaseTypes()
-{
-    QList<CFDanalysisType *> * templateList = myDriver->getTemplateList();
+    QList<CFDanalysisType *> * templateList = cwe_globals::get_CWE_Driver()->getTemplateList();
     QGridLayout *layout = new QGridLayout();
 
     int idx = 0;
@@ -237,7 +181,7 @@ void CWE_Create_Copy_Simulation::populateCaseTypes()
     ui->scroll_NewCase->setLayout(layout);
 }
 
-void CWE_Create_Copy_Simulation::selectCaseTemplate()
+void Create_Case_Popup::selectCaseTemplate()
 {
     QObject *sender = QObject::sender();
     QVector<CASE_TYPE_DATA>::iterator i;

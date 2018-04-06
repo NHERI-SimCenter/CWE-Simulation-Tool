@@ -1,6 +1,5 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
 ** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
@@ -31,51 +30,36 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_CREATE_COPY_SIMULATION_H
-#define CWE_CREATE_COPY_SIMULATION_H
+#ifndef CWEJOBACCOUNTANT_H
+#define CWEJOBACCOUNTANT_H
 
-#include "cwe_super.h"
+#include <QObject>
+#include <QMap>
 
-#include <QPushButton>
-#include <QRadioButton>
-#include <QJsonObject>
+class RemoteJobData;
 
-class CFDanalysisType;
-
-struct CASE_TYPE_DATA {
-    QRadioButton         *radioBtn;
-    QPushButton          *pbtn;
-    CFDanalysisType      *templateData;
-};
-
-namespace Ui {
-class CWE_Create_Copy_Simulation;
-}
-
-class CWE_Create_Copy_Simulation : public CWE_Super
+class CWEjobAccountant : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit CWE_Create_Copy_Simulation(QWidget *parent = 0);
-    ~CWE_Create_Copy_Simulation();
+    explicit CWEjobAccountant(QObject *parent = nullptr);
+    const RemoteJobData * getJobByID(QString IDstr);
+    const RemoteJobData * getJobByFolder(QString folderName);
+    bool allRunningDetailsLoaded();
 
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
+signals:
+    void haveNewJobInfo();
 
-private slots:
-    void on_pBtn_create_copy_clicked();
-    void on_tabWidget_currentChanged(int index);
-    void selectCaseTemplate();
+public slots:
+    void reloadJobLists();
 
 private:
-    Ui::CWE_Create_Copy_Simulation *ui;
-    void populateCaseTypes();
-    void create_new_case_from_template(QString filename);
+    QMap<QString, const RemoteJobData *> detailedRunningJobs;
+    QMap<QString, const RemoteJobData *> undetailedRunningJobs;
+    QMap<QString, const RemoteJobData *> terminatedJobs;
 
-    CFDanalysisType * selectedTemplate = NULL;
-
-    QVector<CASE_TYPE_DATA> caseTypeDataList;
 };
 
-#endif // CWE_CREATE_COPY_SIMULATION_H
+#endif // CWEJOBACCOUNTANT_H

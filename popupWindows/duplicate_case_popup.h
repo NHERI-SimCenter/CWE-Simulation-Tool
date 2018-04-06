@@ -1,12 +1,12 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -32,62 +32,39 @@
 
 // Contributors:
 
-#ifndef CWE_FILE_MANAGER2_H
-#define CWE_FILE_MANAGER2_H
+#ifndef DUPLICATE_CASE_POPUP_H
+#define DUPLICATE_CASE_POPUP_H
 
-#include "cwe_super.h"
+#include <QMainWindow>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QJsonObject>
 
-#include <QFileSystemModel>
-#include <QMenu>
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 
-class FileTreeNode;
+class CFDanalysisType;
 
 namespace Ui {
-class CWE_file_manager2;
+class Duplicate_Case_Popup;
 }
 
-class CWE_file_manager2 : public CWE_Super
+class Duplicate_Case_Popup : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit CWE_file_manager2(QWidget *parent = 0);
-    ~CWE_file_manager2();
-
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
+    explicit Duplicate_Case_Popup(FileNodeRef toClone, QWidget *parent = 0);
+    ~Duplicate_Case_Popup();
 
 private slots:
-    void on_pb_upload_clicked();
-    void on_pb_download_clicked();
-
-    void customFileMenu(const QPoint &pos);
-    void copyMenuItem();
-    void moveMenuItem();
-    void renameMenuItem();
-    void deleteMenuItem();
-    void createFolderMenuItem();
-
-    void compressMenuItem();
-    void decompressMenuItem();
-    void refreshMenuItem();
-
-    void downloadBufferItem();
-
-    void remoteOpDone();
-
-    void on_localButton_newFolder_clicked();
-    void on_localButton_deleteFolder_clicked();
-    void on_localButton_deleteFile_clicked();
-
-    void on_remoteButton_newFolder_clicked();
-    void on_remoteButton_deleteFolder_clicked();
-    void on_remoteButton_deleteFile_clicked();
+    void button_create_copy_clicked();
+    //void on_tabWidget_currentChanged(int index);
 
 private:
-    Ui::CWE_file_manager2 *ui;
-    QFileSystemModel *localFileModel;
+    Ui::Duplicate_Case_Popup *ui;
+    void create_new_case_from_template(QString filename);
 
-    FileTreeNode * targetNode = NULL;
+    FileNodeRef clonedFolder;
 };
 
-#endif // CWE_FILE_MANAGER2_H
+#endif // DUPLICATE_CASE_POPUP_H

@@ -95,18 +95,22 @@ void CWE_ParamPanel::addVariable(QString varName, QJsonObject &theVariable)
 
     if (type.toLower() == "std") {
         theVar = new SCtrStdDataWidget(this);
+        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
     else if (type.toLower() == "choose") {
         theVar = new SCtrChoiceDataWidget(this);
+        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
     else if (type.toLower() == "bool") {
         theVar = new SCtrBoolDataWidget(this);
+        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
     else if (type.toLower() == "file") {
         theVar = new SCtrFileDataWidget(myDriver, this);
+        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
     else {
