@@ -15,7 +15,6 @@
     </qresource>
     <qresource prefix="/">
         <file>copyText.txt</file>
-        <file>cweStyle.qss</file>
         <file>images/Overview/CWEFlow1.png</file>
         <file>images/Overview/CWEFlow2.png</file>
         <file>images/Overview/CWEFlow3.png</file>
@@ -197,13 +196,15 @@
         <file>icons/world2.gif</file>
         <file>icons/world2.png</file>
         <file>icons/xml.png</file>
-        <file>help/overview.html</file>
-        <file>help/default.html</file>
         <file>help/about_developers.html</file>
         <file>help/about_simcenter.html</file>
         <file>help/license.html</file>
-        <file>help/clone_case.html</file>
-        <file>help/continue_case.html</file>
-        <file>help/create_case.html</file>
+        <file>styleSheets/cweLinux.qss</file>
+        <file>styleSheets/cweMac.qss</file>
+        <file>styleSheets/cweStyle.qss</file>
+        <file>styleSheets/cweWin.qss</file>
+        <file>help/common_header.html</file>
+        <file>help/common_footer.html</file>
+        <file>help/index.html</file>
     </qresource>
 </RCC>

@@ -73,8 +73,8 @@ ResultVisualPopup::~ResultVisualPopup()
 
 void ResultVisualPopup::performStandardInit(QMap<QString, QString> neededFiles)
 {
-    FileTreeNode * trueBaseFolder = myCase->getCaseFolderNode()->getChildNodeWithName(resultObj["stage"]);
-    if (trueBaseFolder == NULL)
+    FileNodeRef trueBaseFolder = myCase->getCaseFolder().getChildWithName(resultObj["stage"]);
+    if (trueBaseFolder.isNil())
     {
         cwe_globals::displayPopup("ERROR: Result requested for stage that is not yet complete.");
         this->deleteLater();

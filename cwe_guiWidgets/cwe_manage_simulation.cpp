@@ -38,9 +38,13 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "../popupWindows/create_case_popup.h"
+#include "../popupWindows/duplicate_case_popup.h"
+
 #include "mainWindow/cwe_mainwindow.h"
 
 #include "cwe_interfacedriver.h"
+#include "cwe_globals.h"
 
 CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
     CWE_Super(parent),
@@ -48,8 +52,8 @@ CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QObject::connect(ui->treeView, SIGNAL(newFileSelected(FileTreeNode*)),
-                             this, SLOT(newFileSelected(FileTreeNode*)));
+    QObject::connect(ui->treeView, SIGNAL(newFileSelected(FileNodeRef)),
+                             this, SLOT(newFileSelected(FileNodeRef)));
 
     clearSelectView();
 
@@ -61,33 +65,42 @@ CWE_manage_simulation::~CWE_manage_simulation()
     delete ui;
 }
 
-void CWE_manage_simulation::linkDriver(CWE_InterfaceDriver * theDriver)
+void CWE_manage_simulation::linkDriver()
 {
-    CWE_Super::linkDriver(theDriver);
-    QObject::connect(myDriver, SIGNAL(haveNewCase()),
+    cwe_globals::get_CWE_Driver()->getMainWindow()->getFileModel()->linkRemoteFileTreeToModel(ui->treeView);
+    QObject::connect(cwe_globals::get_CWE_Driver(), SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
 }
 
-void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
+void CWE_manage_simulation::newFileSelected(FileNodeRef newFile)
 {
-    if (newFile == NULL)
+    if (!newFile.fileNodeExtant())
     {
-        myDriver->setCurrentCase(NULL);
+        cwe_globals::get_CWE_Driver()->setCurrentCase();
         return;
     }
 
-    myDriver->setCurrentCase(new CFDcaseInstance(newFile, myDriver));
+    cwe_globals::get_CWE_Driver()->setCurrentCase(newFile);
 }
 
 void CWE_manage_simulation::newCaseGiven()
 {
-    CFDcaseInstance * newCase = myDriver->getCurrentCase();
+    CFDcaseInstance * newCase = cwe_globals::get_CWE_Driver()->getCurrentCase();
+
+    //TODO: This code is to fix problem with inconsistant case selection
+    //Should clear slection if new case is not same as already selected folder
+    //if ((newCase->getCaseFolder().fileNodeExtant()) &&
+    //    (newCase->getCaseFolder() != ui->treeView->getSelectedFile()))
+    //{
+    //    ui->treeView->selectFileByNode(newCase->getCaseFolder());
+    //}
 
     ui->label_caseStatus->setCurrentCase(newCase);    
 
     ui->treeView->setEnabled(true);
     clearSelectView();
 
+    ui->pb_duplicateCase->setEnabled(false);
     ui->pb_viewParameters->setEnabled(false);
     ui->pb_viewResults->setEnabled(false);
 
@@ -113,6 +126,7 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         ui->treeView->setEnabled(false);
 
         showSelectView();
+        ui->pb_duplicateCase->setEnabled(false);
         ui->pb_viewParameters->setEnabled(false);
         ui->pb_viewResults->setEnabled(false);
         return;
@@ -132,23 +146,27 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         if (newState != CaseState::LOADING)
         {
             clearSelectView();
+            ui->pb_duplicateCase->setEnabled(false);
             ui->pb_viewParameters->setEnabled(false);
             ui->pb_viewResults->setEnabled(false);
         }
         return;
     }
 
-    if ((newState == CaseState::RUNNING) || (newState == CaseState::READY))
+    if ((newState == CaseState::RUNNING) ||
+            (newState == CaseState::READY) ||
+            (newState == CaseState::EXTERN_OP))
     {
+        ui->pb_duplicateCase->setEnabled(true);
         ui->pb_viewParameters->setEnabled(true);
         ui->pb_viewResults->setEnabled(true);
 
-        CFDcaseInstance * theCase = myDriver->getCurrentCase();
+        CFDcaseInstance * theCase = cwe_globals::get_CWE_Driver()->getCurrentCase();
 
         CFDanalysisType * theType = theCase->getMyType();
         if (theType == NULL)
         {
-            myDriver->fatalInterfaceError("Type/stage mismatch for case.");
+            cwe_globals::get_CWE_Driver()->fatalInterfaceError("Type/stage mismatch for case.");
             return;
         }
         ui->label_CaseTypeIcon->setPixmap(theType->getIcon()->pixmap(150,100));
@@ -168,16 +186,40 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
     }
 }
 
+void CWE_manage_simulation::create_new_case_clicked()
+{
+    Create_Case_Popup * createCase = new Create_Case_Popup(this);
+    createCase->show();
+}
+
+void CWE_manage_simulation::duplicate_case_clicked()
+{
+    FileNodeRef slectedFolder = ui->treeView->getSelectedFile();
+    if (slectedFolder.isNil())
+    {
+        cwe_globals::displayPopup("Please select a folder to duplicate.");
+        return;
+    }
+    if (slectedFolder.getFileType() != FileType::DIR)
+    {
+        cwe_globals::displayPopup("Please select a folder to duplicate.");
+        return;
+    }
+
+    Duplicate_Case_Popup * duplicateCase = new Duplicate_Case_Popup(slectedFolder, this);
+    duplicateCase->show();
+}
+
 void CWE_manage_simulation::on_pb_viewParameters_clicked()
 {
     // switch main window to parameters tab
-    myDriver->getMainWindow()->switchToParameterTab();
+    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToParameterTab();
 }
 
 void CWE_manage_simulation::on_pb_viewResults_clicked()
 {
     // switch main window to results tab
-    myDriver->getMainWindow()->switchToResultsTab();
+    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToResultsTab();
 }
 
 void CWE_manage_simulation::clearSelectView()

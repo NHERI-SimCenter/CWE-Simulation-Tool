@@ -34,7 +34,7 @@
 
 #include "sctrfiledatawidget.h"
 
-#include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
+#include "../AgaveExplorer/remoteModelViews/remotefiletree.h"
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "../AgaveClientInterface/filemetadata.h"
 #include "cwe_interfacedriver.h"
@@ -94,8 +94,8 @@ void SCtrFileDataWidget::setData(QJsonObject &obj)
         selectedFile->setText(obj.value(QString("default")).toString());
     }
 
-    QObject::connect(myFileTree, SIGNAL(newFileSelected(FileTreeNode*)),
-                     this, SLOT(newFileSelected(FileTreeNode*)));
+    QObject::connect(myFileTree, SIGNAL(newFileSelected(FileNodeRef)),
+                     this, SLOT(newFileSelected(FileNodeRef)));
 }
 
 bool SCtrFileDataWidget::toBool()
@@ -116,11 +116,11 @@ void SCtrFileDataWidget::updateValue(QString s)
     myFileTree->clearSelection();
 }
 
-void SCtrFileDataWidget::newFileSelected(FileTreeNode * newFile)
+void SCtrFileDataWidget::newFileSelected(FileNodeRef newFile)
 {
-    if (newFile == NULL)
+    if (newFile.isNil())
     {
         selectedFile->setText("");
     }
-    selectedFile->setText(newFile->getFileData().getFullPath());
+    selectedFile->setText(newFile.getFullPath());
 }

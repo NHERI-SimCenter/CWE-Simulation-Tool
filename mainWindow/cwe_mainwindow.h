@@ -38,6 +38,9 @@
 #include <QMainWindow>
 
 #include <QDesktopWidget>
+#include <QPushButton>
+
+#include "../AgaveExplorer/remoteModelViews/remotefilemodel.h"
 
 namespace Ui {
 class CWE_MainWindow;
@@ -52,7 +55,7 @@ class CWE_MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit CWE_MainWindow(CWE_InterfaceDriver *newDriver, QWidget *parent = 0);
+    explicit CWE_MainWindow(QWidget *parent = 0);
     ~CWE_MainWindow();
 
     void runSetupSteps();
@@ -61,8 +64,9 @@ public:
 
     void switchToParameterTab();
     void switchToResultsTab();
-    void switchToCreateTab();
     void switchToFilesTab();
+
+    RemoteFileModel * getFileModel();
 
 private slots:
     void newCaseGiven();
@@ -77,7 +81,7 @@ private:
 
     Ui::CWE_MainWindow *ui;
 
-    CWE_InterfaceDriver     *myDriver;
+    RemoteFileModel fileModel;
     cwe_state_label        *stateLabel = NULL;
 };
 

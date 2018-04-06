@@ -94,6 +94,12 @@
    </item>
    <item>
     <widget class="QLabel" name="statusLabel">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <weight>50</weight>
@@ -102,7 +108,7 @@
      </property>
      <property name="styleSheet">
       <string notr="true">QLabel {
-color: #C0E000;
+color: red;
 }
 </string>
      </property>
