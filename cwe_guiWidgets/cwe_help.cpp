@@ -39,70 +39,18 @@
 #include <QFileInfo>
 #include <QUrl>
 
+#include <QtGlobal>
+
 CWE_help::CWE_help(QWidget *parent) :
     CWE_Super(parent),
     ui(new Ui::CWE_help)
 {
     ui->setupUi(this);
-
-    QObject::connect(ui->helpBrowser, SIGNAL(anchorClicked(QUrl)),
-                     this, SLOT(browser_anchor_clicked(QUrl)));
-
-    QFile headText(":/help/common_header.html");
-    if (!headText.open(QIODevice::ReadOnly | QIODevice::Text))
-            return;
-    headerText = headText.readAll();
-    headText.close();
-
-    QFile footText(":/help/common_footer.html");
-    if (!footText.open(QIODevice::ReadOnly | QIODevice::Text))
-            return;
-    footerText = footText.readAll();
-    footText.close();
-
-    setLocalPage(":/help/index.html");
+    ui->helpBrowser->setSource(QUrl("qrc:///help/index.html"));
+    ui->helpBrowser->setOpenExternalLinks(true);
 }
 
 CWE_help::~CWE_help()
 {
     delete ui;
-}
-
-void CWE_help::setLocalPage(QString pageName)
-{
-    QFile helpText(pageName);
-    if (!helpText.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        if (currentPageName == pageName)
-        {
-            setLocalPage(":/help/index.html");
-        }
-        else
-        {
-            setLocalPage(currentPageName);
-        }
-        return;
-    }
-
-    currentPageName = pageName;
-    QByteArray theText;
-    theText = theText.append(headerText);
-    theText = theText.append(helpText.readAll());
-    theText = theText.append(footerText);
-
-    helpText.close();
-
-    ui->helpBrowser->setHtml(theText);
-}
-
-void CWE_help::browser_anchor_clicked(const QUrl &link)
-{
-    if (link.isLocalFile())
-    {
-        setLocalPage(link.toLocalFile());
-        return;
-    }
-
-    QDesktopServices::openUrl(link);
-    setLocalPage(currentPageName);
 }
