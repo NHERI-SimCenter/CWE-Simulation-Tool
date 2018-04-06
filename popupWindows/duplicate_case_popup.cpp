@@ -53,8 +53,8 @@ Duplicate_Case_Popup::Duplicate_Case_Popup(FileNodeRef toClone, QWidget *parent)
 
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        ui->primary_remoteFileTree->setupFileView();
         ui->primary_remoteFileTree->header()->resizeSection(0,200);
+        cwe_globals::get_CWE_Driver()->getMainWindow()->getFileModel()->linkRemoteFileTreeToModel(ui->primary_remoteFileTree);
     }
 
     clonedFolder = toClone;
@@ -143,21 +143,3 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
     cwe_globals::get_CWE_Driver()->getMainWindow()->switchToParameterTab();
     this->close();
 }
-
-/*
-void CWE_Create_Copy_Simulation::on_tabWidget_currentChanged(int index)
-{
-    switch (index) {
-    case 0: // create new case
-        ui->pBtn_create_copy->setText("Create New Simulation");
-        break;
-    case 1: // duplicate an existing case
-        ui->pBtn_create_copy->setText(tr("Duplicate && Edit"));
-        break;
-    default:
-        break;
-        // this one should not happen.
-//        ui->tabWidget->setCurrentIndex(0);
-    }
-}
-*/
