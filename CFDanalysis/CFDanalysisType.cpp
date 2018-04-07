@@ -76,6 +76,150 @@ QString CFDanalysisType::getName()
     return obj["name"].toString();
 }
 
+QString CFDanalysisType::getDescription()
+{
+    QJsonObject obj = myConfiguration.object();
+    return obj["description"].toString();
+}
+
+QString CFDanalysisType::getIconName()
+{
+    QJsonObject obj = myConfiguration.object();
+    return obj["icon"].toString();
+}
+
+QStringList CFDanalysisType::getSequence()
+{
+    QStringList list;
+
+    QJsonObject obj = myConfiguration.object();
+    QJsonArray sequence = obj["sequence"].toArray();
+
+    foreach (QJsonValue item, sequence)
+    {
+        list.append(item.toString());
+    }
+
+    return list;
+}
+
+QString CFDanalysisType::getStageName(QString stage)
+{
+    QJsonObject obj = myConfiguration.object();
+    QString    name = obj["stages"].toObject().value(stage).toObject().value("name").toString();
+    if (name.isEmpty())
+    {
+        name = "unknown";
+    }
+    return name;
+}
+
+QStringList CFDanalysisType::getStageGroups(QString stage)
+{
+    QStringList list;
+
+    QJsonObject obj = myConfiguration.object();
+    QJsonArray groups = obj["stages"].toObject().value(stage).toObject().value("groups").toArray();
+
+    foreach (QJsonValue item, groups)
+    {
+        list.append(item.toString());
+    }
+
+    return list;
+}
+
+QList<RESULTS_STYLE> CFDanalysisType::getStageResults(QString stage)
+{
+    QList<RESULTS_STYLE> list;
+
+    QJsonObject obj = myConfiguration.object();
+    QJsonArray results = obj["stages"].toObject().value(stage).toObject().value("results").toArray();
+
+    foreach (QJsonValue val, results)
+    {
+        QJsonObject item = val.toObject();
+
+        RESULTS_STYLE res;
+
+        if (item.contains("name")) { res.name = item.value("name").toString(); }
+        if (item.contains("type")) { res.type = item.value("type").toString(); }
+        if (item.contains("file")) { res.file = item.value("file").toString(); }
+        if (item.contains("values")) { res.values = item.value("values").toString(); }
+
+        list.append(res);
+    }
+
+    return list;
+}
+
+QStringList CFDanalysisType::getVarGroup(QString group)
+{
+    QStringList list;
+
+    QJsonObject obj = myConfiguration.object();
+    QJsonArray vars = obj["varGroups"].toObject().value(group).toArray();
+
+    foreach (QJsonValue val, vars)
+    {
+        QString str = val.toString();
+        if (!str.isEmpty())
+        {
+            list.append( str);
+        }
+    }
+
+    return list;
+}
+
+VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
+{
+    VARIABLE_TYPE res;
+
+    res.unit = "";
+    res.precission = "";
+    res.sign = "";
+    res.options = QList<KEY_VAL_PAIR>();
+
+    QJsonObject obj = myConfiguration.object();
+    QJsonObject vals = obj["vars"].toObject();
+
+    if (vals.contains(name))
+    {
+        QJsonObject item = vals.value(name).toObject();
+
+        if (item.contains("displayname")) { res.displayName = item.value("displayname").toString(); }
+        if (item.contains("type"))        { res.type = item.value("type").toString(); }
+        if (item.contains("default"))     { res.defaultValue = item.value("default").toString(); }
+        if (item.contains("unit"))        { res.unit = item.value("unit").toString(); }
+        if (item.contains("precission"))  { res.precission = item.value("precission").toString(); }
+        if (item.contains("sign"))        { res.sign = item.value("sign").toString(); }
+        if (item.contains("options"))
+        {
+            QList<KEY_VAL_PAIR> allOptions;
+
+            foreach (QString key, item["options"].toObject().keys())
+            {
+                KEY_VAL_PAIR pair;
+                pair.key   = key;
+                pair.value = item["options"].toObject().value(key).toString();
+
+                allOptions.append(pair);
+            }
+
+            res.options = allOptions;
+        }
+    }
+    else
+    {
+        res.displayName   = "none";
+        res.type          = "text";
+        res.defaultValue  = QString("missing definition for variable '%1'").arg(name);
+    }
+
+    return res;
+}
+
 QString CFDanalysisType::getStageApp(QString stageName)
 {
     QJsonObject obj = myConfiguration.object();
