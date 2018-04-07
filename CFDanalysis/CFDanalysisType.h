@@ -58,7 +58,7 @@ struct VARIABLE_TYPE {
     QString type;
     QString defaultValue;
     QString unit;
-    QString precission;
+    QString precision;
     QString sign;
     QList<KEY_VAL_PAIR> options;
 };
@@ -74,7 +74,8 @@ public:
     QString getName();
     QString getDescription();
     QString getIconName();
-    QStringList getSequence();
+    QStringList getStageNames();
+    QStringList getStageSequence();
 
     QString getStageName(QString stage);
     QStringList getStageGroups(QString stage);
@@ -86,8 +87,6 @@ public:
     QString getStageApp(QString stageName);
     QString getExtraInput(QString stageName);
 
-    QStringList getStageNames();
-    QStringList getStageSequence();
     QString translateStageId(QString stageId);
 
     QIcon * getIcon();

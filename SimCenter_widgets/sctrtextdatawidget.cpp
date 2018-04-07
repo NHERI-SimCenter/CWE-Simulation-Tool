@@ -32,44 +32,42 @@
 
 // Contributors:
 
-#ifndef CWE_PARAMPANEL_H
-#define CWE_PARAMPANEL_H
+#include "SimCenter_widgets/sctrtextdatawidget.h"
 
-#include <QFrame>
-//#include <QJsonObject>
-//#include <QJsonArray>
-#include <QMap>
-#include <QLayout>
+SCtrTextDataWidget::SCtrTextDataWidget(QWidget *parent):
+    SCtrMasterDataWidget(parent)
+{
 
-#include "SimCenter_widgets/sctrstates.h"
-#include "CFDanalysis/CFDanalysisType.h"
-
-class SCtrMasterDataWidget;
-class CWE_InterfaceDriver;
-enum class SimCenterViewState;
-
-namespace Ui {
-class CWE_ParamPanel;
 }
 
-class CWE_ParamPanel : public QFrame
+void SCtrTextDataWidget::setData(VARIABLE_TYPE &obj)
 {
-    Q_OBJECT
+    // set up the UI for the widget
+    this->initUI();
 
-public:
-    explicit CWE_ParamPanel(CWE_InterfaceDriver *theDriver, QWidget *parent = 0);
-    ~CWE_ParamPanel();
+    m_obj = obj;
 
-    void setViewState(SimCenterViewState);
-    SimCenterViewState getViewState();
-    void addVariable(QString varName, VARIABLE_TYPE &theVariable);
-    void addParameterConfig(QStringList &groupVars, CFDanalysisType *myType);
-    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
+    QHBoxLayout *layout = (QHBoxLayout *)this->layout();
+    layout->setMargin(0);
 
-private:
-    SimCenterViewState m_viewState;
-    QMap<QString, SCtrMasterDataWidget *> *variableWidgets;
-    CWE_InterfaceDriver * myDriver;
-};
+    theValue = new QLineEdit(this);
+    layout->insertWidget(1, theValue, 4);
 
-#endif // CWE_PARAMPANEL_H
+    if (label_varName != NULL) { label_varName->setText(m_obj.displayName); }
+
+    this->setLayout(layout);  // do I need this one?
+
+    /* set default */
+    this->updateValue(m_obj.defaultValue);
+}
+
+QString SCtrTextDataWidget::toString()
+{
+    return m_obj.defaultValue;
+}
+
+void SCtrTextDataWidget::updateValue(QString s)
+{
+    /* update the value */
+    theValue->setText(s);
+}
