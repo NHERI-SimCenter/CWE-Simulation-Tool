@@ -42,7 +42,7 @@ SCtrBoolDataWidget::SCtrBoolDataWidget(QWidget *parent):
 
 }
 
-void SCtrBoolDataWidget::setData(QJsonObject &obj)
+void SCtrBoolDataWidget::setData(VARIABLE_TYPE &obj)
 {
     // set up the UI for the widget
     this->initUI();
@@ -56,17 +56,23 @@ void SCtrBoolDataWidget::setData(QJsonObject &obj)
     layout->insertWidget(1, theCheckBox, 4);
 
     if (label_unit != NULL) {
-        label_unit->setText(obj.value(QString("unit")).toString());
+        label_unit->setText(m_obj.unit);
     }
     if (label_varName != NULL) {
-        label_varName->setText(obj.value(QString("displayname")).toString());
+        label_varName->setText(m_obj.displayName);
     }
 
     this->setLayout(layout);  // do I need this one?
 
     /* set default */
-    bool defaultValue = obj.value(QString("default")).toBool();
-    theCheckBox->setChecked(defaultValue?Qt::Checked:Qt::Unchecked);
+    if (m_obj.defaultValue.toLower() == "true")
+    {
+        theCheckBox->setChecked(Qt::Checked);
+    }
+    else
+    {
+        theCheckBox->setChecked(Qt::Unchecked);
+    }
 }
 
 bool SCtrBoolDataWidget::toBool()
@@ -107,9 +113,7 @@ void SCtrBoolDataWidget::updateValue(QString s)
     else
     {
         /* add an error message */
-        QString name = m_obj["displayname"].toString();
-
-        cwe_globals::displayPopup(QString("Boolean variable %1 cannot be set to \'%2\'.\nVariable ignored.").arg(name).arg(s), "Warning");
+        cwe_globals::displayPopup(QString("Boolean variable %1 cannot be set to \'%2\'.\nVariable ignored.").arg(m_obj.displayName).arg(s), "Warning");
         return;
     }
 }

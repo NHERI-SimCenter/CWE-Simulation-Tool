@@ -42,7 +42,7 @@ SCtrChoiceDataWidget::SCtrChoiceDataWidget(QWidget *parent):
 
 }
 
-void SCtrChoiceDataWidget::setData(QJsonObject &obj)
+void SCtrChoiceDataWidget::setData(VARIABLE_TYPE &obj)
 {
     // set up the UI for the widget
     this->initUI();
@@ -53,32 +53,36 @@ void SCtrChoiceDataWidget::setData(QJsonObject &obj)
     layout->setMargin(0);
 
     if (label_unit != NULL) {
-        label_unit->setText(obj.value(QString("unit")).toString());
+        label_unit->setText(m_obj.unit);
     }
     if (label_varName != NULL) {
-        label_varName->setText(obj.value(QString("displayname")).toString());
+        label_varName->setText(m_obj.displayName);
     }
 
     QStandardItemModel *theModel = new QStandardItemModel(this);
 
-    QJsonObject options = obj.value(QString("options")).toObject();
-    QString theDefault = obj.value(QString("default")).toString();
+    QString defaultValue = "";
 
-    foreach (QString key, options.keys())
+    foreach (KEY_VAL_PAIR option, m_obj.options)
     {
         QList<QStandardItem *> newRow;
         // newRow.clear();
-        newRow.append(new QStandardItem(key));
-        newRow.append(new QStandardItem(options.value(key).toString()));
+        newRow.append(new QStandardItem(option.key));
+        newRow.append(new QStandardItem(option.value));
 
         theModel->appendRow(newRow);
+
+        if (option.key == m_obj.defaultValue) defaultValue = option.value;
     }
 
     theComboBox = new QComboBox(this);
     layout->insertWidget(1, theComboBox, 4);
     theComboBox->setModel(theModel);
     theComboBox->setModelColumn(1);
-    theComboBox->setCurrentText(options.value(theDefault).toString());
+    if (!defaultValue.isEmpty())
+    {
+        theComboBox->setCurrentText(defaultValue);
+    }
 
     this->setLayout(layout);
 }
@@ -122,8 +126,7 @@ void SCtrChoiceDataWidget::updateValue(QString s)
     if (itemList.isEmpty())
     {
         /* add an error message */
-        QString name = m_obj["displayname"].toString();
-        cwe_globals::displayPopup(QString("Variable %1 of unknown selection option \'%2\'.\nVariable ignored.").arg(name).arg(s), "Warning");
+        cwe_globals::displayPopup(QString("Variable %1 of unknown selection option \'%2\'.\nVariable ignored.").arg(m_obj.displayName).arg(s), "Warning");
         return;
     }
 

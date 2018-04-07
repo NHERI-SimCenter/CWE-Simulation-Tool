@@ -42,6 +42,7 @@
 #include <QDebug>
 
 #include "SimCenter_widgets/sctrstates.h"
+#include "CFDanalysis/CFDanalysisType.h"
 
 class CWE_StageStatusTab;
 class CWE_GroupsWidget;
@@ -76,7 +77,7 @@ public:
     bool addVariable(QString varName, QJsonObject JSONvariable, const QString &key, const QString &label , QString *setVal = NULL);
     void addVarsData(QJsonObject , QJsonObject );
 
-    void setParameterConfig(QJsonObject &obj);
+    void setParameterConfig(CFDanalysisType *myType);
     void updateParameterValues(QMap<QString, QString>);
     void initQuickParameterPtr();
 
@@ -100,7 +101,7 @@ private:
 
     Ui::CWE_TabWidget *ui;
 
-    QMap<QString, SimCenterViewState> m_viewState;
+    QMap<QString, SimCenterViewState>  m_viewState;
     QMap<QString, SimCenterButtonMode> buttonModeList;
 
     QMap<QString, CWE_StageStatusTab *> *stageTabList;

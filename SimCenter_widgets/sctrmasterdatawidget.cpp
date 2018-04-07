@@ -34,16 +34,20 @@
 
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 #include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+#include "CFDanalysis/CFDanalysisType.h"
 
 SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
     QFrame(parent)
 {
     this->setViewState(SimCenterViewState::visible);
 
-    m_obj = QJsonObject();
-    m_obj.insert("type","unknown");
-    m_obj.insert("displayname","not specified");
-    m_obj.insert("varname","UNKNOWN");
+    m_obj.displayName = "";
+    m_obj.type = "text";
+    m_obj.defaultValue = "error in configuration file";
+    m_obj.unit = "";
+    m_obj.precision = "";
+    m_obj.sign = "";
+    m_obj.options = QList<KEY_VAL_PAIR>();
 }
 
 SCtrMasterDataWidget::~SCtrMasterDataWidget()

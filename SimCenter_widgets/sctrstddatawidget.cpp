@@ -40,7 +40,7 @@ SCtrStdDataWidget::SCtrStdDataWidget(QWidget *parent):
 
 }
 
-void SCtrStdDataWidget::setData(QJsonObject &obj)
+void SCtrStdDataWidget::setData(VARIABLE_TYPE &obj)
 {
     // set up the UI for the widget
     this->initUI();
@@ -54,16 +54,16 @@ void SCtrStdDataWidget::setData(QJsonObject &obj)
     layout->insertWidget(1, theValue, 4);
 
     if (label_unit != NULL) {
-        label_unit->setText(obj.value(QString("unit")).toString());
+        label_unit->setText(m_obj.unit);
     }
     if (label_varName != NULL) {
-        label_varName->setText(obj.value(QString("displayname")).toString());
+        label_varName->setText(m_obj.displayName);
     }
 
     this->setLayout(layout);  // do I need this one?
 
     /* set default */
-    QString defaultValue = obj.value(QString("default")).toString();
+    QString defaultValue = m_obj.defaultValue;
     this->updateValue(defaultValue);
 }
 
@@ -71,7 +71,7 @@ QString SCtrStdDataWidget::toString()
 {
     QString s = "";
 
-    QString precString  = m_obj.value("precision").toString();
+    QString precString  = m_obj.precision;
     if (precString.toLower() == "int")
     {
         s = QString("%1").arg(((theValue->text()).toInt()));
@@ -95,7 +95,7 @@ void SCtrStdDataWidget::updateValue(QString s)
 
     /* check if new information is of an appropriate type */
 
-    QString precString  = m_obj.value("precision").toString();
+    QString precString  = m_obj.precision;
     if (precString.toLower() == "int")
     {
         val = QString("%1").arg(s.toInt());
