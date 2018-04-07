@@ -101,7 +101,7 @@ private:
 
     Ui::CWE_TabWidget *ui;
 
-    QMap<QString, SimCenterViewState> m_viewState;
+    QMap<QString, SimCenterViewState>  m_viewState;
     QMap<QString, SimCenterButtonMode> buttonModeList;
 
     QMap<QString, CWE_StageStatusTab *> *stageTabList;
