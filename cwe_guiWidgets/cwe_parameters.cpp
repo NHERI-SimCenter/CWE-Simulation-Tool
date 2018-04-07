@@ -227,13 +227,15 @@ void CWE_Parameters::createUnderlyingParamWidgets()
     if (newCase->getMyType() == NULL) return;
     if (newCase->getCaseFolder().isNil()) return;
 
-    QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
+    CFDanalysisType * myType = newCase->getMyType();
+
+    //QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
 
     ui->label_theName->setText(newCase->getCaseName());
-    ui->label_theType->setText(newCase->getMyType()->getName());
+    ui->label_theType->setText(myType->getName());
     ui->label_theLocation->setText(newCase->getCaseFolder().getFullPath());
 
-    ui->theTabWidget->setParameterConfig(rawConfig);
+    ui->theTabWidget->setParameterConfig(myType);
     ui->theTabWidget->setViewState(SimCenterViewState::visible);
 
     paramWidgetsExist = true;

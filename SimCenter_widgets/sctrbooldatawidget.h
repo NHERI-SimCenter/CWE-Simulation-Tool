@@ -41,7 +41,7 @@ class SCtrBoolDataWidget: public SCtrMasterDataWidget
 {
 public:
     SCtrBoolDataWidget(QWidget *parent);
-    void setData(QJsonObject &obj);
+    void setData(VARIABLE_TYPE &);
     QString toString();
     double  toDouble();
     bool toBool();

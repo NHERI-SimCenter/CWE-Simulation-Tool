@@ -32,44 +32,18 @@
 
 // Contributors:
 
-#ifndef CWE_PARAMPANEL_H
-#define CWE_PARAMPANEL_H
+#ifndef SCTRTEXTDATAWIDGET_H
+#define SCTRTEXTDATAWIDGET_H
 
-#include <QFrame>
-//#include <QJsonObject>
-//#include <QJsonArray>
-#include <QMap>
-#include <QLayout>
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
-#include "SimCenter_widgets/sctrstates.h"
-#include "CFDanalysis/CFDanalysisType.h"
-
-class SCtrMasterDataWidget;
-class CWE_InterfaceDriver;
-enum class SimCenterViewState;
-
-namespace Ui {
-class CWE_ParamPanel;
-}
-
-class CWE_ParamPanel : public QFrame
+class SCtrTextDataWidget: public SCtrMasterDataWidget
 {
-    Q_OBJECT
-
 public:
-    explicit CWE_ParamPanel(CWE_InterfaceDriver *theDriver, QWidget *parent = 0);
-    ~CWE_ParamPanel();
-
-    void setViewState(SimCenterViewState);
-    SimCenterViewState getViewState();
-    void addVariable(QString varName, VARIABLE_TYPE &theVariable);
-    void addParameterConfig(QStringList &groupVars, CFDanalysisType *myType);
-    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
-
-private:
-    SimCenterViewState m_viewState;
-    QMap<QString, SCtrMasterDataWidget *> *variableWidgets;
-    CWE_InterfaceDriver * myDriver;
+    SCtrTextDataWidget(QWidget *parent);
+    void setData(VARIABLE_TYPE &);
+    QString toString();
+    void updateValue(QString);
 };
 
-#endif // CWE_PARAMPANEL_H
+#endif // SCTRTEXTDATAWIDGET_H

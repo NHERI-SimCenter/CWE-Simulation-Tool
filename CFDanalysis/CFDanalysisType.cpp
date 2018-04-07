@@ -88,21 +88,6 @@ QString CFDanalysisType::getIconName()
     return obj["icon"].toString();
 }
 
-QStringList CFDanalysisType::getSequence()
-{
-    QStringList list;
-
-    QJsonObject obj = myConfiguration.object();
-    QJsonArray sequence = obj["sequence"].toArray();
-
-    foreach (QJsonValue item, sequence)
-    {
-        list.append(item.toString());
-    }
-
-    return list;
-}
-
 QString CFDanalysisType::getStageName(QString stage)
 {
     QJsonObject obj = myConfiguration.object();
@@ -177,7 +162,7 @@ VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
     VARIABLE_TYPE res;
 
     res.unit = "";
-    res.precission = "";
+    res.precision = "";
     res.sign = "";
     res.options = QList<KEY_VAL_PAIR>();
 
@@ -192,7 +177,7 @@ VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
         if (item.contains("type"))        { res.type = item.value("type").toString(); }
         if (item.contains("default"))     { res.defaultValue = item.value("default").toString(); }
         if (item.contains("unit"))        { res.unit = item.value("unit").toString(); }
-        if (item.contains("precission"))  { res.precission = item.value("precission").toString(); }
+        if (item.contains("precision"))   { res.precision = item.value("precision").toString(); }
         if (item.contains("sign"))        { res.sign = item.value("sign").toString(); }
         if (item.contains("options"))
         {
