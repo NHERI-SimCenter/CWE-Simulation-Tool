@@ -143,7 +143,7 @@ QStringList CFDanalysisType::getVarGroup(QString group)
     QStringList list;
 
     QJsonObject obj = myConfiguration.object();
-    QJsonArray vars = obj["varGroups"].toObject().value(group).toArray();
+    QJsonArray vars = obj["groups"].toObject().value(group).toObject().value("vars").toArray();
 
     foreach (QJsonValue val, vars)
     {
