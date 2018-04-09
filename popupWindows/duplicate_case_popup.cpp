@@ -41,12 +41,13 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "mainWindow/cwe_mainwindow.h"
+
 #include "cwe_interfacedriver.h"
 
 #include "cwe_globals.h"
 
-Duplicate_Case_Popup::Duplicate_Case_Popup(FileNodeRef toClone, QWidget *parent) :
-    QMainWindow(parent),
+Duplicate_Case_Popup::Duplicate_Case_Popup(FileNodeRef toClone, CWE_MainWindow *controlWindow, QWidget *parent) :
+    CWE_Popup(controlWindow, parent),
     ui(new Ui::Duplicate_Case_Popup)
 {
     ui->setupUi(this);
@@ -104,7 +105,8 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
         return;
     }
 
-    CFDcaseInstance * tempCase = cwe_globals::get_CWE_Driver()->getCaseFromFolder(clonedFolder);
+    CFDcaseInstance * tempCase = myMainWindow->getCaseFromFolder(clonedFolder);
+    tempCase->deleteLater();
     CaseState dupState = tempCase->getCaseState();
 
     if (dupState == CaseState::INVALID)
@@ -122,10 +124,11 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
         cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
         return;
     }
-    newCase = cwe_globals::get_CWE_Driver()->createNewCase(NULL);
+    newCase = new CFDcaseInstance();
     if (!newCase->duplicateCase(newCaseName, selectedFile, clonedFolder))
     {
         cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+        newCase->deleteLater();
         return;
     }
 
@@ -137,9 +140,9 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
     }
 
     //Set new case will signal the other panels so that they can get configurations
-    cwe_globals::get_CWE_Driver()->setCurrentCase(newCase);
+    myMainWindow->setCurrentCase(newCase);
 
     /* time to switch to the ParameterTab */
-    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToParameterTab();
+    myMainWindow->switchToParameterTab();
     this->close();
 }

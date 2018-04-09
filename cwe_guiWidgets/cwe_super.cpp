@@ -33,10 +33,17 @@
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
 #include "cwe_super.h"
+#include "cwe_globals.h"
+#include "cwe_interfacedriver.h"
 
 CWE_Super::CWE_Super(QWidget *parent) : QFrame(parent)
 {
-
+    setMainWindow(cwe_globals::get_CWE_Driver()->getMainWindow());
 }
 
 void CWE_Super::linkDriver(){}
+
+void CWE_Super::setMainWindow(CWE_MainWindow * newMainWindow)
+{
+    theMainWindow = newMainWindow;
+}

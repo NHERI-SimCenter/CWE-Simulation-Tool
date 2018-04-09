@@ -67,8 +67,8 @@ CWE_manage_simulation::~CWE_manage_simulation()
 
 void CWE_manage_simulation::linkDriver()
 {
-    cwe_globals::get_CWE_Driver()->getMainWindow()->getFileModel()->linkRemoteFileTreeToModel(ui->treeView);
-    QObject::connect(cwe_globals::get_CWE_Driver(), SIGNAL(haveNewCase()),
+    theMainWindow->getFileModel()->linkRemoteFileTreeToModel(ui->treeView);
+    QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
 }
 
@@ -76,25 +76,18 @@ void CWE_manage_simulation::newFileSelected(FileNodeRef newFile)
 {
     if (!newFile.fileNodeExtant())
     {
-        cwe_globals::get_CWE_Driver()->setCurrentCase();
+        theMainWindow->setCurrentCase();
         return;
     }
 
-    cwe_globals::get_CWE_Driver()->setCurrentCase(newFile);
+    theMainWindow->setCurrentCase(newFile);
 }
 
 void CWE_manage_simulation::newCaseGiven()
 {
-    CFDcaseInstance * newCase = cwe_globals::get_CWE_Driver()->getCurrentCase();
+    CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
 
-    //TODO: This code is to fix problem with inconsistant case selection
-    //Should clear slection if new case is not same as already selected folder
-    //if ((newCase->getCaseFolder().fileNodeExtant()) &&
-    //    (newCase->getCaseFolder() != ui->treeView->getSelectedFile()))
-    //{
-    //    ui->treeView->selectFileByNode(newCase->getCaseFolder());
-    //}
-
+    ui->treeView->selectRowByFile(newCase->getCaseFolder());
     ui->label_caseStatus->setCurrentCase(newCase);    
 
     ui->treeView->setEnabled(true);
@@ -161,7 +154,7 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         ui->pb_viewParameters->setEnabled(true);
         ui->pb_viewResults->setEnabled(true);
 
-        CFDcaseInstance * theCase = cwe_globals::get_CWE_Driver()->getCurrentCase();
+        CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
 
         CFDanalysisType * theType = theCase->getMyType();
         if (theType == NULL)
@@ -188,25 +181,25 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
 
 void CWE_manage_simulation::create_new_case_clicked()
 {
-    Create_Case_Popup * createCase = new Create_Case_Popup(this);
+    Create_Case_Popup * createCase = new Create_Case_Popup(theMainWindow, NULL);
     createCase->show();
 }
 
 void CWE_manage_simulation::duplicate_case_clicked()
 {
-    FileNodeRef slectedFolder = ui->treeView->getSelectedFile();
-    if (slectedFolder.isNil())
+    FileNodeRef selectedFolder = ui->treeView->getSelectedFile();
+    if (selectedFolder.isNil())
     {
         cwe_globals::displayPopup("Please select a folder to duplicate.");
         return;
     }
-    if (slectedFolder.getFileType() != FileType::DIR)
+    if (selectedFolder.getFileType() != FileType::DIR)
     {
         cwe_globals::displayPopup("Please select a folder to duplicate.");
         return;
     }
 
-    Duplicate_Case_Popup * duplicateCase = new Duplicate_Case_Popup(slectedFolder, this);
+    Duplicate_Case_Popup * duplicateCase = new Duplicate_Case_Popup(selectedFolder, theMainWindow, this);
     duplicateCase->show();
 }
 

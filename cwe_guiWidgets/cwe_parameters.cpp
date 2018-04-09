@@ -64,7 +64,7 @@ CWE_Parameters::~CWE_Parameters()
 
 void CWE_Parameters::linkDriver()
 {
-    QObject::connect(cwe_globals::get_CWE_Driver(), SIGNAL(haveNewCase()),
+    QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
 }
 
@@ -83,7 +83,7 @@ void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
 
 void CWE_Parameters::saveAllParams()
 {
-    CFDcaseInstance * linkedCFDCase = cwe_globals::get_CWE_Driver()->getCurrentCase();
+    CFDcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
     if (linkedCFDCase == NULL) return;
 
     if (!linkedCFDCase->changeParameters(ui->theTabWidget->collectParamData()))
@@ -94,7 +94,7 @@ void CWE_Parameters::saveAllParams()
 
 void CWE_Parameters::newCaseGiven()
 {
-    CFDcaseInstance * newCase = cwe_globals::get_CWE_Driver()->getCurrentCase();
+    CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
 
     this->resetViewInfo();
 
@@ -119,7 +119,7 @@ void CWE_Parameters::newCaseState(CaseState newState)
     }
 
     //Sets the listed states of the stage tabs
-    QMap<QString, StageState> stageStates = cwe_globals::get_CWE_Driver()->getCurrentCase()->getStageStates();
+    QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
     for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
     {
         ui->theTabWidget->setTabStage(*itr, itr.key());
@@ -147,7 +147,7 @@ void CWE_Parameters::newCaseState(CaseState newState)
         ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
         break;
     case CaseState::READY:
-        ui->theTabWidget->updateParameterValues(cwe_globals::get_CWE_Driver()->getCurrentCase()->getCurrentParams());
+        ui->theTabWidget->updateParameterValues(theMainWindow->getCurrentCase()->getCurrentParams());
         setVisibleAccordingToStage();
         setButtonsAccordingToStage();
         break;
@@ -160,7 +160,7 @@ void CWE_Parameters::newCaseState(CaseState newState)
 
 void CWE_Parameters::setButtonsAccordingToStage()
 {
-    QMap<QString, StageState> stageStates = cwe_globals::get_CWE_Driver()->getCurrentCase()->getStageStates();
+    QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
     for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
     {
         switch (*itr)
@@ -195,7 +195,7 @@ void CWE_Parameters::setButtonsAccordingToStage()
 
 void CWE_Parameters::setVisibleAccordingToStage()
 {
-    QMap<QString, StageState> stageStates = cwe_globals::get_CWE_Driver()->getCurrentCase()->getStageStates();
+    QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
     for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
     {
         switch (*itr)
@@ -221,7 +221,7 @@ void CWE_Parameters::createUnderlyingParamWidgets()
 {
     if (paramWidgetsExist) return;
 
-    CFDcaseInstance * newCase = cwe_globals::get_CWE_Driver()->getCurrentCase();
+    CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
 
     if (newCase == NULL) return;
     if (newCase->getMyType() == NULL) return;
@@ -248,7 +248,7 @@ void CWE_Parameters::switchToResults()
 
 void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
 {
-    if (cwe_globals::get_CWE_Driver()->getCurrentCase() == NULL)
+    if (theMainWindow->getCurrentCase() == NULL)
     {
         return;
     }
@@ -257,7 +257,7 @@ void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
 
     if (toEnact == CaseCommand::CANCEL)
     {
-        if (!cwe_globals::get_CWE_Driver()->getCurrentCase()->stopJob())
+        if (!theMainWindow->getCurrentCase()->stopJob())
         {
             cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
             return;
@@ -265,7 +265,7 @@ void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
     }
     else if (toEnact == CaseCommand::ROLLBACK)
     {
-        if (!cwe_globals::get_CWE_Driver()->getCurrentCase()->rollBack(stage))
+        if (!theMainWindow->getCurrentCase()->rollBack(stage))
         {
             cwe_globals::displayPopup("Unable to rool back this stage, please check that this stage is done and check your network connection.", "Network Issue");
             return;
@@ -273,7 +273,7 @@ void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
     }
     else if (toEnact == CaseCommand::RUN)
     {
-        if (!cwe_globals::get_CWE_Driver()->getCurrentCase()->startStageApp(stage))
+        if (!theMainWindow->getCurrentCase()->startStageApp(stage))
         {
             cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
             return;

@@ -96,13 +96,6 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
 CWE_InterfaceDriver::~CWE_InterfaceDriver()
 {
     if (mainWindow != NULL) delete mainWindow;
-
-    for (CFDcaseInstance * aCase: caseList)
-    {
-        QObject::disconnect(aCase, 0,0,0);
-        delete aCase;
-    }
-    caseList.clear();
 }
 
 void CWE_InterfaceDriver::startup()
@@ -160,8 +153,6 @@ void CWE_InterfaceDriver::startOffline()
     myJobAccountant = new CWEjobAccountant(this);
     mainWindow = new CWE_MainWindow();
 
-    setCurrentCase(new CFDcaseInstance(templateList.at(0)));
-
     mainWindow->runSetupSteps();
     mainWindow->show();
 
@@ -181,102 +172,6 @@ QString CWE_InterfaceDriver::getVersion()
 QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()
 {
     return &templateList;
-}
-
-CFDcaseInstance * CWE_InterfaceDriver::getCurrentCase()
-{
-    return currentCFDCase;
-}
-
-void CWE_InterfaceDriver::setCurrentCase()
-{
-    if (currentCFDCase == NULL) return;
-
-    deactivateCurrentCase();
-    currentCFDCase = NULL;
-    emit haveNewCase();
-}
-
-void CWE_InterfaceDriver::setCurrentCase(CFDcaseInstance * newCase)
-{
-    if (newCase == currentCFDCase) return;
-    deactivateCurrentCase();
-    currentCFDCase = newCase;
-    if (!caseList.contains(currentCFDCase))
-    {
-        caseList.append(currentCFDCase);
-    }
-
-    emit haveNewCase();
-}
-
-void CWE_InterfaceDriver::setCurrentCase(const FileNodeRef &caseNode)
-{
-    CFDcaseInstance * newCase = getCaseFromFolder(caseNode);
-    if (newCase == NULL)
-    {
-        setCurrentCase();
-        return;
-    }
-    setCurrentCase(newCase);
-}
-
-CFDcaseInstance * CWE_InterfaceDriver::getCaseFromFolder(const FileNodeRef &caseNode)
-{
-    for (CFDcaseInstance * aCase : caseList)
-    {
-        if (aCase->getCaseFolder().getFullPath() == caseNode.getFullPath())
-        {
-            return aCase;
-        }
-    }
-
-    CFDcaseInstance * newCase = new CFDcaseInstance(caseNode);
-    QObject::connect(newCase,SIGNAL(haveNewState(CaseState)),
-                     this, SLOT(caseHasNewState(CaseState)),
-                     Qt::QueuedConnection);
-
-    return newCase;
-}
-
-CFDcaseInstance * CWE_InterfaceDriver::createNewCase(CFDanalysisType * caseType)
-{
-    CFDcaseInstance * ret;
-    if (caseType == NULL)
-    {
-        ret = new CFDcaseInstance();
-    }
-    else
-    {
-        ret = new CFDcaseInstance(caseType);
-    }
-    QObject::connect(ret,SIGNAL(haveNewState(CaseState)),
-                     this, SLOT(caseHasNewState(CaseState)),
-                     Qt::QueuedConnection);
-    setCurrentCase(ret);
-    return ret;
-}
-
-void CWE_InterfaceDriver::deactivateCurrentCase()
-{
-    if (currentCFDCase == NULL) return;
-
-    QObject::disconnect(currentCFDCase,0,0,0);
-
-    CaseState theState = currentCFDCase->getCaseState();
-    if ((theState == CaseState::ERROR) || (theState == CaseState::INVALID))
-    {
-        caseList.removeAll(currentCFDCase);
-        currentCFDCase->deleteLater();
-        currentCFDCase = NULL;
-        return;
-    }
-
-    if (theState == CaseState::DEFUNCT) return;
-
-    QObject::connect(currentCFDCase,SIGNAL(haveNewState(CaseState)),
-                     this, SLOT(caseHasNewState(CaseState)),
-                     Qt::QueuedConnection);    
 }
 
 CWE_MainWindow * CWE_InterfaceDriver::getMainWindow()
@@ -311,36 +206,6 @@ void CWE_InterfaceDriver::checkAppList(RequestState replyState, QJsonArray * app
     if (!neededApps.isEmpty())
     {
         fatalInterfaceError("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
-    }
-}
-
-void CWE_InterfaceDriver::caseHasNewState(CaseState newState)
-{
-    QObject * theSender = sender();
-    if (theSender == NULL) return;
-    CFDcaseInstance * theCase = (CFDcaseInstance *) theSender;
-
-    if (newState == CaseState::DEFUNCT)
-    {
-        if (currentCFDCase == theCase)
-        {
-            setCurrentCase();
-        }
-
-        caseList.removeAll(theCase);
-        return;
-    }
-
-    if (currentCFDCase == theCase)
-    {
-        return;
-    }
-
-    if ((newState == CaseState::ERROR) || (newState == CaseState::INVALID))
-    {
-        caseList.removeAll(theCase);
-        theCase->deleteLater();
-        return;
     }
 }
 

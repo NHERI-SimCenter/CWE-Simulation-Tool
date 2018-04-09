@@ -38,7 +38,7 @@
 #include <QFrame>
 #include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 
-class RemoteFileModel;
+class CWE_MainWindow;
 
 class CWE_Super : public QFrame
 {
@@ -46,6 +46,11 @@ class CWE_Super : public QFrame
 public:
     explicit CWE_Super(QWidget *parent = nullptr);
     virtual void linkDriver();
+
+    void setMainWindow(CWE_MainWindow * newMainWindow);
+
+protected:
+    CWE_MainWindow * theMainWindow;
 };
 
 #endif // CWE_SUPER_H

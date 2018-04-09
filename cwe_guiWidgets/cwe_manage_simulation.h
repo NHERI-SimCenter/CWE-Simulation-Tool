@@ -40,6 +40,7 @@
 #include <QStandardItemModel>
 
 class FileNodeRef;
+class CWE_MainWindow;
 enum class CaseState;
 enum class StageState;
 
