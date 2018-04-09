@@ -41,7 +41,7 @@ class SCtrStdDataWidget: public SCtrMasterDataWidget
 {
 public:
     SCtrStdDataWidget(QWidget *parent);
-    void setData(QJsonObject &obj);
+    void setData(VARIABLE_TYPE &);
     QString toString();
     double  toDouble();
     void updateValue(QString);

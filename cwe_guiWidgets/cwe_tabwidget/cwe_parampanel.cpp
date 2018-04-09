@@ -44,6 +44,8 @@
 #include "SimCenter_widgets/sctrfiledatawidget.h"
 #include "SimCenter_widgets/sctrchoicedatawidget.h"
 
+#include "CFDanalysis/CFDanalysisType.h"
+
 #include "cwe_globals.h"
 
 CWE_ParamPanel::CWE_ParamPanel(CWE_InterfaceDriver * theDriver, QWidget *parent) :
@@ -57,11 +59,6 @@ CWE_ParamPanel::CWE_ParamPanel(CWE_InterfaceDriver * theDriver, QWidget *parent)
 CWE_ParamPanel::~CWE_ParamPanel()
 {
     if (variableWidgets != NULL) delete variableWidgets;
-}
-
-void CWE_ParamPanel::setData(QJsonObject &obj)
-{
-    m_obj = obj;
 }
 
 void CWE_ParamPanel::setViewState(SimCenterViewState state)
@@ -85,37 +82,35 @@ SimCenterViewState CWE_ParamPanel::getViewState()
     return m_viewState;
 }
 
-void CWE_ParamPanel::addVariable(QString varName, QJsonObject &theVariable)
+void CWE_ParamPanel::addVariable(QString varName, VARIABLE_TYPE &theVariable)
 {
     SCtrMasterDataWidget *theVar = NULL;
 
     QLayout *layout = this->layout();
 
-    QString type = theVariable.value("type").toString();
-
-    if (type.toLower() == "std") {
+    if (theVariable.type.toLower() == "std") {
         theVar = new SCtrStdDataWidget(this);
         theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
-    else if (type.toLower() == "choose") {
+    else if (theVariable.type.toLower() == "choose") {
         theVar = new SCtrChoiceDataWidget(this);
         theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
-    else if (type.toLower() == "bool") {
+    else if (theVariable.type.toLower() == "bool") {
         theVar = new SCtrBoolDataWidget(this);
         theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
-    else if (type.toLower() == "file") {
+    else if (theVariable.type.toLower() == "file") {
         theVar = new SCtrFileDataWidget(myDriver, this);
         theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
     else {
         /* add an error message */
-        cwe_globals::displayPopup(QString("Variable %1 of unknown type %2.\nVariable ignored.").arg(varName).arg(type), "Warning");
+        cwe_globals::displayPopup(QString("Variable %1 of unknown type %2.\nVariable ignored.").arg(varName).arg(theVariable.type), "Warning");
         theVar->deleteLater();
         return;
     }
@@ -124,17 +119,16 @@ void CWE_ParamPanel::addVariable(QString varName, QJsonObject &theVariable)
     variableWidgets->insert(varName, theVar);
 }
 
-void CWE_ParamPanel::addParameterConfig(QJsonArray &groupVars, QJsonObject &allVars)
+void CWE_ParamPanel::addParameterConfig(QStringList &groupVars, CFDanalysisType *myType)
 {
     QVBoxLayout *layout = (QVBoxLayout *)this->layout();
     if (layout != NULL) { delete layout; }
     layout = new QVBoxLayout();
     this->setLayout(layout);
 
-    foreach (QJsonValue var, groupVars)
+    foreach (QString varName, groupVars)
     {
-        QString varName = var.toString();
-        QJsonObject theVariable = allVars.value(varName).toObject();
+        VARIABLE_TYPE theVariable = myType->getVariableInfo(varName);
         this->addVariable(varName, theVariable);
     }
 

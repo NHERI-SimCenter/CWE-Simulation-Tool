@@ -72,7 +72,7 @@ void SCtrFileDataWidget::initUI()
     this->setLayout(fullLayout);
 }
 
-void SCtrFileDataWidget::setData(QJsonObject &obj)
+void SCtrFileDataWidget::setData(VARIABLE_TYPE &obj)
 {
     // set up the UI for the widget
     this->initUI();
@@ -87,11 +87,11 @@ void SCtrFileDataWidget::setData(QJsonObject &obj)
     layout->insertWidget(1, myFileTree, 4);
 
     if (label_varName != NULL) {
-        label_varName->setText(obj.value(QString("displayname")).toString());
+        label_varName->setText(m_obj.displayName);
     }
 
     if (selectedFile != NULL) {
-        selectedFile->setText(obj.value(QString("default")).toString());
+        selectedFile->setText(m_obj.defaultValue);
     }
 
     QObject::connect(myFileTree, SIGNAL(newFileSelected(FileNodeRef)),
