@@ -41,6 +41,7 @@
 
 #include "SimCenter_widgets/sctrstates.h"
 
+class CWE_MainWindow;
 enum class CaseState;
 enum class CaseCommand { ROLLBACK, RUN, CANCEL };
 
@@ -56,7 +57,7 @@ public:
     explicit CWE_Parameters(QWidget *parent = 0);
     ~CWE_Parameters();
 
-    virtual void linkDriver();
+    virtual void linkMainWindow(CWE_MainWindow *theMainWin);
     void resetViewInfo();
 
     void switchToResults();
@@ -78,7 +79,6 @@ private:
     void saveAllParams();
 
     Ui::CWE_Parameters *ui;
-
     bool paramWidgetsExist = false;
 
 };

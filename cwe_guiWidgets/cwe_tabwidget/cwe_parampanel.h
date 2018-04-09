@@ -57,7 +57,7 @@ class CWE_ParamPanel : public QFrame
     Q_OBJECT
 
 public:
-    explicit CWE_ParamPanel(CWE_InterfaceDriver *theDriver, QWidget *parent = 0);
+    explicit CWE_ParamPanel(QWidget *parent = 0);
     ~CWE_ParamPanel();
 
     void setViewState(SimCenterViewState);
@@ -69,7 +69,6 @@ public:
 private:
     SimCenterViewState m_viewState;
     QMap<QString, SCtrMasterDataWidget *> *variableWidgets;
-    CWE_InterfaceDriver * myDriver;
 };
 
 #endif // CWE_PARAMPANEL_H

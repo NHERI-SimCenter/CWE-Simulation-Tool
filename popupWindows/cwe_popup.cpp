@@ -1,6 +1,5 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
 ** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
@@ -31,18 +30,11 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_debug_widget.h"
-#include "ui_cwe_debug_widget.h"
+#include "cwe_popup.h"
 
-CWE_Debug_Widget::CWE_Debug_Widget(QWidget *parent) :
-    CWE_Super(parent),
-    ui(new Ui::CWE_Debug_Widget)
+CWE_Popup::CWE_Popup(CWE_MainWindow *controlWindow, QWidget *parent) : QMainWindow(parent)
 {
-    ui->setupUi(this);
-}
-
-CWE_Debug_Widget::~CWE_Debug_Widget()
-{
-    delete ui;
+    myMainWindow = controlWindow;
 }

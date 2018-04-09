@@ -51,6 +51,8 @@
 #include "cwe_guiWidgets/cwe_parameters.h"
 #include "../CFDClientProgram/cwe_interfacedriver.h"
 
+#include "mainWindow/cwe_mainwindow.h"
+
 #include "cwe_globals.h"
 
 CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
@@ -184,7 +186,7 @@ void CWE_TabWidget::setParameterConfig(CFDanalysisType *myType)
     QStringList stages = myType->getStageSequence();
 
     QMap<QString, StageState> stageStates;
-    stageStates = cwe_globals::get_CWE_Driver()->getCurrentCase()->getStageStates();
+    stageStates = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase()->getStageStates();
 
     foreach (QString stageName, stages)
     {

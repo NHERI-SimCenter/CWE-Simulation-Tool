@@ -48,16 +48,6 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //Esablish connections with driver
-    QObject::connect(cwe_globals::get_CWE_Driver(), SIGNAL(haveNewCase()),
-                     this, SLOT(newCaseGiven()));
-
-    if (!cwe_globals::get_CWE_Driver()->inDebugMode())
-    {
-        //Tabs only appearing in debug mode should be listed here
-        ui->tab_debug->deleteLater();
-    }
-
     changeParamsAndResultsEnabled(false);
 
     //Set Header text
@@ -101,32 +91,19 @@ void CWE_MainWindow::runSetupSteps()
             continue;
         }
         CWE_Super * aWidget = (CWE_Super *) rawWidget;
-        aWidget->linkDriver();
+        aWidget->linkMainWindow(this);
     }
-}
-
-void CWE_MainWindow::newCaseGiven()
-{
-    CFDcaseInstance * newCase = cwe_globals::get_CWE_Driver()->getCurrentCase();
-
-    changeParamsAndResultsEnabled(false);
-    if (stateLabel != NULL)
-    {
-        stateLabel->setCurrentCase(newCase);
-    }
-
-    if (newCase == NULL)
-    {
-        return;
-    }
-    QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
-                         this, SLOT(newCaseState(CaseState)));
-    //Manually invoke state change to initialize visibility
-    newCaseState(newCase->getCaseState());
 }
 
 void CWE_MainWindow::newCaseState(CaseState newState)
 {
+    QObject * theSender = sender();
+    if (theSender != NULL)
+    {
+        CFDcaseInstance * theCase = (CFDcaseInstance *) theSender;
+        if (theCase != currentCase) return;
+    }
+
     if ((newState == CaseState::DEFUNCT) ||
             (newState == CaseState::ERROR) ||
             (newState == CaseState::INVALID))
@@ -212,4 +189,93 @@ void CWE_MainWindow::changeParamsAndResultsEnabled(bool setting)
 void CWE_MainWindow::changeTabEnabled(QWidget * theTab, bool newSetting)
 {
     ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(theTab),newSetting);
+}
+
+CFDcaseInstance * CWE_MainWindow::getCurrentCase()
+{
+    return currentCase;
+}
+
+void CWE_MainWindow::setCurrentCase()
+{
+    if (currentCase == NULL) return;
+
+    deactivateCurrentCase();
+    currentCase = NULL;
+    stateLabel->setCurrentCase(currentCase);
+    emit haveNewCase();
+}
+
+void CWE_MainWindow::setCurrentCase(CFDcaseInstance * newCase)
+{
+    if (newCase == currentCase) return;
+
+    changeParamsAndResultsEnabled(false);
+    stateLabel->setCurrentCase(newCase);
+
+    deactivateCurrentCase();
+    currentCase = newCase;
+    if (currentCase == NULL) return;
+
+    QObject::connect(currentCase, SIGNAL(haveNewState(CaseState)),
+                    this, SLOT(newCaseState(CaseState)),
+                    Qt::QueuedConnection);
+    //Manually invoke state change to initialize visibility
+    newCaseState(currentCase->getCaseState());
+    emit haveNewCase();
+}
+
+void CWE_MainWindow::setCurrentCase(const FileNodeRef &caseNode)
+{
+    CFDcaseInstance * newCase = getCaseFromFolder(caseNode);
+    if (newCase == NULL)
+    {
+        setCurrentCase();
+        return;
+    }
+    setCurrentCase(newCase);
+}
+
+void CWE_MainWindow::setCurrentCase(CFDanalysisType * newCaseType)
+{
+    CFDcaseInstance * newCase = getCaseFromType(newCaseType);
+    if (newCase == NULL)
+    {
+        setCurrentCase();
+        return;
+    }
+    setCurrentCase(newCase);
+}
+
+CFDcaseInstance * CWE_MainWindow::getCaseFromFolder(const FileNodeRef &caseNode)
+{
+    if ((currentCase != NULL) && (currentCase->getCaseFolder().getFullPath() == caseNode.getFullPath()))
+    {
+        return currentCase;
+    }
+
+    CFDcaseInstance * newCase = new CFDcaseInstance(caseNode);
+    return newCase;
+}
+
+CFDcaseInstance * CWE_MainWindow::getCaseFromType(CFDanalysisType * caseType)
+{
+    CFDcaseInstance * ret;
+    if (caseType == NULL)
+    {
+        ret = new CFDcaseInstance();
+    }
+    else
+    {
+        ret = new CFDcaseInstance(caseType);
+    }
+    return ret;
+}
+
+void CWE_MainWindow::deactivateCurrentCase()
+{
+    if (currentCase == NULL) return;
+    QObject::disconnect(currentCase,0,0,0);
+    currentCase->deleteLater();
+    currentCase = NULL;
 }

@@ -102,7 +102,7 @@ void CWEjobAccountant::reloadJobLists()
     for (const RemoteJobData * aJob : fullJobList)
     {
         QString theApp = aJob->getApp();
-        if ((theApp != "cwe-serial") && (theApp != "cwe-parallel"))
+        if (!theApp.startsWith("cwe-serial") && !theApp.startsWith("cwe-parallel"))
         {
             continue;
         }
@@ -123,4 +123,5 @@ void CWEjobAccountant::reloadJobLists()
             undetailedRunningJobs.insert(aJob->getID(),aJob);
         }
     }
+    emit haveNewJobInfo();
 }

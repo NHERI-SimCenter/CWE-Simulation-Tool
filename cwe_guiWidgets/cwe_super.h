@@ -38,14 +38,17 @@
 #include <QFrame>
 #include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 
-class RemoteFileModel;
+class CWE_MainWindow;
 
 class CWE_Super : public QFrame
 {
     Q_OBJECT
 public:
     explicit CWE_Super(QWidget *parent = nullptr);
-    virtual void linkDriver();
+    virtual void linkMainWindow(CWE_MainWindow * newMainWindow);
+
+protected:
+    CWE_MainWindow * theMainWindow;
 };
 
 #endif // CWE_SUPER_H
