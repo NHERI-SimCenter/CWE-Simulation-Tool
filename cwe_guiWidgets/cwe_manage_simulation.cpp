@@ -65,9 +65,10 @@ CWE_manage_simulation::~CWE_manage_simulation()
     delete ui;
 }
 
-void CWE_manage_simulation::linkDriver()
+void CWE_manage_simulation::linkMainWindow(CWE_MainWindow *theMainWin)
 {
-    theMainWindow->getFileModel()->linkRemoteFileTreeToModel(ui->treeView);
+    CWE_Super::linkMainWindow(theMainWin);
+    ui->treeView->setModelLink(theMainWindow->getFileModel());
     QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
 }

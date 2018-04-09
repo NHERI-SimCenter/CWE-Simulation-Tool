@@ -56,7 +56,7 @@ public:
     explicit CWE_manage_simulation(QWidget *parent = 0);
     ~CWE_manage_simulation();
 
-    virtual void linkDriver();
+    virtual void linkMainWindow(CWE_MainWindow *theMainWin);
 
 private slots:
     void newFileSelected(FileNodeRef newFile);

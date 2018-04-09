@@ -45,9 +45,7 @@ class CWE_Super : public QFrame
     Q_OBJECT
 public:
     explicit CWE_Super(QWidget *parent = nullptr);
-    virtual void linkDriver();
-
-    void setMainWindow(CWE_MainWindow * newMainWindow);
+    virtual void linkMainWindow(CWE_MainWindow * newMainWindow);
 
 protected:
     CWE_MainWindow * theMainWindow;

@@ -58,7 +58,7 @@ public:
     explicit CWE_Results(QWidget *parent = 0);
     ~CWE_Results();
 
-    virtual void linkDriver();
+    virtual void linkMainWindow(CWE_MainWindow *theMainWin);
     void resetViewInfo();
 
 private slots:
