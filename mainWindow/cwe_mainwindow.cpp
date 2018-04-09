@@ -91,12 +91,17 @@ void CWE_MainWindow::runSetupSteps()
             continue;
         }
         CWE_Super * aWidget = (CWE_Super *) rawWidget;
-        aWidget->linkDriver();
+        aWidget->linkMainWindow(this);
     }
 }
 
 void CWE_MainWindow::newCaseState(CaseState newState)
 {
+    QObject * theSender = sender();
+    if (theSender == NULL) return;
+    CFDcaseInstance * theCase = (CFDcaseInstance *) theSender;
+    if (theCase != currentCase) return;
+
     if ((newState == CaseState::DEFUNCT) ||
             (newState == CaseState::ERROR) ||
             (newState == CaseState::INVALID))
@@ -111,34 +116,6 @@ void CWE_MainWindow::newCaseState(CaseState newState)
     {
         changeParamsAndResultsEnabled(true);
     }
-    /*
-     * QObject * theSender = sender();
-    if (theSender == NULL) return;
-    CFDcaseInstance * theCase = (CFDcaseInstance *) theSender;
-
-    if (newState == CaseState::DEFUNCT)
-    {
-        if (currentCFDCase == theCase)
-        {
-            setCurrentCase();
-        }
-
-        caseList.removeAll(theCase);
-        return;
-    }
-
-    if (currentCFDCase == theCase)
-    {
-        return;
-    }
-
-    if ((newState == CaseState::ERROR) || (newState == CaseState::INVALID))
-    {
-        caseList.removeAll(theCase);
-        theCase->deleteLater();
-        return;
-    }
-    */
 }
 
 void CWE_MainWindow::menuCopyInfo()

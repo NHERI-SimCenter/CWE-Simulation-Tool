@@ -54,8 +54,7 @@ Duplicate_Case_Popup::Duplicate_Case_Popup(FileNodeRef toClone, CWE_MainWindow *
 
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        ui->primary_remoteFileTree->header()->resizeSection(0,200);
-        cwe_globals::get_CWE_Driver()->getMainWindow()->getFileModel()->linkRemoteFileTreeToModel(ui->primary_remoteFileTree);
+        ui->primary_remoteFileTree->setModelLink(myMainWindow->getFileModel());
     }
 
     clonedFolder = toClone;

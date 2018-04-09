@@ -68,8 +68,9 @@ CWE_Results::~CWE_Results()
     delete ui;
 }
 
-void CWE_Results::linkDriver()
+void CWE_Results::linkMainWindow(CWE_MainWindow *theMainWin)
 {
+    CWE_Super::linkMainWindow(theMainWin);
     QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
 
