@@ -48,6 +48,8 @@ class CWE_MainWindow;
 
 class cwe_state_label;
 class CWE_InterfaceDriver;
+class CFDcaseInstance;
+class CFDanalysisType;
 enum class CaseState;
 
 class CWE_MainWindow : public QMainWindow
@@ -68,18 +70,33 @@ public:
 
     RemoteFileModel * getFileModel();
 
+    CFDcaseInstance * getCurrentCase();
+    void setCurrentCase();
+    void setCurrentCase(CFDcaseInstance * newCase);
+    void setCurrentCase(const FileNodeRef &caseNode);
+    void setCurrentCase(CFDanalysisType * newCaseType);
+
+    CFDcaseInstance * getCaseFromType(CFDanalysisType *caseType);
+    CFDcaseInstance * getCaseFromFolder(const FileNodeRef &caseNode);
+
+signals:
+    void haveNewCase();
+
 private slots:
-    void newCaseGiven();
     void newCaseState(CaseState newState);
 
     void menuExit();
     void menuCopyInfo();
 
 private:
+    void deactivateCurrentCase();
+
     void changeParamsAndResultsEnabled(bool setting);
     void changeTabEnabled(QWidget *theTab, bool newSetting);
 
     Ui::CWE_MainWindow *ui;
+
+    CFDcaseInstance * currentCase = NULL;
 
     RemoteFileModel fileModel;
     cwe_state_label        *stateLabel = NULL;

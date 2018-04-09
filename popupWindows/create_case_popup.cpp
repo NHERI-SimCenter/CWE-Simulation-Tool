@@ -45,8 +45,8 @@
 
 #include "cwe_globals.h"
 
-Create_Case_Popup::Create_Case_Popup(QWidget *parent) :
-    QMainWindow(parent),
+Create_Case_Popup::Create_Case_Popup(CWE_MainWindow *controlWindow, QWidget *parent) :
+    CWE_Popup(controlWindow, parent),
     ui(new Ui::Create_Case_Popup)
 {
     ui->setupUi(this);
@@ -68,7 +68,7 @@ void Create_Case_Popup::button_create_copy_clicked()
 {
     if (cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        cwe_globals::get_CWE_Driver()->createNewCase(selectedTemplate);
+        myMainWindow->setCurrentCase(selectedTemplate);
         this->close();
         return;
     }
@@ -102,10 +102,11 @@ void Create_Case_Popup::button_create_copy_clicked()
         cwe_globals::displayPopup("Please select a valid case type.");
         return;
     }
-    newCase = cwe_globals::get_CWE_Driver()->createNewCase(selectedTemplate);
+    newCase = myMainWindow->getCaseFromType(selectedTemplate);
     if (!newCase->createCase(newCaseName, selectedNode))
     {
         cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+        newCase->deleteLater();
         return;
     }
 
@@ -117,7 +118,7 @@ void Create_Case_Popup::button_create_copy_clicked()
     }
 
     //Set new case will signal the other panels so that they can get configurations
-    cwe_globals::get_CWE_Driver()->setCurrentCase(newCase);
+    myMainWindow->setCurrentCase(newCase);
 
     /* time to switch to the ParameterTab */
     cwe_globals::get_CWE_Driver()->getMainWindow()->switchToParameterTab();

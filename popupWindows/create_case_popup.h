@@ -35,7 +35,8 @@
 #ifndef CREATE_CASE_POPUP_H
 #define CREATE_CASE_POPUP_H
 
-#include <QMainWindow>
+#include "cwe_popup.h"
+
 #include <QPushButton>
 #include <QRadioButton>
 #include <QJsonObject>
@@ -52,12 +53,12 @@ namespace Ui {
 class Create_Case_Popup;
 }
 
-class Create_Case_Popup : public QMainWindow
+class Create_Case_Popup : public CWE_Popup
 {
     Q_OBJECT
 
 public:
-    explicit Create_Case_Popup(QWidget *parent = 0);
+    explicit Create_Case_Popup(CWE_MainWindow * controlWindow, QWidget *parent = 0);
     ~Create_Case_Popup();
 
 private slots:

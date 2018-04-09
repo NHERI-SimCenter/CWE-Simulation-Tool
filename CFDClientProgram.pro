@@ -60,7 +60,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_welcome_screen.cpp \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
-    cwe_guiWidgets/cwe_debug_widget.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.cpp \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.cpp \
@@ -111,7 +110,8 @@ SOURCES += main.cpp \
     popupWindows/create_case_popup.cpp \
     popupWindows/duplicate_case_popup.cpp \
     ../AgaveExplorer/remoteModelViews/remotefileitem.cpp \
-    SimCenter_widgets/sctrtextdatawidget.cpp
+    SimCenter_widgets/sctrtextdatawidget.cpp \
+    popupWindows/cwe_popup.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -126,7 +126,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_welcome_screen.h \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
-    cwe_guiWidgets/cwe_debug_widget.h \
     cwe_guiWidgets/cwe_state_label.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h \
@@ -176,7 +175,8 @@ HEADERS  += \
     popupWindows/create_case_popup.h \
     popupWindows/duplicate_case_popup.h \
     ../AgaveExplorer/remoteModelViews/remotefileitem.h \
-    SimCenter_widgets/sctrtextdatawidget.h
+    SimCenter_widgets/sctrtextdatawidget.h \
+    popupWindows/cwe_popup.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
