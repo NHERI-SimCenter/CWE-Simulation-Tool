@@ -80,7 +80,7 @@ void CWE_GroupsWidget::setParameterConfig(QString stage, CFDanalysisType *myType
     foreach (QString groupName, groups)
     {
         QScrollArea *scrollArea = new QScrollArea(this);
-        CWE_ParamPanel *panel = new CWE_ParamPanel(myDriver, this);
+        CWE_ParamPanel *panel = new CWE_ParamPanel(this);
         scrollArea->setWidgetResizable(true);
         scrollArea->setWidget(panel);
 

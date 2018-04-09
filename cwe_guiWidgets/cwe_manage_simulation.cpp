@@ -88,7 +88,6 @@ void CWE_manage_simulation::newCaseGiven()
 {
     CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
 
-    ui->treeView->selectRowByFile(newCase->getCaseFolder());
     ui->label_caseStatus->setCurrentCase(newCase);    
 
     ui->treeView->setEnabled(true);
@@ -100,6 +99,7 @@ void CWE_manage_simulation::newCaseGiven()
 
     if (newCase != NULL)
     {
+        ui->treeView->selectRowByFile(newCase->getCaseFolder());
         ui->label_caseName->setText(newCase->getCaseName());
 
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
@@ -149,11 +149,12 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
 
     if ((newState == CaseState::RUNNING) ||
             (newState == CaseState::READY) ||
-            (newState == CaseState::EXTERN_OP))
+            (newState == CaseState::EXTERN_OP) ||
+            (newState == CaseState::PARAM_SAVE))
     {
         ui->pb_duplicateCase->setEnabled(true);
         ui->pb_viewParameters->setEnabled(true);
-        ui->pb_viewResults->setEnabled(true);
+        ui->pb_viewResults->setEnabled(newState == CaseState::READY);
 
         CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
 

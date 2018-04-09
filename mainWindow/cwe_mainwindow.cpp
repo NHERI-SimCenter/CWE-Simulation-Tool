@@ -98,9 +98,11 @@ void CWE_MainWindow::runSetupSteps()
 void CWE_MainWindow::newCaseState(CaseState newState)
 {
     QObject * theSender = sender();
-    if (theSender == NULL) return;
-    CFDcaseInstance * theCase = (CFDcaseInstance *) theSender;
-    if (theCase != currentCase) return;
+    if (theSender != NULL)
+    {
+        CFDcaseInstance * theCase = (CFDcaseInstance *) theSender;
+        if (theCase != currentCase) return;
+    }
 
     if ((newState == CaseState::DEFUNCT) ||
             (newState == CaseState::ERROR) ||
@@ -200,6 +202,7 @@ void CWE_MainWindow::setCurrentCase()
 
     deactivateCurrentCase();
     currentCase = NULL;
+    stateLabel->setCurrentCase(currentCase);
     emit haveNewCase();
 }
 
@@ -208,10 +211,7 @@ void CWE_MainWindow::setCurrentCase(CFDcaseInstance * newCase)
     if (newCase == currentCase) return;
 
     changeParamsAndResultsEnabled(false);
-    if (stateLabel != NULL)
-    {
-        stateLabel->setCurrentCase(newCase);
-    }
+    stateLabel->setCurrentCase(newCase);
 
     deactivateCurrentCase();
     currentCase = newCase;
@@ -249,7 +249,7 @@ void CWE_MainWindow::setCurrentCase(CFDanalysisType * newCaseType)
 
 CFDcaseInstance * CWE_MainWindow::getCaseFromFolder(const FileNodeRef &caseNode)
 {
-    if (currentCase->getCaseFolder().getFullPath() == caseNode.getFullPath())
+    if ((currentCase != NULL) && (currentCase->getCaseFolder().getFullPath() == caseNode.getFullPath()))
     {
         return currentCase;
     }
