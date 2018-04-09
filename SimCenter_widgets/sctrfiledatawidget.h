@@ -48,7 +48,7 @@ class SCtrFileDataWidget: public SCtrMasterDataWidget
 public:
     SCtrFileDataWidget(QWidget *parent);
     SCtrFileDataWidget(CWE_InterfaceDriver* theDriver, QWidget *parent);
-    void setData(QJsonObject &obj);
+    void setData(VARIABLE_TYPE &);
     QString toString();
     bool toBool();
     virtual void updateValue(QString);
