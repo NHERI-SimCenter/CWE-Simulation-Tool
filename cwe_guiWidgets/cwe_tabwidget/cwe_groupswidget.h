@@ -77,7 +77,6 @@ private:
     QJsonObject m_obj;
 
     CWE_StageStatusTab * myTab;
-    CWE_InterfaceDriver * myDriver;
 
     QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
 };

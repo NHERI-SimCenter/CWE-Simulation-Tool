@@ -112,5 +112,10 @@ void cwe_state_label::setNewState(CaseState newState)
         this->setText("OFFLINE MODE");
         return;
     }
+    if (newState == CaseState::PARAM_SAVE)
+    {
+        this->setText("Saving Parameters");
+        return;
+    }
     this->setText("ERROR");
 }

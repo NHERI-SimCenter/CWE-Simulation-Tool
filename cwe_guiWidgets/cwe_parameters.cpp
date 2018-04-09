@@ -144,6 +144,7 @@ void CWE_Parameters::newCaseState(CaseState newState)
     case CaseState::DOWNLOAD:
     case CaseState::OP_INVOKE:
     case CaseState::RUNNING:
+    case CaseState::PARAM_SAVE:
         ui->theTabWidget->setViewState(SimCenterViewState::visible);
         ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
         break;
@@ -274,7 +275,7 @@ void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
     }
     else if (toEnact == CaseCommand::RUN)
     {
-        if (!theMainWindow->getCurrentCase()->startStageApp(stage))
+        if (!theMainWindow->getCurrentCase()->changeParameters(ui->theTabWidget->collectParamData(), stage))
         {
             cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
             return;

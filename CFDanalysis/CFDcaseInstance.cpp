@@ -149,6 +149,8 @@ bool CFDcaseInstance::createCase(QString newName, const FileNodeRef &containingF
     if (!caseFolder.isNil()) return false;
     if (!expectedNewCaseFolder.isEmpty()) return false;
 
+    newName = newName.replace(' ', '_');
+
     expectedNewCaseFolder = containingFolder.getFullPath();
     expectedNewCaseFolder = expectedNewCaseFolder.append("/");
     expectedNewCaseFolder = expectedNewCaseFolder.append(newName);
@@ -258,7 +260,8 @@ bool CFDcaseInstance::startStageApp(QString stageID)
     if (defunct) return false;
     if (!caseFolder.fileNodeExtant()) return false;
     if (myType == NULL) return false;
-    if (myState != InternalCaseState::READY) return false;
+    if ((myState != InternalCaseState::READY) &&
+            (myState != InternalCaseState::PARAM_SAVE_RUN))return false;
     if (storedStageStates.value(stageID, StageState::ERROR) != StageState::UNRUN) return false;
 
     QString appName = myType->getStageApp(stageID);
@@ -369,6 +372,8 @@ bool CFDcaseInstance::downloadCase(QString destLocalFile)
 void CFDcaseInstance::underlyingFilesUpdated(const FileNodeRef changedNode)
 {
     if (defunct) return;
+    if (caseFolder.isNil()) return;
+
     if (!caseFolder.fileNodeExtant())
     {
         emitNewState(InternalCaseState::DEFUNCT);
@@ -810,8 +815,7 @@ bool CFDcaseInstance::recomputeStageStates()
 
     if ((caseFolder.isNil()) || (!caseFolder.folderContentsLoaded()) ||
             (myState == InternalCaseState::STOPPING_JOB) || (myState == InternalCaseState::MAKING_FOLDER) ||
-            (myState == InternalCaseState::INIT_PARAM_UPLOAD) || (myState == InternalCaseState::PARAM_SAVE) ||
-            (myState == InternalCaseState::PARAM_SAVE_RUN) ||
+            (myState == InternalCaseState::INIT_PARAM_UPLOAD) ||
             (myState == InternalCaseState::FOLDER_CHECK_STOPPED_JOB) || (myState == InternalCaseState::COPYING_FOLDER) ||
             (myState == InternalCaseState::WAITING_FOLDER_DEL))
     {
@@ -1257,5 +1261,10 @@ void CFDcaseInstance::state_Param_Save_Run_taskDone(RequestState invokeStatus)
     {
         paramNode.setFileBuffer(NULL);
     }
-    startStageApp(runningStage);
+    if (!startStageApp(runningStage))
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Error: Unable to start task. Please reset and try again.", "Remote Job error");
+        return;
+    }
 }
