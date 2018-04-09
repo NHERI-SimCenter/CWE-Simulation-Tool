@@ -58,12 +58,13 @@ enum class StageState {UNREADY, UNRUN, RUNNING, FINISHED, FINISHED_PREREQ, LOADI
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, OP_INVOKE, EXTERN_OP, RUNNING, DOWNLOAD, OFFLINE};
+enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, OP_INVOKE, EXTERN_OP, PARAM_SAVE, RUNNING, DOWNLOAD, OFFLINE};
 enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
                              TYPE_SELECTED, EMPTY_CASE, INIT_DATA_LOAD,
                              MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD,
                              READY, EXTERN_FILE_OP,
-                             USER_PARAM_UPLOAD, WAITING_FOLDER_DEL, RE_DATA_LOAD,
+                             PARAM_SAVE, PARAM_SAVE_RUN,
+                             WAITING_FOLDER_DEL, RE_DATA_LOAD,
                              STARTING_JOB, STOPPING_JOB, RUNNING_JOB,
                              FOLDER_CHECK_STOPPED_JOB, DOWNLOAD};
 
@@ -92,6 +93,7 @@ public:
     bool createCase(QString newName, const FileNodeRef &containingFolder);
     bool duplicateCase(QString newName, const FileNodeRef &containingFolder, const FileNodeRef &oldCase);
     bool changeParameters(QMap<QString, QString> paramList);
+    bool changeParameters(QMap<QString, QString> paramList, QString stageToRun);
     bool startStageApp(QString stageID);
     bool rollBack(QString stageToDelete);
     bool stopJob();
@@ -139,9 +141,10 @@ private:
     void state_Running_jobList();
     void state_StartingJob_jobInvoked(QString jobID);
     void state_StoppingJob_jobKilled();
-    void state_UserParamUpload_taskDone(RequestState invokeStatus);
     void state_WaitingFolderDel_taskDone(RequestState invokeStatus);
     void state_Download_recursiveOpDone(RequestState invokeStatus);
+    void state_Param_Save_taskDone(RequestState invokeStatus);
+    void state_Param_Save_Run_taskDone(RequestState invokeStatus);
 
     bool defunct = false;
     QMap<QString, StageState> storedStageStates;
