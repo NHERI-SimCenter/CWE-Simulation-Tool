@@ -1042,12 +1042,15 @@ void CFDcaseInstance::state_DataLoad_fileChange_jobList()
 
     computeParamList();
 
-    const RemoteJobData * myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFileName());
+    const RemoteJobData * myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFullPath());
     if (myJob != NULL)
     {
-        runningID = myJob->getID();
-        emitNewState(InternalCaseState::RUNNING_JOB);
-        return;
+        if ((myJob->getState() != "FINISHED") && (myJob->getState() == "FAILED"))
+        {
+            runningID = myJob->getID();
+            emitNewState(InternalCaseState::RUNNING_JOB);
+            return;
+        }
     }
 
     if (cwe_globals::get_CWE_Job_Accountant()->allRunningDetailsLoaded())
@@ -1136,13 +1139,16 @@ void CFDcaseInstance::state_Ready_fileChange_jobList()
         return;
     }
 
-    const RemoteJobData * myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFileName());
+    const RemoteJobData * myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFullPath());
     if (myJob != NULL)
     {
-        runningStage.clear();
-        runningID = myJob->getID();
-        emitNewState(InternalCaseState::RUNNING_JOB);
-        return;
+        if ((myJob->getState() != "FINISHED") && (myJob->getState() == "FAILED"))
+        {
+            runningStage.clear();
+            runningID = myJob->getID();
+            emitNewState(InternalCaseState::RUNNING_JOB);
+            return;
+        }
     }
 
     if (!cwe_globals::get_CWE_Job_Accountant()->allRunningDetailsLoaded())
@@ -1162,6 +1168,7 @@ void CFDcaseInstance::state_Running_jobList()
             (aNode->getState() == "FAILED"))
     {
         emitNewState(InternalCaseState::RE_DATA_LOAD);
+        return;
     }
 
     if (runningStage.isEmpty() && aNode->detailsLoaded())
