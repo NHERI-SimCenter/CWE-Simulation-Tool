@@ -65,6 +65,7 @@ const RemoteJobData * CWEjobAccountant::getJobByID(QString IDstr)
 
 const RemoteJobData * CWEjobAccountant::getJobByFolder(QString folderName)
 {
+    //TODO: Fix error. Should get most recent job to that folder
     for (const RemoteJobData * aJob : detailedRunningJobs)
     {
         if (!aJob->detailsLoaded()) continue;
