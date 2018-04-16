@@ -166,7 +166,7 @@ QString CWE_InterfaceDriver::getBanner()
 
 QString CWE_InterfaceDriver::getVersion()
 {
-    return "Version: 0.6.0";
+    return "Version: 0.7.0";
 }
 
 QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()

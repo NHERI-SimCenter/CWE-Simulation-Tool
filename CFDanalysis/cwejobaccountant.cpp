@@ -65,15 +65,22 @@ const RemoteJobData * CWEjobAccountant::getJobByID(QString IDstr)
 
 const RemoteJobData * CWEjobAccountant::getJobByFolder(QString folderName)
 {
+    const RemoteJobData * retJob = NULL;
+
     for (const RemoteJobData * aJob : detailedRunningJobs)
     {
         if (!aJob->detailsLoaded()) continue;
 
         if (cwe_globals::folderNamesMatch(folderName, aJob->getInputs().value("directory")))
         {
-            return aJob;
+            if ((retJob == NULL) || (aJob->getTimeCreated() > retJob->getTimeCreated()))
+            {
+                retJob = aJob;
+            }
         }
     }
+
+    if (retJob != NULL) return retJob;
 
     for (const RemoteJobData * aJob : terminatedJobs)
     {
@@ -81,10 +88,13 @@ const RemoteJobData * CWEjobAccountant::getJobByFolder(QString folderName)
 
         if (cwe_globals::folderNamesMatch(folderName, aJob->getInputs().value("directory")))
         {
-            return aJob;
+            if ((retJob == NULL) || (aJob->getTimeCreated() > retJob->getTimeCreated()))
+            {
+                retJob = aJob;
+            }
         }
     }
-    return NULL;
+    return retJob;
 }
 
 bool CWEjobAccountant::allRunningDetailsLoaded()

@@ -149,12 +149,13 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
 
     if ((newState == CaseState::RUNNING) ||
             (newState == CaseState::READY) ||
+            (newState == CaseState::READY_ERROR) ||
             (newState == CaseState::EXTERN_OP) ||
             (newState == CaseState::PARAM_SAVE))
     {
-        ui->pb_duplicateCase->setEnabled(true);
+        ui->pb_duplicateCase->setEnabled(newState == CaseState::READY);
         ui->pb_viewParameters->setEnabled(true);
-        ui->pb_viewResults->setEnabled(newState == CaseState::READY);
+        ui->pb_viewResults->setEnabled((newState == CaseState::READY) || (newState == CaseState::READY_ERROR));
 
         CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
 

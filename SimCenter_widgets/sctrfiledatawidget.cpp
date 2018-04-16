@@ -55,8 +55,8 @@ void SCtrFileDataWidget::initUI()
     {
         selectedFile = new QLabel(this);
     }
-    explainText = new QLabel("\nIn order to run a simulation, a geometry file must be uploaded.\nClick on the files tab to go to the upload/download screen.\nCWE can use \"Alias Mesh\" .obj files exported from FreeCAD, as well as our own JSON geometry format.\n\nSelected File:");
-    explainText->setMaximumWidth(400);
+    explainText = new QLabel("\nIn order to run a simulation, a geometry file must be selected.\nIf you selected \"Uploaded File\", above, you will need to choose a geometry file you have uploaded.\nClick on the files tab to go to the upload/download screen.\nCWE can use \"Alias Mesh\" .obj files exported from FreeCAD, as well as our own JSON geometry format.\n\nSelected File:");
+    explainText->setMaximumWidth(500);
     explainText->setWordWrap(true);
     QBoxLayout *fullLayout = new QHBoxLayout();
     QBoxLayout *leftLayout = new QVBoxLayout();

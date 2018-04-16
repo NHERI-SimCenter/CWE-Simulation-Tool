@@ -191,9 +191,10 @@ QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
     {
         QString stageName = itr.key();
-        StageState theStageState = currentStates.value(stageName, StageState::ERROR);
+        StageState theStageState = currentStates.value(stageName, StageState::OFFLINE);
         if ((theStageState != StageState::FINISHED) &&
-                (theStageState != StageState::FINISHED_PREREQ))
+                (theStageState != StageState::FINISHED_PREREQ) &&
+                (theStageState != StageState::ERROR))
         {
             continue;
         }
@@ -255,6 +256,7 @@ void CWE_Results::newCaseState(CaseState newState)
         return;
         break;
     case CaseState::READY:
+    case CaseState::READY_ERROR:
         ui->downloadEntireCaseButton->setEnabled(true);
         resetViewInfo();
         populateResultsScreen();
@@ -301,9 +303,10 @@ void CWE_Results::populateResultsScreen()
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
     {
         QString stageName = itr.key();
-        StageState theStageState = currentStates.value(stageName, StageState::ERROR);
+        StageState theStageState = currentStates.value(stageName, StageState::OFFLINE);
         if ((theStageState != StageState::FINISHED) &&
-                (theStageState != StageState::FINISHED_PREREQ))
+                (theStageState != StageState::FINISHED_PREREQ) &&
+                (theStageState != StageState::ERROR))
         {
             continue;
         }
