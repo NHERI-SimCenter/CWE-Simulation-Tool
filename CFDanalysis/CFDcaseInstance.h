@@ -58,15 +58,15 @@ enum class StageState {UNREADY, UNRUN, RUNNING, FINISHED, FINISHED_PREREQ, LOADI
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
 
-enum class CaseState {LOADING, INVALID, READY, DEFUNCT, ERROR, OP_INVOKE, EXTERN_OP, PARAM_SAVE, RUNNING, DOWNLOAD, OFFLINE};
+enum class CaseState {LOADING, INVALID, READY, READY_ERROR, DEFUNCT, ERROR, OP_INVOKE, EXTERN_OP, PARAM_SAVE, RUNNING, DOWNLOAD, OFFLINE};
 enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
-                             TYPE_SELECTED, EMPTY_CASE, INIT_DATA_LOAD,
+                             TYPE_SELECTED, EMPTY_CASE,
                              MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD,
-                             READY, EXTERN_FILE_OP,
+                             READY, READY_ERROR, EXTERN_FILE_OP,
                              PARAM_SAVE, PARAM_SAVE_RUN,
                              WAITING_FOLDER_DEL, RE_DATA_LOAD,
                              STARTING_JOB, STOPPING_JOB, RUNNING_JOB,
-                             FOLDER_CHECK_STOPPED_JOB, DOWNLOAD};
+                             DOWNLOAD};
 
 class CFDcaseInstance : public QObject
 {
@@ -107,7 +107,6 @@ private slots:
     void jobListUpdated();
     void fileTaskDone(RequestState invokeStatus, QString opMessage);
     void fileTaskStarted();
-    void chainedStateTransition();
 
     void jobInvoked(RequestState invokeStatus, QJsonDocument* jobData);
     void jobKilled(RequestState invokeStatus);
@@ -116,7 +115,6 @@ private:
     void computeInitState();
 
     void emitNewState(InternalCaseState newState);
-    void enactDataReload();
     bool caseDataLoaded();
     bool caseDataInvalid();
     void computeCaseType();
@@ -132,7 +130,6 @@ private:
 
     //The various state change functions:
     void state_CopyingFolder_taskDone(RequestState invokeStatus);
-    void state_FolderCheckStopped_fileChange_taskDone();
     void state_DataLoad_fileChange_jobList();
     void state_ExternOp_taskDone();
     void state_InitParam_taskDone(RequestState invokeStatus);
@@ -145,6 +142,8 @@ private:
     void state_Download_recursiveOpDone(RequestState invokeStatus);
     void state_Param_Save_taskDone(RequestState invokeStatus);
     void state_Param_Save_Run_taskDone(RequestState invokeStatus);
+
+    void computeIdleState();
 
     bool defunct = false;
     QMap<QString, StageState> storedStageStates;
