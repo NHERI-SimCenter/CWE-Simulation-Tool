@@ -41,6 +41,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QList>
+#include <QThread>
 
 #include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 
@@ -58,7 +59,8 @@ enum class StageState {UNREADY, UNRUN, RUNNING, FINISHED, FINISHED_PREREQ, LOADI
 //FINISHED: Parameters frozen(visible), RESULTS button active, ROOLBACK button Active
 //ERROR: ROLLBACK/RESET only thing available
 
-enum class CaseState {LOADING, INVALID, READY, READY_ERROR, DEFUNCT, ERROR, OP_INVOKE, EXTERN_OP, PARAM_SAVE, RUNNING, DOWNLOAD, OFFLINE};
+enum class CaseState {LOADING, INVALID, READY, READY_ERROR, DEFUNCT,
+                      ERROR, OP_INVOKE, EXTERN_OP, PARAM_SAVE, RUNNING, DOWNLOAD, OFFLINE};
 enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
                              TYPE_SELECTED, EMPTY_CASE,
                              MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD,
@@ -160,6 +162,8 @@ private:
     QString downloadDest;
 
     QString caseParamFileName = ".caseParams";
+    QString exitFileName = ".exit";
+    bool triedParamFile = false;
 };
 
 #endif // CFDCASEINSTANCE_H
