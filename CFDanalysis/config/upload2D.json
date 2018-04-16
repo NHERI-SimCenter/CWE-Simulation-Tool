@@ -28,12 +28,12 @@
                 {
                     "name":"Mesh Error Log",
                     "type":"text",
-                    "file":"logs/cwe-serial-mesh.err"
+                    "file":"logs/cwe-serial.err"
                 },
                 {
                     "name":"Mesh Output Log",
                     "type":"text",
-                    "file":"logs/cwe-serial-mesh.out"
+                    "file":"logs/cwe-serial.out"
                 }
             ]
         },
@@ -70,12 +70,12 @@
                 {
                     "name":"Sim Error Log",
                     "type":"text",
-                    "file":"logs/cwe-parallel-sim.err"
+                    "file":"logs/cwe-parallel.err"
                 },
                 {
                     "name":"Sim Output Log",
                     "type":"text",
-                    "file":"logs/cwe-parallel-sim.out"
+                    "file":"logs/cwe-parallel.out"
                 }
             ]
         }
@@ -84,6 +84,7 @@
         "Building Geometry":{
             "name":"Building Geometry",
             "vars":[
+                "geoChoose",
                 "geoFile",
                 "slicePlane",
                 "sliceAngle"
@@ -151,8 +152,18 @@
         }
     },
     "vars":{
+        "geoChoose":{
+            "displayname":"Select Geometry File",
+            "type":"choose",
+            "default":"cwe_cube.json",
+            "options":{
+                "cwe_cube.json": "10x10x10m cube",
+                "cwe_cone.json": "10x10x10m cone",
+                "uploaded": "Uploaded File"
+            }
+        },
         "geoFile":{
-            "displayname":"Geometry File",
+            "displayname":"Uploaded File",
             "type":"file"
         },
         "slicePlane":{

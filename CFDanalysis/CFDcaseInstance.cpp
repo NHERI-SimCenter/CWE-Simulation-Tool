@@ -342,7 +342,8 @@ bool CFDcaseInstance::downloadCase(QString destLocalFile)
 {
     if (defunct) return false;
     if (caseFolder.isNil()) return false;
-    if (myState != InternalCaseState::READY) return false;
+    if ((myState != InternalCaseState::READY) &&
+            (myState != InternalCaseState::READY_ERROR)) return false;
     if (myType == NULL) return false;
     if (cwe_globals::get_file_handle()->operationIsPending()) return false;
 
@@ -393,6 +394,7 @@ void CFDcaseInstance::underlyingFilesUpdated(const FileNodeRef changedNode)
         state_DataLoad_fileChange_jobList(); return;
 
     case InternalCaseState::READY:
+    case InternalCaseState::READY_ERROR:
         state_Ready_fileChange_jobList(); return;
 
     default:
@@ -412,6 +414,7 @@ void CFDcaseInstance::jobListUpdated()
         state_DataLoad_fileChange_jobList(); return;
 
     case InternalCaseState::READY:
+    case InternalCaseState::READY_ERROR:
         state_Ready_fileChange_jobList(); return;
 
     case InternalCaseState::RUNNING_JOB:
@@ -475,6 +478,7 @@ void CFDcaseInstance::fileTaskStarted()
     switch (activeState)
     {
     case InternalCaseState::READY:
+    case InternalCaseState::READY_ERROR:
         state_Ready_fileChange_jobList(); return;
 
     default:
@@ -609,6 +613,16 @@ bool CFDcaseInstance::caseDataLoaded()
     if (varFile.isNil()) return false;
     if (!varFile.fileBufferLoaded()) return false;
 
+    for (QString aStage : myType->getStageNames())
+    {
+        const FileNodeRef childFolder = caseFolder.getChildWithName(aStage);
+        if (childFolder.isNil()) continue;
+        if (!childFolder.folderContentsLoaded()) return false;
+        const FileNodeRef exitFile = childFolder.getChildWithName(exitFileName);
+        if (exitFile.isNil()) continue;
+        if (!exitFile.fileBufferLoaded()) return false;
+    }
+
     return true;
 }
 
@@ -627,12 +641,23 @@ bool CFDcaseInstance::caseDataInvalid()
 
     QByteArray varStore = varFile.getFileBuffer();
 
+    //This code is stopgap against too quick download of uploaded parameters
+    if (varStore.isEmpty() && !triedParamFile)
+    {
+        triedParamFile = true;
+        varFile.setFileBuffer(NULL);
+        cwe_globals::get_file_handle()->sendDownloadBuffReq(varFile);
+        return false;
+    }
+
     QJsonDocument varDoc = QJsonDocument::fromJson(varStore);
     QString templateName = varDoc.object().value("type").toString();
     if (templateName.isEmpty())
     {
         return true;
     }
+
+    triedParamFile = false;
 
     QList<CFDanalysisType *> * templates = cwe_globals::get_CWE_Driver()->getTemplateList();
     for (auto itr = templates->cbegin(); itr != templates->cend(); itr++)
@@ -787,11 +812,29 @@ bool CFDcaseInstance::recomputeStageStates()
         if (checkNode.isNil())
         {
             newStageStates[*itr] = StageState::UNRUN;
+            continue;
         }
-        else
+
+        const FileNodeRef exitFile = checkNode.getChildWithName(exitFileName);
+        if (exitFile.isNil())
         {
-            newStageStates[*itr] = StageState::FINISHED;
+            newStageStates[*itr] = StageState::ERROR;
+            continue;
         }
+        if (!exitFile.fileBufferLoaded())
+        {
+            newStageStates[*itr] = StageState::ERROR;
+            continue;
+        }
+        const QByteArray exitBytes = exitFile.getFileBuffer();
+
+        if (QString::fromLatin1(exitBytes) != "0\n")
+        {
+            newStageStates[*itr] = StageState::ERROR;
+            continue;
+        }
+
+        newStageStates[*itr] = StageState::FINISHED;
     }
 
     for (int i = 0; i < stageList.length(); i++)
@@ -817,7 +860,7 @@ bool CFDcaseInstance::recomputeStageStates()
         }
         else if (nowState == StageState::FINISHED)
         {
-            if (nextState == StageState::FINISHED)
+            if ((nextState == StageState::FINISHED) || (nextState == StageState::ERROR))
             {
                 newStageStates[stageList[i]] = StageState::FINISHED_PREREQ;
             }
@@ -940,6 +983,9 @@ void CFDcaseInstance::state_InitParam_taskDone(RequestState invokeStatus)
         return;
     }
 
+    //This line is a stopgap measure against a race condition if one reads too quickly an uploaded file.
+    //QThread::msleep(500);
+
     computeIdleState();
 }
 
@@ -979,7 +1025,8 @@ void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
 
 void CFDcaseInstance::state_Ready_fileChange_jobList()
 {
-    if (myState != InternalCaseState::READY) return;
+    if ((myState != InternalCaseState::READY) &&
+            (myState != InternalCaseState::READY_ERROR)) return;
 
     computeIdleState();
 }
@@ -1064,11 +1111,17 @@ void CFDcaseInstance::state_Param_Save_taskDone(RequestState invokeStatus)
         return;
     }
 
+    storedParamList = prospectiveNewParamList;
+    prospectiveNewParamList.clear();
     FileNodeRef paramNode = caseFolder.getChildWithName(caseParamFileName);
     if (!paramNode.isNil())
     {
         paramNode.setFileBuffer(NULL);
     }
+
+    //This line is a stopgap measure against a race condition if one reads too quickly an uploaded file.
+    //QThread::msleep(500);
+
     computeIdleState();
 }
 
@@ -1083,6 +1136,8 @@ void CFDcaseInstance::state_Param_Save_Run_taskDone(RequestState invokeStatus)
         return;
     }
 
+    storedParamList = prospectiveNewParamList;
+    prospectiveNewParamList.clear();
     FileNodeRef paramNode = caseFolder.getChildWithName(caseParamFileName);
     if (!paramNode.isNil())
     {
@@ -1118,11 +1173,38 @@ void CFDcaseInstance::computeIdleState()
         {
             cwe_globals::get_file_handle()->sendDownloadBuffReq(varFile);
         }
+        else if (!caseFolder.folderContentsLoaded())
+        {
+            caseFolder.enactFolderRefresh();
+        }
+        else if (myType != NULL)
+        {
+            for (QString aStage : myType->getStageNames())
+            {
+                const FileNodeRef childFolder = caseFolder.getChildWithName(aStage);
+                if (childFolder.isNil()) continue;
+                if (!childFolder.folderContentsLoaded())
+                {
+                    childFolder.enactFolderRefresh();
+                    continue;
+                }
+                const FileNodeRef exitFile = childFolder.getChildWithName(exitFileName);
+                if (exitFile.isNil()) continue;
+                if (!exitFile.fileBufferLoaded())
+                {
+                    cwe_globals::get_file_handle()->sendDownloadBuffReq(exitFile);
+                }
+            }
+        }
+        else
+        {
+            qDebug("Internal State error: case not loaded, but no step given to load.");
+        }
+
+
         emitNewState(InternalCaseState::RE_DATA_LOAD);
         return;
     }
-
-    computeParamList();
 
     const RemoteJobData * myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFullPath());
     if (myJob != NULL)
@@ -1148,8 +1230,34 @@ void CFDcaseInstance::computeIdleState()
         return;
     }
 
+    computeParamList();
     runningStage.clear();
     runningID.clear();
+
+    for (QString aStage : myType->getStageNames())
+    {
+        const FileNodeRef childFolder = caseFolder.getChildWithName(aStage);
+        if (childFolder.isNil()) continue;
+        const FileNodeRef exitFile = childFolder.getChildWithName(exitFileName);
+        if (exitFile.isNil())
+        {
+            emitNewState(InternalCaseState::READY_ERROR);
+            return;
+        }
+        if (!exitFile.fileBufferLoaded())
+        {
+            emitNewState(InternalCaseState::READY_ERROR);
+            return;
+        }
+        const QByteArray exitBytes = exitFile.getFileBuffer();
+
+        if (QString::fromLatin1(exitBytes) != "0\n")
+        {
+            emitNewState(InternalCaseState::READY_ERROR);
+            return;
+        }
+    }
+
     emitNewState(InternalCaseState::READY);
 }
 

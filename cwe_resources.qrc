@@ -210,5 +210,6 @@
         <file>help/tut_result.html</file>
         <file>help/tut_sim.html</file>
         <file>help/help_default.html</file>
+        <file>help/cfd_intro.html</file>
     </qresource>
 </RCC>
