@@ -16,6 +16,21 @@
                 "Boundaries"
             ],
             "results":[
+                {
+                    "name":"Mesh Agave Log",
+                    "type":"text",
+                    "file":"logs/.agave.log"
+                },
+                {
+                    "name":"Mesh Error Log",
+                    "type":"text",
+                    "file":"logs/cwe-serial-mesh.err"
+                },
+                {
+                    "name":"Mesh Output Log",
+                    "type":"text",
+                    "file":"logs/cwe-serial-mesh.out"
+                }
             ]
         },
         "sim":{
@@ -26,6 +41,21 @@
                 "Advanced"
             ],
             "results":[
+                {
+                    "name":"Sim Agave Log",
+                    "type":"text",
+                    "file":"logs/.agave.log"
+                },
+                {
+                    "name":"Sim Error Log",
+                    "type":"text",
+                    "file":"logs/cwe-parallel-sim.err"
+                },
+                {
+                    "name":"Sim Output Log",
+                    "type":"text",
+                    "file":"logs/cwe-parallel-sim.out"
+                }
             ]
         }
     },

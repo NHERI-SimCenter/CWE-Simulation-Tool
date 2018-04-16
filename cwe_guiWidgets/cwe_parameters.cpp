@@ -146,10 +146,11 @@ void CWE_Parameters::newCaseState(CaseState newState)
     case CaseState::RUNNING:
     case CaseState::PARAM_SAVE:
         ui->theTabWidget->setViewState(SimCenterViewState::visible);
-        ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
+        setButtonsAccordingToStage();
         break;
     case CaseState::READY:
         ui->theTabWidget->updateParameterValues(theMainWindow->getCurrentCase()->getCurrentParams());
+    case CaseState::READY_ERROR:
         setVisibleAccordingToStage();
         setButtonsAccordingToStage();
         break;
