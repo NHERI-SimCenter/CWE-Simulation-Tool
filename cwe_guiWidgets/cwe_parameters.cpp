@@ -138,17 +138,18 @@ void CWE_Parameters::newCaseState(CaseState newState)
         break;
     case CaseState::LOADING:
     case CaseState::EXTERN_OP:
+    case CaseState::PARAM_SAVE:
         ui->theTabWidget->setViewState(SimCenterViewState::visible);
         ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
         break;
     case CaseState::DOWNLOAD:
     case CaseState::OP_INVOKE:
     case CaseState::RUNNING:
-    case CaseState::PARAM_SAVE:
         ui->theTabWidget->setViewState(SimCenterViewState::visible);
-        ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
+        setButtonsAccordingToStage();
         break;
     case CaseState::READY:
+    case CaseState::READY_ERROR:
         ui->theTabWidget->updateParameterValues(theMainWindow->getCurrentCase()->getCurrentParams());
         setVisibleAccordingToStage();
         setButtonsAccordingToStage();

@@ -254,6 +254,11 @@ CFDcaseInstance * CWE_MainWindow::getCaseFromFolder(const FileNodeRef &caseNode)
         return currentCase;
     }
 
+    if (caseNode.getFileType() != FileType::DIR)
+    {
+        return NULL;
+    }
+
     CFDcaseInstance * newCase = new CFDcaseInstance(caseNode);
     return newCase;
 }
