@@ -277,7 +277,7 @@ bool CFDcaseInstance::startStageApp(QString stageID)
         }
     }
 
-    RemoteDataInterface * remoteConnect = cwe_globals::get_Driver()->getDataConnection();
+    RemoteDataThread * remoteConnect = cwe_globals::get_Driver()->getDataConnection();
     QString jobName = appName;
     jobName = jobName.append("-");
     jobName = jobName.append(stageID);
@@ -289,8 +289,8 @@ bool CFDcaseInstance::startStageApp(QString stageID)
     }
     runningStage = stageID;
     runningID.clear();
-    QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(jobInvoked(RequestState,QJsonDocument*)));
+    QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument)),
+                     this, SLOT(jobInvoked(RequestState,QJsonDocument)));
     emitNewState(InternalCaseState::STARTING_JOB);
     return true;
 }
@@ -486,7 +486,7 @@ void CFDcaseInstance::fileTaskStarted()
     }
 }
 
-void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument *jobData)
+void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument jobData)
 {
     if (defunct) return;
 
@@ -506,7 +506,7 @@ void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument *jobDa
 
     InternalCaseState activeState = myState;
 
-    QString idFromReply = jobData->object().value("result").toObject().value("id").toString();
+    QString idFromReply = jobData.object().value("result").toObject().value("id").toString();
 
     switch (activeState)
     {

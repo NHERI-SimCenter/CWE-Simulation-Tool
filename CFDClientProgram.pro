@@ -111,7 +111,8 @@ SOURCES += main.cpp \
     popupWindows/duplicate_case_popup.cpp \
     ../AgaveExplorer/remoteModelViews/remotefileitem.cpp \
     SimCenter_widgets/sctrtextdatawidget.cpp \
-    popupWindows/cwe_popup.cpp
+    popupWindows/cwe_popup.cpp \
+    ../AgaveClientInterface/agaveInterfaces/agavethread.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -176,7 +177,8 @@ HEADERS  += \
     popupWindows/duplicate_case_popup.h \
     ../AgaveExplorer/remoteModelViews/remotefileitem.h \
     SimCenter_widgets/sctrtextdatawidget.h \
-    popupWindows/cwe_popup.h
+    popupWindows/cwe_popup.h \
+    ../AgaveClientInterface/agaveInterfaces/agavethread.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
