@@ -40,6 +40,7 @@
 
 #include <QWindow>
 #include <QDir>
+#include <QVariant>
 
 class CWE_MainWindow;
 class CFDanalysisType;
@@ -71,7 +72,7 @@ public:
     bool inOfflineMode();
 
 private slots:
-    void checkAppList(RequestState replyState, QJsonArray * appList);
+    void checkAppList(RequestState replyState, QVariantList appList);
 
 private:
     CWE_MainWindow * mainWindow;
