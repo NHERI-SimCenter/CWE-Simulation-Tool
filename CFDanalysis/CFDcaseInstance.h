@@ -110,7 +110,7 @@ private slots:
     void fileTaskDone(RequestState invokeStatus, QString opMessage);
     void fileTaskStarted();
 
-    void jobInvoked(RequestState invokeStatus, QJsonDocument* jobData);
+    void jobInvoked(RequestState invokeStatus, QJsonDocument jobData);
     void jobKilled(RequestState invokeStatus);
 
 private:
