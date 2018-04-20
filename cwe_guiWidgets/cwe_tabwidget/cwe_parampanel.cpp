@@ -46,12 +46,12 @@
 
 #include "CFDanalysis/CFDanalysisType.h"
 
+#include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
-CWE_ParamPanel::CWE_ParamPanel(CWE_InterfaceDriver * theDriver, QWidget *parent) :
+CWE_ParamPanel::CWE_ParamPanel(QWidget *parent) :
     QFrame(parent)
 {
-    myDriver = theDriver;
     variableWidgets = new QMap<QString, SCtrMasterDataWidget *>();
     this->setViewState(SimCenterViewState::visible);
 }
@@ -104,7 +104,7 @@ void CWE_ParamPanel::addVariable(QString varName, VARIABLE_TYPE &theVariable)
         layout->addWidget(theVar);
     }
     else if (theVariable.type.toLower() == "file") {
-        theVar = new SCtrFileDataWidget(myDriver, this);
+        theVar = new SCtrFileDataWidget(cwe_globals::get_CWE_Driver()->getMainWindow(), this);
         theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }

@@ -203,13 +203,13 @@
         <file>styleSheets/cweMac.qss</file>
         <file>styleSheets/cweStyle.qss</file>
         <file>styleSheets/cweWin.qss</file>
-        <file>help/common_header.html</file>
-        <file>help/common_footer.html</file>
         <file>help/index.html</file>
         <file>help/tut_case.html</file>
         <file>help/tut_geo.html</file>
         <file>help/tut_mesh.html</file>
         <file>help/tut_result.html</file>
         <file>help/tut_sim.html</file>
+        <file>help/help_default.html</file>
+        <file>help/cfd_intro.html</file>
     </qresource>
 </RCC>

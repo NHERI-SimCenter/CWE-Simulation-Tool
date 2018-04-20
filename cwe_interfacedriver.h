@@ -40,6 +40,7 @@
 
 #include <QWindow>
 #include <QDir>
+#include <QVariant>
 
 class CWE_MainWindow;
 class CFDanalysisType;
@@ -66,33 +67,17 @@ public:
 
     QList<CFDanalysisType *> * getTemplateList();
 
-    CFDcaseInstance * getCurrentCase();
-    void setCurrentCase();
-    void setCurrentCase(CFDcaseInstance * newCase);
-    void setCurrentCase(const FileNodeRef &caseNode);
-    CFDcaseInstance * getCaseFromFolder(const FileNodeRef &caseNode);
-
-    CFDcaseInstance *createNewCase(CFDanalysisType *caseType);
-
     CWE_MainWindow * getMainWindow();
 
     bool inOfflineMode();
 
-signals:
-    void haveNewCase();
-
 private slots:
-    void checkAppList(RequestState replyState, QJsonArray * appList);
-    void caseHasNewState(CaseState newState);
+    void checkAppList(RequestState replyState, QVariantList appList);
 
 private:
-    void deactivateCurrentCase();
-
     CWE_MainWindow * mainWindow;
     QList<CFDanalysisType *> templateList;
 
-    CFDcaseInstance * currentCFDCase = NULL;
-    QList<CFDcaseInstance *> caseList;
     CWEjobAccountant * myJobAccountant = NULL;
 
     bool offlineMode = false;

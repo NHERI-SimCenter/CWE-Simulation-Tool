@@ -16,6 +16,21 @@
                 "Boundaries"
             ],
             "results":[
+                {
+                    "name":"Mesh Agave Log",
+                    "type":"text",
+                    "file":"logs/.agave.log"
+                },
+                {
+                    "name":"Mesh Error Log",
+                    "type":"text",
+                    "file":"logs/cwe-serial.err"
+                },
+                {
+                    "name":"Mesh Output Log",
+                    "type":"text",
+                    "file":"logs/cwe-serial.out"
+                }
             ]
         },
         "sim":{
@@ -26,6 +41,21 @@
                 "Advanced"
             ],
             "results":[
+                {
+                    "name":"Sim Agave Log",
+                    "type":"text",
+                    "file":"logs/.agave.log"
+                },
+                {
+                    "name":"Sim Error Log",
+                    "type":"text",
+                    "file":"logs/cwe-parallel.err"
+                },
+                {
+                    "name":"Sim Output Log",
+                    "type":"text",
+                    "file":"logs/cwe-parallel.out"
+                }
             ]
         }
     },
@@ -33,6 +63,7 @@
         "Building Geometry":{
             "name":"Building Geometry",
             "vars":[
+                "geoChoose",
                 "geoFile"
                 ],
             "image":"placeholderIcon.png"
@@ -108,8 +139,18 @@
         }
     },
     "vars":{
+        "geoChoose":{
+            "displayname":"Select Geometry File",
+            "type":"choose",
+            "default":"cwe_cube.json",
+            "options":{
+                "cwe_cube.json": "10x10x10m cube",
+                "cwe_cone.json": "10x10x10m cone",
+                "uploaded": "Uploaded File"
+            }
+        },
         "geoFile":{
-            "displayname":"Geometry File",
+            "displayname":"Uploaded File",
             "type":"file"
         },
         "endTime":{
