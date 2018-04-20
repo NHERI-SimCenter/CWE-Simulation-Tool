@@ -116,11 +116,6 @@
         <string>Results</string>
        </attribute>
       </widget>
-      <widget class="CWE_Debug_Widget" name="tab_debug">
-       <attribute name="title">
-        <string>.</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
     <item>
@@ -306,12 +301,6 @@
    <class>CWE_Parameters</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_parameters.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>CWE_Debug_Widget</class>
-   <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_debug_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

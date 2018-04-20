@@ -35,6 +35,8 @@
 #ifndef DUPLICATE_CASE_POPUP_H
 #define DUPLICATE_CASE_POPUP_H
 
+#include "cwe_popup.h"
+
 #include <QMainWindow>
 #include <QPushButton>
 #include <QRadioButton>
@@ -48,12 +50,12 @@ namespace Ui {
 class Duplicate_Case_Popup;
 }
 
-class Duplicate_Case_Popup : public QMainWindow
+class Duplicate_Case_Popup : public CWE_Popup
 {
     Q_OBJECT
 
 public:
-    explicit Duplicate_Case_Popup(FileNodeRef toClone, QWidget *parent = 0);
+    explicit Duplicate_Case_Popup(FileNodeRef toClone, CWE_MainWindow * controlWindow, QWidget *parent = 0);
     ~Duplicate_Case_Popup();
 
 private slots:

@@ -260,9 +260,9 @@
           </widget>
          </item>
          <item row="0" column="3">
-          <widget class="QCommandLinkButton" name="remoteButton_deleteFolder">
+          <widget class="QCommandLinkButton" name="remoteButton_delete">
            <property name="text">
-            <string>Delete Folder</string>
+            <string>Delete</string>
            </property>
            <property name="icon">
             <iconset resource="../cwe_resources.qrc">
@@ -271,13 +271,13 @@
           </widget>
          </item>
          <item row="0" column="4">
-          <widget class="QCommandLinkButton" name="remoteButton_deleteFile">
+          <widget class="QCommandLinkButton" name="remoteButton_rename">
            <property name="text">
-            <string>Delete</string>
+            <string>Rename</string>
            </property>
            <property name="icon">
             <iconset resource="../cwe_resources.qrc">
-             <normaloff>:/icons/bomb.png</normaloff>:/icons/bomb.png</iconset>
+             <normaloff>:/icons/dir.gif</normaloff>:/icons/dir.gif</iconset>
            </property>
           </widget>
          </item>
@@ -341,5 +341,59 @@
  <resources>
   <include location="../cwe_resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>remoteButton_delete</sender>
+   <signal>clicked()</signal>
+   <receiver>CWE_file_manager</receiver>
+   <slot>button_delete_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>840</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>560</x>
+     <y>222</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>remoteButton_newFolder</sender>
+   <signal>clicked()</signal>
+   <receiver>CWE_file_manager</receiver>
+   <slot>button_newFolder_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>658</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>560</x>
+     <y>222</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>remoteButton_rename</sender>
+   <signal>clicked()</signal>
+   <receiver>CWE_file_manager</receiver>
+   <slot>button_rename_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1023</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>560</x>
+     <y>222</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>button_newFolder_clicked()</slot>
+  <slot>button_delete_clicked()</slot>
+  <slot>button_rename_clicked()</slot>
+ </slots>
 </ui>
