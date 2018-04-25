@@ -39,49 +39,18 @@
 #include <QFileInfo>
 #include <QUrl>
 
+#include <QtGlobal>
+
 CWE_help::CWE_help(QWidget *parent) :
     CWE_Super(parent),
     ui(new Ui::CWE_help)
 {
     ui->setupUi(this);
-
-    this->setOverview();
+    ui->helpBrowser->setSource(QUrl("qrc:///help/index.html"));
+    ui->helpBrowser->setOpenExternalLinks(true);
 }
 
 CWE_help::~CWE_help()
 {
     delete ui;
-}
-
-void CWE_help::setOverview()
-{
-    QFile overview(":/help/overview.html");
-    if (!overview.open(QIODevice::ReadOnly | QIODevice::Text))
-            return;
-    QByteArray theText = overview.readAll();
-    overview.close();
-
-    ui->textBrowser_overview->setHtml(theText);
-    ui->textBrowser_overview->setOpenLinks(false);
-    ui->helpTabs->setTabsClosable(true);
-
-    QObject::connect(ui->textBrowser_overview, SIGNAL(anchorClicked(QUrl)),
-                     this, SLOT(overview_anchor_clicked(QUrl)));
-}
-
-void CWE_help::overview_anchor_clicked(const QUrl &link)
-{
-    QFile helpText(link.toLocalFile());
-    if (!helpText.open(QIODevice::ReadOnly | QIODevice::Text))
-            return;
-    QByteArray theText = helpText.readAll();
-    helpText.close();
-
-    QTextBrowser *browser = new QTextBrowser(this);
-    browser->setOpenLinks(true);
-    browser->setHtml(theText);
-
-    QString theLabel = QFileInfo(link.fileName()).completeBaseName();
-    int tabIdx = ui->helpTabs->addTab(browser, theLabel);
-    ui->helpTabs->setCurrentIndex(tabIdx);
 }

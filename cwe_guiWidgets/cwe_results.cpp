@@ -35,13 +35,21 @@
 #include "cwe_results.h"
 #include "ui_cwe_results.h"
 
+#include "../AgaveClientInterface/filemetadata.h"
+
+#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
+#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
+
+#include "mainWindow/cwe_mainwindow.h"
 
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
-#include "cwe_result_popup.h"
+#include "visualUtils/resultVisuals/resultmesh2dwindow.h"
+#include "visualUtils/resultVisuals/resultfield2dwindow.h"
+#include "visualUtils/resultVisuals/resulttextdisp.h"
 
 CWE_Results::CWE_Results(QWidget *parent) :
     CWE_Super(parent),
@@ -49,8 +57,8 @@ CWE_Results::CWE_Results(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    model = new QStandardItemModel(this);
-    ui->resultsTreeView->setModel(model);
+    resultListModel = new QStandardItemModel(this);
+    ui->resultsTreeView->setModel(resultListModel);
 
     resetViewInfo();
 }
@@ -60,10 +68,10 @@ CWE_Results::~CWE_Results()
     delete ui;
 }
 
-void CWE_Results::linkDriver(CWE_InterfaceDriver * newDriver)
+void CWE_Results::linkMainWindow(CWE_MainWindow *theMainWin)
 {
-    CWE_Super::linkDriver(newDriver);
-    QObject::connect(myDriver, SIGNAL(haveNewCase()),
+    CWE_Super::linkMainWindow(theMainWin);
+    QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
 
     QObject::connect(ui->resultsTreeView, SIGNAL(clicked(QModelIndex)),
@@ -72,12 +80,12 @@ void CWE_Results::linkDriver(CWE_InterfaceDriver * newDriver)
 
 void CWE_Results::resetViewInfo()
 {
-    model->clear();
+    resultListModel->clear();
     viewIsValid = false;
 
     QStringList HeaderList;
     HeaderList << "Loading Case Data, Please Wait";
-    model->setHorizontalHeaderLabels(HeaderList);
+    resultListModel->setHorizontalHeaderLabels(HeaderList);
 
     ui->resultsTreeView->header()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
     showCol = -1;
@@ -86,7 +94,7 @@ void CWE_Results::resetViewInfo()
 
 void CWE_Results::on_downloadEntireCaseButton_clicked()
 {
-    if (myDriver->getCurrentCase() == NULL)
+    if (theMainWindow->getCurrentCase() == NULL)
     {
         return;
     }
@@ -96,12 +104,12 @@ void CWE_Results::on_downloadEntireCaseButton_clicked()
         return;
     }
 
-    myDriver->getCurrentCase()->downloadCase(fileName);
+    theMainWindow->getCurrentCase()->downloadCase(fileName);
 }
 
 void CWE_Results::newCaseGiven()
 {
-    CFDcaseInstance * newCase = myDriver->getCurrentCase();
+    CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
     resetViewInfo();
 
     if (newCase != NULL)
@@ -114,9 +122,9 @@ void CWE_Results::newCaseGiven()
 
 void CWE_Results::resultViewClicked(QModelIndex modelID)
 {
-    QStandardItem * theItem = model->itemFromIndex(modelID);
+    QStandardItem * theItem = resultListModel->itemFromIndex(modelID);
     if (theItem == NULL) return;
-    CFDcaseInstance * currentCase = myDriver->getCurrentCase();
+    CFDcaseInstance * currentCase = theMainWindow->getCurrentCase();
     if (currentCase == NULL) return;
 
     if (!(theItem->column() == showCol) && !(theItem->column() == downloadCol))
@@ -124,7 +132,7 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
         return;
     }
 
-    QString resultName = model->invisibleRootItem()->child(theItem->row(), 0)->text();
+    QString resultName = resultListModel->invisibleRootItem()->child(theItem->row(), 0)->text();
     if (resultName.isEmpty())
     {
         return;
@@ -139,42 +147,29 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
     QString resultType = resultObject.value("type");
     if (resultType == "text")
     {
-        CWE_Result_Popup * resultPopup = NULL;
         if (theItem->column() == showCol)
         {
-            resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
-                                 currentCase->getMyType()->getName(),
-                                 resultObject, myDriver);
+            ResultTextDisplay * resultPopup = new ResultTextDisplay(currentCase, resultObject, NULL);
+            resultPopup->initializeView();;
         }
         else if (theItem->column() == downloadCol)
         {
-            resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
-                                 currentCase->getMyType()->getName(),
-                                 resultObject, myDriver, true);
+            performSingleFileDownload(resultObject["file"], resultObject["stage"]);
         }
-        resultPopup->show();
     }
     else if (resultType == "GLdata")
     {
-        if (theItem->column() != showCol)
-        {
-            return;
-        }
-        CWE_Result_Popup * resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
-                             currentCase->getMyType()->getName(),
-                             resultObject, myDriver);
-        resultPopup->show();
+        if (theItem->column() != showCol) return;
+
+        ResultField2dWindow * resultPopup = new ResultField2dWindow(currentCase, resultObject, NULL);
+        resultPopup->initializeView();
     }
     else if (resultType == "GLmesh")
     {
-        if (theItem->column() != showCol)
-        {
-            return;
-        }
-        CWE_Result_Popup * resultPopup = new CWE_Result_Popup(currentCase->getCaseName(),
-                             currentCase->getMyType()->getName(),
-                             resultObject, myDriver);
-        resultPopup->show();
+        if (theItem->column() != showCol) return;
+
+        ResultMesh2dWindow * resultPopup = new ResultMesh2dWindow(currentCase, resultObject, NULL);
+        resultPopup->initializeView();
     }
 }
 
@@ -183,9 +178,9 @@ QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
     QMap<QString, QString> ret;
 
     if (!viewIsValid) return ret;
-    CFDcaseInstance * currentCase = myDriver->getCurrentCase();
+    CFDcaseInstance * currentCase = theMainWindow->getCurrentCase();
     if (currentCase == NULL) return ret;
-    if (currentCase->getCaseFolder().isEmpty()) return ret;
+    if (currentCase->getCaseFolder().isNil()) return ret;
     CFDanalysisType * theTemplate = currentCase->getMyType();
     if (theTemplate == NULL) return ret;
     QJsonObject configobj    = theTemplate->getRawConfig()->object();
@@ -196,9 +191,10 @@ QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
     {
         QString stageName = itr.key();
-        StageState theStageState = currentStates.value(stageName, StageState::ERROR);
+        StageState theStageState = currentStates.value(stageName, StageState::OFFLINE);
         if ((theStageState != StageState::FINISHED) &&
-                (theStageState != StageState::FINISHED_PREREQ))
+                (theStageState != StageState::FINISHED_PREREQ) &&
+                (theStageState != StageState::ERROR))
         {
             continue;
         }
@@ -246,7 +242,9 @@ void CWE_Results::newCaseState(CaseState newState)
         break;
     case CaseState::DOWNLOAD:
     case CaseState::LOADING:
+    case CaseState::EXTERN_OP:
     case CaseState::OP_INVOKE:
+    case CaseState::PARAM_SAVE:
         ui->downloadEntireCaseButton->setDisabled(true);
         resetViewInfo();
         return;
@@ -258,13 +256,14 @@ void CWE_Results::newCaseState(CaseState newState)
         return;
         break;
     case CaseState::READY:
+    case CaseState::READY_ERROR:
         ui->downloadEntireCaseButton->setEnabled(true);
         resetViewInfo();
         populateResultsScreen();
         return;
         break;
     default:
-        myDriver->fatalInterfaceError("Remote case has unhandled state");
+        cwe_globals::get_CWE_Driver()->fatalInterfaceError("Remote case has unhandled state");
         return;
         break;
     }
@@ -273,9 +272,9 @@ void CWE_Results::newCaseState(CaseState newState)
 void CWE_Results::populateResultsScreen()
 {
     if (viewIsValid) return;
-    CFDcaseInstance * currentCase = myDriver->getCurrentCase();
+    CFDcaseInstance * currentCase = theMainWindow->getCurrentCase();
     if (currentCase == NULL) return;
-    if (currentCase->getCaseFolder().isEmpty()) return;
+    if (currentCase->getCaseFolder().isNil()) return;
     CFDanalysisType * theTemplate = currentCase->getMyType();
     if (theTemplate == NULL) return;
     QJsonObject configobj    = theTemplate->getRawConfig()->object();
@@ -285,10 +284,10 @@ void CWE_Results::populateResultsScreen()
 
     viewIsValid = true;
 
-    model->clear();
+    resultListModel->clear();
     QStringList HeaderList;
     HeaderList << "Result:" << "View?" << "Download?"  << "Type:";
-    model->setHorizontalHeaderLabels(HeaderList);
+    resultListModel->setHorizontalHeaderLabels(HeaderList);
     showCol = 1;
     downloadCol = 2;
 
@@ -299,14 +298,15 @@ void CWE_Results::populateResultsScreen()
 
     ui->label_theName->setText(currentCase->getCaseName());
     ui->label_theType->setText(theTemplate->getName());
-    ui->label_theLocation->setText(currentCase->getCaseFolder());
+    ui->label_theLocation->setText(currentCase->getCaseFolder().getFullPath());
 
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
     {
         QString stageName = itr.key();
-        StageState theStageState = currentStates.value(stageName, StageState::ERROR);
+        StageState theStageState = currentStates.value(stageName, StageState::OFFLINE);
         if ((theStageState != StageState::FINISHED) &&
-                (theStageState != StageState::FINISHED_PREREQ))
+                (theStageState != StageState::FINISHED_PREREQ) &&
+                (theStageState != StageState::ERROR))
         {
             continue;
         }
@@ -334,6 +334,28 @@ void CWE_Results::populateResultsScreen()
             }
         }
     }
+}
+
+void CWE_Results::performSingleFileDownload(QString filePathToDownload, QString stage)
+{
+    if (filePathToDownload.isEmpty()) return;
+    QString localfileName = QFileDialog::getSaveFileName(this, "Save Downloaded File:");
+    if (localfileName.isEmpty()) {return;}
+
+    FileNodeRef targetNode = theMainWindow->getCurrentCase()->getCaseFolder().getChildWithName(stage);
+    if (targetNode.isNil())
+    {
+        cwe_globals::displayPopup("The stage for this download has not been completed. Please check your case and try again.");
+        return;
+    }
+
+    targetNode = cwe_globals::get_file_handle()->speculateFileWithName(targetNode, filePathToDownload, false);
+    if (targetNode.isNil())
+    {
+        cwe_globals::displayPopup("The result to be downloaded does not exist. Please check your case and try again.");
+        return;
+    }
+    cwe_globals::get_file_handle()->sendDownloadReq(targetNode, localfileName);
 }
 
 void CWE_Results::addResult(QString name, bool showeye, bool download, QString type)
@@ -364,5 +386,5 @@ void CWE_Results::addResult(QString name, bool showeye, bool download, QString t
     List.append(var4);
 
     // Populate our model
-    model->appendRow(List);
+    resultListModel->appendRow(List);
 }

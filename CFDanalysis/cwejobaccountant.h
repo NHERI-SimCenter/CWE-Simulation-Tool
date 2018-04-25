@@ -1,6 +1,5 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
 ** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
@@ -31,18 +30,36 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "cwe_debug_widget.h"
-#include "ui_cwe_debug_widget.h"
+#ifndef CWEJOBACCOUNTANT_H
+#define CWEJOBACCOUNTANT_H
 
-CWE_Debug_Widget::CWE_Debug_Widget(QWidget *parent) :
-    CWE_Super(parent),
-    ui(new Ui::CWE_Debug_Widget)
+#include <QObject>
+#include <QMap>
+
+class RemoteJobData;
+
+class CWEjobAccountant : public QObject
 {
-    ui->setupUi(this);
-}
+    Q_OBJECT
+public:
+    explicit CWEjobAccountant(QObject *parent = nullptr);
+    const RemoteJobData * getJobByID(QString IDstr);
+    const RemoteJobData * getJobByFolder(QString folderName);
+    bool allRunningDetailsLoaded();
 
-CWE_Debug_Widget::~CWE_Debug_Widget()
-{
-    delete ui;
-}
+signals:
+    void haveNewJobInfo();
+
+public slots:
+    void reloadJobLists();
+
+private:
+    QMap<QString, const RemoteJobData *> detailedRunningJobs;
+    QMap<QString, const RemoteJobData *> undetailedRunningJobs;
+    QMap<QString, const RemoteJobData *> terminatedJobs;
+
+};
+
+#endif // CWEJOBACCOUNTANT_H

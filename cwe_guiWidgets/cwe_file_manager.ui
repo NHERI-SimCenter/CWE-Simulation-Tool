@@ -41,199 +41,359 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>410</width>
-    <height>420</height>
+    <width>1122</width>
+    <height>446</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <property name="leftMargin">
-    <number>6</number>
-   </property>
-   <property name="topMargin">
-    <number>6</number>
-   </property>
-   <property name="rightMargin">
-    <number>6</number>
-   </property>
-   <property name="bottomMargin">
-    <number>6</number>
-   </property>
-   <item row="3" column="1">
-    <widget class="QFrame" name="frame">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QFrame" name="localFrame">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>100</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <property name="lineWidth">
-      <number>0</number>
-     </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
       <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
        <number>0</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
       </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string/>
+       <widget class="QLabel" name="label_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="pixmap">
-         <pixmap resource="../cwe_resources.qrc">:/buttons/images/CWE_button_down_arrows.png</pixmap>
+        <property name="text">
+         <string>Local files:</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTreeView" name="localTreeView">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>3</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="local_panel">
+        <property name="frameShape">
+         <enum>QFrame::Panel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pb_upload">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Upload</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../cwe_resources.qrc">
+          <normaloff>:/icons/right.png</normaloff>:/icons/right.png</iconset>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Remote files:</string>
+   <item>
+    <widget class="Line" name="line">
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Local files:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="4">
-    <widget class="QPushButton" name="pb_upload">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="baseSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Upload</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QPushButton" name="pb_download">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Download</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="3">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="../cwe_resources.qrc">:/buttons/images/CWE_button_up_arrows.png</pixmap>
-     </property>
-     <property name="scaledContents">
-      <bool>false</bool>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="5">
-    <widget class="QTreeView" name="localTreeView">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>3</horstretch>
-       <verstretch>1</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="5">
-    <widget class="RemoteFileTree" name="remoteTreeView" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>3</horstretch>
-       <verstretch>1</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="contextMenuPolicy">
-      <enum>Qt::CustomContextMenu</enum>
-     </property>
+   <item>
+    <widget class="QFrame" name="remoteFrame">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Remote files:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="RemoteFileTree" name="remoteTreeView" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>3</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="contextMenuPolicy">
+         <enum>Qt::CustomContextMenu</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="remote_panel">
+        <property name="frameShape">
+         <enum>QFrame::Panel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="2">
+          <widget class="QCommandLinkButton" name="remoteButton_newFolder">
+           <property name="text">
+            <string>New Folder</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../cwe_resources.qrc">
+             <normaloff>:/icons/folder.png</normaloff>:/icons/folder.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QCommandLinkButton" name="remoteButton_delete">
+           <property name="text">
+            <string>Delete</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../cwe_resources.qrc">
+             <normaloff>:/icons/burst.png</normaloff>:/icons/burst.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QCommandLinkButton" name="remoteButton_rename">
+           <property name="text">
+            <string>Rename</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../cwe_resources.qrc">
+             <normaloff>:/icons/dir.gif</normaloff>:/icons/dir.gif</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pb_download">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Download</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../cwe_resources.qrc">
+          <normaloff>:/icons/left.png</normaloff>:/icons/left.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
+  <action name="actionlocal_new_folder">
+   <property name="icon">
+    <iconset resource="../cwe_resources.qrc">
+     <normaloff>:/icons/folder.png</normaloff>:/icons/folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>local_new_folder</string>
+   </property>
+   <property name="toolTip">
+    <string>create a new folder</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
    <class>RemoteFileTree</class>
    <extends>QWidget</extends>
-   <header>../AgaveExplorer/remoteFileOps/remotefiletree.h</header>
+   <header>../AgaveExplorer/remoteModelViews/remotefiletree.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
   <include location="../cwe_resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>remoteButton_delete</sender>
+   <signal>clicked()</signal>
+   <receiver>CWE_file_manager</receiver>
+   <slot>button_delete_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>840</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>560</x>
+     <y>222</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>remoteButton_newFolder</sender>
+   <signal>clicked()</signal>
+   <receiver>CWE_file_manager</receiver>
+   <slot>button_newFolder_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>658</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>560</x>
+     <y>222</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>remoteButton_rename</sender>
+   <signal>clicked()</signal>
+   <receiver>CWE_file_manager</receiver>
+   <slot>button_rename_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1023</x>
+     <y>383</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>560</x>
+     <y>222</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>button_newFolder_clicked()</slot>
+  <slot>button_delete_clicked()</slot>
+  <slot>button_rename_clicked()</slot>
+ </slots>
 </ui>

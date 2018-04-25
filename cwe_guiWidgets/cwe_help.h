@@ -36,6 +36,7 @@
 #define CWE_HELP_H
 
 #include "cwe_super.h"
+#include <QDesktopServices>
 
 namespace Ui {
 class CWE_help;
@@ -48,11 +49,6 @@ class CWE_help : public CWE_Super
 public:
     explicit CWE_help(QWidget *parent = 0);
     ~CWE_help();
-
-    void setOverview();
-
-public slots:
-    void overview_anchor_clicked(const QUrl &);
 
 private:
     Ui::CWE_help *ui;

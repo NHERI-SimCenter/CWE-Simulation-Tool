@@ -46,9 +46,14 @@
 #include "cwe_stagestatustab.h"
 #include "cwe_groupswidget.h"
 #include "CFDanalysis/CFDcaseInstance.h"
+#include "CFDanalysis/CFDanalysisType.h"
 
 #include "cwe_guiWidgets/cwe_parameters.h"
 #include "../CFDClientProgram/cwe_interfacedriver.h"
+
+#include "mainWindow/cwe_mainwindow.h"
+
+#include "cwe_globals.h"
 
 CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
     QFrame(parent),
@@ -167,7 +172,7 @@ void CWE_TabWidget::resetView()
 }
 
 
-void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
+void CWE_TabWidget::setParameterConfig(CFDanalysisType *myType)
 {
     QVBoxLayout *tablayout = (QVBoxLayout *)ui->tabsBar->layout();
     delete tablayout;
@@ -178,16 +183,14 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 
     stageTabList->clear();
 
-    QJsonArray  sequence = obj.value(QString("sequence")).toArray();
-    QJsonObject stages   = obj.value(QString("stages")).toObject();
+    QStringList stages = myType->getStageSequence();
 
     QMap<QString, StageState> stageStates;
-    stageStates = myController->getDriver()->getCurrentCase()->getStageStates();
+    stageStates = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase()->getStageStates();
 
-    foreach (QJsonValue theStage, sequence)
+    foreach (QString stageName, stages)
     {
-        QString stageName = theStage.toString();
-        QString stageLabel = stages.value(stageName).toObject().value("name").toString();
+        QString stageLabel = myType->getStageName(stageName);
         stageLabel += "\nParameters";
 
         /* create a CWE_StageStatusTab */
@@ -200,7 +203,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
 
         /* create a CWE_GroupsWidget */
-        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(myController->getDriver(), this);
+        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(this);
         ui->stagePanels->addWidget(groupWidget);
 
         /* link tab and groupWidget */
@@ -208,7 +211,7 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
         groupWidget->linkWidget(tab);
 
         /* set the parameter information for the CWE_GroupsWidget */
-        groupWidget->setParameterConfig(stageName, obj);
+        groupWidget->setParameterConfig(stageName, myType);
 
         /* connect signals and slots */
         QObject::connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
@@ -219,8 +222,11 @@ void CWE_TabWidget::setParameterConfig(QJsonObject &obj)
 
     initQuickParameterPtr();
 
-    QString firstTabKey = sequence[0].toString();
-    if (firstTabKey != "") { stageTabList->value(firstTabKey)->setActive(); }
+    if (stages.length()>0)
+    {
+        QString firstTabKey = stages[0];
+        if (!firstTabKey.isEmpty()) { stageTabList->value(firstTabKey)->setActive(); }
+    }
 
     this->setButtonMode(SimCenterButtonMode_NONE);
     this->setViewState(SimCenterViewState::hidden);
@@ -285,7 +291,7 @@ QString CWE_TabWidget::getStateText(StageState theState)
     if (theState == StageState::LOADING)        { return "Loading Data ..."; }
     if (theState == StageState::OFFLINE)        { return "Offline (Debug)"; }
     if (theState == StageState::RUNNING)        { return "Task Running"; }
-    if (theState == StageState::UNREADY)        { return "Need Prev. Stage"; }
+    if (theState == StageState::UNREADY)        { return "Need Prev. \nStage"; }
     if (theState == StageState::UNRUN)          { return "Not Yet Run"; }
     return "*** TOTAL ERROR ***";
 }

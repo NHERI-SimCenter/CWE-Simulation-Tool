@@ -50,16 +50,16 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
-    <number>6</number>
+    <number>12</number>
    </property>
    <property name="topMargin">
-    <number>6</number>
+    <number>12</number>
    </property>
    <property name="rightMargin">
-    <number>6</number>
+    <number>12</number>
    </property>
    <property name="bottomMargin">
-    <number>6</number>
+    <number>12</number>
    </property>
    <item row="0" column="0" colspan="2">
     <widget class="RemoteJobLister" name="tableView_jobs">
@@ -75,6 +75,12 @@
      <property name="sizeAdjustPolicy">
       <enum>QAbstractScrollArea::AdjustIgnored</enum>
      </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>185</number>
+     </attribute>
     </widget>
    </item>
   </layout>
@@ -83,7 +89,7 @@
   <customwidget>
    <class>RemoteJobLister</class>
    <extends>QTableView</extends>
-   <header>../AgaveExplorer/remoteFileOps/remotejoblister.h</header>
+   <header>../AgaveExplorer/remoteModelViews/remotejoblister.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

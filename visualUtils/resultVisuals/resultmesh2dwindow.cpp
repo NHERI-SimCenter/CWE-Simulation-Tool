@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
-** Copyright (c) 2018 The Regents of the University of California
+** Copyright (c) 2017 The University of Notre Dame
+** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -31,26 +31,42 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_DEBUG_WIDGET_H
-#define CWE_DEBUG_WIDGET_H
+#include "resultmesh2dwindow.h"
 
-#include "cwe_super.h"
+#include "../cfdglcanvas.h"
 
-namespace Ui {
-class CWE_Debug_Widget;
+ResultMesh2dWindow::ResultMesh2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
+
+ResultMesh2dWindow::~ResultMesh2dWindow(){}
+
+void ResultMesh2dWindow::initializeView()
+{
+    QMap<QString, QString> neededFiles;
+    neededFiles["points"] = "/constant/polyMesh/points.gz";
+    neededFiles["faces"] = "/constant/polyMesh/faces.gz";
+    neededFiles["owner"] = "/constant/polyMesh/owner.gz";
+
+    performStandardInit(neededFiles);
 }
 
-class CWE_Debug_Widget : public CWE_Super
+void ResultMesh2dWindow::allFilesLoaded()
 {
-    Q_OBJECT
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-public:
-    explicit CWE_Debug_Widget(QWidget *parent = 0);
-    ~CWE_Debug_Widget();
+    CFDglCanvas * myCanvas;
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
-private:
-    Ui::CWE_Debug_Widget *ui;
-};
+    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
-#endif // CWE_DEBUG_WIDGET_H
+    if (!myCanvas->haveMeshData())
+    {
+        changeDisplayFrameTenant(new QLabel("Error: Data for 2D mesh result is unreadable. Please reset and try again."));
+        return;
+    }
+
+    myCanvas->setDisplayState(CFDDisplayState::MESH);
+}

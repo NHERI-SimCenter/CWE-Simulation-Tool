@@ -34,21 +34,16 @@
 
 #include "sctrfiledatawidget.h"
 
-#include "../AgaveExplorer/remoteFileOps/remotefiletree.h"
+#include "../AgaveExplorer/remoteModelViews/remotefiletree.h"
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "../AgaveClientInterface/filemetadata.h"
 #include "cwe_interfacedriver.h"
+#include "mainWindow/cwe_mainwindow.h"
 
-SCtrFileDataWidget::SCtrFileDataWidget(QWidget *parent):
+SCtrFileDataWidget::SCtrFileDataWidget(CWE_MainWindow *mainWindow, QWidget *parent):
     SCtrMasterDataWidget(parent)
 {
-
-}
-
-SCtrFileDataWidget::SCtrFileDataWidget(CWE_InterfaceDriver *theDriver, QWidget *parent):
-    SCtrMasterDataWidget(parent)
-{
-    myDriver = theDriver;
+    theMainWindow = mainWindow;
 }
 
 void SCtrFileDataWidget::initUI()
@@ -60,8 +55,8 @@ void SCtrFileDataWidget::initUI()
     {
         selectedFile = new QLabel(this);
     }
-    explainText = new QLabel("\nIn order to run a simulation, a geometry file must be uploaded.\nClick on the files tab to go to the upload/download screen.\nCWE can use \"Alias Mesh\" .obj files exported from FreeCAD, as well as our own JSON geometry format.\n\nSelected File:");
-    explainText->setMaximumWidth(400);
+    explainText = new QLabel("\nIn order to run a simulation, a geometry file must be selected.\nIf you selected \"Uploaded File\", above, you will need to choose a geometry file you have uploaded.\nClick on the files tab to go to the upload/download screen.\nCWE can use \"Alias Mesh\" .obj files exported from FreeCAD, as well as our own JSON geometry format.\n\nSelected File:");
+    explainText->setMaximumWidth(500);
     explainText->setWordWrap(true);
     QBoxLayout *fullLayout = new QHBoxLayout();
     QBoxLayout *leftLayout = new QVBoxLayout();
@@ -72,7 +67,7 @@ void SCtrFileDataWidget::initUI()
     this->setLayout(fullLayout);
 }
 
-void SCtrFileDataWidget::setData(QJsonObject &obj)
+void SCtrFileDataWidget::setData(VARIABLE_TYPE &obj)
 {
     // set up the UI for the widget
     this->initUI();
@@ -83,19 +78,20 @@ void SCtrFileDataWidget::setData(QJsonObject &obj)
     layout->setMargin(0);
 
     myFileTree = new RemoteFileTree(this);
+    myFileTree->setModelLink(theMainWindow->getFileModel());
     myFileTree->setEditTriggers(QTreeView::NoEditTriggers);
     layout->insertWidget(1, myFileTree, 4);
 
     if (label_varName != NULL) {
-        label_varName->setText(obj.value(QString("displayname")).toString());
+        label_varName->setText(m_obj.displayName);
     }
 
     if (selectedFile != NULL) {
-        selectedFile->setText(obj.value(QString("default")).toString());
+        selectedFile->setText(m_obj.defaultValue);
     }
 
-    QObject::connect(myFileTree, SIGNAL(newFileSelected(FileTreeNode*)),
-                     this, SLOT(newFileSelected(FileTreeNode*)));
+    QObject::connect(myFileTree, SIGNAL(newFileSelected(FileNodeRef)),
+                     this, SLOT(newFileSelected(FileNodeRef)));
 }
 
 bool SCtrFileDataWidget::toBool()
@@ -116,11 +112,11 @@ void SCtrFileDataWidget::updateValue(QString s)
     myFileTree->clearSelection();
 }
 
-void SCtrFileDataWidget::newFileSelected(FileTreeNode * newFile)
+void SCtrFileDataWidget::newFileSelected(FileNodeRef newFile)
 {
-    if (newFile == NULL)
+    if (newFile.isNil())
     {
         selectedFile->setText("");
     }
-    selectedFile->setText(newFile->getFileData().getFullPath());
+    selectedFile->setText(newFile.getFullPath());
 }

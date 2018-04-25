@@ -38,9 +38,13 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "../popupWindows/create_case_popup.h"
+#include "../popupWindows/duplicate_case_popup.h"
+
 #include "mainWindow/cwe_mainwindow.h"
 
 #include "cwe_interfacedriver.h"
+#include "cwe_globals.h"
 
 CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
     CWE_Super(parent),
@@ -48,8 +52,8 @@ CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QObject::connect(ui->treeView, SIGNAL(newFileSelected(FileTreeNode*)),
-                             this, SLOT(newFileSelected(FileTreeNode*)));
+    QObject::connect(ui->treeView, SIGNAL(newFileSelected(FileNodeRef)),
+                             this, SLOT(newFileSelected(FileNodeRef)));
 
     clearSelectView();
 
@@ -61,38 +65,41 @@ CWE_manage_simulation::~CWE_manage_simulation()
     delete ui;
 }
 
-void CWE_manage_simulation::linkDriver(CWE_InterfaceDriver * theDriver)
+void CWE_manage_simulation::linkMainWindow(CWE_MainWindow *theMainWin)
 {
-    CWE_Super::linkDriver(theDriver);
-    QObject::connect(myDriver, SIGNAL(haveNewCase()),
+    CWE_Super::linkMainWindow(theMainWin);
+    ui->treeView->setModelLink(theMainWindow->getFileModel());
+    QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
 }
 
-void CWE_manage_simulation::newFileSelected(FileTreeNode * newFile)
+void CWE_manage_simulation::newFileSelected(FileNodeRef newFile)
 {
-    if (newFile == NULL)
+    if (!newFile.fileNodeExtant())
     {
-        myDriver->setCurrentCase(NULL);
+        theMainWindow->setCurrentCase();
         return;
     }
 
-    myDriver->setCurrentCase(new CFDcaseInstance(newFile, myDriver));
+    theMainWindow->setCurrentCase(newFile);
 }
 
 void CWE_manage_simulation::newCaseGiven()
 {
-    CFDcaseInstance * newCase = myDriver->getCurrentCase();
+    CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
 
     ui->label_caseStatus->setCurrentCase(newCase);    
 
     ui->treeView->setEnabled(true);
     clearSelectView();
 
+    ui->pb_duplicateCase->setEnabled(false);
     ui->pb_viewParameters->setEnabled(false);
     ui->pb_viewResults->setEnabled(false);
 
     if (newCase != NULL)
     {
+        ui->treeView->selectRowByFile(newCase->getCaseFolder());
         ui->label_caseName->setText(newCase->getCaseName());
 
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
@@ -113,6 +120,7 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         ui->treeView->setEnabled(false);
 
         showSelectView();
+        ui->pb_duplicateCase->setEnabled(false);
         ui->pb_viewParameters->setEnabled(false);
         ui->pb_viewResults->setEnabled(false);
         return;
@@ -132,23 +140,29 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         if (newState != CaseState::LOADING)
         {
             clearSelectView();
+            ui->pb_duplicateCase->setEnabled(false);
             ui->pb_viewParameters->setEnabled(false);
             ui->pb_viewResults->setEnabled(false);
         }
         return;
     }
 
-    if ((newState == CaseState::RUNNING) || (newState == CaseState::READY))
+    if ((newState == CaseState::RUNNING) ||
+            (newState == CaseState::READY) ||
+            (newState == CaseState::READY_ERROR) ||
+            (newState == CaseState::EXTERN_OP) ||
+            (newState == CaseState::PARAM_SAVE))
     {
+        ui->pb_duplicateCase->setEnabled(newState == CaseState::READY);
         ui->pb_viewParameters->setEnabled(true);
-        ui->pb_viewResults->setEnabled(true);
+        ui->pb_viewResults->setEnabled((newState == CaseState::READY) || (newState == CaseState::READY_ERROR));
 
-        CFDcaseInstance * theCase = myDriver->getCurrentCase();
+        CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
 
         CFDanalysisType * theType = theCase->getMyType();
         if (theType == NULL)
         {
-            myDriver->fatalInterfaceError("Type/stage mismatch for case.");
+            cwe_globals::get_CWE_Driver()->fatalInterfaceError("Type/stage mismatch for case.");
             return;
         }
         ui->label_CaseTypeIcon->setPixmap(theType->getIcon()->pixmap(150,100));
@@ -168,16 +182,40 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
     }
 }
 
+void CWE_manage_simulation::create_new_case_clicked()
+{
+    Create_Case_Popup * createCase = new Create_Case_Popup(theMainWindow, NULL);
+    createCase->show();
+}
+
+void CWE_manage_simulation::duplicate_case_clicked()
+{
+    FileNodeRef selectedFolder = ui->treeView->getSelectedFile();
+    if (selectedFolder.isNil())
+    {
+        cwe_globals::displayPopup("Please select a folder to duplicate.");
+        return;
+    }
+    if (selectedFolder.getFileType() != FileType::DIR)
+    {
+        cwe_globals::displayPopup("Please select a folder to duplicate.");
+        return;
+    }
+
+    Duplicate_Case_Popup * duplicateCase = new Duplicate_Case_Popup(selectedFolder, theMainWindow, this);
+    duplicateCase->show();
+}
+
 void CWE_manage_simulation::on_pb_viewParameters_clicked()
 {
     // switch main window to parameters tab
-    myDriver->getMainWindow()->switchToParameterTab();
+    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToParameterTab();
 }
 
 void CWE_manage_simulation::on_pb_viewResults_clicked()
 {
     // switch main window to results tab
-    myDriver->getMainWindow()->switchToResultsTab();
+    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToResultsTab();
 }
 
 void CWE_manage_simulation::clearSelectView()

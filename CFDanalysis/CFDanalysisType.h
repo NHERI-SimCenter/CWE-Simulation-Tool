@@ -41,19 +41,52 @@
 #include <QIcon>
 #include <QFile>
 
+struct RESULTS_STYLE {
+    QString name;
+    QString type;
+    QString file;
+    QString values;
+};
+
+struct KEY_VAL_PAIR {
+    QString key;
+    QString value;
+};
+
+struct VARIABLE_TYPE {
+    QString displayName;
+    QString type;
+    QString defaultValue;
+    QString unit;
+    QString precision;
+    QString sign;
+    QList<KEY_VAL_PAIR> options;
+};
+
 class CFDanalysisType
 {
 public:
     CFDanalysisType(QString configFile);
 
-    QJsonDocument * getRawConfig();
+    QJsonDocument * getRawConfig(); // should become a private method (?)
+
     QString getInternalName();
     QString getName();
+    QString getDescription();
+    QString getIconName();
+    QStringList getStageNames();
+    QStringList getStageSequence();
+
+    QString getStageName(QString stage);
+    QStringList getStageGroups(QString stage);
+    QList<RESULTS_STYLE> getStageResults(QString stage);
+
+    QStringList getVarGroup(QString group);
+    VARIABLE_TYPE getVariableInfo(QString name);
+
     QString getStageApp(QString stageName);
     QString getExtraInput(QString stageName);
 
-    QStringList getStageNames();
-    QStringList getStageSequence();
     QString translateStageId(QString stageId);
 
     QIcon * getIcon();

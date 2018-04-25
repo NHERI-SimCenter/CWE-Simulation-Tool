@@ -41,14 +41,13 @@
 
 #include "cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
+#include "CFDanalysis/CFDanalysisType.h"
 
 #include "cwe_globals.h"
 
-CWE_GroupsWidget::CWE_GroupsWidget(CWE_InterfaceDriver * theDriver, QWidget *parent) : QTabWidget(parent)
+CWE_GroupsWidget::CWE_GroupsWidget(QWidget *parent) : QTabWidget(parent)
 {
     quickParameterPtr = new QMap<QString, SCtrMasterDataWidget *>();
-    myDriver = theDriver;
-
     this->setViewState(SimCenterViewState::visible);
 }
 
@@ -73,33 +72,25 @@ void CWE_GroupsWidget::setViewState(SimCenterViewState state)
     }
 }
 
-void CWE_GroupsWidget::setParameterConfig(QString key, QJsonObject &obj)
+void CWE_GroupsWidget::setParameterConfig(QString stage, CFDanalysisType *myType)
 {
     /* find all groups and create a tab per group */
-    QJsonArray groups = obj.value(QString("stages")).toObject().value(key).toObject().value(QString("groups")).toArray();
-    QJsonObject allVars  = obj.value(QString("vars")).toObject();
+    QStringList groups  = myType->getStageGroups(stage);
 
-    foreach (QJsonValue group, groups)
+    foreach (QString groupName, groups)
     {
-        QString groupName = group.toString();
         QScrollArea *scrollArea = new QScrollArea(this);
-        CWE_ParamPanel *panel = new CWE_ParamPanel(myDriver, this);
+        CWE_ParamPanel *panel = new CWE_ParamPanel(this);
         scrollArea->setWidgetResizable(true);
         scrollArea->setWidget(panel);
 
         this->addTab(scrollArea, groupName);
 
         /* now add the parameter tabs */
-        QJsonObject groupList = obj.value(QString("groups")).toObject();
-        if (!groupList.contains(groupName))
-        {
-            cwe_globals::displayFatalPopup("Template configuration error: in groups");
-        }
-        QJsonObject theGroup = groupList.value(groupName).toObject();
-        QJsonArray groupVars  = theGroup.value(QString("vars")).toArray();
+        QStringList groupVars = myType->getVarGroup(groupName);
 
         //TODO: If has image, need to display
-        panel->addParameterConfig(groupVars, allVars);
+        panel->addParameterConfig(groupVars, myType);
     }
 }
 

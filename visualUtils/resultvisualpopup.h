@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -33,37 +33,53 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef RESULTVISUALBASE_H
-#define RESULTVISUALBASE_H
+#ifndef RESULTVISUALPOPUP_H
+#define RESULTVISUALPOPUP_H
 
-#include <QObject>
-#include <QMap>
+#include <QWidget>
+#include <QFrame>
+#include <QLabel>
+#include <QHBoxLayout>
+#include "resultprocurebase.h"
 
-class FileTreeNode;
+class CFDcaseInstance;
 
-class ResultVisualBase : public QObject
+namespace Ui {
+class ResultVisualPopup;
+}
+
+class ResultVisualPopup : public ResultProcureBase
 {
     Q_OBJECT
 public:
-    explicit ResultVisualBase(QObject *parent = nullptr);
-    ~ResultVisualBase();
+    explicit ResultVisualPopup(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent = nullptr);
+    ~ResultVisualPopup();
 
-    void initializeWithNeededFiles(FileTreeNode * baseFolder, QList<QString> neededFiles);
+    virtual void initializeView() = 0;
+    void performStandardInit(QMap<QString, QString> neededFiles);
 
 protected:
-    virtual void setupInitDisplay() = 0;
-    virtual void neededFileMissing() = 0;
-    virtual void allFilesLoaded(QMap<QString, QByteArray *> fileDataList) = 0;
-    virtual void dataLostError() = 0;
+    void setupResultDisplay(QString caseName, QString caseType, QString resultName);
+    void changeDisplayFrameTenant(QWidget * newDisplay);
+    virtual void initialFailure();
+    virtual void underlyingDataChanged(QString fileID);
+
+    QMap<QString, QString> getResultObj();
+
+protected slots:
+    virtual void baseFolderRemoved();
 
 private slots:
-    void baseFolderRemoved();
-    void fileRecordsChanged();
+    void closeButtonClicked();
 
 private:
-    FileTreeNode * myBaseFolder;
-    QList<QString> myFileList;
+    Ui::ResultVisualPopup *ui;
 
+    CFDcaseInstance * myCase;
+    QMap<QString, QString> resultObj;
+
+    QWidget * displayFrameTenant = NULL;
+    QHBoxLayout * resultFrameLayout = NULL;
 };
 
-#endif // RESULTVISUALBASE_H
+#endif // RESULTVISUALPOPUP_H

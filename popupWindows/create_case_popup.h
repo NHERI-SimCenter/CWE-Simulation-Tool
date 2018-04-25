@@ -32,10 +32,10 @@
 
 // Contributors:
 
-#ifndef CWE_CREATE_COPY_SIMULATION_H
-#define CWE_CREATE_COPY_SIMULATION_H
+#ifndef CREATE_CASE_POPUP_H
+#define CREATE_CASE_POPUP_H
 
-#include "cwe_super.h"
+#include "cwe_popup.h"
 
 #include <QPushButton>
 #include <QRadioButton>
@@ -50,26 +50,24 @@ struct CASE_TYPE_DATA {
 };
 
 namespace Ui {
-class CWE_Create_Copy_Simulation;
+class Create_Case_Popup;
 }
 
-class CWE_Create_Copy_Simulation : public CWE_Super
+class Create_Case_Popup : public CWE_Popup
 {
     Q_OBJECT
 
 public:
-    explicit CWE_Create_Copy_Simulation(QWidget *parent = 0);
-    ~CWE_Create_Copy_Simulation();
-
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
+    explicit Create_Case_Popup(CWE_MainWindow * controlWindow, QWidget *parent = 0);
+    ~Create_Case_Popup();
 
 private slots:
-    void on_pBtn_create_copy_clicked();
-    void on_tabWidget_currentChanged(int index);
+    void button_create_copy_clicked();
+    //void on_tabWidget_currentChanged(int index);
     void selectCaseTemplate();
 
 private:
-    Ui::CWE_Create_Copy_Simulation *ui;
+    Ui::Create_Case_Popup *ui;
     void populateCaseTypes();
     void create_new_case_from_template(QString filename);
 
@@ -78,4 +76,4 @@ private:
     QVector<CASE_TYPE_DATA> caseTypeDataList;
 };
 
-#endif // CWE_CREATE_COPY_SIMULATION_H
+#endif // CREATE_CASE_POPUP_H

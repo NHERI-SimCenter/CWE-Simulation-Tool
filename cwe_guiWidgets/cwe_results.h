@@ -43,6 +43,8 @@
 #include <QJsonArray>
 
 enum class CaseState;
+class ResultProcureBase;
+class CWE_MainWindow;
 
 namespace Ui {
 class CWE_Results;
@@ -56,7 +58,7 @@ public:
     explicit CWE_Results(QWidget *parent = 0);
     ~CWE_Results();
 
-    virtual void linkDriver(CWE_InterfaceDriver * newDriver);
+    virtual void linkMainWindow(CWE_MainWindow *theMainWin);
     void resetViewInfo();
 
 private slots:
@@ -69,15 +71,15 @@ private slots:
 private:
     QMap<QString, QString> getResultObjectFromName(QString name);
     void populateResultsScreen();
+    void performSingleFileDownload(QString filePathToDownload, QString stage);
+    void addResult(QString name, bool showeye, bool download, QString type);
 
     Ui::CWE_Results    *ui;
-    QStandardItemModel *model;
+    QStandardItemModel *resultListModel;
 
     bool viewIsValid = false;
     int showCol;
     int downloadCol;
-
-    void addResult(QString name, bool showeye, bool download, QString type);
 };
 
 #endif // CWE_RESULTS_H

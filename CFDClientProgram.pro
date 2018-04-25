@@ -55,14 +55,11 @@ SOURCES += main.cpp \
     visualUtils/cfdtoken.cpp \
     visualUtils/decompresswrapper.cpp \
     cwe_guiWidgets/cwe_super.cpp \
-    cwe_guiWidgets/cwe_file_manager.cpp \
     cwe_guiWidgets/cwe_help.cpp \
     cwe_guiWidgets/cwe_manage_simulation.cpp \
     cwe_guiWidgets/cwe_welcome_screen.cpp \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
-    cwe_guiWidgets/cwe_create_copy_simulation.cpp \
-    cwe_guiWidgets/cwe_debug_widget.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.cpp \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.cpp \
@@ -83,8 +80,6 @@ SOURCES += main.cpp \
     ../AgaveExplorer/remoteFileOps/fileoperator.cpp \
     ../AgaveExplorer/remoteFileOps/filetreenode.cpp \
     ../AgaveExplorer/remoteFileOps/joboperator.cpp \
-    ../AgaveExplorer/remoteFileOps/remotefiletree.cpp \
-    ../AgaveExplorer/remoteFileOps/remotejoblister.cpp \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.cpp \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.cpp \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.cpp \
@@ -96,14 +91,28 @@ SOURCES += main.cpp \
     SimCenter_widgets/sctrfiledatawidget.cpp \
     cwe_globals.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.cpp \
-    cwe_guiWidgets/cwe_result_popup.cpp \
     cwe_guiWidgets/cwe_job_list.cpp \
-    cwe_guiWidgets/cwe_file_manager2.cpp \
-    ../AgaveExplorer/utilFuncs/linkedstandarditem.cpp \
     ../AgaveExplorer/remoteFileOps/joblistnode.cpp \
-    visualUtils/resultvisualbase.cpp \
     ../AgaveExplorer/ae_globals.cpp \
-    cwe_interfacedriver.cpp
+    cwe_interfacedriver.cpp \
+    visualUtils/resultVisuals/resultmesh2dwindow.cpp \
+    visualUtils/resultprocurebase.cpp \
+    visualUtils/resultvisualpopup.cpp \
+    visualUtils/resultVisuals/resultfield2dwindow.cpp \
+    visualUtils/resultVisuals/resulttextdisp.cpp \
+    cwe_guiWidgets/cwe_file_manager.cpp \
+    CFDanalysis/cwejobaccountant.cpp \
+    ../AgaveExplorer/remoteFileOps/filenoderef.cpp \
+    ../AgaveExplorer/remoteModelViews/linkedstandarditem.cpp \
+    ../AgaveExplorer/remoteModelViews/remotefilemodel.cpp \
+    ../AgaveExplorer/remoteModelViews/remotefiletree.cpp \
+    ../AgaveExplorer/remoteModelViews/remotejoblister.cpp \
+    popupWindows/create_case_popup.cpp \
+    popupWindows/duplicate_case_popup.cpp \
+    ../AgaveExplorer/remoteModelViews/remotefileitem.cpp \
+    SimCenter_widgets/sctrtextdatawidget.cpp \
+    popupWindows/cwe_popup.cpp \
+    ../AgaveClientInterface/agaveInterfaces/agavethread.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -113,14 +122,11 @@ HEADERS  += \
     visualUtils/decompresswrapper.h \
     mainWindow/cwe_mainwindow.h \
     cwe_guiWidgets/cwe_super.h \
-    cwe_guiWidgets/cwe_file_manager.h \
     cwe_guiWidgets/cwe_help.h \
     cwe_guiWidgets/cwe_manage_simulation.h \
     cwe_guiWidgets/cwe_welcome_screen.h \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
-    cwe_guiWidgets/cwe_create_copy_simulation.h \
-    cwe_guiWidgets/cwe_debug_widget.h \
     cwe_guiWidgets/cwe_state_label.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h \
@@ -140,8 +146,6 @@ HEADERS  += \
     ../AgaveExplorer/remoteFileOps/fileoperator.h \
     ../AgaveExplorer/remoteFileOps/filetreenode.h \
     ../AgaveExplorer/remoteFileOps/joboperator.h \
-    ../AgaveExplorer/remoteFileOps/remotefiletree.h \
-    ../AgaveExplorer/remoteFileOps/remotejoblister.h \
     ../AgaveExplorer/SimCenterCommon/FooterWidget.h \
     ../AgaveExplorer/SimCenterCommon/HeaderWidget.h \
     ../AgaveExplorer/utilFuncs/agavesetupdriver.h \
@@ -153,24 +157,36 @@ HEADERS  += \
     SimCenter_widgets/sctrfiledatawidget.h \
     cwe_globals.h \
     ../AgaveClientInterface/agaveInterfaces/agavepipebuffer.h \
-    cwe_guiWidgets/cwe_result_popup.h \
     cwe_guiWidgets/cwe_job_list.h \
-    cwe_guiWidgets/cwe_file_manager2.h \
-    ../AgaveExplorer/utilFuncs/linkedstandarditem.h \
     ../AgaveExplorer/remoteFileOps/joblistnode.h \
-    visualUtils/resultvisualbase.h \
     ../AgaveExplorer/ae_globals.h \
-    cwe_interfacedriver.h
+    cwe_interfacedriver.h \
+    visualUtils/resultVisuals/resultmesh2dwindow.h \
+    visualUtils/resultprocurebase.h \
+    visualUtils/resultvisualpopup.h \
+    visualUtils/resultVisuals/resultfield2dwindow.h \
+    visualUtils/resultVisuals/resulttextdisp.h \
+    cwe_guiWidgets/cwe_file_manager.h \
+    CFDanalysis/cwejobaccountant.h \
+    ../AgaveExplorer/remoteFileOps/filenoderef.h \
+    ../AgaveExplorer/remoteModelViews/linkedstandarditem.h \
+    ../AgaveExplorer/remoteModelViews/remotefilemodel.h \
+    ../AgaveExplorer/remoteModelViews/remotefiletree.h \
+    ../AgaveExplorer/remoteModelViews/remotejoblister.h \
+    popupWindows/create_case_popup.h \
+    popupWindows/duplicate_case_popup.h \
+    ../AgaveExplorer/remoteModelViews/remotefileitem.h \
+    SimCenter_widgets/sctrtextdatawidget.h \
+    popupWindows/cwe_popup.h \
+    ../AgaveClientInterface/agaveInterfaces/agavethread.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
-    cwe_guiWidgets/cwe_file_manager.ui \
     cwe_guiWidgets/cwe_help.ui \
     cwe_guiWidgets/cwe_manage_simulation.ui \
     cwe_guiWidgets/cwe_welcome_screen.ui \
     cwe_guiWidgets/cwe_results.ui \
     cwe_guiWidgets/cwe_parameters.ui \
-    cwe_guiWidgets/cwe_create_copy_simulation.ui \
     cwe_guiWidgets/cwe_debug_widget.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
@@ -178,11 +194,15 @@ FORMS    += \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
     cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
-    cwe_guiWidgets/cwe_result_popup.ui \
     cwe_guiWidgets/cwe_job_list.ui \
-    cwe_guiWidgets/cwe_file_manager2.ui
+    visualUtils/resultvisualpopup.ui \
+    cwe_guiWidgets/cwe_file_manager.ui \
+    popupWindows/create_case_popup.ui \
+    popupWindows/duplicate_case_popup.ui
 
 RESOURCES += \
     cwe_resources.qrc \
     ../AgaveExplorer/SimCenterCommon/commonResources.qrc \
     CFDanalysis/config/cfdconfig.qrc
+
+DISTFILES +=

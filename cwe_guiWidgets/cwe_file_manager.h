@@ -32,10 +32,12 @@
 
 // Contributors:
 
-#ifndef CWE_FILE_MANAGER_H
-#define CWE_FILE_MANAGER_H
+#ifndef CWE_FILE_MANAGER2_H
+#define CWE_FILE_MANAGER2_H
 
 #include "cwe_super.h"
+
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 
 #include <QFileSystemModel>
 #include <QMenu>
@@ -54,7 +56,7 @@ public:
     explicit CWE_file_manager(QWidget *parent = 0);
     ~CWE_file_manager();
 
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
+    virtual void linkMainWindow(CWE_MainWindow * theMainWin);
 
 private slots:
     void on_pb_upload_clicked();
@@ -63,9 +65,6 @@ private slots:
     void customFileMenu(const QPoint &pos);
     void copyMenuItem();
     void moveMenuItem();
-    void renameMenuItem();
-    void deleteMenuItem();
-    void createFolderMenuItem();
 
     void compressMenuItem();
     void decompressMenuItem();
@@ -75,11 +74,15 @@ private slots:
 
     void remoteOpDone();
 
+    void button_newFolder_clicked();
+    void button_delete_clicked();
+    void button_rename_clicked();
+
 private:
     Ui::CWE_file_manager *ui;
     QFileSystemModel *localFileModel;
 
-    FileTreeNode * targetNode = NULL;
+    FileNodeRef targetNode;
 };
 
-#endif // CWE_FILE_MANAGER_H
+#endif // CWE_FILE_MANAGER2_H

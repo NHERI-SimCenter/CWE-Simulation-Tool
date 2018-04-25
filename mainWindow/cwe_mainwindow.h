@@ -38,6 +38,9 @@
 #include <QMainWindow>
 
 #include <QDesktopWidget>
+#include <QPushButton>
+
+#include "../AgaveExplorer/remoteModelViews/remotefilemodel.h"
 
 namespace Ui {
 class CWE_MainWindow;
@@ -45,6 +48,8 @@ class CWE_MainWindow;
 
 class cwe_state_label;
 class CWE_InterfaceDriver;
+class CFDcaseInstance;
+class CFDanalysisType;
 enum class CaseState;
 
 class CWE_MainWindow : public QMainWindow
@@ -52,7 +57,7 @@ class CWE_MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit CWE_MainWindow(CWE_InterfaceDriver *newDriver, QWidget *parent = 0);
+    explicit CWE_MainWindow(QWidget *parent = 0);
     ~CWE_MainWindow();
 
     void runSetupSteps();
@@ -61,23 +66,39 @@ public:
 
     void switchToParameterTab();
     void switchToResultsTab();
-    void switchToCreateTab();
     void switchToFilesTab();
 
+    RemoteFileModel * getFileModel();
+
+    CFDcaseInstance * getCurrentCase();
+    void setCurrentCase();
+    void setCurrentCase(CFDcaseInstance * newCase);
+    void setCurrentCase(const FileNodeRef &caseNode);
+    void setCurrentCase(CFDanalysisType * newCaseType);
+
+    CFDcaseInstance * getCaseFromType(CFDanalysisType *caseType);
+    CFDcaseInstance * getCaseFromFolder(const FileNodeRef &caseNode);
+
+signals:
+    void haveNewCase();
+
 private slots:
-    void newCaseGiven();
     void newCaseState(CaseState newState);
 
     void menuExit();
     void menuCopyInfo();
 
 private:
+    void deactivateCurrentCase();
+
     void changeParamsAndResultsEnabled(bool setting);
     void changeTabEnabled(QWidget *theTab, bool newSetting);
 
     Ui::CWE_MainWindow *ui;
 
-    CWE_InterfaceDriver     *myDriver;
+    CFDcaseInstance * currentCase = NULL;
+
+    RemoteFileModel fileModel;
     cwe_state_label        *stateLabel = NULL;
 };
 

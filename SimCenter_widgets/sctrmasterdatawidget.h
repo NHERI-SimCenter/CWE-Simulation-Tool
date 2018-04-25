@@ -45,6 +45,8 @@
 #include <QBoxLayout>
 
 #include "SimCenter_widgets/sctrstates.h"
+#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+#include "CFDanalysis/CFDanalysisType.h"
 
 class FileTreeNode;
 
@@ -57,7 +59,7 @@ public:
     ~SCtrMasterDataWidget();
     SimCenterViewState ViewState();
     virtual void setViewState(SimCenterViewState);
-    virtual void setData(QJsonObject &) = 0;
+    virtual void setData(VARIABLE_TYPE &) = 0;
     virtual void initUI();
     virtual void setValue(QString);
     virtual void setValue(float);
@@ -69,7 +71,7 @@ public:
 
 private slots:
     void on_theValue_editingFinished();
-    virtual void newFileSelected(FileTreeNode *);
+    virtual void newFileSelected(FileNodeRef);
     //TODO: Need to rethink some of the polymorphism here
 
 protected:
@@ -80,7 +82,7 @@ protected:
     QLabel  *label_varName = NULL;
     QLabel  *label_unit = NULL;
 
-    QJsonObject m_obj;
+    VARIABLE_TYPE m_obj;
 
 private:
     void setVariableName(QString s);

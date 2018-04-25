@@ -54,23 +54,90 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
-   <item row="0" column="0">
-    <widget class="QTabWidget" name="helpTabs">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btn_back">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../cwe_resources.qrc">
+         <normaloff>:/buttons/images/CWE_left.png</normaloff>:/buttons/images/CWE_left.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="head_label">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>CWE Help</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_index">
+         <property name="text">
+          <string>Return to Index</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_forward">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../cwe_resources.qrc">
+         <normaloff>:/buttons/images/CWE_right.png</normaloff>:/buttons/images/CWE_right.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTextBrowser" name="helpBrowser">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+      <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -81,78 +148,70 @@
        <height>0</height>
       </size>
      </property>
-     <property name="tabPosition">
-      <enum>QTabWidget::North</enum>
+     <property name="lineWrapMode">
+      <enum>QTextEdit::WidgetWidth</enum>
      </property>
-     <property name="tabShape">
-      <enum>QTabWidget::Rounded</enum>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <property name="elideMode">
-      <enum>Qt::ElideRight</enum>
-     </property>
-     <property name="usesScrollButtons">
-      <bool>false</bool>
-     </property>
-     <property name="documentMode">
+     <property name="readOnly">
       <bool>true</bool>
      </property>
-     <property name="tabsClosable">
-      <bool>true</bool>
-     </property>
-     <property name="movable">
+     <property name="openExternalLinks">
       <bool>false</bool>
      </property>
-     <widget class="QWidget" name="tab_overview">
-      <attribute name="title">
-       <string>Overview</string>
-      </attribute>
-      <attribute name="toolTip">
-       <string>Help topics overview</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QTextBrowser" name="textBrowser_overview">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>1</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="lineWrapMode">
-          <enum>QTextEdit::WidgetWidth</enum>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
- <connections/>
+ <resources>
+  <include location="../cwe_resources.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>btn_back</sender>
+   <signal>clicked()</signal>
+   <receiver>helpBrowser</receiver>
+   <slot>backward()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>50</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>194</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btn_forward</sender>
+   <signal>clicked()</signal>
+   <receiver>helpBrowser</receiver>
+   <slot>forward()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>328</x>
+     <y>50</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>194</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btn_index</sender>
+   <signal>clicked()</signal>
+   <receiver>helpBrowser</receiver>
+   <slot>home()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>194</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

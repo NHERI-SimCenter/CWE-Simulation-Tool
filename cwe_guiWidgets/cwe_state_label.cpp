@@ -97,14 +97,29 @@ void cwe_state_label::setNewState(CaseState newState)
         this->setText("Getting remote data  . . . Please Wait");
         return;
     }
+    if (newState == CaseState::EXTERN_OP)
+    {
+        this->setText("File Operation in Progress . . . Please Wait");
+        return;
+    }
     if (newState == CaseState::READY)
     {
         this->setText("Ready for user input");
         return;
     }
+    if (newState == CaseState::READY_ERROR)
+    {
+        this->setText("Error in remote task process.");
+        return;
+    }
     if (newState == CaseState::OFFLINE)
     {
         this->setText("OFFLINE MODE");
+        return;
+    }
+    if (newState == CaseState::PARAM_SAVE)
+    {
+        this->setText("Saving Parameters");
         return;
     }
     this->setText("ERROR");

@@ -6,7 +6,7 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -31,63 +31,48 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_FILE_MANAGER2_H
-#define CWE_FILE_MANAGER2_H
+#include "resultfield2dwindow.h"
 
-#include "cwe_super.h"
+#include "../cfdglcanvas.h"
 
-#include <QFileSystemModel>
-#include <QMenu>
+ResultField2dWindow::ResultField2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
 
-class FileTreeNode;
+ResultField2dWindow::~ResultField2dWindow(){}
 
-namespace Ui {
-class CWE_file_manager2;
+void ResultField2dWindow::initializeView()
+{
+    QMap<QString, QString> neededFiles;
+    neededFiles["points"] = "/constant/polyMesh/points.gz";
+    neededFiles["faces"] = "/constant/polyMesh/faces.gz";
+    neededFiles["owner"] = "/constant/polyMesh/owner.gz";
+
+    QString fieldName = getResultObj()["file"];
+    QString fieldFile = "[final]/";
+    fieldFile.append(fieldName).append(".gz");
+    neededFiles["data"] = fieldFile;
+
+    performStandardInit(neededFiles);
 }
 
-class CWE_file_manager2 : public CWE_Super
+void ResultField2dWindow::allFilesLoaded()
 {
-    Q_OBJECT
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-public:
-    explicit CWE_file_manager2(QWidget *parent = 0);
-    ~CWE_file_manager2();
+    CFDglCanvas * myCanvas;
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
+    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
-private slots:
-    void on_pb_upload_clicked();
-    void on_pb_download_clicked();
+    if (!myCanvas->haveMeshData())
+    {
+        changeDisplayFrameTenant(new QLabel("Error: Data for 2D mesh is unreadable. Please reset and try again."));
+        return;
+    }
 
-    void customFileMenu(const QPoint &pos);
-    void copyMenuItem();
-    void moveMenuItem();
-    void renameMenuItem();
-    void deleteMenuItem();
-    void createFolderMenuItem();
-
-    void compressMenuItem();
-    void decompressMenuItem();
-    void refreshMenuItem();
-
-    void downloadBufferItem();
-
-    void remoteOpDone();
-
-    void on_localButton_newFolder_clicked();
-    void on_localButton_deleteFolder_clicked();
-    void on_localButton_deleteFile_clicked();
-
-    void on_remoteButton_newFolder_clicked();
-    void on_remoteButton_deleteFolder_clicked();
-    void on_remoteButton_deleteFile_clicked();
-
-private:
-    Ui::CWE_file_manager2 *ui;
-    QFileSystemModel *localFileModel;
-
-    FileTreeNode * targetNode = NULL;
-};
-
-#endif // CWE_FILE_MANAGER2_H
+    myCanvas->loadFieldData(fileBuffers["data"], getResultObj()["values"]);
+    myCanvas->setDisplayState(CFDDisplayState::FIELD);
+}

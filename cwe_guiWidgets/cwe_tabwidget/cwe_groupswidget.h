@@ -40,6 +40,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QScrollArea>
+#include "CFDanalysis/CFDanalysisType.h"
 
 class CWE_StageStatusTab;
 class CWE_ParamTab;
@@ -51,7 +52,7 @@ enum class StageState;
 class CWE_GroupsWidget : public QTabWidget
 {
 public:
-    CWE_GroupsWidget(CWE_InterfaceDriver *theDriver, QWidget *parent = NULL);
+    CWE_GroupsWidget(QWidget *parent = NULL);
     ~CWE_GroupsWidget();
     void setCorrespondingTab(CWE_StageStatusTab * newTab);
 
@@ -59,7 +60,7 @@ public:
     void addVSpacer(const QString &key, const QString &label);
     void addVarsToTab(QString key, const QString &label, QJsonArray *, QJsonObject *, QMap<QString,QString> * );
 
-    void setParameterConfig(QString key, QJsonObject &obj);
+    void setParameterConfig(QString key, CFDanalysisType *myType);
     void linkWidget(CWE_StageStatusTab *tab);
     QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
 
@@ -76,7 +77,6 @@ private:
     QJsonObject m_obj;
 
     CWE_StageStatusTab * myTab;
-    CWE_InterfaceDriver * myDriver;
 
     QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
 };

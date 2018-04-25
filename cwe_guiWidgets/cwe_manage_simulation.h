@@ -39,7 +39,8 @@
 
 #include <QStandardItemModel>
 
-class FileTreeNode;
+class FileNodeRef;
+class CWE_MainWindow;
 enum class CaseState;
 enum class StageState;
 
@@ -55,14 +56,16 @@ public:
     explicit CWE_manage_simulation(QWidget *parent = 0);
     ~CWE_manage_simulation();
 
-    virtual void linkDriver(CWE_InterfaceDriver * theDriver);
+    virtual void linkMainWindow(CWE_MainWindow *theMainWin);
 
 private slots:
-    void newFileSelected(FileTreeNode * newFile);
+    void newFileSelected(FileNodeRef newFile);
 
     void newCaseGiven();
     void newCaseState(CaseState newState);
 
+    void create_new_case_clicked();
+    void duplicate_case_clicked();
     void on_pb_viewParameters_clicked();
     void on_pb_viewResults_clicked();
 

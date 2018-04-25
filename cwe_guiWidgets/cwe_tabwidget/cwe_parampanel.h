@@ -36,12 +36,13 @@
 #define CWE_PARAMPANEL_H
 
 #include <QFrame>
-#include <QJsonObject>
-#include <QJsonArray>
+//#include <QJsonObject>
+//#include <QJsonArray>
 #include <QMap>
 #include <QLayout>
 
 #include "SimCenter_widgets/sctrstates.h"
+#include "CFDanalysis/CFDanalysisType.h"
 
 class SCtrMasterDataWidget;
 class CWE_InterfaceDriver;
@@ -56,21 +57,18 @@ class CWE_ParamPanel : public QFrame
     Q_OBJECT
 
 public:
-    explicit CWE_ParamPanel(CWE_InterfaceDriver *theDriver, QWidget *parent = 0);
+    explicit CWE_ParamPanel(QWidget *parent = 0);
     ~CWE_ParamPanel();
 
     void setViewState(SimCenterViewState);
     SimCenterViewState getViewState();
-    void setData(QJsonObject &);
-    void addVariable(QString varName, QJsonObject &theVariable);
-    void addParameterConfig(QJsonArray &groupVars, QJsonObject &allVars);
+    void addVariable(QString varName, VARIABLE_TYPE &theVariable);
+    void addParameterConfig(QStringList &groupVars, CFDanalysisType *myType);
     QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
 
 private:
     SimCenterViewState m_viewState;
-    QJsonObject m_obj;
     QMap<QString, SCtrMasterDataWidget *> *variableWidgets;
-    CWE_InterfaceDriver * myDriver;
 };
 
 #endif // CWE_PARAMPANEL_H

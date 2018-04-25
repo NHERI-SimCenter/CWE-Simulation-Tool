@@ -48,92 +48,27 @@
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
-CFDcaseInstance::CFDcaseInstance(FileTreeNode * newCaseFolder, CWE_InterfaceDriver * mainDriver):
-    QObject((QObject *) mainDriver)
+CFDcaseInstance::CFDcaseInstance(const FileNodeRef &newCaseFolder):
+    QObject((QObject *) cwe_globals::get_CWE_Driver())
 {
     caseFolder = newCaseFolder;
-    theDriver = mainDriver;
-
-    QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
-                     this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                     this, SLOT(underlyingFilesUpdated()));
-    QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
-                     this, SLOT(jobListUpdated()));
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
-                     this, SLOT(fileTaskDone(RequestState)));
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(recursiveProcessFinished(bool,QString)),
-                     this, SLOT(recursiveFileOpDone(bool,QString)));
-
-    if (theDriver->inOfflineMode())
-    {
-        myState = InternalCaseState::OFFLINE;
-        return;
-    }
-
-    if (caseDataInvalid())
-    {
-        myState = InternalCaseState::INVALID;
-        return;
-    }
-
-    computeCaseType();
-    if (caseDataLoaded())
-    {
-        myState = InternalCaseState::READY;
-        storedStageStates = computeStageStates();
-        computeParamList();
-        return;
-    }
-
-    myState = InternalCaseState::INIT_DATA_LOAD;
-    storedStageStates = computeStageStates();
-    enactDataReload();
+    connectCaseSignals();
+    computeInitState();
 }
 
-CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType, CWE_InterfaceDriver *mainDriver):
-    QObject((QObject *) mainDriver)
+CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType):
+    QObject((QObject *) cwe_globals::get_CWE_Driver())
 {
     myType = caseType;
-    theDriver = mainDriver;
-
-    QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
-                     this, SLOT(jobListUpdated()));
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
-                     this, SLOT(fileTaskDone(RequestState)));
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(recursiveProcessFinished(bool,QString)),
-                     this, SLOT(recursiveFileOpDone(bool,QString)));
-
-    if (theDriver->inOfflineMode())
-    {
-        myState = InternalCaseState::OFFLINE;
-    }
-    else
-    {
-        myState = InternalCaseState::TYPE_SELECTED;
-    }
+    connectCaseSignals();
+    computeInitState();
 }
 
-CFDcaseInstance::CFDcaseInstance(CWE_InterfaceDriver *mainDriver):
-    QObject((QObject *) mainDriver)
+CFDcaseInstance::CFDcaseInstance():
+    QObject((QObject *) cwe_globals::get_CWE_Driver())
 {
-    theDriver = mainDriver;
-
-    QObject::connect(theDriver->getJobHandler(), SIGNAL(newJobData()),
-                     this, SLOT(jobListUpdated()));
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
-                     this, SLOT(fileTaskDone(RequestState)));
-    QObject::connect(theDriver->getFileHandler(), SIGNAL(recursiveProcessFinished(bool,QString)),
-                     this, SLOT(recursiveFileOpDone(bool,QString)));
-
-    if (theDriver->inOfflineMode())
-    {
-        myState = InternalCaseState::OFFLINE;
-    }
-    else
-    {
-        myState = InternalCaseState::EMPTY_CASE;
-    }
+    connectCaseSignals();
+    computeInitState();
 }
 
 bool CFDcaseInstance::isDefunct()
@@ -152,38 +87,36 @@ CaseState CFDcaseInstance::getCaseState()
     case InternalCaseState::OFFLINE : return CaseState::OFFLINE;
     case InternalCaseState::READY : return CaseState::READY;
     case InternalCaseState::INVALID : return CaseState::INVALID;
+    case InternalCaseState::READY_ERROR : return CaseState::READY_ERROR;
+    case InternalCaseState::EXTERN_FILE_OP : return CaseState::EXTERN_OP;
     case InternalCaseState::EMPTY_CASE :
-    case InternalCaseState::INIT_DATA_LOAD :
     case InternalCaseState::RE_DATA_LOAD :
     case InternalCaseState::TYPE_SELECTED : return CaseState::LOADING;
+    case InternalCaseState::PARAM_SAVE :
+    case InternalCaseState::PARAM_SAVE_RUN : return CaseState::PARAM_SAVE;
     case InternalCaseState::COPYING_FOLDER :
-    case InternalCaseState::FOLDER_CHECK_STOPPED_JOB :
     case InternalCaseState::INIT_PARAM_UPLOAD :
     case InternalCaseState::MAKING_FOLDER :
     case InternalCaseState::STARTING_JOB :
     case InternalCaseState::STOPPING_JOB :
-    case InternalCaseState::USER_PARAM_UPLOAD :
     case InternalCaseState::WAITING_FOLDER_DEL : return CaseState::OP_INVOKE;
-    case InternalCaseState::RUNNING_JOB_NORECORD :
-    case InternalCaseState::RUNNING_JOB_YESRECORD : return CaseState::RUNNING;
+    case InternalCaseState::RUNNING_JOB : return CaseState::RUNNING;
     default:
         return CaseState::ERROR;
     }
     return CaseState::ERROR;
 }
 
-QString CFDcaseInstance::getCaseFolder()
+const FileNodeRef CFDcaseInstance::getCaseFolder()
 {
-    QString ret;
-    if (caseFolder == NULL) return ret;
-    return caseFolder->getFileData().getFullPath();
+    return caseFolder;
 }
 
 QString CFDcaseInstance::getCaseName()
 {
     QString ret;
-    if (caseFolder == NULL) return ret;
-    return caseFolder->getFileData().getFileName();
+    if (caseFolder.isNil()) return ret;
+    return caseFolder.getFileName();
 }
 
 CFDanalysisType * CFDcaseInstance::getMyType()
@@ -206,80 +139,85 @@ QMap<QString, StageState> CFDcaseInstance::getStageStates()
     return storedStageStates;
 }
 
-void CFDcaseInstance::createCase(QString newName, FileTreeNode * containingFolder)
+bool CFDcaseInstance::createCase(QString newName, const FileNodeRef &containingFolder)
 {
-    if (defunct) return;
+    if (defunct) return false;
 
-    if (myState != InternalCaseState::TYPE_SELECTED) return;
-    if (theDriver->getFileHandler()->operationIsPending()) return;
-    if (caseFolder != NULL) return;
-    if (!expectedNewCaseFolder.isEmpty()) return;
+    if (myState != InternalCaseState::TYPE_SELECTED) return false;
+    if (cwe_globals::get_file_handle()->operationIsPending()) return false;
+    if (!caseFolder.isNil()) return false;
+    if (!expectedNewCaseFolder.isEmpty()) return false;
 
-    expectedNewCaseFolder = containingFolder->getFileData().getFullPath();
+    newName = newName.replace(' ', '_');
+
+    expectedNewCaseFolder = containingFolder.getFullPath();
     expectedNewCaseFolder = expectedNewCaseFolder.append("/");
     expectedNewCaseFolder = expectedNewCaseFolder.append(newName);
 
-    theDriver->getFileHandler()->sendCreateFolderReq(containingFolder, newName);
+    cwe_globals::get_file_handle()->sendCreateFolderReq(containingFolder, newName);
 
-    if (!theDriver->getFileHandler()->operationIsPending())
+    if (!cwe_globals::get_file_handle()->operationIsPending())
     {
-        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-        return;
+        return false;
     }
 
     emitNewState(InternalCaseState::MAKING_FOLDER);
+    return true;
 }
 
-void CFDcaseInstance::duplicateCase(QString newName, FileTreeNode * containingFolder, FileTreeNode * oldCase)
+bool CFDcaseInstance::duplicateCase(QString newName, const FileNodeRef &containingFolder, const FileNodeRef &oldCase)
 {
-    if (defunct) return;
+    if (defunct) return false;
 
-    if (myState != InternalCaseState::EMPTY_CASE) return;
-    if (containingFolder == NULL) return;
-    if (oldCase == NULL) return;
-    if (theDriver->getFileHandler()->operationIsPending()) return;
-    if (caseFolder != NULL) return;
-    if (!expectedNewCaseFolder.isEmpty()) return;
+    if (myState != InternalCaseState::EMPTY_CASE) return false;
+    if (!containingFolder.fileNodeExtant()) return false;
+    if (!oldCase.fileNodeExtant()) return false;
+    if (cwe_globals::get_file_handle()->operationIsPending()) return false;
+    if (!caseFolder.isNil()) return false;
+    if (!expectedNewCaseFolder.isEmpty()) return false;
 
-    expectedNewCaseFolder = containingFolder->getFileData().getFullPath();
+    expectedNewCaseFolder = containingFolder.getFullPath();
     expectedNewCaseFolder = expectedNewCaseFolder.append("/");
     expectedNewCaseFolder = expectedNewCaseFolder.append(newName);
 
-    theDriver->getFileHandler()->sendCopyReq(oldCase, expectedNewCaseFolder);
+    cwe_globals::get_file_handle()->sendCopyReq(oldCase, expectedNewCaseFolder);
 
-    if (!theDriver->getFileHandler()->operationIsPending())
+    if (!cwe_globals::get_file_handle()->operationIsPending())
     {
-        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-        return;
+        return false;
     }
 
     emitNewState(InternalCaseState::COPYING_FOLDER);
+    return true;
 }
 
-void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
+bool CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 {
-    if (defunct) return;
+    QString empty;
+    return changeParameters(paramList, empty);
+}
 
-    if (myState != InternalCaseState::READY) return;
-    if (caseFolder == NULL) return;
-    if (theDriver->getFileHandler()->operationIsPending()) return;
+bool CFDcaseInstance::changeParameters(QMap<QString, QString> paramList, QString stageToRun)
+{
+    if (defunct) return false;
 
-    FileTreeNode * varStore = caseFolder->getChildNodeWithName(caseParamFileName);
-    QByteArray * fileData = varStore->getFileBuffer();
+    if (myState != InternalCaseState::READY) return false;
+    if (!caseFolder.fileNodeExtant()) return false;
+    if (cwe_globals::get_file_handle()->operationIsPending()) return false;
+
+    const FileNodeRef varStore = caseFolder.getChildWithName(caseParamFileName);
+    QByteArray fileData = varStore.getFileBuffer();
 
     prospectiveNewParamList.clear();
 
-    if (fileData != NULL)
+    QJsonDocument varDoc = QJsonDocument::fromJson(fileData);
+    if (!varDoc.isNull())
     {
-        QJsonDocument varDoc = QJsonDocument::fromJson(*fileData);
-        if (!varDoc.isNull())
-        {
-            QJsonObject varsList = varDoc.object().value("vars").toObject();
+        QJsonObject varsList = varDoc.object().value("vars").toObject();
 
-            for (auto itr = varsList.constBegin(); itr != varsList.constEnd(); itr++)
-            {
-                prospectiveNewParamList.insert(itr.key(),(*itr).toString());
-            }
+        for (auto itr = varsList.constBegin(); itr != varsList.constEnd(); itr++)
+        {
+            prospectiveNewParamList.insert(itr.key(),(*itr).toString());
         }
     }
 
@@ -296,24 +234,34 @@ void CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
     }
 
     QByteArray newFile = produceJSONparams(prospectiveNewParamList);
-    theDriver->getFileHandler()->sendUploadBuffReq(caseFolder, newFile, caseParamFileName);
-    if (!theDriver->getFileHandler()->operationIsPending())
+    cwe_globals::get_file_handle()->sendUploadBuffReq(caseFolder, newFile, caseParamFileName);
+    if (!cwe_globals::get_file_handle()->operationIsPending())
     {
-        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-        return;
+        return false;
     }
 
-    varStore->setFileBuffer(NULL);
-    emitNewState(InternalCaseState::USER_PARAM_UPLOAD);
+    varStore.setFileBuffer(NULL);
+    if (stageToRun.isEmpty())
+    {
+        emitNewState(InternalCaseState::PARAM_SAVE);
+    }
+    else
+    {
+        runningStage = stageToRun;
+        emitNewState(InternalCaseState::PARAM_SAVE_RUN);
+    }
+
+    return true;
 }
 
-void CFDcaseInstance::startStageApp(QString stageID)
+bool CFDcaseInstance::startStageApp(QString stageID)
 {
-    if (defunct) return;
-    if (caseFolder == NULL) return;
-    if (myType == NULL) return;
-    if (myState != InternalCaseState::READY) return;
-    if (storedStageStates.value(stageID, StageState::ERROR) != StageState::UNRUN) return;
+    if (defunct) return false;
+    if (!caseFolder.fileNodeExtant()) return false;
+    if (myType == NULL) return false;
+    if ((myState != InternalCaseState::READY) &&
+            (myState != InternalCaseState::PARAM_SAVE_RUN))return false;
+    if (storedStageStates.value(stageID, StageState::ERROR) != StageState::UNRUN) return false;
 
     QString appName = myType->getStageApp(stageID);
 
@@ -329,153 +277,124 @@ void CFDcaseInstance::startStageApp(QString stageID)
         }
     }
 
-    RemoteDataInterface * remoteConnect = theDriver->getDataConnection();
+    RemoteDataThread * remoteConnect = cwe_globals::get_Driver()->getDataConnection();
     QString jobName = appName;
     jobName = jobName.append("-");
     jobName = jobName.append(stageID);
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder->getFileData().getFullPath(), jobName);
+    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder.getFullPath(), jobName);
 
     if (jobHandle == NULL)
     {
-        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-        return;
+        return false;
     }
     runningStage = stageID;
-    runningJobNode = NULL; //Note: job nodes are managed and cleaned up by the job handler
-    QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument*)),
-                     this, SLOT(jobInvoked(RequestState,QJsonDocument*)));
+    runningID.clear();
+    QObject::connect(jobHandle, SIGNAL(haveJobReply(RequestState,QJsonDocument)),
+                     this, SLOT(jobInvoked(RequestState,QJsonDocument)));
     emitNewState(InternalCaseState::STARTING_JOB);
+    return true;
 }
 
-void CFDcaseInstance::rollBack(QString stageToDelete)
+bool CFDcaseInstance::rollBack(QString stageToDelete)
 {
-    if (defunct) return;
-    if (caseFolder == NULL) return;
-    if (myState != InternalCaseState::READY) return;
-    if (storedStageStates.value(stageToDelete, StageState::ERROR) != StageState::FINISHED) return;
-    if (theDriver->getFileHandler()->operationIsPending()) return;
+    if (defunct) return false;
+    if (!caseFolder.fileNodeExtant()) return false;
+    if ((myState != InternalCaseState::READY) &&
+            (myState != InternalCaseState::READY_ERROR))
+        return false;
+    if ((storedStageStates.value(stageToDelete, StageState::ERROR) != StageState::FINISHED) &&
+            (storedStageStates.value(stageToDelete, StageState::ERROR) != StageState::ERROR))
+        return false;
+    if (cwe_globals::get_file_handle()->operationIsPending()) return false;
 
-    FileTreeNode * folderToRemove = caseFolder->getChildNodeWithName(stageToDelete);
+    const FileNodeRef folderToRemove = caseFolder.getChildWithName(stageToDelete);
 
-    if (folderToRemove == NULL)
-    {
-        cwe_globals::displayPopup("Unable to remove stage not yet done.", "Network Issue");
-        return;
-    }
+    if (folderToRemove.isNil()) return false;
 
-    theDriver->getFileHandler()->sendDeleteReq(folderToRemove);
+    cwe_globals::get_file_handle()->sendDeleteReq(folderToRemove);
 
-    if (!theDriver->getFileHandler()->operationIsPending())
-    {
-        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-        return;
-    }
+    if (!cwe_globals::get_file_handle()->operationIsPending()) return false;
 
     runningStage = stageToDelete;
     emitNewState(InternalCaseState::WAITING_FOLDER_DEL);
+    return true;
 }
 
-void CFDcaseInstance::killCaseConnection()
+bool CFDcaseInstance::stopJob()
 {
-    defunct = true;
-    emit detachCase();
-    this->deleteLater();
-}
-
-void CFDcaseInstance::downloadCase(QString destLocalFile)
-{
-    if (defunct) return;
-    if (caseFolder == NULL) return;
-    if (myState != InternalCaseState::READY) return;
-    if (myType == NULL) return;
-    if (theDriver->getFileHandler()->operationIsPending()) return;
-
-    if (!cwe_globals::isValidLocalFolder(destLocalFile))
-    {
-        cwe_globals::displayPopup("Please select a valid local folder for download", "I/O Error");
-        return;
-    }
-
-    FileTreeNode * lastCompleteNode = NULL;
-
-    for (QString aStage : myType->getStageSequence())
-    {
-        FileTreeNode * testNode = caseFolder->getChildNodeWithName(aStage);
-        if (testNode != NULL)
-        {
-            lastCompleteNode = testNode;
-        }
-    }
-
-    if (lastCompleteNode == NULL)
-    {
-        cwe_globals::displayPopup("Results cannot be downloaded until a stage is run.", "Download Error");
-        return;
-    }
-
-    emitNewState(InternalCaseState::DOWNLOAD);
-    theDriver->getFileHandler()->enactRecursiveDownload(lastCompleteNode, destLocalFile);
-}
-
-void CFDcaseInstance::stopJob(QString stage)
-{
-    if (defunct) return;
-    if (caseFolder == NULL) return;
-    if ((myState != InternalCaseState::RUNNING_JOB_YESRECORD) && (myState != InternalCaseState::RUNNING_JOB_NORECORD)) return;
+    if (defunct) return false;
+    if (caseFolder.isNil()) return false;
+    if (myState != InternalCaseState::RUNNING_JOB) return false;
 
     RemoteDataReply * jobHandle = NULL;
-    if (myState == InternalCaseState::RUNNING_JOB_YESRECORD)
-    {
-        if (runningJobNode == NULL)
-        {
-            cwe_globals::displayPopup("Error: Stop invoked for non-identified running job.", "Internal Program Inconsitancy");
-            emitNewState(InternalCaseState::ERROR);
-            return;
-        }
+    jobHandle = cwe_globals::get_connection()->stopJob(runningID);
 
-        if (runningJobNode->getParams().value("stage") != stage)
-        {
-            cwe_globals::displayPopup("Error: Stop invoked for job in wrong stage.", "Internal Program Inconsitancy");
-            emitNewState(InternalCaseState::ERROR);
-            return;
-        }
-
-        jobHandle = theDriver->getDataConnection()->stopJob(runningJobNode->getID());
-    }
-    else
-    {
-        jobHandle = theDriver->getDataConnection()->stopJob(runningID);
-    }
-
-    if (jobHandle == NULL)
-    {
-        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-        return;
-    }
+    if (jobHandle == NULL) return false;
 
     QObject::connect(jobHandle, SIGNAL(haveStoppedJob(RequestState)),
                      this, SLOT(jobKilled(RequestState)));
 
     emitNewState(InternalCaseState::STOPPING_JOB);
-    return;
+    return true;
 }
 
-void CFDcaseInstance::underlyingFilesUpdated()
+bool CFDcaseInstance::downloadCase(QString destLocalFile)
+{
+    if (defunct) return false;
+    if (caseFolder.isNil()) return false;
+    if ((myState != InternalCaseState::READY) &&
+            (myState != InternalCaseState::READY_ERROR)) return false;
+    if (myType == NULL) return false;
+    if (cwe_globals::get_file_handle()->operationIsPending()) return false;
+
+    if (!cwe_globals::isValidLocalFolder(destLocalFile))
+    {
+        cwe_globals::displayPopup("Please select a valid local folder for download", "I/O Error");
+        return false;
+    }
+
+    FileNodeRef lastCompleteNode;
+
+    for (QString aStage : myType->getStageSequence())
+    {
+        const FileNodeRef testNode = caseFolder.getChildWithName(aStage);
+        if (!testNode.isNil())
+        {
+            lastCompleteNode = testNode;
+        }
+    }
+
+    if (lastCompleteNode.isNil()) return false;
+
+    cwe_globals::get_file_handle()->enactRecursiveDownload(lastCompleteNode, destLocalFile);
+    if (!cwe_globals::get_file_handle()->operationIsPending()) return false;
+
+    emitNewState(InternalCaseState::DOWNLOAD);
+    return true;
+}
+
+void CFDcaseInstance::underlyingFilesUpdated(const FileNodeRef changedNode)
 {
     if (defunct) return;
+    if (caseFolder.isNil()) return;
+
+    if (!caseFolder.fileNodeExtant())
+    {
+        emitNewState(InternalCaseState::DEFUNCT);
+        return;
+    }
+
+    if (!caseFolder.isAncestorOf(changedNode)) return;
 
     InternalCaseState activeState = myState;
 
     switch (activeState)
     {
-    case InternalCaseState::FOLDER_CHECK_STOPPED_JOB:
-        state_FolderCheckStopped_fileChange_taskDone(); return;
-
-    case InternalCaseState::INIT_DATA_LOAD:
     case InternalCaseState::RE_DATA_LOAD:
         state_DataLoad_fileChange_jobList(); return;
 
     case InternalCaseState::READY:
+    case InternalCaseState::READY_ERROR:
         state_Ready_fileChange_jobList(); return;
 
     default:
@@ -491,25 +410,22 @@ void CFDcaseInstance::jobListUpdated()
 
     switch (activeState)
     {
-    case InternalCaseState::INIT_DATA_LOAD:
     case InternalCaseState::RE_DATA_LOAD:
         state_DataLoad_fileChange_jobList(); return;
 
     case InternalCaseState::READY:
+    case InternalCaseState::READY_ERROR:
         state_Ready_fileChange_jobList(); return;
 
-    case InternalCaseState::RUNNING_JOB_NORECORD:
-        state_RunningNoRecord_jobList(); return;
-
-    case InternalCaseState::RUNNING_JOB_YESRECORD:
-        state_RunningYesRecord_jobList(); return;
+    case InternalCaseState::RUNNING_JOB:
+        state_Running_jobList(); return;
 
     default:
         return;
     }
 }
 
-void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
+void CFDcaseInstance::fileTaskDone(RequestState invokeStatus, QString)
 {
     if (defunct) return;
 
@@ -527,8 +443,8 @@ void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
     case InternalCaseState::COPYING_FOLDER:
         state_CopyingFolder_taskDone(invokeStatus); return;
 
-    case InternalCaseState::FOLDER_CHECK_STOPPED_JOB:
-        state_FolderCheckStopped_fileChange_taskDone(); return;
+    case InternalCaseState::EXTERN_FILE_OP:
+        state_ExternOp_taskDone(); return;
 
     case InternalCaseState::INIT_PARAM_UPLOAD:
         state_InitParam_taskDone(invokeStatus); return;
@@ -536,18 +452,41 @@ void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
     case InternalCaseState::MAKING_FOLDER:
         state_MakingFolder_taskDone(invokeStatus); return;
 
-    case InternalCaseState::USER_PARAM_UPLOAD:
-        state_UserParamUpload_taskDone(invokeStatus); return;
-
     case InternalCaseState::WAITING_FOLDER_DEL:
         state_WaitingFolderDel_taskDone(invokeStatus); return;
+
+    case InternalCaseState::DOWNLOAD:
+        state_Download_recursiveOpDone(invokeStatus); return;
+
+    case InternalCaseState::PARAM_SAVE:
+        state_Param_Save_taskDone(invokeStatus); return;
+
+    case InternalCaseState::PARAM_SAVE_RUN:
+        state_Param_Save_Run_taskDone(invokeStatus); return;
 
     default:
         return;
     }
 }
 
-void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument *jobData)
+void CFDcaseInstance::fileTaskStarted()
+{
+    if (defunct) return;
+
+    InternalCaseState activeState = myState;
+
+    switch (activeState)
+    {
+    case InternalCaseState::READY:
+    case InternalCaseState::READY_ERROR:
+        state_Ready_fileChange_jobList(); return;
+
+    default:
+        return;
+    }
+}
+
+void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument jobData)
 {
     if (defunct) return;
 
@@ -560,15 +499,14 @@ void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument *jobDa
 
     if (invokeStatus == RequestState::FAIL)
     {
-        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        computeIdleState();
         cwe_globals::displayPopup("Unable to start requested job. Reloading Case", "Network Connection Error");
-        enactDataReload();
         return;
     }
 
     InternalCaseState activeState = myState;
 
-    QString idFromReply = jobData->object().value("result").toObject().value("id").toString();
+    QString idFromReply = jobData.object().value("result").toObject().value("id").toString();
 
     switch (activeState)
     {
@@ -593,9 +531,8 @@ void CFDcaseInstance::jobKilled(RequestState invokeStatus)
 
     if (invokeStatus == RequestState::FAIL)
     {
-        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        computeIdleState();
         cwe_globals::displayPopup("Unable to stop requested job. Reloading Case", "Network Connection Error");
-        enactDataReload();
         return;
     }
 
@@ -611,39 +548,39 @@ void CFDcaseInstance::jobKilled(RequestState invokeStatus)
     }
 }
 
-void CFDcaseInstance::recursiveFileOpDone(bool opSuccess, QString message)
+void CFDcaseInstance::computeInitState()
 {
-    if (defunct) return;
-
-    if (opSuccess == false)
+    if (cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        emitNewState(InternalCaseState::RE_DATA_LOAD);
-        cwe_globals::displayPopup(message, "File Operation Failed");
-        enactDataReload();
+        myState = InternalCaseState::OFFLINE;
         return;
     }
 
-    InternalCaseState activeState = myState;
-
-    switch (activeState)
+    if (caseFolder.isNil())
     {
-    case InternalCaseState::DOWNLOAD:
-        state_Download_recursiveOpDone(); return;
-
-    default:
+        if (myType == NULL)
+        {
+            myState = InternalCaseState::EMPTY_CASE;
+        }
+        else
+        {
+            myState = InternalCaseState::TYPE_SELECTED;
+        }
         return;
     }
-}
 
-void CFDcaseInstance::caseFolderRemoved()
-{
-    killCaseConnection();
-    theDriver->setCurrentCase(NULL);
+    myState = InternalCaseState::RE_DATA_LOAD;
+    recomputeStageStates();
+    computeIdleState();
 }
 
 void CFDcaseInstance::emitNewState(InternalCaseState newState)
 {
     if (defunct) return;
+    if (newState == InternalCaseState::DEFUNCT)
+    {
+        defunct = true;
+    }
 
     if (myState == InternalCaseState::ERROR)
     {
@@ -653,54 +590,38 @@ void CFDcaseInstance::emitNewState(InternalCaseState newState)
     if (newState != myState)
     {
         myState = newState;
-        storedStageStates = computeStageStates();
+        recomputeStageStates();
         emit haveNewState(getCaseState());
         return;
     }
 
-    QMap<QString, StageState> oldStageStates = storedStageStates;
-    storedStageStates = computeStageStates();
-
-    if (!stageStatesEqual(&oldStageStates, &storedStageStates))
+    if (recomputeStageStates())
     {
         emit haveNewState(getCaseState());
     }
-}
-
-void CFDcaseInstance::enactDataReload()
-{
-    if (defunct) return;
-    if (caseDataLoaded()) return;
-    FileTreeNode * varFile = caseFolder->getChildNodeWithName(caseParamFileName);
-
-    if (varFile == NULL)
-    {
-        theDriver->getFileHandler()->speculateNodeWithName(caseFolder, caseParamFileName, false);
-        return;
-    }
-
-    QByteArray * varStore = varFile->getFileBuffer();
-    if (varStore == NULL)
-    {
-        theDriver->getFileHandler()->sendDownloadBuffReq(varFile);
-    }
-    return;
 }
 
 bool CFDcaseInstance::caseDataLoaded()
 {
     if (defunct) return false;
     if (myType == NULL) return false;
-    if (caseFolder == NULL) return false;
+    if (caseFolder.isNil()) return false;
 
-    FileTreeNode * varFile = caseFolder->getChildNodeWithName(caseParamFileName);
+    if (!caseFolder.folderContentsLoaded()) return false;
 
-    if (varFile == NULL) return false;
-    QByteArray * varStore = varFile->getFileBuffer();
-    if (varStore == NULL) return false;
+    const FileNodeRef varFile = caseFolder.getChildWithName(caseParamFileName);
+    if (varFile.isNil()) return false;
+    if (!varFile.fileBufferLoaded()) return false;
 
-    if (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED) return false;
-    if (varFile->getNodeState() != NodeState::FILE_BUFF_LOADED) return false;
+    for (QString aStage : myType->getStageNames())
+    {
+        const FileNodeRef childFolder = caseFolder.getChildWithName(aStage);
+        if (childFolder.isNil()) continue;
+        if (!childFolder.folderContentsLoaded()) return false;
+        const FileNodeRef exitFile = childFolder.getChildWithName(exitFileName);
+        if (exitFile.isNil()) continue;
+        if (!exitFile.fileBufferLoaded()) return false;
+    }
 
     return true;
 }
@@ -709,26 +630,36 @@ bool CFDcaseInstance::caseDataInvalid()
 {
     //This is for when we have loaded the remote info and we know this current folder is NOT a CWE case
     if (defunct) return false;
-    if (caseFolder == NULL) return false;
+    if (caseFolder.isNil()) return false;
 
-    if (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED) return false;
+    if (!caseFolder.folderContentsLoaded()) return false;
 
-    FileTreeNode * varFile = caseFolder->getChildNodeWithName(caseParamFileName);
+    const FileNodeRef varFile = caseFolder.getChildWithName(caseParamFileName);
 
-    if (varFile == NULL) return true;
-    if (varFile->getNodeState() != NodeState::FILE_BUFF_LOADED) return false;
+    if (varFile.isNil()) return true;
+    if (!varFile.fileBufferLoaded()) return false;
 
-    QByteArray * varStore = varFile->getFileBuffer();
-    if (varStore == NULL) return true;
+    QByteArray varStore = varFile.getFileBuffer();
 
-    QJsonDocument varDoc = QJsonDocument::fromJson(*varStore);
+    //This code is stopgap against too quick download of uploaded parameters
+    if (varStore.isEmpty() && !triedParamFile)
+    {
+        triedParamFile = true;
+        varFile.setFileBuffer(NULL);
+        cwe_globals::get_file_handle()->sendDownloadBuffReq(varFile);
+        return false;
+    }
+
+    QJsonDocument varDoc = QJsonDocument::fromJson(varStore);
     QString templateName = varDoc.object().value("type").toString();
     if (templateName.isEmpty())
     {
         return true;
     }
 
-    QList<CFDanalysisType *> * templates = theDriver->getTemplateList();
+    triedParamFile = false;
+
+    QList<CFDanalysisType *> * templates = cwe_globals::get_CWE_Driver()->getTemplateList();
     for (auto itr = templates->cbegin(); itr != templates->cend(); itr++)
     {
         if (templateName == (*itr)->getInternalName())
@@ -744,25 +675,24 @@ void CFDcaseInstance::computeCaseType()
 {
     if (myType != NULL) return;
 
-    FileTreeNode * varFile = caseFolder->getChildNodeWithName(caseParamFileName);
-    if (varFile == NULL) return;
+    const FileNodeRef varFile = caseFolder.getChildWithName(caseParamFileName);
+    if (varFile.isNil()) return;
 
-    QByteArray * varStore = varFile->getFileBuffer();
-    if (varStore == NULL) return;
+    if (!varFile.fileBufferLoaded()) return;
+    QByteArray varStore = varFile.getFileBuffer();
 
-    QJsonDocument varDoc = QJsonDocument::fromJson(*varStore);
+    QJsonDocument varDoc = QJsonDocument::fromJson(varStore);
     QString templateName = varDoc.object().value("type").toString();
     if (templateName.isEmpty())
     {
         return;
     }
 
-    QList<CFDanalysisType *> * templates = theDriver->getTemplateList();
-    for (auto itr = templates->cbegin(); (itr != templates->cend()) && (myType == NULL); itr++)
+    for (CFDanalysisType * aTemplate : *(cwe_globals::get_CWE_Driver()->getTemplateList()))
     {
-        if (templateName == (*itr)->getInternalName())
+        if (templateName == aTemplate->getInternalName())
         {
-            myType = (*itr);
+            myType = aTemplate;
             return;
         }
     }
@@ -789,16 +719,29 @@ bool CFDcaseInstance::stageStatesEqual(QMap<QString, StageState> *list1, QMap<QS
     return true;
 }
 
-QMap<QString, StageState> CFDcaseInstance::computeStageStates()
+bool CFDcaseInstance::updateStageStatesIfNew(QMap<QString, StageState> * newStageStates)
 {
+    if (stageStatesEqual(newStageStates, &storedStageStates))
+    {
+        return false;
+    }
+    storedStageStates = *newStageStates;
+    return true;
+}
+
+bool CFDcaseInstance::recomputeStageStates()
+{
+    //Return true if stage states have changed
+
     //Note: The code here smells bad
     //Needs re-think and re-write
 
-    QMap<QString, StageState> ret;
-    if (defunct) return ret;
-    if (myType == NULL) return ret;
+    if (defunct) return false;
+    if (myType == NULL) return false;
 
-    QStringList stateList = myType->getStageSequence();
+    QMap<QString, StageState> newStageStates;
+
+    QStringList stageList = myType->getStageSequence();
     CaseState currentState = getCaseState();
 
     if ((currentState == CaseState::DOWNLOAD) ||
@@ -822,93 +765,109 @@ QMap<QString, StageState> CFDcaseInstance::computeStageStates()
             allStagesState = StageState::OFFLINE;
         }
 
-        for (auto itr = stateList.begin(); itr != stateList.cend(); itr++)
+        for (auto itr = stageList.begin(); itr != stageList.cend(); itr++)
         {
-            ret.insert((*itr), allStagesState);
+            newStageStates.insert((*itr), allStagesState);
         }
-        return ret;
+
+        return updateStageStatesIfNew(&newStageStates);
     }
 
-    for (auto itr = stateList.begin(); itr != stateList.cend(); itr++)
+    for (auto itr = stageList.begin(); itr != stageList.cend(); itr++)
     {
-        ret.insert((*itr), StageState::LOADING);
+        newStageStates.insert((*itr), StageState::LOADING);
     }
 
-    if ((caseFolder == NULL) || (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED) ||
+    if ((caseFolder.isNil()) || (!caseFolder.folderContentsLoaded()) ||
             (myState == InternalCaseState::STOPPING_JOB) || (myState == InternalCaseState::MAKING_FOLDER) ||
-            (myState == InternalCaseState::INIT_PARAM_UPLOAD) || (myState == InternalCaseState::USER_PARAM_UPLOAD) ||
-            (myState == InternalCaseState::FOLDER_CHECK_STOPPED_JOB) || (myState == InternalCaseState::COPYING_FOLDER) ||
+            (myState == InternalCaseState::INIT_PARAM_UPLOAD) ||
+            (myState == InternalCaseState::COPYING_FOLDER) ||
             (myState == InternalCaseState::WAITING_FOLDER_DEL))
     {
-        return ret;
+        return updateStageStatesIfNew(&newStageStates);
     }
 
-    if ((myState == InternalCaseState::STARTING_JOB) || (myState == InternalCaseState::RUNNING_JOB_NORECORD))
+    if ((myState == InternalCaseState::STARTING_JOB) || (myState == InternalCaseState::RUNNING_JOB))
     {
-        if (ret.contains(runningStage))
+        if (runningStage.isEmpty())
         {
-            ret[runningStage] = StageState::RUNNING;
+            return updateStageStatesIfNew(&newStageStates);
         }
-    }
-    else if (myState == InternalCaseState::RUNNING_JOB_YESRECORD)
-    {
-        QString trueStage = runningJobNode->getParams().value("stage");
-        if (ret.contains(trueStage))
+
+        if (newStageStates.contains(runningStage))
         {
-            ret[trueStage] = StageState::RUNNING;
+            newStageStates[runningStage] = StageState::RUNNING;
         }
     }
 
     //Check known files for expected result files
-    for (auto itr = stateList.begin(); itr != stateList.cend(); itr++)
+    for (auto itr = stageList.begin(); itr != stageList.cend(); itr++)
     {
-        if (ret[*itr] != StageState::LOADING)
+        if (newStageStates[*itr] != StageState::LOADING)
         {
             continue;
         }
 
-        FileTreeNode * checkNode = caseFolder->getChildNodeWithName(*itr);
-        if (checkNode == NULL)
+        FileNodeRef checkNode = caseFolder.getChildWithName(*itr);
+        if (checkNode.isNil())
         {
-            ret[*itr] = StageState::UNRUN;
+            newStageStates[*itr] = StageState::UNRUN;
+            continue;
         }
-        else
+
+        const FileNodeRef exitFile = checkNode.getChildWithName(exitFileName);
+        if (exitFile.isNil())
         {
-            ret[*itr] = StageState::FINISHED;
+            newStageStates[*itr] = StageState::ERROR;
+            continue;
         }
+        if (!exitFile.fileBufferLoaded())
+        {
+            newStageStates[*itr] = StageState::ERROR;
+            continue;
+        }
+        const QByteArray exitBytes = exitFile.getFileBuffer();
+
+        if (QString::fromLatin1(exitBytes) != "0\n")
+        {
+            newStageStates[*itr] = StageState::ERROR;
+            continue;
+        }
+
+        newStageStates[*itr] = StageState::FINISHED;
     }
 
-    for (int i = 0; i < stateList.length(); i++)
+    for (int i = 0; i < stageList.length(); i++)
     {
         StageState prevState = StageState::FINISHED;
         StageState nextState = StageState::UNRUN;
         if (i != 0)
         {
-            prevState = ret[stateList[i-1]];
+            prevState = newStageStates[stageList[i-1]];
         }
-        if (i + 1 < stateList.length())
+        if (i + 1 < stageList.length())
         {
-            nextState = ret[stateList[i+1]];
+            nextState = newStageStates[stageList[i+1]];
         }
-        StageState nowState = ret[stateList[i]];
+        StageState nowState = newStageStates[stageList[i]];
 
         if (nowState == StageState::UNRUN)
         {
             if ((prevState != StageState::FINISHED) && (prevState != StageState::FINISHED_PREREQ))
             {
-                ret[stateList[i]] = StageState::UNREADY;
+                newStageStates[stageList[i]] = StageState::UNREADY;
             }
         }
         else if (nowState == StageState::FINISHED)
         {
-            if (nextState == StageState::FINISHED)
+            if ((nextState == StageState::FINISHED) || (nextState == StageState::ERROR))
             {
-                ret[stateList[i]] = StageState::FINISHED_PREREQ;
+                newStageStates[stageList[i]] = StageState::FINISHED_PREREQ;
             }
         }
     }
 
-    return ret;
+    return updateStageStatesIfNew(&newStageStates);
 }
 
 void CFDcaseInstance::computeParamList()
@@ -916,10 +875,10 @@ void CFDcaseInstance::computeParamList()
     if (defunct) return;
     if (!caseDataLoaded()) return;
 
-    FileTreeNode * varFile = caseFolder->getChildNodeWithName(caseParamFileName);
-    QByteArray * varStore = varFile->getFileBuffer();
+    FileNodeRef varFile = caseFolder.getChildWithName(caseParamFileName);
+    QByteArray varStore = varFile.getFileBuffer();
 
-    QJsonDocument varDoc = QJsonDocument::fromJson(*varStore);
+    QJsonDocument varDoc = QJsonDocument::fromJson(varStore);
 
     if (varDoc.isNull())
     {
@@ -935,49 +894,6 @@ void CFDcaseInstance::computeParamList()
     {
         storedParamList.insert(itr.key(),(*itr).toString());
     }
-}
-
-bool CFDcaseInstance::allListedJobsHaveDetails(QMap<QString, const RemoteJobData * > jobList)
-{
-    for (auto itr = jobList.begin(); itr != jobList.end(); itr++)
-    {
-        if (!(*itr)->detailsLoaded())
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-QMap<QString, const RemoteJobData * > CFDcaseInstance::getRelevantJobs()
-{
-    QMap<QString, const RemoteJobData *> ret;
-
-    if (caseFolder == NULL)
-    {
-        return ret;
-    }
-
-    QMap<QString, const RemoteJobData *> jobs = theDriver->getRunningCWEjobs();
-
-    for (auto itr = jobs.begin(); itr != jobs.end(); itr++)
-    {
-        QString jobID = (*itr)->getID();
-
-        if (!(*itr)->detailsLoaded())
-        {
-            ret.insert(jobID, (*itr));
-            continue;
-        }
-
-        QString jobDir = (*itr)->getInputs().value("directory");
-
-        if (caseFolder->fileNameMatches(jobDir))
-        {
-            ret.insert(jobID, (*itr));
-        }
-    }
-    return ret;
 }
 
 QByteArray CFDcaseInstance::produceJSONparams(QMap<QString, QString> paramList)
@@ -1004,6 +920,22 @@ QByteArray CFDcaseInstance::produceJSONparams(QMap<QString, QString> paramList)
     return ret.toJson();
 }
 
+void CFDcaseInstance::connectCaseSignals()
+{
+    QObject::connect(cwe_globals::get_CWE_Job_Accountant(), SIGNAL(haveNewJobInfo()),
+                     this, SLOT(jobListUpdated()),
+                     Qt::QueuedConnection);
+    QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
+                     this, SLOT(fileTaskDone(RequestState, QString)),
+                     Qt::QueuedConnection);
+    QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
+                     this, SLOT(underlyingFilesUpdated(FileNodeRef)),
+                     Qt::QueuedConnection);
+    QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpStarted()),
+                     this, SLOT(fileTaskStarted()),
+                     Qt::QueuedConnection);
+}
+
 void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
 {
     if (myState != InternalCaseState::COPYING_FOLDER) return;
@@ -1015,108 +947,29 @@ void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
         return;
     }
 
-    theDriver->getFileHandler()->speculateNodeWithName(expectedNewCaseFolder, true);
-    caseFolder = theDriver->getFileHandler()->getNodeFromName(expectedNewCaseFolder);
-    if (caseFolder == NULL)
+    caseFolder = cwe_globals::get_file_handle()->speculateFileWithName(expectedNewCaseFolder, true);
+    if (caseFolder.isNil())
     {
         emitNewState(InternalCaseState::ERROR);
         cwe_globals::displayPopup("Unable to find case folder info. Please reset and try again.", "Network Issue");
         return;
     }
     expectedNewCaseFolder.clear();
-    QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
-                     this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                     this, SLOT(underlyingFilesUpdated()));
-
-    enactDataReload();
-    emitNewState(InternalCaseState::INIT_DATA_LOAD);
-}
-
-void CFDcaseInstance::state_FolderCheckStopped_fileChange_taskDone()
-{
-    if (myState != InternalCaseState::FOLDER_CHECK_STOPPED_JOB) return;
-
-    if ((caseFolder->getNodeState() == NodeState::FOLDER_KNOWN_CONTENTS_NOT) ||
-            (caseFolder->getNodeState() == NodeState::FOLDER_SPECULATE_IDLE))
-    {
-        theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
-        return;
-    }
-
-    if (caseFolder->getNodeState() != NodeState::FOLDER_CONTENTS_LOADED) return;
-
-    if (runningStage.isEmpty())
-    {
-        enactDataReload();
-        emitNewState(InternalCaseState::RE_DATA_LOAD);
-        return;
-    }
-
-    FileTreeNode * folderToRemove = caseFolder->getChildNodeWithName(runningStage);
-    if (folderToRemove == NULL)
-    {
-        enactDataReload();
-        emitNewState(InternalCaseState::RE_DATA_LOAD);
-        return;
-    }
-
-    if (theDriver->getFileHandler()->operationIsPending())
-    {
-        return;
-    }
-
-    theDriver->getFileHandler()->sendDeleteReq(folderToRemove);
-    if (!theDriver->getFileHandler()->operationIsPending())
-    {
-        emitNewState(InternalCaseState::ERROR);
-        cwe_globals::displayPopup("Unable to contact DesignSafe. Connection may have been lost. Please reset and try again.", "Network Issue");
-        return;
-    }
-    emitNewState(InternalCaseState::WAITING_FOLDER_DEL);
+    computeIdleState();
 }
 
 void CFDcaseInstance::state_DataLoad_fileChange_jobList()
 {
-    if ((myState != InternalCaseState::INIT_DATA_LOAD) && (myState != InternalCaseState::RE_DATA_LOAD)) return;
+    if (myState != InternalCaseState::RE_DATA_LOAD) return;
 
-    if (caseDataInvalid())
-    {
-        emitNewState(InternalCaseState::INVALID);
-        return;
-    }
-    computeCaseType();
+    computeIdleState();
+}
 
-    if (!caseDataLoaded())
-    {
-        enactDataReload();
-        return;
-    }
+void CFDcaseInstance::state_ExternOp_taskDone()
+{
+    if (myState != InternalCaseState::EXTERN_FILE_OP) return;
 
-    computeParamList();
-
-    QMap<QString, const RemoteJobData *> relevantJobs = getRelevantJobs();
-    if (relevantJobs.isEmpty())
-    {
-        emitNewState(InternalCaseState::READY);
-        return;
-    }
-
-    if (allListedJobsHaveDetails(relevantJobs))
-    {
-        if (relevantJobs.size() > 1)
-        {
-            emitNewState(InternalCaseState::ERROR);
-            cwe_globals::displayPopup("CWE job started outside of this program. Case data now corrupted. Please do not start CWE jobs outside of CWE.", "ERROR");
-            return;
-        }
-        runningJobNode = relevantJobs.first();
-        emitNewState(InternalCaseState::RUNNING_JOB_YESRECORD);
-    }
-    else
-    {
-        emitNewState(InternalCaseState::RE_DATA_LOAD);
-    }
+    computeIdleState();
 }
 
 void CFDcaseInstance::state_InitParam_taskDone(RequestState invokeStatus)
@@ -1130,8 +983,10 @@ void CFDcaseInstance::state_InitParam_taskDone(RequestState invokeStatus)
         return;
     }
 
-    enactDataReload();
-    emitNewState(InternalCaseState::INIT_DATA_LOAD);
+    //This line is a stopgap measure against a race condition if one reads too quickly an uploaded file.
+    //QThread::msleep(500);
+
+    computeIdleState();
 }
 
 void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
@@ -1145,26 +1000,21 @@ void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
         return;
     }
 
-    theDriver->getFileHandler()->speculateNodeWithName(expectedNewCaseFolder, true);
-    caseFolder = theDriver->getFileHandler()->getNodeFromName(expectedNewCaseFolder);
-    if (caseFolder == NULL)
+    caseFolder = cwe_globals::get_file_handle()->speculateFileWithName(expectedNewCaseFolder, true);
+    if (caseFolder.isNil())
     {
         emitNewState(InternalCaseState::ERROR);
         cwe_globals::displayPopup("Error: Internal record of new case folder does not exist. Please contact developer to fix bug.", "Internal ERROR");
         return;
     }
     expectedNewCaseFolder.clear();
-    QObject::connect(caseFolder, SIGNAL(destroyed(QObject*)),
-                     this, SLOT(caseFolderRemoved()));
-    QObject::connect(caseFolder, SIGNAL(fileDataChanged()),
-                     this, SLOT(underlyingFilesUpdated()));
 
     QMap<QString, QString> allVars;
     QByteArray newFile = produceJSONparams(allVars);
 
-    theDriver->getFileHandler()->sendUploadBuffReq(caseFolder, newFile, caseParamFileName);
+    cwe_globals::get_file_handle()->sendUploadBuffReq(caseFolder, newFile, caseParamFileName);
 
-    if (!theDriver->getFileHandler()->operationIsPending())
+    if (!cwe_globals::get_file_handle()->operationIsPending())
     {
         emitNewState(InternalCaseState::ERROR);
         cwe_globals::displayPopup("Unable to contact DesignSafe. Please wait and try again.", "Network Issue");
@@ -1175,70 +1025,23 @@ void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
 
 void CFDcaseInstance::state_Ready_fileChange_jobList()
 {
-    if (myState != InternalCaseState::READY) return;
+    if ((myState != InternalCaseState::READY) &&
+            (myState != InternalCaseState::READY_ERROR)) return;
 
-    if (!caseDataLoaded())
-    {
-        enactDataReload();
-        emitNewState(InternalCaseState::RE_DATA_LOAD);
-    }
-
-    QMap<QString, const RemoteJobData *> relevantJobs = getRelevantJobs();
-    if (relevantJobs.isEmpty())
-    {
-        emitNewState(InternalCaseState::READY);
-        return;
-    }
-
-    if (!allListedJobsHaveDetails(relevantJobs))
-    {
-        enactDataReload();
-        emitNewState(InternalCaseState::RE_DATA_LOAD);
-    }
-
-    if (relevantJobs.size() > 1)
-    {
-        emitNewState(InternalCaseState::ERROR);
-        cwe_globals::displayPopup("CWE job started outside of this program. Case data now corrupted. Please do not start CWE jobs outside of CWE.", "ERROR");
-        return;
-    }
-    runningJobNode = relevantJobs.first();
-    emitNewState(InternalCaseState::RUNNING_JOB_YESRECORD);
+    computeIdleState();
 }
 
-void CFDcaseInstance::state_RunningNoRecord_jobList()
+void CFDcaseInstance::state_Running_jobList()
 {
-    if (myState != InternalCaseState::RUNNING_JOB_NORECORD) return;
+    if (myState != InternalCaseState::RUNNING_JOB) return;
 
-    const RemoteJobData * aNode = theDriver->getJobHandler()->findJobByID(runningID);
+    const RemoteJobData * aNode = cwe_globals::get_CWE_Job_Accountant()->getJobByID(runningID);
     if (aNode == NULL) return;
 
-    if ((aNode->getState() == "FINISHED") ||
-            (aNode->getState() == "FAILED"))
+    if ((aNode->getState() == "FINISHED") || (aNode->getState() == "FAILED"))
     {
-        runningJobNode = NULL;
-        emitNewState(InternalCaseState::RE_DATA_LOAD);
-    }
-
-    if ((aNode != NULL) && aNode->detailsLoaded())
-    {
-        runningJobNode = aNode;
-        emitNewState(InternalCaseState::RUNNING_JOB_YESRECORD);
-    }
-}
-
-void CFDcaseInstance::state_RunningYesRecord_jobList()
-{
-    if (myState != InternalCaseState::RUNNING_JOB_YESRECORD) return;
-
-    QMap<QString, const RemoteJobData *> relevantJobs = getRelevantJobs();
-    if (!relevantJobs.contains(runningJobNode->getID()))
-    {
-        runningJobNode = NULL;
-        theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
-        enactDataReload();
-        emitNewState(InternalCaseState::RE_DATA_LOAD);
-        return;
+        caseFolder.enactFolderRefresh(true);
+        computeIdleState();
     }
 }
 
@@ -1255,36 +1058,16 @@ void CFDcaseInstance::state_StartingJob_jobInvoked(QString jobID)
 
     runningID = jobID;
 
-    theDriver->getJobHandler()->demandJobDataRefresh();
-    emitNewState(InternalCaseState::RUNNING_JOB_NORECORD);
+    cwe_globals::get_job_handle()->demandJobDataRefresh();
+    emitNewState(InternalCaseState::RUNNING_JOB);
 }
 
 void CFDcaseInstance::state_StoppingJob_jobKilled()
 {
     if (myState != InternalCaseState::STOPPING_JOB) return;
 
-    theDriver->getFileHandler()->enactFolderRefresh(caseFolder);
-    emitNewState(InternalCaseState::FOLDER_CHECK_STOPPED_JOB);
-}
-
-void CFDcaseInstance::state_UserParamUpload_taskDone(RequestState invokeStatus)
-{
-    if (myState != InternalCaseState::USER_PARAM_UPLOAD) return;
-
-    if (invokeStatus != RequestState::GOOD)
-    {
-        emitNewState(InternalCaseState::ERROR);
-        cwe_globals::displayPopup("Error: Unable to change parameters. Please reset and try again.", "Remote Filesystem error");
-        return;
-    }
-
-    FileTreeNode * paramNode = caseFolder->getChildNodeWithName(caseParamFileName);
-    if (paramNode != NULL)
-    {
-        paramNode->setFileBuffer(NULL);
-    }
-    enactDataReload();
-    emitNewState(InternalCaseState::RE_DATA_LOAD);
+    caseFolder.enactFolderRefresh(true);
+    computeIdleState();
 }
 
 void CFDcaseInstance::state_WaitingFolderDel_taskDone(RequestState invokeStatus)
@@ -1297,15 +1080,184 @@ void CFDcaseInstance::state_WaitingFolderDel_taskDone(RequestState invokeStatus)
         return;
     }
 
-    theDriver->getFileHandler()->enactFolderRefresh(caseFolder, true);
-    enactDataReload();
-    emitNewState(InternalCaseState::RE_DATA_LOAD);
+    caseFolder.enactFolderRefresh(true);
+    computeIdleState();
 }
 
-void CFDcaseInstance::state_Download_recursiveOpDone()
+void CFDcaseInstance::state_Download_recursiveOpDone(RequestState invokeStatus)
 {
     if (myState != InternalCaseState::DOWNLOAD) return;
-    enactDataReload();
-    emitNewState(InternalCaseState::RE_DATA_LOAD);
-    cwe_globals::displayPopup("Case results successfully downloaded.", "Download Complete");
+
+    if (invokeStatus == RequestState::GOOD)
+    {
+        cwe_globals::displayPopup("Case results successfully downloaded.", "Download Complete");
+    }
+    else
+    {
+        cwe_globals::displayPopup("Unable to download case, please check connection and try again.", "Download Error");
+    }
+
+    computeIdleState();
 }
+
+void CFDcaseInstance::state_Param_Save_taskDone(RequestState invokeStatus)
+{
+    if (myState != InternalCaseState::PARAM_SAVE) return;
+
+    if (invokeStatus != RequestState::GOOD)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Error: Unable to change parameters. Please reset and try again.", "Remote Filesystem error");
+        return;
+    }
+
+    storedParamList = prospectiveNewParamList;
+    prospectiveNewParamList.clear();
+    FileNodeRef paramNode = caseFolder.getChildWithName(caseParamFileName);
+    if (!paramNode.isNil())
+    {
+        paramNode.setFileBuffer(NULL);
+    }
+
+    //This line is a stopgap measure against a race condition if one reads too quickly an uploaded file.
+    //QThread::msleep(500);
+
+    computeIdleState();
+}
+
+void CFDcaseInstance::state_Param_Save_Run_taskDone(RequestState invokeStatus)
+{
+    if (myState != InternalCaseState::PARAM_SAVE_RUN) return;
+
+    if (invokeStatus != RequestState::GOOD)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Error: Unable to change parameters. Please reset and try again.", "Remote Filesystem error");
+        return;
+    }
+
+    storedParamList = prospectiveNewParamList;
+    prospectiveNewParamList.clear();
+    FileNodeRef paramNode = caseFolder.getChildWithName(caseParamFileName);
+    if (!paramNode.isNil())
+    {
+        paramNode.setFileBuffer(NULL);
+    }
+    if (!startStageApp(runningStage))
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("Error: Unable to start task. Please reset and try again.", "Remote Job error");
+        return;
+    }
+}
+
+void CFDcaseInstance::computeIdleState()
+{
+    if (defunct) return;
+    if (caseDataInvalid())
+    {
+        emitNewState(InternalCaseState::INVALID);
+        return;
+    }
+
+    computeCaseType();
+    if (!caseDataLoaded())
+    {
+        const FileNodeRef varFile = caseFolder.getChildWithName(caseParamFileName);
+
+        if (varFile.isNil())
+        {
+            cwe_globals::get_file_handle()->speculateFileWithName(caseFolder, caseParamFileName, false);
+        }
+        else if (!varFile.fileBufferLoaded())
+        {
+            cwe_globals::get_file_handle()->sendDownloadBuffReq(varFile);
+        }
+        else if (!caseFolder.folderContentsLoaded())
+        {
+            caseFolder.enactFolderRefresh();
+        }
+        else if (myType != NULL)
+        {
+            for (QString aStage : myType->getStageNames())
+            {
+                const FileNodeRef childFolder = caseFolder.getChildWithName(aStage);
+                if (childFolder.isNil()) continue;
+                if (!childFolder.folderContentsLoaded())
+                {
+                    childFolder.enactFolderRefresh();
+                    continue;
+                }
+                const FileNodeRef exitFile = childFolder.getChildWithName(exitFileName);
+                if (exitFile.isNil()) continue;
+                if (!exitFile.fileBufferLoaded())
+                {
+                    cwe_globals::get_file_handle()->sendDownloadBuffReq(exitFile);
+                }
+            }
+        }
+        else
+        {
+            qDebug("Internal State error: case not loaded, but no step given to load.");
+        }
+
+
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        return;
+    }
+
+    const RemoteJobData * myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFullPath());
+    if (myJob != NULL)
+    {
+        if ((myJob->getState() != "FINISHED") && (myJob->getState() != "FAILED"))
+        {
+            runningID = myJob->getID();
+            runningStage = myJob->getParams().value("stage");
+            emitNewState(InternalCaseState::RUNNING_JOB);
+            return;
+        }
+    }
+
+    if (!cwe_globals::get_CWE_Job_Accountant()->allRunningDetailsLoaded())
+    {
+        emitNewState(InternalCaseState::RE_DATA_LOAD);
+        return;
+    }
+
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        emitNewState(InternalCaseState::EXTERN_FILE_OP);
+        return;
+    }
+
+    computeParamList();
+    runningStage.clear();
+    runningID.clear();
+
+    for (QString aStage : myType->getStageNames())
+    {
+        const FileNodeRef childFolder = caseFolder.getChildWithName(aStage);
+        if (childFolder.isNil()) continue;
+        const FileNodeRef exitFile = childFolder.getChildWithName(exitFileName);
+        if (exitFile.isNil())
+        {
+            emitNewState(InternalCaseState::READY_ERROR);
+            return;
+        }
+        if (!exitFile.fileBufferLoaded())
+        {
+            emitNewState(InternalCaseState::READY_ERROR);
+            return;
+        }
+        const QByteArray exitBytes = exitFile.getFileBuffer();
+
+        if (QString::fromLatin1(exitBytes) != "0\n")
+        {
+            emitNewState(InternalCaseState::READY_ERROR);
+            return;
+        }
+    }
+
+    emitNewState(InternalCaseState::READY);
+}
+

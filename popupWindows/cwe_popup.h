@@ -1,6 +1,5 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
 ** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
@@ -31,48 +30,23 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_RESULT_POPUP_H
-#define CWE_RESULT_POPUP_H
+#ifndef CWE_POPUP_H
+#define CWE_POPUP_H
 
-#include <QWidget>
+class CWE_MainWindow;
 
-#include <QLabel>
-#include <QPlainTextEdit>
-#include <QFileDialog>
+#include <QMainWindow>
 
-class CWE_InterfaceDriver;
-class CFDglCanvas;
-
-namespace Ui {
-class CWE_Result_Popup;
-}
-
-class CWE_Result_Popup : public QWidget
+class CWE_Popup : public QMainWindow
 {
     Q_OBJECT
-
 public:
-    explicit CWE_Result_Popup(QString caseName, QString caseType, QMap<QString, QString> theResult, CWE_InterfaceDriver * theDriver, bool downloadResult = false, QWidget *parent = 0);
-    ~CWE_Result_Popup();
+    explicit CWE_Popup(CWE_MainWindow * controlWindow, QWidget *parent = nullptr);
 
-private slots:
-    void closeButtonClicked();
-    void newFileInfo();
-
-private:
-    Ui::CWE_Result_Popup *ui;
-    CWE_InterfaceDriver * myDriver;
-    bool download;
-    QMap<QString, QString> myResult;
-
-    QString resultType;
-    QString targetFolder;
-    QString targetFile;
-
-    QLabel * loadingLabel = NULL;
-    CFDglCanvas * myCanvas = NULL;
-    QPlainTextEdit * textBox = NULL;
+protected:
+    CWE_MainWindow * myMainWindow;
 };
 
-#endif // CWE_RESULT_POPUP_H
+#endif // CWE_POPUP_H

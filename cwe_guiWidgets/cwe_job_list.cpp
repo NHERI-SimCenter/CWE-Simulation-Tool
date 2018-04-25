@@ -43,23 +43,6 @@ CWE_job_list::CWE_job_list(QWidget *parent) :
     ui(new Ui::CWE_job_list)
 {
     ui->setupUi(this);
-
-    // Create model
-    model = new QStandardItemModel(this);
-
-    QStringList HeaderList;
-    HeaderList << "name given" << "state" << "time created" << "ID" << "application";
-    model->setHorizontalHeaderLabels(HeaderList);
-
-    // Glue model and view together
-    ui->tableView_jobs->setModel(model);
-    ui->tableView_jobs->verticalHeader()->setVisible(false);
-
-    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Stretch);
-    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(1,QHeaderView::ResizeToContents);
-    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(2,QHeaderView::ResizeToContents);
-    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(3,QHeaderView::ResizeToContents);
-    ui->tableView_jobs->horizontalHeader()->setSectionResizeMode(4,QHeaderView::Stretch);
 }
 
 CWE_job_list::~CWE_job_list()

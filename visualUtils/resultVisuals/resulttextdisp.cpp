@@ -33,64 +33,31 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "resultvisualbase.h"
+#include "resulttextdisp.h"
 
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "../cfdglcanvas.h"
 
-ResultVisualBase::ResultVisualBase(QObject *parent) : QObject(parent)
+ResultTextDisplay::ResultTextDisplay(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
+
+ResultTextDisplay::~ResultTextDisplay(){}
+
+void ResultTextDisplay::initializeView()
 {
+    QMap<QString, QString> neededFiles;
+    neededFiles["text"] = getResultObj()["file"];
 
+    performStandardInit(neededFiles);
 }
 
-ResultVisualBase::~ResultVisualBase()
+void ResultTextDisplay::allFilesLoaded()
 {
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-}
+    QPlainTextEdit * myDisplay;
 
-void ResultVisualBase::initializeWithNeededFiles(FileTreeNode * baseFolder, QList<QString> neededFiles)
-{
-
-
-    fileRecordsChanged();
-}
-
-void ResultVisualBase::baseFolderRemoved()
-{
-    QObject::disconnect(this); //TODO: Make specific to given signal
-    dataLostError();
-}
-
-void ResultVisualBase::fileRecordsChanged()
-{
-    bool fileMissing = false;
-    QMap<QString, QByteArray *> rawFileData;
-
-    for (auto itr = myFileList.cbegin(); itr != myFileList.cend(); itr++)
-    {
-        QString filePath = *itr;
-
-        FileTreeNode * theDataNode = myBaseFolder->getNodeReletiveToNodeWithName(filePath);
-
-        if (theDataNode == NULL)
-        {
-            fileMissing = true;
-        }
-        else if (theDataNode->getFileBuffer() == NULL)
-        {
-            fileMissing = true;
-
-        }
-        else
-        {
-            rawFileData.insert(filePath, theDataNode->getFileBuffer());
-        }
-    }
-
-    if (!fileMissing)
-    {
-        QObject::disconnect(this); //TODO: Make specific to given signal
-        allFilesLoaded(rawFileData);
-        return;
-    }
-
+    QString theText = QString::fromLatin1(*(fileBuffers["text"]));
+    changeDisplayFrameTenant(myDisplay = new QPlainTextEdit(theText));
+    myDisplay->setReadOnly(true);
 }

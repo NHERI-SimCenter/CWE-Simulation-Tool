@@ -40,11 +40,15 @@
 
 #include <QWindow>
 #include <QDir>
+#include <QVariant>
 
 class CWE_MainWindow;
 class CFDanalysisType;
 class CFDcaseInstance;
 class RemoteJobData;
+class FileNodeRef;
+class CWEjobAccountant;
+enum class CaseState;
 
 class CWE_InterfaceDriver : public AgaveSetupDriver
 {
@@ -62,27 +66,19 @@ public:
     virtual QString getVersion();
 
     QList<CFDanalysisType *> * getTemplateList();
-    CFDcaseInstance * getCurrentCase();
-    void setCurrentCase(CFDcaseInstance * newCase);
+
     CWE_MainWindow * getMainWindow();
 
     bool inOfflineMode();
 
-    QMap<QString, const RemoteJobData *> getRunningCWEjobs();
-
-signals:
-    void haveNewCase();
-
 private slots:
-    void currentCaseInvalidated();
-    void checkAppList(RequestState replyState, QJsonArray * appList);
-    void processNewJobInfo();
+    void checkAppList(RequestState replyState, QVariantList appList);
 
 private:
     CWE_MainWindow * mainWindow;
     QList<CFDanalysisType *> templateList;
 
-    CFDcaseInstance * currentCFDCase = NULL;
+    CWEjobAccountant * myJobAccountant = NULL;
 
     bool offlineMode = false;
 };

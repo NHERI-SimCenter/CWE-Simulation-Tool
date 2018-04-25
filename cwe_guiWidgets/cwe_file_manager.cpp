@@ -41,6 +41,8 @@
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/utilFuncs/singlelinedialog.h"
 
+#include "mainWindow/cwe_mainwindow.h"
+
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
@@ -59,6 +61,7 @@ CWE_file_manager::CWE_file_manager(QWidget *parent) :
 
     // Attach the model to the view
     ui->localTreeView->setModel(localFileModel);
+    ui->localTreeView->header()->resizeSection(0,200);
 
     // QFileSystemModel requires root path
     localFileModel->setRootPath(QDir::homePath());
@@ -70,30 +73,30 @@ CWE_file_manager::~CWE_file_manager()
     delete ui;
 }
 
-void CWE_file_manager::linkDriver(CWE_InterfaceDriver * theDriver)
+void CWE_file_manager::linkMainWindow(CWE_MainWindow *theMainWin)
 {
-    CWE_Super::linkDriver(theDriver);
-    if (!myDriver->inOfflineMode())
+    CWE_Super::linkMainWindow(theMainWin);
+    if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        ui->remoteTreeView->setupFileView();
+        ui->remoteTreeView->setModelLink(theMainWindow->getFileModel());
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
-        QObject::connect(myDriver->getFileHandler(), SIGNAL(fileOpDone(RequestState)),
+        QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
                          this, SLOT(remoteOpDone()));
     }
 }
 
 void CWE_file_manager::on_pb_upload_clicked()
 {
-    if (myDriver->getFileHandler()->operationIsPending())
+    if (cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Currently running file operation. Please Wait.");
         return;
     }
 
-    FileTreeNode * targetFile = ui->remoteTreeView->getSelectedNode();
+    FileNodeRef targetFile = ui->remoteTreeView->getSelectedFile();
 
-    if ((targetFile == NULL) || (targetFile->getFileData().getFileType() != FileType::DIR))
+    if ((targetFile.isNil()) || (targetFile.getFileType() != FileType::DIR))
     {
         cwe_globals::displayPopup("Please select a destination folder to upload to.");
         return;
@@ -108,9 +111,9 @@ void CWE_file_manager::on_pb_upload_clicked()
         return;
     }
 
-    myDriver->getFileHandler()->sendUploadReq(targetFile, fileData.absoluteFilePath());
+    cwe_globals::get_file_handle()->sendUploadReq(targetFile, fileData.absoluteFilePath());
 
-    if (!myDriver->getFileHandler()->operationIsPending())
+    if (!cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Error: Unable to start file operation. Please try again.");
         return;
@@ -121,15 +124,15 @@ void CWE_file_manager::on_pb_upload_clicked()
 
 void CWE_file_manager::on_pb_download_clicked()
 {
-    if (myDriver->getFileHandler()->operationIsPending())
+    if (cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Currently running file operation. Please Wait.");
         return;
     }
 
-    FileTreeNode * targetFile = ui->remoteTreeView->getSelectedNode();
+    FileNodeRef targetFile = ui->remoteTreeView->getSelectedFile();
 
-    if ((targetFile == NULL) || (targetFile->getFileData().getFileType() != FileType::FILE))
+    if ((targetFile.isNil()) || (targetFile.getFileType() != FileType::FILE))
     {
         cwe_globals::displayPopup("Please select a file to download to.");
         return;
@@ -151,11 +154,11 @@ void CWE_file_manager::on_pb_download_clicked()
     localPath = localPath.append('/');
 #endif
 
-    localPath = localPath.append(targetFile->getFileData().getFileName());
+    localPath = localPath.append(targetFile.getFileName());
 
-    myDriver->getFileHandler()->sendDownloadReq(targetFile, localPath);
+    cwe_globals::get_file_handle()->sendDownloadReq(targetFile, localPath);
 
-    if (!myDriver->getFileHandler()->operationIsPending())
+    if (!cwe_globals::get_file_handle()->operationIsPending())
     {
         cwe_globals::displayPopup("Error: Unable to start file operation. Please check that the local file does not already exist and try again.");
         return;
@@ -172,7 +175,7 @@ void CWE_file_manager::copyMenuItem()
         return;
     }
 
-    ae_globals::get_Driver()->getFileHandler()->sendCopyReq(targetNode, newNamePopup.getInputText());
+    cwe_globals::get_file_handle()->sendCopyReq(targetNode, newNamePopup.getInputText());
 }
 
 void CWE_file_manager::moveMenuItem()
@@ -184,58 +187,27 @@ void CWE_file_manager::moveMenuItem()
         return;
     }
 
-    ae_globals::get_Driver()->getFileHandler()->sendMoveReq(targetNode,newNamePopup.getInputText());
-}
-
-void CWE_file_manager::renameMenuItem()
-{
-    SingleLineDialog newNamePopup("Please type a new file name:", "newname");
-
-    if (newNamePopup.exec() != QDialog::Accepted)
-    {
-        return;
-    }
-
-    ae_globals::get_Driver()->getFileHandler()->sendRenameReq(targetNode, newNamePopup.getInputText());
-}
-
-void CWE_file_manager::deleteMenuItem()
-{
-    if (ae_globals::get_Driver()->getFileHandler()->deletePopup(targetNode))
-    {
-        ae_globals::get_Driver()->getFileHandler()->sendDeleteReq(targetNode);
-    }
-}
-
-void CWE_file_manager::createFolderMenuItem()
-{
-    SingleLineDialog newFolderNamePopup("Please input a name for the new folder:", "newFolder1");
-
-    if (newFolderNamePopup.exec() != QDialog::Accepted)
-    {
-        return;
-    }
-    ae_globals::get_Driver()->getFileHandler()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
+    cwe_globals::get_file_handle()->sendMoveReq(targetNode,newNamePopup.getInputText());
 }
 
 void CWE_file_manager::compressMenuItem()
 {
-    ae_globals::get_Driver()->getFileHandler()->sendCompressReq(targetNode);
+    cwe_globals::get_file_handle()->sendCompressReq(targetNode);
 }
 
 void CWE_file_manager::decompressMenuItem()
 {
-    ae_globals::get_Driver()->getFileHandler()->sendDecompressReq(targetNode);
+    cwe_globals::get_file_handle()->sendDecompressReq(targetNode);
 }
 
 void CWE_file_manager::refreshMenuItem()
 {
-    ae_globals::get_Driver()->getFileHandler()->enactFolderRefresh(targetNode);
+    targetNode.enactFolderRefresh();
 }
 
 void CWE_file_manager::downloadBufferItem()
 {
-    ae_globals::get_Driver()->getFileHandler()->sendDownloadBuffReq(targetNode);
+    cwe_globals::get_file_handle()->sendDownloadBuffReq(targetNode);
 }
 
 void CWE_file_manager::remoteOpDone()
@@ -247,7 +219,7 @@ void CWE_file_manager::remoteOpDone()
 void CWE_file_manager::customFileMenu(const QPoint &pos)
 {
     QMenu fileMenu;
-    if (ae_globals::get_Driver()->getFileHandler()->operationIsPending())
+    if (cwe_globals::get_file_handle()->operationIsPending())
     {
         fileMenu.addAction("File Operation In Progress . . .");
         fileMenu.exec(QCursor::pos());
@@ -257,34 +229,24 @@ void CWE_file_manager::customFileMenu(const QPoint &pos)
     QModelIndex targetIndex = ui->remoteTreeView->indexAt(pos);
     ui->remoteTreeView->fileEntryTouched(targetIndex);
 
-    targetNode = ui->remoteTreeView->getSelectedNode();
+    targetNode = ui->remoteTreeView->getSelectedFile();
 
     //If we did not click anything, we should return
-    if (targetNode == NULL) return;
-    FileMetaData theFileData = targetNode->getFileData();
+    if (targetNode.isNil()) return;
+    if (targetNode.isRootNode()) return;
 
-    if (theFileData.getFileType() == FileType::INVALID) return;
+    if (targetNode.getFileType() == FileType::INVALID) return;
 
-    if (!(targetNode->isRootNode()))
-    {
-        //We don't let the user mess up the username folder
-        fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
-        fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
-        fileMenu.addAction("Rename",this, SLOT(renameMenuItem()));
-        fileMenu.addSeparator();
-        fileMenu.addAction("Delete",this, SLOT(deleteMenuItem()));
-        fileMenu.addSeparator();
-    }
-    if (theFileData.getFileType() == FileType::DIR)
-    {
-        fileMenu.addAction("Create New Folder",this, SLOT(createFolderMenuItem()));
-    }
-    if (theFileData.getFileType() == FileType::FILE)
+    fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
+    fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
+    //We don't let the user delete the username folder
+
+    if (targetNode.getFileType() == FileType::FILE)
     {
         fileMenu.addAction("Download Buffer (DEBUG)",this, SLOT(downloadBufferItem()));
     }
 
-    if ((theFileData.getFileType() == FileType::DIR) || (theFileData.getFileType() == FileType::FILE))
+    if ((targetNode.getFileType() == FileType::DIR) || (targetNode.getFileType() == FileType::FILE))
     {
         fileMenu.addSeparator();
         fileMenu.addAction("Refresh Data",this, SLOT(refreshMenuItem()));
@@ -292,4 +254,74 @@ void CWE_file_manager::customFileMenu(const QPoint &pos)
     }
 
     fileMenu.exec(QCursor::pos());
+}
+
+void CWE_file_manager::button_newFolder_clicked()
+{
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        cwe_globals::displayPopup("File Operation in progress. Please Wait.");
+        return;
+    }
+
+    targetNode = ui->remoteTreeView->getSelectedFile();
+    if (targetNode.getFileType() != FileType::DIR)
+    {
+        cwe_globals::displayPopup("Please select a folder in which to place the new folder.");
+        return;
+    }
+
+    SingleLineDialog newFolderNamePopup("Please input a name for the new folder:", "newFolder1");
+
+    if (newFolderNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+    cwe_globals::get_file_handle()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
+}
+
+void CWE_file_manager::button_delete_clicked()
+{
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        cwe_globals::displayPopup("File Operation in progress. Please Wait.");
+        return;
+    }
+
+    targetNode = ui->remoteTreeView->getSelectedFile();
+    if (targetNode.isRootNode())
+    {
+        cwe_globals::displayPopup("Error: We cannot rename or delete your main folder.");
+        return;
+    }
+
+    if (cwe_globals::get_file_handle()->deletePopup(targetNode))
+    {
+        cwe_globals::get_file_handle()->sendDeleteReq(targetNode);
+    }
+}
+
+void CWE_file_manager::button_rename_clicked()
+{
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        cwe_globals::displayPopup("File Operation in progress. Please Wait.");
+        return;
+    }
+
+    targetNode = ui->remoteTreeView->getSelectedFile();
+    if (targetNode.isRootNode())
+    {
+        cwe_globals::displayPopup("Error: We cannot rename or delete your main folder.");
+        return;
+    }
+
+    SingleLineDialog newNamePopup("Please type a new file name:", "newname");
+
+    if (newNamePopup.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    cwe_globals::get_file_handle()->sendRenameReq(targetNode, newNamePopup.getInputText());
 }
