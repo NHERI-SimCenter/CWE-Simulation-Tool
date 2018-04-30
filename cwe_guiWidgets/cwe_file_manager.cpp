@@ -81,7 +81,7 @@ void CWE_file_manager::linkMainWindow(CWE_MainWindow *theMainWin)
         ui->remoteTreeView->setModelLink(theMainWindow->getFileModel());
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
-        QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
+        QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState)),
                          this, SLOT(remoteOpDone()));
     }
 }

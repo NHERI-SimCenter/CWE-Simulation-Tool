@@ -107,7 +107,7 @@ signals:
 private slots:
     void underlyingFilesUpdated(FileNodeRef changedFile);
     void jobListUpdated();
-    void fileTaskDone(RequestState invokeStatus, QString opMessage);
+    void fileTaskDone(RequestState invokeStatus);
     void fileTaskStarted();
 
     void jobInvoked(RequestState invokeStatus, QJsonDocument jobData);
