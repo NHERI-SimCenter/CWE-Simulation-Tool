@@ -36,6 +36,7 @@
 #include "ui_cwe_file_manager.h"
 
 #include "../AgaveClientInterface/filemetadata.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
 
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
@@ -81,8 +82,8 @@ void CWE_file_manager::linkMainWindow(CWE_MainWindow *theMainWin)
         ui->remoteTreeView->setModelLink(theMainWindow->getFileModel());
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
-        QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState)),
-                         this, SLOT(remoteOpDone()));
+        QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState,QString)),
+                         this, SLOT(remoteOpDone(RequestState,QString)));
     }
 }
 
@@ -210,10 +211,19 @@ void CWE_file_manager::downloadBufferItem()
     cwe_globals::get_file_handle()->sendDownloadBuffReq(targetNode);
 }
 
-void CWE_file_manager::remoteOpDone()
+void CWE_file_manager::remoteOpDone(RequestState operationStatus, QString message)
 {
     ui->pb_upload->setDisabled(false);
     ui->pb_download->setDisabled(false);
+
+    if (operationStatus != RequestState::GOOD)
+    {
+        cwe_globals::displayPopup(message,"File Transfer Error");
+    }
+    else
+    {
+        cwe_globals::displayPopup("File Operation Complete","File Manager");
+    }
 }
 
 void CWE_file_manager::customFileMenu(const QPoint &pos)
