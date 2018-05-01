@@ -120,7 +120,7 @@ void CWE_InterfaceDriver::closeAuthScreen()
 {
     if (mainWindow == NULL)
     {
-        fatalInterfaceError("Fatal Error: Main window not found");
+        cwe_globals::displayFatalPopup("Fatal Error: Main window not found");
     }
 
     myJobHandle->demandJobDataRefresh();
@@ -136,7 +136,7 @@ void CWE_InterfaceDriver::closeAuthScreen()
 
     if (getAppList == NULL)
     {
-        fatalInterfaceError("Unable to get app list from DesignSafe");
+        cwe_globals::displayFatalPopup("Unable to get app list from DesignSafe");
         return;
     }
     QObject::connect(getAppList, SIGNAL(haveAgaveAppList(RequestState,QVariantList)),
@@ -189,7 +189,7 @@ void CWE_InterfaceDriver::checkAppList(RequestState replyState, QVariantList app
 {
     if (replyState != RequestState::GOOD)
     {
-        fatalInterfaceError("Unable to connect to Agave to get app info.");
+        cwe_globals::displayFatalPopup("Unable to connect to Agave to get app info.");
         return;
     }
 
@@ -211,7 +211,7 @@ void CWE_InterfaceDriver::checkAppList(RequestState replyState, QVariantList app
 
     if (!neededApps.isEmpty())
     {
-        fatalInterfaceError("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
+        cwe_globals::displayFatalPopup("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
     }
 }
 

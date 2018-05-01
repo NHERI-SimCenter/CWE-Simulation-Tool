@@ -162,7 +162,7 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         CFDanalysisType * theType = theCase->getMyType();
         if (theType == NULL)
         {
-            cwe_globals::get_CWE_Driver()->fatalInterfaceError("Type/stage mismatch for case.");
+            cwe_globals::displayFatalPopup("Type/stage mismatch for case.");
             return;
         }
         ui->label_CaseTypeIcon->setPixmap(theType->getIcon()->pixmap(150,100));
