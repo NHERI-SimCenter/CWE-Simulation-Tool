@@ -155,7 +155,7 @@ void CWE_Parameters::newCaseState(CaseState newState)
         setButtonsAccordingToStage();
         break;
     default:
-        cwe_globals::get_CWE_Driver()->fatalInterfaceError("Remote case has unhandled state");
+        cwe_globals::displayFatalPopup("Remote case has unhandled state");
         return;
         break;
     }

@@ -43,6 +43,7 @@
 #include <QMenu>
 
 class FileTreeNode;
+enum class RequestState;
 
 namespace Ui {
 class CWE_file_manager;
@@ -72,7 +73,7 @@ private slots:
 
     void downloadBufferItem();
 
-    void remoteOpDone();
+    void remoteOpDone(RequestState operationStatus, QString message);
 
     void button_newFolder_clicked();
     void button_delete_clicked();

@@ -41,10 +41,11 @@
 #include "../AgaveClientInterface/remotedatainterface.h"
 
 #include "cwe_interfacedriver.h"
+#include "cwe_globals.h"
 
 void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
 
-QString openStyleFiles(CWE_InterfaceDriver * theDriver)
+QString openStyleFiles()
 {
     QString ret;
     QFile mainStyleFile(":/styleSheets/cweStyle.qss");
@@ -63,13 +64,13 @@ QString openStyleFiles(CWE_InterfaceDriver * theDriver)
 
     if (!mainStyleFile.open(QFile::ReadOnly))
     {
-        theDriver->fatalInterfaceError("Unable to open main style file. Install may be corrupted.");
+        cwe_globals::displayFatalPopup("Unable to open main style file. Install may be corrupted.");
         return ret;
     }
 
     if (!appendedStyle.open(QFile::ReadOnly))
     {
-        theDriver->fatalInterfaceError("Unable to open platform style file. Install may be corrupted.");
+        cwe_globals::displayFatalPopup("Unable to open platform style file. Install may be corrupted.");
         return ret;
     }
 
@@ -122,10 +123,10 @@ int main(int argc, char *argv[])
     CWE_InterfaceDriver programDriver(nullptr, debugLoggingEnabled);
     if (QSslSocket::supportsSsl() == false)
     {
-        programDriver.fatalInterfaceError("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
+        cwe_globals::displayFatalPopup("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
     }
 
-    mainRunLoop.setStyleSheet(openStyleFiles(&programDriver));
+    mainRunLoop.setStyleSheet(openStyleFiles());
 
     mainRunLoop.setQuitOnLastWindowClosed(false);
     //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
