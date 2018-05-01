@@ -84,6 +84,7 @@ private:
     QFileSystemModel *localFileModel;
 
     FileNodeRef targetNode;
+    bool expectingOp = false;
 };
 
 #endif // CWE_FILE_MANAGER2_H

@@ -911,7 +911,7 @@ void CFDcaseInstance::connectCaseSignals()
     QObject::connect(cwe_globals::get_CWE_Job_Accountant(), SIGNAL(haveNewJobInfo()),
                      this, SLOT(jobListUpdated()),
                      Qt::QueuedConnection);
-    QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState)),
+    QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
                      this, SLOT(fileTaskDone(RequestState)),
                      Qt::QueuedConnection);
     QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
