@@ -2,9 +2,8 @@
   <Installer>
       <Name>CWE Client Program</Name>
       <Version>0.8.0</Version>
-      <Title>CWE Client Program Mac Installer</Title>
+      <Title>CWE Client Program Linux Installer</Title>
       <Publisher>NHERI SimCenter</Publisher>
-      <TargetDir>@HomeDir@/Applications/SimCenterCWE</TargetDir>
+      <TargetDir>@HomeDir@/SimCenterCWE</TargetDir>
       <MaintenanceToolName>RemoveSimCenterCWE</MaintenanceToolName>
   </Installer>
-

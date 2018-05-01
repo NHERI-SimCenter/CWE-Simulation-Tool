@@ -36,6 +36,7 @@
 #include "ui_cwe_file_manager.h"
 
 #include "../AgaveClientInterface/filemetadata.h"
+#include "../AgaveClientInterface/remotedatainterface.h"
 
 #include "../AgaveExplorer/remoteFileOps/filetreenode.h"
 #include "../AgaveExplorer/remoteFileOps/fileoperator.h"
@@ -81,8 +82,8 @@ void CWE_file_manager::linkMainWindow(CWE_MainWindow *theMainWin)
         ui->remoteTreeView->setModelLink(theMainWindow->getFileModel());
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
-        QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
-                         this, SLOT(remoteOpDone()));
+        QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState,QString)),
+                         this, SLOT(remoteOpDone(RequestState,QString)));
     }
 }
 
@@ -112,6 +113,7 @@ void CWE_file_manager::on_pb_upload_clicked()
     }
 
     cwe_globals::get_file_handle()->sendUploadReq(targetFile, fileData.absoluteFilePath());
+    expectingOp = true;
 
     if (!cwe_globals::get_file_handle()->operationIsPending())
     {
@@ -176,6 +178,7 @@ void CWE_file_manager::copyMenuItem()
     }
 
     cwe_globals::get_file_handle()->sendCopyReq(targetNode, newNamePopup.getInputText());
+    expectingOp = true;
 }
 
 void CWE_file_manager::moveMenuItem()
@@ -188,16 +191,19 @@ void CWE_file_manager::moveMenuItem()
     }
 
     cwe_globals::get_file_handle()->sendMoveReq(targetNode,newNamePopup.getInputText());
+    expectingOp = true;
 }
 
 void CWE_file_manager::compressMenuItem()
 {
     cwe_globals::get_file_handle()->sendCompressReq(targetNode);
+    expectingOp = true;
 }
 
 void CWE_file_manager::decompressMenuItem()
 {
     cwe_globals::get_file_handle()->sendDecompressReq(targetNode);
+    expectingOp = true;
 }
 
 void CWE_file_manager::refreshMenuItem()
@@ -208,12 +214,25 @@ void CWE_file_manager::refreshMenuItem()
 void CWE_file_manager::downloadBufferItem()
 {
     cwe_globals::get_file_handle()->sendDownloadBuffReq(targetNode);
+    expectingOp = true;
 }
 
-void CWE_file_manager::remoteOpDone()
+void CWE_file_manager::remoteOpDone(RequestState operationStatus, QString message)
 {
     ui->pb_upload->setDisabled(false);
     ui->pb_download->setDisabled(false);
+
+    if (!expectingOp) return;
+    expectingOp = false;
+
+    if (operationStatus != RequestState::GOOD)
+    {
+        cwe_globals::displayPopup(message,"File Transfer Error");
+    }
+    else
+    {
+        cwe_globals::displayPopup("File Operation Complete","File Manager");
+    }
 }
 
 void CWE_file_manager::customFileMenu(const QPoint &pos)
@@ -278,6 +297,7 @@ void CWE_file_manager::button_newFolder_clicked()
         return;
     }
     cwe_globals::get_file_handle()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
+    expectingOp = true;
 }
 
 void CWE_file_manager::button_delete_clicked()
@@ -298,6 +318,7 @@ void CWE_file_manager::button_delete_clicked()
     if (cwe_globals::get_file_handle()->deletePopup(targetNode))
     {
         cwe_globals::get_file_handle()->sendDeleteReq(targetNode);
+        expectingOp = true;
     }
 }
 
@@ -324,4 +345,5 @@ void CWE_file_manager::button_rename_clicked()
     }
 
     cwe_globals::get_file_handle()->sendRenameReq(targetNode, newNamePopup.getInputText());
+    expectingOp = true;
 }

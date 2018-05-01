@@ -425,11 +425,11 @@ void CFDcaseInstance::jobListUpdated()
     }
 }
 
-void CFDcaseInstance::fileTaskDone(RequestState invokeStatus, QString)
+void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
 {
     if (defunct) return;
 
-    if (invokeStatus == RequestState::NO_CONNECT)
+    if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(InternalCaseState::ERROR);
         cwe_globals::displayPopup("Lost connection to DesignSafe. Please check network and try again.", "Network Connection Error");
@@ -490,17 +490,10 @@ void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument jobDat
 {
     if (defunct) return;
 
-    if (invokeStatus == RequestState::NO_CONNECT)
+    if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(InternalCaseState::ERROR);
         cwe_globals::displayPopup("Lost connection to DesignSafe. Please check network and try again.", "Network Connection Error");
-        return;
-    }
-
-    if (invokeStatus == RequestState::FAIL)
-    {
-        computeIdleState();
-        cwe_globals::displayPopup("Unable to start requested job. Reloading Case", "Network Connection Error");
         return;
     }
 
@@ -522,17 +515,10 @@ void CFDcaseInstance::jobKilled(RequestState invokeStatus)
 {
     if (defunct) return;
 
-    if (invokeStatus == RequestState::NO_CONNECT)
+    if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(InternalCaseState::ERROR);
         cwe_globals::displayPopup("Lost connection to DesignSafe. Please check network and try again.", "Network Connection Error");
-        return;
-    }
-
-    if (invokeStatus == RequestState::FAIL)
-    {
-        computeIdleState();
-        cwe_globals::displayPopup("Unable to stop requested job. Reloading Case", "Network Connection Error");
         return;
     }
 
@@ -926,7 +912,7 @@ void CFDcaseInstance::connectCaseSignals()
                      this, SLOT(jobListUpdated()),
                      Qt::QueuedConnection);
     QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
-                     this, SLOT(fileTaskDone(RequestState, QString)),
+                     this, SLOT(fileTaskDone(RequestState)),
                      Qt::QueuedConnection);
     QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
                      this, SLOT(underlyingFilesUpdated(FileNodeRef)),

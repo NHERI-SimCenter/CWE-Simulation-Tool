@@ -93,7 +93,7 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
 
     if (!cwe_globals::isValidFolderName(newCaseName))
     {
-        cwe_globals::displayPopup("Please input a valid folder name");
+        cwe_globals::displayPopup("Please input a valid folder name. Folder names should not include any special characters. (!, @, #, $, %, ^, etc.)");
         return;
     }
 
