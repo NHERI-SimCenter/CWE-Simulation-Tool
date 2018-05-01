@@ -227,5 +227,9 @@
         <file>help/Images/SimulationCases.png</file>
         <file>help/Images/ViewParameters.png</file>
         <file>help/Images/ViewResults.png</file>
+        <file>help/workflow_app.html</file>
+        <file>help/workflow_clone_case.html</file>
+        <file>help/workflow_continue.html</file>
+        <file>help/workflow_new_case.html</file>
     </qresource>
 </RCC>
