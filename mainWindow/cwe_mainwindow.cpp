@@ -41,6 +41,7 @@
 #include "cwe_interfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 #include "cwe_globals.h"
+#include <QResource>
 
 CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -55,6 +56,9 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
 
     changeTabEnabled(ui->tab_spacer_1, false);
     changeTabEnabled(ui->tab_spacer_2, false);
+
+    // register binary resources
+    QResource::registerResource("/resources/cwe_help.rcc");
 
     // adjust application size to display
     QRect rec = QApplication::desktop()->screenGeometry();
