@@ -35,7 +35,7 @@ XCOPY /S /I release\* installer\packages\nheri.simcenter.cfdclient\data
 
 cd installer
 
-%QT_BIN_CREATE% --offline-only -c config\config.xml -p packages ../setupSimCenterCFD.exe
+%QT_BIN_CREATE% --offline-only -c config\winconfig.xml -p packages ../setupSimCenterCFD.exe
 
 PAUSE
 
