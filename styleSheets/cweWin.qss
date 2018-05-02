@@ -1,0 +1,18 @@
+QTextBrowser {
+    background-color: white;
+    border-style: outset;
+    border-width: 1px;
+    border-radius: 50px;
+    border-color: #607D8B;
+   font: 12pt slanted;
+}
+
+QTextBrowser#helpBrowser {
+    background-color: white;
+    border-style: outset;
+    border-width: 1px;
+    border-radius: 25px;
+    border-color: #607D8B;
+   font: 12pt;
+}
+
