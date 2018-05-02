@@ -205,4 +205,12 @@ RESOURCES += \
     ../AgaveExplorer/SimCenterCommon/commonResources.qrc \
     CFDanalysis/config/cfdconfig.qrc
 
-DISTFILES +=
+mkdir_help_resources.commands = $(MKDIR) $$OUT_PWD/resources
+create_help_resources.commands = rcc -binary $$PWD/cwe_help.qrc -o $$OUT_PWD/resources/cwe_help.rcc
+create_help_resources.depends = mkdir_help_resources
+first.depends += create_help_resources
+export(first.depends)
+export(create_help_resources.depends)
+export(create_help_resources.commands)
+export(mkdir_help_resources.commands)
+QMAKE_EXTRA_TARGETS += first create_help_resources mkdir_help_resources
