@@ -41,29 +41,11 @@
 #include "cwe_interfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 #include "cwe_globals.h"
-#include <QResource>
-#include <QDebug>
 
 CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CWE_MainWindow)
 {
-    // register binary resources
-#ifdef Q_OS_MAC
-    // Peter MH: your path here
-    QResource::registerResource("/Users/pmackenz/Development/SimCenter/CFDClientProgram/resources/cwe_help.rcc");
-#endif
-
-#ifdef Q_OS_WIN
-    // whoever compiles on Windows: your path here
-    QResource::registerResource("C:/Users/Peter Mackenzie/Documents/GitHub/CFDClientProgram/resources/cwe_help.rcc");
-#endif
-
-#ifdef Q_OS_LINUX
-    // Peter S: your path here
-    QResource::registerResource("/Users/pmackenz/Development/SimCenter/CFDClientProgram/resources/cwe_help.rcc");
-#endif
-
     ui->setupUi(this);
 
     changeParamsAndResultsEnabled(false);
