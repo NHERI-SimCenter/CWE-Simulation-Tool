@@ -41,11 +41,29 @@
 #include "cwe_interfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 #include "cwe_globals.h"
+#include <QResource>
+#include <QDebug>
 
 CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CWE_MainWindow)
 {
+    // register binary resources
+#ifdef Q_OS_MAC
+    // Peter MH: your path here
+    QResource::registerResource("/Users/pmackenz/Development/SimCenter/CFDClientProgram/resources/cwe_help.rcc");
+#endif
+
+#ifdef Q_OS_WIN
+    // whoever compiles on Windows: your path here
+    QResource::registerResource("C:/Users/Peter Mackenzie/Documents/GitHub/CFDClientProgram/resources/cwe_help.rcc");
+#endif
+
+#ifdef Q_OS_LINUX
+    // Peter S: your path here
+    QResource::registerResource("/Users/pmackenz/Development/SimCenter/CFDClientProgram/resources/cwe_help.rcc");
+#endif
+
     ui->setupUi(this);
 
     changeParamsAndResultsEnabled(false);
@@ -58,8 +76,10 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
 
     // adjust application size to display
     QRect rec = QApplication::desktop()->screenGeometry();
-    int height = this->height()<0.75*rec.height()?this->height():0.75*rec.height();
-    int width  = this->width()<0.65*rec.width()?this->width():0.65*rec.width();
+    int height = this->height()>0.75*rec.height()?this->height():0.75*rec.height();
+    if ( height > 0.95*rec.height() ) { height = 0.95*rec.height(); }
+    int width  = this->width()>0.65*rec.width()?this->width():0.65*rec.width();
+    if ( width > 0.95*rec.width() ) { width = 0.95*rec.width(); }
     this->resize(width, height);
 }
 
