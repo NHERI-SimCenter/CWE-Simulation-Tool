@@ -75,25 +75,22 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
     filters << "*.json" << "*.JSON";
     QStringList caseTypeFiles = confDir.entryList(filters);
 
-    foreach (QString caseConfigFile, caseTypeFiles) {
+    foreach (QString caseConfigFile, caseTypeFiles)
+    {
         QString confPath = ":/config/";
         confPath = confPath.append(caseConfigFile);
         CFDanalysisType * newTemplate = new CFDanalysisType(confPath);
-        if (debug == false)
+        if ((debug == false) && (newTemplate->isDebugOnly() == true))
         {
-            if (newTemplate->isDebugOnly() == false)
-            {
-                templateList.append(newTemplate);
-            }
-            else
-            {
-                delete newTemplate;
-            }
+            delete newTemplate;
+            continue;
         }
-        else
+        if (newTemplate->isDisabled())
         {
-            templateList.append(newTemplate);
+            delete newTemplate;
+            continue;
         }
+        templateList.append(newTemplate);
     }
 }
 
