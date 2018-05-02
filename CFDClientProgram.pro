@@ -205,4 +205,13 @@ RESOURCES += \
     ../AgaveExplorer/SimCenterCommon/commonResources.qrc \
     CFDanalysis/config/cfdconfig.qrc
 
-DISTFILES +=
+#To recreate the help resources, run:
+# rcc -binary cew_help.qrc -o resources/cwe_help.rcc
+
+#Below will copy the help resource as needed
+
+copy_resources.commands = $(COPY_DIR) $$PWD/resources $$OUT_PWD
+first.depends += copy_resources
+export(first.depends)
+export(copy_resources.commands)
+QMAKE_EXTRA_TARGETS += first copy_resources

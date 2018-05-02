@@ -37,6 +37,7 @@
 #include <QFile>
 #include <QSslSocket>
 #include <QtGlobal>
+#include <QResource>
 
 #include "../AgaveClientInterface/remotedatainterface.h"
 
@@ -131,6 +132,12 @@ int main(int argc, char *argv[])
     mainRunLoop.setQuitOnLastWindowClosed(false);
     //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
     //Note: Might consider a better way of implementing this.
+
+    // register binary resources
+    if (!QResource::registerResource(QCoreApplication::applicationDirPath().append("/resources/cwe_help.rcc")))
+    {
+        cwe_globals::displayFatalPopup("Error: Unable to locate help files, your install may be corrupted. Please reinstall the client program", "Install Error");
+    }
 
     if (runOffline)
     {
