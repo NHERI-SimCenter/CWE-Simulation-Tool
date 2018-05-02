@@ -206,36 +206,30 @@ RESOURCES += \
     CFDanalysis/config/cfdconfig.qrc
 
 
-win32 {
-    mkdir_help_resources_rel.commands = IF NOT EXIST $$shell_path($$OUT_PWD)\release\resources $(MKDIR) $$shell_path($$OUT_PWD)\release\resources
-    create_help_resources_rel.commands = rcc -binary $$shell_path($$PWD)\cwe_help.qrc -o $$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc
-    create_help_resources_rel.depends = mkdir_help_resources_rel
-    release.depends += create_help_resources_rel
+win32 { 
+    "$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc".commands = IF NOT EXIST $$shell_path($$OUT_PWD)\release\resources $(MKDIR) $$shell_path($$OUT_PWD)\release\resources ; rcc -binary $$shell_path($$PWD)\cwe_help.qrc -o $$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc
+    "$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc".depends = $$PWD/cwe_help.qrc $$PWD/help/* $$PWD/help/Images/*
+    release.depends += "$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc"
 
-    mkdir_help_resources_deb.commands = IF NOT EXIST $$shell_path($$OUT_PWD)\debug\resources $(MKDIR) $$shell_path($$OUT_PWD)\debug\resources
-    create_help_resources_deb.commands = rcc -binary $$shell_path($$PWD)\cwe_help.qrc -o $$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc
-    create_help_resources_deb.depends = mkdir_help_resources_deb
-    debug.depends += create_help_resources_deb
+    "$$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc".commands = IF NOT EXIST $$shell_path($$OUT_PWD)\debug\resources $(MKDIR) $$shell_path($$OUT_PWD)\debug\resources ; rcc -binary $$shell_path($$PWD)\cwe_help.qrc -o $$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc
+    "$$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc".depends = $$PWD/cwe_help.qrc $$PWD/help/* $$PWD/help/Images/*
+    debug.depends += "$$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc"
 
     export(release.depends)
-    export(create_help_resources_rel.depends)
-    export(create_help_resources_rel.commands)
-    export(create_help_resources_rel.commands)
+    export("$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc".depends)
+    export("$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc".commands)
     export(debug.depends)
-    export(create_help_resources_deb.depends)
-    export(create_help_resources_deb.commands)
-    export(create_help_resources_deb.commands)
-    QMAKE_EXTRA_TARGETS += release debug create_help_resources_rel mkdir_help_resources_rel create_help_resources_deb mkdir_help_resources_deb
+    export("$$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc".depends)
+    export("$$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc".commands)
+    QMAKE_EXTRA_TARGETS += release debug "$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc" "$$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc"
 } else {
-    mkdir_help_resources.commands = $(MKDIR) $$OUT_PWD/resources
-    create_help_resources.commands = rcc -binary $$PWD/cwe_help.qrc -o $$OUT_PWD/resources/cwe_help.rcc
-    create_help_resources.depends = mkdir_help_resources
-    first.depends += create_help_resources
+    "$$OUT_PWD/resources/cwe_help.rcc".commands = $(MKDIR) $$OUT_PWD/resources; rcc -binary $$PWD/cwe_help.qrc -o $$OUT_PWD/resources/cwe_help.rcc
+    "$$OUT_PWD/resources/cwe_help.rcc".depends = $$PWD/cwe_help.qrc $$PWD/help/* $$PWD/help/Images/*
+    first.depends += "$$OUT_PWD/resources/cwe_help.rcc"
     export(first.depends)
-    export(create_help_resources.depends)
-    export(create_help_resources.commands)
-    export(mkdir_help_resources.commands)
-    QMAKE_EXTRA_TARGETS += first create_help_resources mkdir_help_resources
+    export("$$OUT_PWD/resources/cwe_help.rcc".depends)
+    export("$$OUT_PWD/resources/cwe_help.rcc".commands)
+    QMAKE_EXTRA_TARGETS += first "$$OUT_PWD/resources/cwe_help.rcc"
 }
 
 
