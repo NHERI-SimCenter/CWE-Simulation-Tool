@@ -12,6 +12,8 @@
         <file>images/CWE_empty.png</file>
         <file>images/placeholderIcon.png</file>
         <file>images/defaultCaseImage.png</file>
+        <file>images/upload2D.png</file>
+        <file>images/upload3D.png</file>
     </qresource>
     <qresource prefix="/">
         <file>copyText.txt</file>

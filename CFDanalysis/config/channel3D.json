@@ -4,6 +4,7 @@
     "description":"This model describes \nthe air flow thru an\n empty 3D channel.",
     "sequence":["mesh","sim"],
     "debugOnly":true,
+    "disable":true,
     "stages":{
         "mesh":{
             "name":"Mesh",
