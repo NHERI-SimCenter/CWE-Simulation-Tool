@@ -22,6 +22,7 @@ mkdir release
 mkdir release/exec
 
 cp $MADE_EXEC_DIR/CFDClientProgram release/exec
+cp -R $MADE_EXEC_DIR/resources release/exec
 
 mkdir release/plugins
 mkdir release/plugins/platforms
