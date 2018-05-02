@@ -56,7 +56,7 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
 
 #ifdef Q_OS_WIN
     // whoever compiles on Windows: your path here
-    QResource::registerResource("C:\Users\pmackenz\Development\SimCenter\CFDClientProgram\resources\cwe_help.rcc");
+    QResource::registerResource("C:/Users/Peter Mackenzie/Documents/GitHub/CFDClientProgram/resources/cwe_help.rcc");
 #endif
 
 #ifdef Q_OS_LINUX
