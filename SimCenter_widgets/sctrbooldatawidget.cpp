@@ -67,11 +67,11 @@ void SCtrBoolDataWidget::setData(VARIABLE_TYPE &obj)
     /* set default */
     if (m_obj.defaultValue.toLower() == "true")
     {
-        theCheckBox->setChecked(Qt::Checked);
+        theCheckBox->setChecked(true);
     }
     else
     {
-        theCheckBox->setChecked(Qt::Unchecked);
+        theCheckBox->setChecked(false);
     }
 }
 
