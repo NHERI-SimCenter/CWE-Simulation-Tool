@@ -227,9 +227,9 @@ win32 {
     "$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc".depends = $$PWD/cwe_help.qrc $$PWD/help/* $$PWD/help/Images/*
     first.depends += "$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc"
     export(first.depends)
-    export(create_help_resources.depends)
-    export(create_help_resources.commands)
-    QMAKE_EXTRA_TARGETS += first create_help_resources
+    export("$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc".depends)
+    export("$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc".commands)
+    QMAKE_EXTRA_TARGETS += first "$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc"
 } else {
     "$$OUT_PWD/resources/cwe_help.rcc".commands = $(MKDIR) $$OUT_PWD/resources; rcc -binary $$PWD/cwe_help.qrc -o $$OUT_PWD/resources/cwe_help.rcc
     "$$OUT_PWD/resources/cwe_help.rcc".depends = $$PWD/cwe_help.qrc $$PWD/help/* $$PWD/help/Images/*
