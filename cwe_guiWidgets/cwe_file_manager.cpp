@@ -284,6 +284,7 @@ void CWE_file_manager::button_newFolder_clicked()
     }
 
     targetNode = ui->remoteTreeView->getSelectedFile();
+
     if (targetNode.getFileType() != FileType::DIR)
     {
         cwe_globals::displayPopup("Please select a folder in which to place the new folder.");
@@ -309,6 +310,11 @@ void CWE_file_manager::button_delete_clicked()
     }
 
     targetNode = ui->remoteTreeView->getSelectedFile();
+    if (targetNode.isNil())
+    {
+        cwe_globals::displayPopup("Please select a file or folder to delete it.", "File Manager");
+        return;
+    }
     if (targetNode.isRootNode())
     {
         cwe_globals::displayPopup("Error: We cannot rename or delete your main folder.");
@@ -331,6 +337,13 @@ void CWE_file_manager::button_rename_clicked()
     }
 
     targetNode = ui->remoteTreeView->getSelectedFile();
+
+    if (targetNode.isNil())
+    {
+        cwe_globals::displayPopup("Please select a file or folder to rename it.", "File Manager");
+        return;
+    }
+
     if (targetNode.isRootNode())
     {
         cwe_globals::displayPopup("Error: We cannot rename or delete your main folder.");

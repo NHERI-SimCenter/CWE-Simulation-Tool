@@ -2,7 +2,7 @@
     "name":"3D Building Geometry",
     "internalName":"upload3D",
     "description":"This model describes \nthe air flow around a building\n using an uploaded 3D geometry.",
-    "icon":"placeholderIcon.png",
+    "icon":"upload3D.png",
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{

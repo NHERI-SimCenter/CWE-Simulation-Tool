@@ -12,6 +12,8 @@
         <file>images/CWE_empty.png</file>
         <file>images/placeholderIcon.png</file>
         <file>images/defaultCaseImage.png</file>
+        <file>images/upload2D.png</file>
+        <file>images/upload3D.png</file>
     </qresource>
     <qresource prefix="/">
         <file>copyText.txt</file>
@@ -195,5 +197,6 @@
         <file>styleSheets/cweMac.qss</file>
         <file>styleSheets/cweStyle.qss</file>
         <file>styleSheets/cweWin.qss</file>
+        <file>icons/NHERI-CWE-Icon.icns</file>
     </qresource>
 </RCC>
