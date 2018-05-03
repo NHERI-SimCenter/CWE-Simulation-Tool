@@ -20,13 +20,16 @@
         <file>help/Images/AnalysisDoneScreen.png</file>
         <file>help/Images/CreateCaseScreen.png</file>
         <file>help/Images/CreateNewCase.png</file>
+        <file>help/Images/DownloadEntireCase.png</file>
         <file>help/Images/DuplicateCase.png</file>
         <file>help/Images/LoginScreen.png</file>
         <file>help/Images/ParameterTabScreen.png</file>
         <file>help/Images/RemoteFiles.png</file>
         <file>help/Images/RemoteJobs.png</file>
         <file>help/Images/ResultsScreen.png</file>
+        <file>help/Images/RunButton.png</file>
         <file>help/Images/RunningScreen.png</file>
+        <file>help/Images/SaveAllParameters.png</file>
         <file>help/Images/SelectTemplateScreen.png</file>
         <file>help/Images/ShowMeshScreen.png</file>
         <file>help/Images/SimulationCases.png</file>

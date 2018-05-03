@@ -23,22 +23,42 @@ you are ready to run your simulation on DesignSafe.
    </center>
 </li>
 <li>
-    On the left side of the screen are tabs for 'mesh' and 'sim'. For the 2D type of case,
-    first a simulation mesh must be created. Then the simulation can actually be run. 
-    There are parameters for each process.
+    On the left side of the screen are tabs for 'mesh parameters' and 'simulation parameters' [1].
+    For the 2D type of case,
+    a valid mesh must be created befor a simulation can be run (<a href="/help/tut_mesh.html">Step 2: Create a Mesh</a>).
 </li>
 <li>
-Under the simulation step, there are parameters for simulation duration, timestep, turbulence modeling and more.
+    <p>
+    Each template case comes with a reasonable set of analysis parameters.
+    However, it is highly recommended to review all parameters and adjust them as appropriate.
+    </p>
+    <p>
+    Parameters are conveniently grouped by analysis stages: 'mesh parameters' and 'simulation parameters' [1].
+    (Further stages may be added with future releases of the CWE Workflow Tool.)
+    Within each stage, parameters are further groupled by topics [2].
+    </p>
+    <p>
+    Parameters such as CAD file name, number or size of elements, etc.,  are found under 'mesh parameters' [1].
+    </p>
+    <p>
+    Parameters such as simulation duration, timestep, turbulence modeling and more are found under 'simulation parameters' [1].
+    </p>
 </li>
 <li>
-At any time, you can click 'save all parameters' to save your changes. Click 'run' to begin running the simulation. Under the 'remote jobs' tab, you will be able to view the list of agave jobs in progress and monitor the eventual completion of your simulation.
+You may click
+<img src="file::/help/Images/SaveAllParameters.png" alt="save all parameters" height="20"> [3]
+at any time to save your changes to the remote filesystem.
 
+Once done with your adjustments, click the
+<img src="file::/help/Images/RunButton.png" alt="Run Button" height="20"> [4]
+tab to begin running the simulation.
 </li>
 <li>
+You can check and monitor your remote analysis status under the
+<img src="file::/help/Images/RemoteJobs.png" alt="Remote Jobs" height="20">
+tab.
 </li>
 </ol>
-
-
 
 <p>
 Continue to <a href="/help/tut_result.html">Step 4: View Results and Download</a>.
