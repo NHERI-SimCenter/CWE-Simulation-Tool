@@ -133,6 +133,8 @@ int main(int argc, char *argv[])
     //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
     //Note: Might consider a better way of implementing this.
 
+    qDebug() << "WTF is going on with the help? ... " << QCoreApplication::applicationDirPath();
+
     // register binary resources
     if (!QResource::registerResource(QCoreApplication::applicationDirPath().append("/resources/cwe_help.rcc")))
     {

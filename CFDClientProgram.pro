@@ -227,6 +227,17 @@ win32 {
     export(create_help_resources_deb.commands)
     QMAKE_EXTRA_TARGETS += release debug create_help_resources_rel mkdir_help_resources_rel create_help_resources_deb mkdir_help_resources_deb
 } else {
+  mac {
+    mkdir_help_resources.commands = $(MKDIR) $$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources
+    create_help_resources.commands = rcc -binary $$PWD/cwe_help.qrc -o $$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc
+    create_help_resources.depends = mkdir_help_resources
+    first.depends += create_help_resources
+    export(first.depends)
+    export(create_help_resources.depends)
+    export(create_help_resources.commands)
+    export(mkdir_help_resources.commands)
+    QMAKE_EXTRA_TARGETS += first create_help_resources mkdir_help_resources
+  } else {
     mkdir_help_resources.commands = $(MKDIR) $$OUT_PWD/resources
     create_help_resources.commands = rcc -binary $$PWD/cwe_help.qrc -o $$OUT_PWD/resources/cwe_help.rcc
     create_help_resources.depends = mkdir_help_resources
@@ -236,6 +247,7 @@ win32 {
     export(create_help_resources.commands)
     export(mkdir_help_resources.commands)
     QMAKE_EXTRA_TARGETS += first create_help_resources mkdir_help_resources
+  }
 }
 
 
