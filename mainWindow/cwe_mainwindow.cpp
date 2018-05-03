@@ -47,7 +47,7 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     ui(new Ui::CWE_MainWindow)
 {
     ui->setupUi(this);// Main screen
-    this->setWindowIcon(QIcon(":/icons/NHERI-CWE-Icon.icns"));
+    //this->setWindowIcon(QIcon(":/icons/NHERI-CWE-Icon.icns"));
 
     changeParamsAndResultsEnabled(false);
 
