@@ -197,5 +197,6 @@
         <file>styleSheets/cweMac.qss</file>
         <file>styleSheets/cweStyle.qss</file>
         <file>styleSheets/cweWin.qss</file>
+        <file>icons/NHERI-CWE-Icon.icns</file>
     </qresource>
 </RCC>
