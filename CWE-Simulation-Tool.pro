@@ -47,7 +47,7 @@ win32 {
 }
 
 win32 {
-    RC_ICONS = icons/NHERI-CWE-Icon.icns
+    RC_ICONS = icons/NHERI-CWE-Icon.ico
 } else {
     mac {
     ICON = icons/NHERI-CWE-Icon.icns
