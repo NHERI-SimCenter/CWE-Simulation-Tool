@@ -21,7 +21,7 @@ rm -rf installer
 mkdir release
 mkdir release/exec
 
-cp $MADE_EXEC_DIR/CFDClientProgram release/exec
+cp $MADE_EXEC_DIR/CWE-Simulation-Tool release/exec
 cp -R $MADE_EXEC_DIR/resources release/exec
 
 mkdir release/plugins

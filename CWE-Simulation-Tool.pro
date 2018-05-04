@@ -37,7 +37,7 @@ QT += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = CFDClientProgram
+TARGET = CWE-Simulation-Tool
 TEMPLATE = app
 
 win32 {
@@ -47,7 +47,7 @@ win32 {
 }
 
 win32 {
-    RC_ICONS = icons/NHERI-CWE-Icon.icns
+    RC_ICONS = icons/NHERI-CWE-Icon.ico
 } else {
     mac {
     ICON = icons/NHERI-CWE-Icon.icns
