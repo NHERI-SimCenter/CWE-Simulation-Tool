@@ -46,6 +46,14 @@ win32 {
     LIBS += -lz
 }
 
+win32 {
+    RC_ICONS = icons/NHERI-CWE-Icon.icns
+} else {
+    mac {
+    ICON = icons/NHERI-CWE-Icon.icns
+    }
+}
+
 DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
