@@ -6,7 +6,7 @@ Component.prototype.createOperations = function()
 
     if (systemInfo.productType === "windows")
     {
-        component.addOperation("CreateShortcut", "@TargetDir@/CWE-Simulation-Tool.exe", "@StartMenuDir@/CWE-Simulation-Tool.lnk",
+        component.addOperation("CreateShortcut", "@TargetDir@/CWE-Simulation-Tool.exe", "@StartMenuDir@/CWE Simulation Tool.lnk",
             "workingDirectory=@TargetDir@", "description=Start SimCenter CWE Client Tool");
     }
 }
