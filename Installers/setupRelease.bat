@@ -21,7 +21,7 @@ RD /S /Q installer
 MKDIR release
 
 COPY %MADE_EXEC_DIR%\CFDClientProgram.exe release\
-XCOPY /S /I %MADE_EXEC_DIR%\resources release\resources 
+XCOPY /S /I %MADE_EXEC_DIR%\resources release\resources
 
 %QT_WIN_DEPLOY% release\CFDClientProgram.exe --no-translations
 
