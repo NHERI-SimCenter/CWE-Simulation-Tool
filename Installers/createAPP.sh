@@ -10,8 +10,8 @@ GENERATOR_DIR=$(dirname "$0")
 
 #----- adjust user settings -----------------------------
 
-APPNAME=CFDClientProgram.app
-APPINSTALLER=SetupSimCenterCWEClient
+APPNAME=CWE-Simulation-Tool.app
+APPINSTALLER=SetupSimCenterCWE
 
 MACDEPLOY=${HOME}/Qt/5.10.1/clang_64/bin/macdeployqt
 

@@ -49,7 +49,7 @@
 #include "CFDanalysis/CFDanalysisType.h"
 
 #include "cwe_guiWidgets/cwe_parameters.h"
-#include "../CFDClientProgram/cwe_interfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
