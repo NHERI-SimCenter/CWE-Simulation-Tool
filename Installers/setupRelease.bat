@@ -20,7 +20,7 @@ RD /S /Q installer
 
 MKDIR release
 
-COPY %MADE_EXEC_DIR%\CFDClientProgram.exe release\
+COPY %MADE_EXEC_DIR%\CWE-Simulation-Tool.exe release\
 XCOPY /S /I %MADE_EXEC_DIR%\resources release\resources
 
 %QT_WIN_DEPLOY% release\CFDClientProgram.exe --no-translations
