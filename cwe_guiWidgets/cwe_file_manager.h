@@ -67,12 +67,11 @@ private slots:
     void copyMenuItem();
     void moveMenuItem();
 
-    void compressMenuItem();
-    void decompressMenuItem();
     void refreshMenuItem();
 
     void downloadBufferItem();
 
+    void remoteOpStarted();
     void remoteOpDone(RequestState operationStatus, QString message);
 
     void button_newFolder_clicked();
@@ -80,6 +79,7 @@ private slots:
     void button_rename_clicked();
 
 private:
+    void setControlsEnabled(bool newSetting);
     Ui::CWE_file_manager *ui;
     QFileSystemModel *localFileModel;
 
