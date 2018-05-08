@@ -87,6 +87,7 @@ QString openStyleFiles()
 int main(int argc, char *argv[])
 {
     QApplication mainRunLoop(argc, argv);
+    mainRunLoop.setWindowIcon(QIcon(":/icons/NHERI-CWE-Icon.icns"));
 
     bool debugLoggingEnabled = false;
     bool runOffline = false;

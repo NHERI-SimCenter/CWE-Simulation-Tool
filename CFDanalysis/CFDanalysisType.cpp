@@ -285,4 +285,22 @@ bool CFDanalysisType::isDebugOnly()
     return false;
 }
 
+bool CFDanalysisType::isDisabled()
+{
+    QJsonObject obj = myConfiguration.object();
+    if (!obj.contains("disable"))
+    {
+        return false;
+    }
+    if (!obj["disable"].isBool())
+    {
+        return false;
+    }
+    if (obj["disable"].toBool() == true)
+    {
+        return true;
+    }
+    return false;
+}
+
 

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
   <Package>
-      <DisplayName>CFD Client Program</DisplayName>
-      <Description>Install CFD Client. (FOR TESTING PURPOSES ONLY. NOT FOR EXTERNAL DISTRIBUTION. YET.)</Description>
-      <Version>0.0.1</Version>
-      <ReleaseDate>2017-06-10</ReleaseDate>
+      <DisplayName>SimCenter CWE Client Program</DisplayName>
+      <Description>Install CWE Client. (BETA VERSION. FOR TESTING PURPOSES ONLY.)</Description>
+      <Version>0.9.0</Version>
+      <ReleaseDate>2018-05-07</ReleaseDate>
       <Licenses>
           <License name="BSD and LGPL" file="license.txt" />
       </Licenses>
       <Default>true</Default>
+      <Script>installCWE.qs</Script>
   </Package>
