@@ -55,8 +55,6 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
 {
     qRegisterMetaType<CaseState>("CaseState");
 
-    qApp->setWindowIcon(QIcon(":/icons/NHERI-CWE-Icon.icns"));
-
     // register binary resources
     if (!QResource::registerResource(QCoreApplication::applicationDirPath().append("/resources/cwe_help.rcc")))
     {
