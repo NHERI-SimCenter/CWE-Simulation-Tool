@@ -42,10 +42,13 @@
 
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
+#include "../AgaveExplorer/utilFuncs/fixforssl.h"
 
 int main(int argc, char *argv[])
 {
     QApplication mainRunLoop(argc, argv);
+
+    mainRunLoop.setWindowIcon(QIcon(":/icons/NHERI-CWE-Icon.icns"));
 
     bool debugLoggingEnabled = false;
     bool runOffline = false;
@@ -64,6 +67,14 @@ int main(int argc, char *argv[])
 
     if (runOffline) qCDebug(agaveAppLayer, "NOTE: Running CWE client offline.");
     if (debugLoggingEnabled) qCDebug(agaveAppLayer, "NOTE: Debugging text output is enabled.");
+
+    if (!runOffline)
+    {
+        if (!FixForSSL::performSSLcheck())
+        {
+            return mainRunLoop.exec();
+        }
+    }
 
     CWE_InterfaceDriver programDriver(nullptr, debugLoggingEnabled || runOffline);
     programDriver.loadStyleFiles();
