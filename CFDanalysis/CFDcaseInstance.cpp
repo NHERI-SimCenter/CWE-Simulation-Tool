@@ -1184,7 +1184,7 @@ void CFDcaseInstance::computeIdleState()
         }
         else
         {
-            qDebug("Internal State error: case not loaded, but no step given to load.");
+            qCDebug(agaveAppLayer, "Internal State error: case not loaded, but no step given to load.");
         }
 
 
