@@ -4,6 +4,7 @@
     "description":"This model describes \nthe air flow around a rectangle\n using a 2D simulation.",
     "icon":"placeholderIcon.png",
     "debugOnly":true,
+    "disable":true,
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{

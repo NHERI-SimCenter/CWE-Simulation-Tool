@@ -20,9 +20,10 @@ RD /S /Q installer
 
 MKDIR release
 
-COPY %MADE_EXEC_DIR%\CFDClientProgram.exe release\
+COPY %MADE_EXEC_DIR%\CWE-Simulation-Tool.exe release\
+XCOPY /S /I %MADE_EXEC_DIR%\resources release\resources
 
-%QT_WIN_DEPLOY% release\CFDClientProgram.exe --no-translations
+%QT_WIN_DEPLOY% release\CWE-Simulation-Tool.exe --no-translations
 
 MKDIR installer
 MKDIR installer\packages 
@@ -35,7 +36,7 @@ XCOPY /S /I release\* installer\packages\nheri.simcenter.cfdclient\data
 
 cd installer
 
-%QT_BIN_CREATE% --offline-only -c config\winconfig.xml -p packages ../setupSimCenterCFD.exe
+%QT_BIN_CREATE% --offline-only -c config\winconfig.xml -p packages ..\SetupSimCenterCWE.exe
 
 PAUSE
 

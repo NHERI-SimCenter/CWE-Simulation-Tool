@@ -67,6 +67,7 @@ CWE_file_manager::CWE_file_manager(QWidget *parent) :
     // QFileSystemModel requires root path
     localFileModel->setRootPath(QDir::homePath());
     ui->localTreeView->setRootIndex(localFileModel->setRootPath(QDir::homePath()));
+    setControlsEnabled(false);
 }
 
 CWE_file_manager::~CWE_file_manager()
@@ -84,6 +85,9 @@ void CWE_file_manager::linkMainWindow(CWE_MainWindow *theMainWin)
                          this, SLOT(customFileMenu(QPoint)));
         QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState,QString)),
                          this, SLOT(remoteOpDone(RequestState,QString)));
+        QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpStarted()),
+                         this, SLOT(remoteOpStarted()));
+        setControlsEnabled(true);
     }
 }
 
@@ -120,8 +124,12 @@ void CWE_file_manager::on_pb_upload_clicked()
         cwe_globals::displayPopup("Error: Unable to start file operation. Please try again.");
         return;
     }
-    ui->pb_upload->setDisabled(true);
-    ui->pb_download->setDisabled(true);
+
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        setControlsEnabled(false);
+        expectingOp = true;
+    }
 }
 
 void CWE_file_manager::on_pb_download_clicked()
@@ -165,12 +173,22 @@ void CWE_file_manager::on_pb_download_clicked()
         cwe_globals::displayPopup("Error: Unable to start file operation. Please check that the local file does not already exist and try again.");
         return;
     }
-    ui->pb_upload->setDisabled(true);
-    ui->pb_download->setDisabled(true);
+
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        setControlsEnabled(false);
+        expectingOp = true;
+    }
 }
 
 void CWE_file_manager::copyMenuItem()
 {
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        cwe_globals::displayPopup("Currently running file operation. Please Wait.");
+        return;
+    }
+
     SingleLineDialog newNamePopup("Please type a file name to copy to:", "newname");
     if (newNamePopup.exec() != QDialog::Accepted)
     {
@@ -178,11 +196,21 @@ void CWE_file_manager::copyMenuItem()
     }
 
     cwe_globals::get_file_handle()->sendCopyReq(targetNode, newNamePopup.getInputText());
-    expectingOp = true;
+
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        setControlsEnabled(false);
+        expectingOp = true;
+    }
 }
 
 void CWE_file_manager::moveMenuItem()
 {
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        cwe_globals::displayPopup("Currently running file operation. Please Wait.");
+        return;
+    }
     SingleLineDialog newNamePopup("Please type a file name to move to:", "newname");
 
     if (newNamePopup.exec() != QDialog::Accepted)
@@ -191,19 +219,11 @@ void CWE_file_manager::moveMenuItem()
     }
 
     cwe_globals::get_file_handle()->sendMoveReq(targetNode,newNamePopup.getInputText());
-    expectingOp = true;
-}
-
-void CWE_file_manager::compressMenuItem()
-{
-    cwe_globals::get_file_handle()->sendCompressReq(targetNode);
-    expectingOp = true;
-}
-
-void CWE_file_manager::decompressMenuItem()
-{
-    cwe_globals::get_file_handle()->sendDecompressReq(targetNode);
-    expectingOp = true;
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        setControlsEnabled(false);
+        expectingOp = true;
+    }
 }
 
 void CWE_file_manager::refreshMenuItem()
@@ -213,14 +233,27 @@ void CWE_file_manager::refreshMenuItem()
 
 void CWE_file_manager::downloadBufferItem()
 {
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        cwe_globals::displayPopup("Currently running file operation. Please Wait.");
+        return;
+    }
     cwe_globals::get_file_handle()->sendDownloadBuffReq(targetNode);
-    expectingOp = true;
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        setControlsEnabled(false);
+        expectingOp = true;
+    }
+}
+
+void CWE_file_manager::remoteOpStarted()
+{
+    setControlsEnabled(false);
 }
 
 void CWE_file_manager::remoteOpDone(RequestState operationStatus, QString message)
 {
-    ui->pb_upload->setDisabled(false);
-    ui->pb_download->setDisabled(false);
+    setControlsEnabled(true);
 
     if (!expectingOp) return;
     expectingOp = false;
@@ -284,6 +317,7 @@ void CWE_file_manager::button_newFolder_clicked()
     }
 
     targetNode = ui->remoteTreeView->getSelectedFile();
+
     if (targetNode.getFileType() != FileType::DIR)
     {
         cwe_globals::displayPopup("Please select a folder in which to place the new folder.");
@@ -297,7 +331,11 @@ void CWE_file_manager::button_newFolder_clicked()
         return;
     }
     cwe_globals::get_file_handle()->sendCreateFolderReq(targetNode, newFolderNamePopup.getInputText());
-    expectingOp = true;
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        setControlsEnabled(false);
+        expectingOp = true;
+    }
 }
 
 void CWE_file_manager::button_delete_clicked()
@@ -309,6 +347,11 @@ void CWE_file_manager::button_delete_clicked()
     }
 
     targetNode = ui->remoteTreeView->getSelectedFile();
+    if (targetNode.isNil())
+    {
+        cwe_globals::displayPopup("Please select a file or folder to delete it.", "File Manager");
+        return;
+    }
     if (targetNode.isRootNode())
     {
         cwe_globals::displayPopup("Error: We cannot rename or delete your main folder.");
@@ -318,7 +361,11 @@ void CWE_file_manager::button_delete_clicked()
     if (cwe_globals::get_file_handle()->deletePopup(targetNode))
     {
         cwe_globals::get_file_handle()->sendDeleteReq(targetNode);
-        expectingOp = true;
+        if (cwe_globals::get_file_handle()->operationIsPending())
+        {
+            setControlsEnabled(false);
+            expectingOp = true;
+        }
     }
 }
 
@@ -331,6 +378,13 @@ void CWE_file_manager::button_rename_clicked()
     }
 
     targetNode = ui->remoteTreeView->getSelectedFile();
+
+    if (targetNode.isNil())
+    {
+        cwe_globals::displayPopup("Please select a file or folder to rename it.", "File Manager");
+        return;
+    }
+
     if (targetNode.isRootNode())
     {
         cwe_globals::displayPopup("Error: We cannot rename or delete your main folder.");
@@ -345,5 +399,22 @@ void CWE_file_manager::button_rename_clicked()
     }
 
     cwe_globals::get_file_handle()->sendRenameReq(targetNode, newNamePopup.getInputText());
-    expectingOp = true;
+    if (cwe_globals::get_file_handle()->operationIsPending())
+    {
+        setControlsEnabled(false);
+        expectingOp = true;
+    }
+}
+
+void CWE_file_manager::setControlsEnabled(bool newSetting)
+{
+    ui->pb_upload->setEnabled(newSetting);
+    ui->pb_download->setEnabled(newSetting);
+
+    ui->localTreeView->setEnabled(newSetting);
+    ui->remoteTreeView->setEnabled(newSetting);
+
+    ui->remoteButton_delete->setEnabled(newSetting);
+    ui->remoteButton_newFolder->setEnabled(newSetting);
+    ui->remoteButton_rename->setEnabled(newSetting);
 }
