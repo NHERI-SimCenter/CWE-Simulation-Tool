@@ -41,6 +41,7 @@
 #include <QWindow>
 #include <QDir>
 #include <QVariant>
+#include <QResource>
 
 class CWE_MainWindow;
 class CFDanalysisType;
@@ -61,6 +62,8 @@ public:
     virtual void closeAuthScreen();
 
     virtual void startOffline();
+
+    virtual void loadStyleFiles();
 
     virtual QString getBanner();
     virtual QString getVersion();

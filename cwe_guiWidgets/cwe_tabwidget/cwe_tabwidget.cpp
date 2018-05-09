@@ -262,7 +262,7 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
         stageTabList->value(stageName)->getGroupsWidget()->collectParamData(currentParameters);
     }
 
-    qDebug() << currentParameters;
+    qCDebug(agaveAppLayer) << currentParameters;
 
     return currentParameters;
 }

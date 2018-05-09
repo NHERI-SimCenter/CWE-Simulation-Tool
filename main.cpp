@@ -37,61 +37,21 @@
 #include <QFile>
 #include <QSslSocket>
 #include <QtGlobal>
-#include <QResource>
 
 #include "../AgaveClientInterface/remotedatainterface.h"
 
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
-
-void emptyMessageHandler(QtMsgType, const QMessageLogContext &, const QString &){}
-
-QString openStyleFiles()
-{
-    QString ret;
-    QFile mainStyleFile(":/styleSheets/cweStyle.qss");
-
-#ifdef Q_OS_WIN
-    QFile appendedStyle(":/styleSheets/cweWin.qss");
-#endif
-
-#ifdef Q_OS_MACOS
-    QFile appendedStyle(":/styleSheets/cweMac.qss");
-#endif
-
-#ifdef Q_OS_LINUX
-    QFile appendedStyle(":/styleSheets/cweLinux.qss");
-#endif
-
-    if (!mainStyleFile.open(QFile::ReadOnly))
-    {
-        cwe_globals::displayFatalPopup("Unable to open main style file. Install may be corrupted.");
-        return ret;
-    }
-
-    if (!appendedStyle.open(QFile::ReadOnly))
-    {
-        cwe_globals::displayFatalPopup("Unable to open platform style file. Install may be corrupted.");
-        return ret;
-    }
-
-    ret = ret.append(mainStyleFile.readAll());
-    ret = ret.append(appendedStyle.readAll());
-
-    mainStyleFile.close();
-    appendedStyle.close();
-
-    return ret;
-}
+#include "../AgaveExplorer/utilFuncs/fixforssl.h"
 
 int main(int argc, char *argv[])
 {
     QApplication mainRunLoop(argc, argv);
+
     mainRunLoop.setWindowIcon(QIcon(":/icons/NHERI-CWE-Icon.icns"));
 
     bool debugLoggingEnabled = false;
     bool runOffline = false;
-    bool logRawOutput = false;
     for (int i = 0; i < argc; i++)
     {
         if (strcmp(argv[i],"enableDebugLogging") == 0)
@@ -101,44 +61,23 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i],"offlineMode") == 0)
         {
             runOffline = true;
+            debugLoggingEnabled = true;
         }
-        if (strcmp(argv[i],"logRawOutput") == 0)
+    }
+
+    if (runOffline) qCDebug(agaveAppLayer, "NOTE: Running CWE client offline.");
+    if (debugLoggingEnabled) qCDebug(agaveAppLayer, "NOTE: Debugging text output is enabled.");
+
+    if (!runOffline)
+    {
+        if (!FixForSSL::performSSLcheck())
         {
-            logRawOutput = true;
+            return mainRunLoop.exec();
         }
     }
 
-    if (runOffline)
-    {
-        qDebug("NOTE: Running CWE client offline.");
-    }
-
-    if (debugLoggingEnabled)
-    {
-        qDebug("NOTE: Debugging text output is enabled.");
-    }
-    else
-    {
-        qInstallMessageHandler(emptyMessageHandler);
-    }
-
-    CWE_InterfaceDriver programDriver(nullptr, debugLoggingEnabled);
-    if (QSslSocket::supportsSsl() == false)
-    {
-        cwe_globals::displayFatalPopup("SSL support was not detected on this computer.\nPlease insure that some version of SSL is installed,\n such as by installing OpenSSL.");
-    }
-
-    mainRunLoop.setStyleSheet(openStyleFiles());
-
-    mainRunLoop.setQuitOnLastWindowClosed(false);
-    //Note: Window closeing must link to the shutdown sequence, otherwise the app will not close
-    //Note: Might consider a better way of implementing this.
-
-    // register binary resources
-    if (!QResource::registerResource(QCoreApplication::applicationDirPath().append("/resources/cwe_help.rcc")))
-    {
-        cwe_globals::displayFatalPopup("Error: Unable to locate help files, your install may be corrupted. Please reinstall the client program", "Install Error");
-    }
+    CWE_InterfaceDriver programDriver(nullptr, debugLoggingEnabled || runOffline);
+    programDriver.loadStyleFiles();
 
     if (runOffline)
     {
@@ -147,12 +86,6 @@ int main(int argc, char *argv[])
     else
     {
         programDriver.startup();
-    }
-
-    if (debugLoggingEnabled && logRawOutput)
-    {
-        qDebug("NOTE: Debugging text including raw remote output.");
-        programDriver.getDataConnection()->setRawDebugOutput(true);
     }
 
     return mainRunLoop.exec();
