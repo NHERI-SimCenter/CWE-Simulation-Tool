@@ -88,7 +88,7 @@ QMap<QString, QByteArray *> ResultProcureBase::getFileBuffers()
 {
     if (!initLoadDone)
     {
-        qDebug("ERROR: File buffer compute request before files retrieved.");
+        qCDebug(agaveAppLayer, "ERROR: File buffer compute request before files retrieved.");
         QMap<QString, QByteArray *> empty;
         return empty;
     }
