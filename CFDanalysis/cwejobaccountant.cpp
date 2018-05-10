@@ -117,8 +117,7 @@ void CWEjobAccountant::reloadJobLists()
             continue;
         }
 
-        QString myState = aJob->getState();
-        if (myState.isEmpty() || (myState == "FINISHED") || (myState == "FAILED"))
+        if (aJob->inTerminalState() || (aJob->getState().isEmpty()))
         {
             terminatedJobs.insert(aJob->getID(),aJob);
             continue;
