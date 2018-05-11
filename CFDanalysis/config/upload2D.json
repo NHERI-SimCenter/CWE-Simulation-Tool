@@ -76,6 +76,11 @@
                     "name":"Sim Output Log",
                     "type":"text",
                     "file":"logs/cwe-parallel.out"
+                },
+                {
+                    "name":"OpenFOAM Log",
+                    "type":"text",
+                    "file":"logs/sim.log"
                 }
             ]
         }
