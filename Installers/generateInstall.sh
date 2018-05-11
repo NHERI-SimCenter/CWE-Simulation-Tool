@@ -57,4 +57,4 @@ cp -R release/* installer/packages/nheri.simcenter.cfdclient/data/
 
 cd installer
 
-$QT_BIN_CREATE --offline-only -c config/linconfig.xml -p packages ../InstallSimCenterCFD
+$QT_BIN_CREATE --offline-only -c config/linconfig.xml -p packages ../SetupSimCenterCWE
