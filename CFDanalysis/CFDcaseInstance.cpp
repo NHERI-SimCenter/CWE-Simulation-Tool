@@ -1024,7 +1024,7 @@ void CFDcaseInstance::state_Running_jobList()
     const RemoteJobData * aNode = cwe_globals::get_CWE_Job_Accountant()->getJobByID(runningID);
     if (aNode == NULL) return;
 
-    if ((aNode->getState() == "FINISHED") || (aNode->getState() == "FAILED"))
+    if (aNode->inTerminalState())
     {
         caseFolder.enactFolderRefresh(true);
         computeIdleState();
@@ -1184,9 +1184,8 @@ void CFDcaseInstance::computeIdleState()
         }
         else
         {
-            qDebug("Internal State error: case not loaded, but no step given to load.");
+            qCDebug(agaveAppLayer, "Internal State error: case not loaded, but no step given to load.");
         }
-
 
         emitNewState(InternalCaseState::RE_DATA_LOAD);
         return;
@@ -1195,10 +1194,11 @@ void CFDcaseInstance::computeIdleState()
     const RemoteJobData * myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFullPath());
     if (myJob != NULL)
     {
-        if ((myJob->getState() != "FINISHED") && (myJob->getState() != "FAILED"))
+        if (!myJob->inTerminalState())
         {
             runningID = myJob->getID();
             runningStage = myJob->getParams().value("stage");
+            computeParamList();
             emitNewState(InternalCaseState::RUNNING_JOB);
             return;
         }
@@ -1217,6 +1217,7 @@ void CFDcaseInstance::computeIdleState()
     }
 
     computeParamList();
+
     runningStage.clear();
     runningID.clear();
 
@@ -1246,4 +1247,3 @@ void CFDcaseInstance::computeIdleState()
 
     emitNewState(InternalCaseState::READY);
 }
-

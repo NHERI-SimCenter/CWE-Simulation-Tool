@@ -55,6 +55,13 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
 {
     qRegisterMetaType<CaseState>("CaseState");
 
+    // register binary resources
+    if (!QResource::registerResource(QCoreApplication::applicationDirPath().append("/resources/cwe_help.rcc")))
+    {
+        cwe_globals::displayFatalPopup("Error: Unable to locate help files, your install may be corrupted. Please reinstall the client program", "Install Error");
+        return;
+    }
+
     AgaveThread * tmpHandle = new AgaveThread(this);
     tmpHandle->start();
     while (!tmpHandle->interfaceReady())
@@ -158,6 +165,44 @@ void CWE_InterfaceDriver::startOffline()
     mainWindow->show();
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
+}
+
+void CWE_InterfaceDriver::loadStyleFiles()
+{
+    QString fullStyleSheet;
+    QFile mainStyleFile(":/styleSheets/cweStyle.qss");
+
+#ifdef Q_OS_WIN
+    QFile appendedStyle(":/styleSheets/cweWin.qss");
+#endif
+
+#ifdef Q_OS_MACOS
+    QFile appendedStyle(":/styleSheets/cweMac.qss");
+#endif
+
+#ifdef Q_OS_LINUX
+    QFile appendedStyle(":/styleSheets/cweLinux.qss");
+#endif
+
+    if (!mainStyleFile.open(QFile::ReadOnly))
+    {
+        cwe_globals::displayFatalPopup("Unable to open main style file. Install may be corrupted.");
+        return;
+    }
+
+    if (!appendedStyle.open(QFile::ReadOnly))
+    {
+        cwe_globals::displayFatalPopup("Unable to open platform style file. Install may be corrupted.");
+        return;
+    }
+
+    fullStyleSheet = fullStyleSheet.append(mainStyleFile.readAll());
+    fullStyleSheet = fullStyleSheet.append(appendedStyle.readAll());
+
+    mainStyleFile.close();
+    appendedStyle.close();
+
+    qApp->setStyleSheet(fullStyleSheet);
 }
 
 QString CWE_InterfaceDriver::getBanner()
