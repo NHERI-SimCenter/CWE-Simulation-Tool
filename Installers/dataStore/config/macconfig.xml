@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
   <Installer>
       <Name>CWE Client Program</Name>
-      <Version>0.9.1</Version>
+      <Version>0.9.2</Version>
       <Title>CWE Client Program Mac Installer</Title>
       <Publisher>NHERI SimCenter</Publisher>
       <TargetDir>@HomeDir@/Applications/SimCenterCWE</TargetDir>

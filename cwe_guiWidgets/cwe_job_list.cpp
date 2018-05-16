@@ -37,6 +37,8 @@
 #include "ui_cwe_job_list.h"
 
 #include "cwe_interfacedriver.h"
+#include "cwe_globals.h"
+#include "../AgaveExplorer/remoteModelViews/remotefiletree.h"
 
 CWE_job_list::CWE_job_list(QWidget *parent) :
     CWE_Super(parent),
@@ -48,4 +50,41 @@ CWE_job_list::CWE_job_list(QWidget *parent) :
 CWE_job_list::~CWE_job_list()
 {
     delete ui;
+}
+
+void CWE_job_list::customJobMenu(const QPoint &pos)
+{
+    //TODO
+    /*
+    QModelIndex targetIndex = ui->tableView_jobs->indexAt(pos);
+    ui->tableView_jobs->
+
+    QMenu jobMenu;
+
+    targetNode = ui->remoteTreeView->getSelectedFile();
+
+    //If we did not click anything, we should return
+    if (targetNode.isNil()) return;
+    if (targetNode.isRootNode()) return;
+
+    if (targetNode.getFileType() == FileType::INVALID) return;
+
+    fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
+    fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
+    //We don't let the user delete the username folder
+
+    if (targetNode.getFileType() == FileType::FILE)
+    {
+        fileMenu.addAction("Download Buffer (DEBUG)",this, SLOT(downloadBufferItem()));
+    }
+
+    if ((targetNode.getFileType() == FileType::DIR) || (targetNode.getFileType() == FileType::FILE))
+    {
+        fileMenu.addSeparator();
+        fileMenu.addAction("Refresh Data",this, SLOT(refreshMenuItem()));
+        fileMenu.addSeparator();
+    }
+
+    fileMenu.exec(QCursor::pos());
+    */
 }

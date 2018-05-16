@@ -142,9 +142,9 @@ void CWE_file_manager::on_pb_download_clicked()
 
     FileNodeRef targetFile = ui->remoteTreeView->getSelectedFile();
 
-    if ((targetFile.isNil()) || (targetFile.getFileType() != FileType::FILE))
+    if (targetFile.isNil())
     {
-        cwe_globals::displayPopup("Please select a file to download to.");
+        cwe_globals::displayPopup("Please select a file or folder to download");
         return;
     }
 
@@ -158,15 +158,22 @@ void CWE_file_manager::on_pb_download_clicked()
     }
 
     QString localPath = fileData.absoluteFilePath();
-#ifdef Q_OS_WIN
-    localPath = localPath.append('\\');
-#else
-    localPath = localPath.append('/');
-#endif
 
-    localPath = localPath.append(targetFile.getFileName());
+    if (targetFile.getFileType() == FileType::FILE)
+    {
+        #ifdef Q_OS_WIN
+            localPath = localPath.append('\\');
+        #else
+            localPath = localPath.append('/');
+        #endif
+        localPath = localPath.append(targetFile.getFileName());
 
-    cwe_globals::get_file_handle()->sendDownloadReq(targetFile, localPath);
+        cwe_globals::get_file_handle()->sendDownloadReq(targetFile, localPath);
+    }
+    else if (targetFile.getFileType() == FileType::DIR)
+    {
+        cwe_globals::get_file_handle()->enactRecursiveDownload(targetFile, localPath);
+    }
 
     if (!cwe_globals::get_file_handle()->operationIsPending())
     {
