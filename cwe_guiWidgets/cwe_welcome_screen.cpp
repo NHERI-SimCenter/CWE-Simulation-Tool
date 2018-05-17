@@ -35,12 +35,19 @@
 
 #include "cwe_welcome_screen.h"
 #include "ui_cwe_welcome_screen.h"
+#include <QFile>
 
 CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
     CWE_Super(parent),
     ui(new Ui::CWE_welcome_screen)
 {
     ui->setupUi(this);
+    QFile frontMatter(":/help/FrontMatter.html");
+
+    if (frontMatter.open(QFile::ReadOnly))
+    {
+        ui->welcome_text->setText(frontMatter.readAll());
+    }
 }
 
 CWE_welcome_screen::~CWE_welcome_screen()
