@@ -55,6 +55,13 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
 {
     qRegisterMetaType<CaseState>("CaseState");
 
+    // register binary resources
+    if (!QResource::registerResource(QCoreApplication::applicationDirPath().append("/resources/cwe_help.rcc")))
+    {
+        cwe_globals::displayFatalPopup("Error: Unable to locate help files, your install may be corrupted. Please reinstall the client program", "Install Error");
+        return;
+    }
+
     AgaveThread * tmpHandle = new AgaveThread(this);
     tmpHandle->start();
     while (!tmpHandle->interfaceReady())
@@ -67,8 +74,6 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
     tmpHandle->registerAgaveAppInfo("cwe-serial", "cwe-serial-0.1.0", {"stage"}, {"directory", "file_input"}, "directory");
     tmpHandle->registerAgaveAppInfo("cwe-parallel", "cwe-parallel-0.1.0", {"stage"}, {"directory", "file_input"}, "directory");
 
-    QObject::connect(tmpHandle, SIGNAL(sendFatalErrorMessage(QString)), this, SLOT(fatalInterfaceError(QString)));
-
     theConnectThread = tmpHandle;
 
     /* populate with available cases */
@@ -77,25 +82,22 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
     filters << "*.json" << "*.JSON";
     QStringList caseTypeFiles = confDir.entryList(filters);
 
-    foreach (QString caseConfigFile, caseTypeFiles) {
+    foreach (QString caseConfigFile, caseTypeFiles)
+    {
         QString confPath = ":/config/";
         confPath = confPath.append(caseConfigFile);
         CFDanalysisType * newTemplate = new CFDanalysisType(confPath);
-        if (debug == false)
+        if ((debug == false) && (newTemplate->isDebugOnly() == true))
         {
-            if (newTemplate->isDebugOnly() == false)
-            {
-                templateList.append(newTemplate);
-            }
-            else
-            {
-                delete newTemplate;
-            }
+            delete newTemplate;
+            continue;
         }
-        else
+        if (newTemplate->isDisabled())
         {
-            templateList.append(newTemplate);
+            delete newTemplate;
+            continue;
         }
+        templateList.append(newTemplate);
     }
 }
 
@@ -120,7 +122,7 @@ void CWE_InterfaceDriver::closeAuthScreen()
 {
     if (mainWindow == NULL)
     {
-        fatalInterfaceError("Fatal Error: Main window not found");
+        cwe_globals::displayFatalPopup("Fatal Error: Main window not found");
     }
 
     myJobHandle->demandJobDataRefresh();
@@ -136,7 +138,7 @@ void CWE_InterfaceDriver::closeAuthScreen()
 
     if (getAppList == NULL)
     {
-        fatalInterfaceError("Unable to get app list from DesignSafe");
+        cwe_globals::displayFatalPopup("Unable to get app list from DesignSafe");
         return;
     }
     QObject::connect(getAppList, SIGNAL(haveAgaveAppList(RequestState,QVariantList)),
@@ -165,6 +167,44 @@ void CWE_InterfaceDriver::startOffline()
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 }
 
+void CWE_InterfaceDriver::loadStyleFiles()
+{
+    QString fullStyleSheet;
+    QFile mainStyleFile(":/styleSheets/cweStyle.qss");
+
+#ifdef Q_OS_WIN
+    QFile appendedStyle(":/styleSheets/cweWin.qss");
+#endif
+
+#ifdef Q_OS_MACOS
+    QFile appendedStyle(":/styleSheets/cweMac.qss");
+#endif
+
+#ifdef Q_OS_LINUX
+    QFile appendedStyle(":/styleSheets/cweLinux.qss");
+#endif
+
+    if (!mainStyleFile.open(QFile::ReadOnly))
+    {
+        cwe_globals::displayFatalPopup("Unable to open main style file. Install may be corrupted.");
+        return;
+    }
+
+    if (!appendedStyle.open(QFile::ReadOnly))
+    {
+        cwe_globals::displayFatalPopup("Unable to open platform style file. Install may be corrupted.");
+        return;
+    }
+
+    fullStyleSheet = fullStyleSheet.append(mainStyleFile.readAll());
+    fullStyleSheet = fullStyleSheet.append(appendedStyle.readAll());
+
+    mainStyleFile.close();
+    appendedStyle.close();
+
+    qApp->setStyleSheet(fullStyleSheet);
+}
+
 QString CWE_InterfaceDriver::getBanner()
 {
     return "SimCenter CWE CFD Client Program";
@@ -172,7 +212,7 @@ QString CWE_InterfaceDriver::getBanner()
 
 QString CWE_InterfaceDriver::getVersion()
 {
-    return "Version: 0.8.0";
+    return "Version: 0.9.0";
 }
 
 QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()
@@ -189,7 +229,7 @@ void CWE_InterfaceDriver::checkAppList(RequestState replyState, QVariantList app
 {
     if (replyState != RequestState::GOOD)
     {
-        fatalInterfaceError("Unable to connect to Agave to get app info.");
+        cwe_globals::displayFatalPopup("Unable to connect to Agave to get app info.");
         return;
     }
 
@@ -211,7 +251,7 @@ void CWE_InterfaceDriver::checkAppList(RequestState replyState, QVariantList app
 
     if (!neededApps.isEmpty())
     {
-        fatalInterfaceError("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
+        cwe_globals::displayFatalPopup("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
     }
 }
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
   <Installer>
-      <Name>CFD Client Program</Name>
-      <Version>0.0.1</Version>
-      <Title>Client Program installer</Title>
+      <Name>CWE Client Program</Name>
+      <Version>0.9.0</Version>
+      <Title>CWE Client Program Mac Installer</Title>
       <Publisher>NHERI SimCenter</Publisher>
-      <StartMenuDir>SimCenter CFD</StartMenuDir>
-      <TargetDir>@HomeDir@/Applications/SimCenterCFD</TargetDir>
-      <MaintenanceToolName>RemoveSimCenterCFD</MaintenanceToolName>
+      <TargetDir>@HomeDir@/Applications/SimCenterCWE</TargetDir>
+      <MaintenanceToolName>RemoveSimCenterCWE</MaintenanceToolName>
   </Installer>
+

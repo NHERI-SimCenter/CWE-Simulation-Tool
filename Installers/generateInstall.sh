@@ -21,7 +21,8 @@ rm -rf installer
 mkdir release
 mkdir release/exec
 
-cp $MADE_EXEC_DIR/CFDClientProgram release/exec
+cp $MADE_EXEC_DIR/CWE-Simulation-Tool release/exec
+cp -R $MADE_EXEC_DIR/resources release/exec
 
 mkdir release/plugins
 mkdir release/plugins/platforms
@@ -56,4 +57,4 @@ cp -R release/* installer/packages/nheri.simcenter.cfdclient/data/
 
 cd installer
 
-$QT_BIN_CREATE --offline-only -c config/config.xml -p packages ../InstallSimCenterCFD
+$QT_BIN_CREATE --offline-only -c config/linconfig.xml -p packages ../InstallSimCenterCFD

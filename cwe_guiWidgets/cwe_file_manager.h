@@ -43,6 +43,7 @@
 #include <QMenu>
 
 class FileTreeNode;
+enum class RequestState;
 
 namespace Ui {
 class CWE_file_manager;
@@ -66,23 +67,24 @@ private slots:
     void copyMenuItem();
     void moveMenuItem();
 
-    void compressMenuItem();
-    void decompressMenuItem();
     void refreshMenuItem();
 
     void downloadBufferItem();
 
-    void remoteOpDone();
+    void remoteOpStarted();
+    void remoteOpDone(RequestState operationStatus, QString message);
 
     void button_newFolder_clicked();
     void button_delete_clicked();
     void button_rename_clicked();
 
 private:
+    void setControlsEnabled(bool newSetting);
     Ui::CWE_file_manager *ui;
     QFileSystemModel *localFileModel;
 
     FileNodeRef targetNode;
+    bool expectingOp = false;
 };
 
 #endif // CWE_FILE_MANAGER2_H

@@ -12,14 +12,11 @@
         <file>images/CWE_empty.png</file>
         <file>images/placeholderIcon.png</file>
         <file>images/defaultCaseImage.png</file>
+        <file>images/upload2D.png</file>
+        <file>images/upload3D.png</file>
     </qresource>
     <qresource prefix="/">
         <file>copyText.txt</file>
-        <file>images/Overview/CWEFlow1.png</file>
-        <file>images/Overview/CWEFlow2.png</file>
-        <file>images/Overview/CWEFlow3.png</file>
-        <file>images/Overview/CWEFlow4.png</file>
-        <file>images/Overview/CWEFlow5.png</file>
         <file>icons/a.gif</file>
         <file>icons/a.png</file>
         <file>icons/alert.black.gif</file>
@@ -196,20 +193,10 @@
         <file>icons/world2.gif</file>
         <file>icons/world2.png</file>
         <file>icons/xml.png</file>
-        <file>help/about_developers.html</file>
-        <file>help/about_simcenter.html</file>
-        <file>help/license.html</file>
         <file>styleSheets/cweLinux.qss</file>
         <file>styleSheets/cweMac.qss</file>
         <file>styleSheets/cweStyle.qss</file>
         <file>styleSheets/cweWin.qss</file>
-        <file>help/index.html</file>
-        <file>help/tut_case.html</file>
-        <file>help/tut_geo.html</file>
-        <file>help/tut_mesh.html</file>
-        <file>help/tut_result.html</file>
-        <file>help/tut_sim.html</file>
-        <file>help/help_default.html</file>
-        <file>help/cfd_intro.html</file>
+        <file>icons/NHERI-CWE-Icon.icns</file>
     </qresource>
 </RCC>

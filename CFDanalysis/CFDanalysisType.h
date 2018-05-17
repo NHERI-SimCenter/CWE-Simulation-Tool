@@ -92,6 +92,7 @@ public:
     QIcon * getIcon();
 
     bool isDebugOnly();
+    bool isDisabled();
 
 private:
     QString myName;

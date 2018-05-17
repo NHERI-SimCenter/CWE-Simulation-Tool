@@ -46,7 +46,8 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CWE_MainWindow)
 {
-    ui->setupUi(this);
+    ui->setupUi(this);// Main screen
+    //this->setWindowIcon(QIcon(":/icons/NHERI-CWE-Icon.icns"));
 
     changeParamsAndResultsEnabled(false);
 
@@ -58,8 +59,10 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
 
     // adjust application size to display
     QRect rec = QApplication::desktop()->screenGeometry();
-    int height = this->height()<0.75*rec.height()?this->height():0.75*rec.height();
-    int width  = this->width()<0.65*rec.width()?this->width():0.65*rec.width();
+    int height = this->height()>0.75*rec.height()?this->height():0.75*rec.height();
+    if ( height > 0.95*rec.height() ) { height = 0.95*rec.height(); }
+    int width  = this->width()>0.65*rec.width()?this->width():0.65*rec.width();
+    if ( width > 0.95*rec.width() ) { width = 0.95*rec.width(); }
     this->resize(width, height);
 }
 

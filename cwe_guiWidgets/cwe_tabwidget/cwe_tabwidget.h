@@ -39,7 +39,6 @@
 
 #include <QMap>
 #include <QJsonArray>
-#include <QDebug>
 
 #include "SimCenter_widgets/sctrstates.h"
 #include "CFDanalysis/CFDanalysisType.h"

@@ -49,7 +49,7 @@
 #include "CFDanalysis/CFDanalysisType.h"
 
 #include "cwe_guiWidgets/cwe_parameters.h"
-#include "../CFDClientProgram/cwe_interfacedriver.h"
+#include "cwe_interfacedriver.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
@@ -262,7 +262,7 @@ QMap<QString, QString> CWE_TabWidget::collectParamData()
         stageTabList->value(stageName)->getGroupsWidget()->collectParamData(currentParameters);
     }
 
-    qDebug() << currentParameters;
+    qCDebug(agaveAppLayer) << currentParameters;
 
     return currentParameters;
 }

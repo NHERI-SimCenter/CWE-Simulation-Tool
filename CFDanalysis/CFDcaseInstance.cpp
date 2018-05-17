@@ -425,11 +425,11 @@ void CFDcaseInstance::jobListUpdated()
     }
 }
 
-void CFDcaseInstance::fileTaskDone(RequestState invokeStatus, QString)
+void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
 {
     if (defunct) return;
 
-    if (invokeStatus == RequestState::NO_CONNECT)
+    if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(InternalCaseState::ERROR);
         cwe_globals::displayPopup("Lost connection to DesignSafe. Please check network and try again.", "Network Connection Error");
@@ -490,17 +490,10 @@ void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument jobDat
 {
     if (defunct) return;
 
-    if (invokeStatus == RequestState::NO_CONNECT)
+    if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(InternalCaseState::ERROR);
         cwe_globals::displayPopup("Lost connection to DesignSafe. Please check network and try again.", "Network Connection Error");
-        return;
-    }
-
-    if (invokeStatus == RequestState::FAIL)
-    {
-        computeIdleState();
-        cwe_globals::displayPopup("Unable to start requested job. Reloading Case", "Network Connection Error");
         return;
     }
 
@@ -522,17 +515,10 @@ void CFDcaseInstance::jobKilled(RequestState invokeStatus)
 {
     if (defunct) return;
 
-    if (invokeStatus == RequestState::NO_CONNECT)
+    if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(InternalCaseState::ERROR);
         cwe_globals::displayPopup("Lost connection to DesignSafe. Please check network and try again.", "Network Connection Error");
-        return;
-    }
-
-    if (invokeStatus == RequestState::FAIL)
-    {
-        computeIdleState();
-        cwe_globals::displayPopup("Unable to stop requested job. Reloading Case", "Network Connection Error");
         return;
     }
 
@@ -926,7 +912,7 @@ void CFDcaseInstance::connectCaseSignals()
                      this, SLOT(jobListUpdated()),
                      Qt::QueuedConnection);
     QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState, QString)),
-                     this, SLOT(fileTaskDone(RequestState, QString)),
+                     this, SLOT(fileTaskDone(RequestState)),
                      Qt::QueuedConnection);
     QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
                      this, SLOT(underlyingFilesUpdated(FileNodeRef)),
@@ -1038,7 +1024,7 @@ void CFDcaseInstance::state_Running_jobList()
     const RemoteJobData * aNode = cwe_globals::get_CWE_Job_Accountant()->getJobByID(runningID);
     if (aNode == NULL) return;
 
-    if ((aNode->getState() == "FINISHED") || (aNode->getState() == "FAILED"))
+    if (aNode->inTerminalState())
     {
         caseFolder.enactFolderRefresh(true);
         computeIdleState();
@@ -1198,9 +1184,8 @@ void CFDcaseInstance::computeIdleState()
         }
         else
         {
-            qDebug("Internal State error: case not loaded, but no step given to load.");
+            qCDebug(agaveAppLayer, "Internal State error: case not loaded, but no step given to load.");
         }
-
 
         emitNewState(InternalCaseState::RE_DATA_LOAD);
         return;
@@ -1209,10 +1194,11 @@ void CFDcaseInstance::computeIdleState()
     const RemoteJobData * myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFullPath());
     if (myJob != NULL)
     {
-        if ((myJob->getState() != "FINISHED") && (myJob->getState() != "FAILED"))
+        if (!myJob->inTerminalState())
         {
             runningID = myJob->getID();
             runningStage = myJob->getParams().value("stage");
+            computeParamList();
             emitNewState(InternalCaseState::RUNNING_JOB);
             return;
         }
@@ -1231,6 +1217,7 @@ void CFDcaseInstance::computeIdleState()
     }
 
     computeParamList();
+
     runningStage.clear();
     runningID.clear();
 
@@ -1260,4 +1247,3 @@ void CFDcaseInstance::computeIdleState()
 
     emitNewState(InternalCaseState::READY);
 }
-
