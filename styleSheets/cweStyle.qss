@@ -247,16 +247,16 @@ QTextBrowser#helpBrowser {
     background-color: white;
     border-style: outset;
     border-width: 1px;
-    border-radius: 25px;
+    border-radius: 15px;
     border-color: #607D8B;
    font: 12pt;
 }
 
 QTextBrowser#welcome_text {
-    background-color: white;
+    background-color: #ECECEC;
     border-style: outset;
     border-width: 1px;
-    border-radius: 25px;
+    border-radius: 15px;
     border-color: #607D8B;
    font: 12pt;
 }
