@@ -105,7 +105,17 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
     }
 
     CFDcaseInstance * tempCase = myMainWindow->getCaseFromFolder(clonedFolder);
-    tempCase->deleteLater();
+    if (tempCase == NULL)
+    {
+        cwe_globals::displayPopup("Folder to duplicated is invalid.", "ERROR");
+        return;
+    }
+
+    if (tempCase != myMainWindow->getCurrentCase())
+    {
+        tempCase->deleteLater();
+    }
+
     CaseState dupState = tempCase->getCaseState();
 
     if (dupState == CaseState::INVALID)
