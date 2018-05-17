@@ -76,6 +76,11 @@
                     "name":"Sim Output Log",
                     "type":"text",
                     "file":"logs/cwe-parallel.out"
+                },
+                {
+                    "name":"OpenFOAM Log",
+                    "type":"text",
+                    "file":"logs/sim.log"
                 }
             ]
         }
@@ -96,8 +101,8 @@
             "vars":[
                 "inPad",
                 "outPad",
-                "topPad",
-                "bottomPad",
+                "highYPad",
+                "lowYPad",
                 "meshDensity",
                 "meshDensityFar"
             ]
@@ -228,7 +233,7 @@
             "precision":"1",
             "sign":"+"
         },
-        "topPad":{
+        "highYPad":{
             "displayname":"Domain Length (Top)",
             "type":"std",
             "default":"8",
@@ -236,7 +241,7 @@
             "precision":"1",
             "sign":"+"
         },
-        "bottomPad":{
+        "lowYPad":{
             "displayname":"Domain Length (Bottom)",
             "type":"std",
             "default":"8",

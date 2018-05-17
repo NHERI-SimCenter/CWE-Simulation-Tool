@@ -429,6 +429,12 @@ void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
 {
     if (defunct) return;
 
+    if (invokeStatus == RequestState::REMOTE_SERVER_ERROR)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("DesignSafe file service has experienced internal error. Connection Lost. If problem persists, please contact developers.", "Network Connection Error");
+        return;
+    }
     if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(InternalCaseState::ERROR);
@@ -490,6 +496,12 @@ void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument jobDat
 {
     if (defunct) return;
 
+    if (invokeStatus == RequestState::REMOTE_SERVER_ERROR)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("DesignSafe job service has experienced internal error. Connection Lost. If problem persists, please contact developers.", "Network Connection Error");
+        return;
+    }
     if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(InternalCaseState::ERROR);
@@ -515,6 +527,12 @@ void CFDcaseInstance::jobKilled(RequestState invokeStatus)
 {
     if (defunct) return;
 
+    if (invokeStatus == RequestState::REMOTE_SERVER_ERROR)
+    {
+        emitNewState(InternalCaseState::ERROR);
+        cwe_globals::displayPopup("DesignSafe job service has experienced internal error. Connection Lost. If problem persists, please contact developers.", "Network Connection Error");
+        return;
+    }
     if (invokeStatus != RequestState::GOOD)
     {
         emitNewState(InternalCaseState::ERROR);
@@ -1028,6 +1046,10 @@ void CFDcaseInstance::state_Running_jobList()
     {
         caseFolder.enactFolderRefresh(true);
         computeIdleState();
+        if (aNode->getState() == "FINISHED")
+        {
+            cwe_globals::displayPopup("Job finished for current case", "Job Complete");
+        }
     }
 }
 
