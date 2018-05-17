@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Create New Case</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -321,9 +321,9 @@
  <connections>
   <connection>
    <sender>button_cancel</sender>
-   <signal>clicked(bool)</signal>
+   <signal>clicked()</signal>
    <receiver>Create_Case_Popup</receiver>
-   <slot>close()</slot>
+   <slot>deleteLater()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>379</x>
@@ -348,6 +348,22 @@
     <hint type="destinationlabel">
      <x>399</x>
      <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>button_cancel</sender>
+   <signal>clicked()</signal>
+   <receiver>Create_Case_Popup</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>584</x>
+     <y>477</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>424</x>
+     <y>249</y>
     </hint>
    </hints>
   </connection>

@@ -192,6 +192,9 @@ void CFDglCanvas::paintGL()
                 double greenVal = 0.0;
                 double blueVal = 1.0;
 
+                if (dataVal > 1.0) dataVal = 1.0;
+                else if (dataVal < 0.0) dataVal = 0.0;
+
                 if (dataVal > 0.5)
                 {
                     blueVal = 0.3 + 0.7 * ((1.0 - dataVal) / 0.5);
@@ -373,8 +376,6 @@ bool CFDglCanvas::loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFi
 
 bool CFDglCanvas::loadFieldData(QByteArray * rawDataFile, QString valueType)
 {
-    dataList.clear();
-
     CFDtoken * dataRoot = CFDtoken::lexifyString(rawDataFile);
 
     if (!CFDtoken::parseTokenStream(dataRoot))
@@ -441,20 +442,21 @@ bool CFDglCanvas::loadFieldData(QByteArray * rawDataFile, QString valueType)
         return false;
     }
 
-    lowDataVal = INFINITY;
-    highDataVal = -INFINITY;
+    QList<double> sortedList = dataList;
 
-    for (auto itr = dataList.cbegin(); itr != dataList.cend(); itr++)
+    std::sort(sortedList.begin(), sortedList.end());
+
+    if (sortedList.size() < 50)
     {
-        if (*itr < lowDataVal)
-        {
-            lowDataVal = *itr;
-        }
-        if (*itr > highDataVal)
-        {
-            highDataVal = *itr;
-        }
+        lowDataVal = sortedList.at(0);
+        highDataVal = sortedList.last();
     }
+    else
+    {
+        lowDataVal = sortedList.at(19);
+        highDataVal = sortedList.at(sortedList.size()-19);
+    }
+
     dataSpan = highDataVal - lowDataVal;
 
     currentDisplayError = "No Error";
