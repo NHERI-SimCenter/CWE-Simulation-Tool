@@ -148,20 +148,3 @@ void CWE_GroupsWidget::updateParameterValues(QMap<QString, QString> newValues)
     }
 }
 
-int CWE_GroupsWidget::collectParamData(QMap<QString, QString> &currentParameters)
-{
-    int count = 0;
-
-    // collect parameter values from all SCtrMasterDataWidget objects
-    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
-
-    while (iter.hasNext())
-    {
-        iter.next();
-        currentParameters.insert(iter.key(), (iter.value())->value());
-        count++;
-    }
-
-    return count;
-}
-
