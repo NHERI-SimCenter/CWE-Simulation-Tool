@@ -55,35 +55,6 @@
 
 #include "cwe_globals.h"
 
-CWE_TabWidget::CWE_TabWidget(QWidget *parent) :
-    QFrame(parent),
-    ui(new Ui::CWE_TabWidget)
-{
-    ui->setupUi(this);
-
-    stageTabList = new QMap<QString, CWE_StageStatusTab *>();
-    enactButtonSetting();
-}
-
-CWE_TabWidget::~CWE_TabWidget()
-{
-    delete ui;
-    delete stageTabList;
-}
-
-void CWE_TabWidget::setController(CWE_Parameters * newController)
-{
-    myController = newController;
-    enactButtonSetting();
-}
-
-void CWE_TabWidget::setTabStage(StageState newState, QString stageName)
-{
-    CWE_StageStatusTab * theTab = stageTabList->value(stageName);
-    if (theTab == NULL) return;
-
-    theTab->setStatus(getStateText(newState));
-}
 
 void CWE_TabWidget::setButtonMode(SimCenterButtonMode mode)
 {
@@ -246,54 +217,6 @@ void CWE_TabWidget::initQuickParameterPtr()
     {
         stageTabList->value(stageName)->getGroupsWidget()->initQuickParameterPtr();
     }
-}
-
-void CWE_TabWidget::on_pbtn_run_clicked()
-{
-    myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::RUN);
-}
-
-QMap<QString, QString> CWE_TabWidget::collectParamData()
-{
-    QMap<QString, QString> currentParameters;
-
-    foreach (QString stageName, stageTabList->keys())
-    {
-        stageTabList->value(stageName)->getGroupsWidget()->collectParamData(currentParameters);
-    }
-
-    qCDebug(agaveAppLayer) << currentParameters;
-
-    return currentParameters;
-}
-
-void CWE_TabWidget::on_pbtn_cancel_clicked()
-{
-    myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::CANCEL);
-}
-
-void CWE_TabWidget::on_pbtn_results_clicked()
-{
-    myController->switchToResults();
-}
-
-void CWE_TabWidget::on_pbtn_rollback_clicked()
-{
-    myController->performCaseCommand(getCurrentSelectedStage(), CaseCommand::ROLLBACK);
-}
-
-QString CWE_TabWidget::getStateText(StageState theState)
-{
-    if (theState == StageState::DOWNLOADING)    { return "Downloading . . ."; }
-    if (theState == StageState::ERROR)          { return "*** ERROR ***"; }
-    if (theState == StageState::FINISHED)       { return "Task Finished"; }
-    if (theState == StageState::FINISHED_PREREQ){ return "Task Finished"; }
-    if (theState == StageState::LOADING)        { return "Loading Data ..."; }
-    if (theState == StageState::OFFLINE)        { return "Offline (Debug)"; }
-    if (theState == StageState::RUNNING)        { return "Task Running"; }
-    if (theState == StageState::UNREADY)        { return "Need Prev. \nStage"; }
-    if (theState == StageState::UNRUN)          { return "Not Yet Run"; }
-    return "*** TOTAL ERROR ***";
 }
 
 QString CWE_TabWidget::getCurrentSelectedStage()
