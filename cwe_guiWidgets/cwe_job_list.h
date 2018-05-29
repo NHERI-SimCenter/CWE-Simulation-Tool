@@ -52,6 +52,7 @@ public:
     ~CWE_job_list();
 
 private slots:
+    void customJobMenu(const QPoint &pos);
 
 private:
     Ui::CWE_job_list    *ui;
