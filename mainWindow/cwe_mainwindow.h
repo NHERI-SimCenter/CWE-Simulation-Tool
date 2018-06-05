@@ -88,6 +88,8 @@ private slots:
     void menuExit();
     void menuCopyInfo();
 
+    void on_actionAbout_CWE_triggered();
+
 private:
     void deactivateCurrentCase();
 
