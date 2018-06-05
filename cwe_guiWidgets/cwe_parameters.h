@@ -37,13 +37,16 @@
 
 #include "cwe_super.h"
 
+#include <QVector>
 #include <QJsonObject>
 
 #include "SimCenter_widgets/sctrstates.h"
 
 class CWE_MainWindow;
+
+class CWE_StageStatusTab;
 enum class CaseState;
-enum class CaseCommand { ROLLBACK, RUN, CANCEL };
+enum class StageState;
 
 namespace Ui {
 class CWE_Parameters;
@@ -58,29 +61,38 @@ public:
     ~CWE_Parameters();
 
     virtual void linkMainWindow(CWE_MainWindow *theMainWin);
-    void resetViewInfo();
 
-    void switchToResults();
-    void performCaseCommand(QString stage, CaseCommand toEnact);
     void setSaveAllButtonDisabled(bool newSetting);
     void setSaveAllButtonEnabled(bool newSetting);
 
 private slots:
-    void on_pbtn_saveAllParameters_clicked();
+    void save_all_button_clicked();
+    void run_button_clicked();
+    void cancel_button_clicked();
+    void results_button_clicked();
+    void rollback_button_clicked();
 
     void newCaseGiven();
     void newCaseState(CaseState newState);
 
 private:
+    bool checkButtonEnactReady();
+    bool paramsChanged();
+
     void setButtonsAccordingToStage();
     void setVisibleAccordingToStage();
+
+    bool enactWidgetCreationSequence();
     void createUnderlyingParamWidgets();
 
-    void saveAllParams();
+    static QString getStateText(StageState theState);
 
     Ui::CWE_Parameters *ui;
     bool paramWidgetsExist = false;
+    bool stageButtonsExist = false;
+    bool groupButtonsExist = false;
 
+    QVector<CWE_StageStatusTab *> stageTabList;
 };
 
 #endif // CWE_PARAMETERS_H

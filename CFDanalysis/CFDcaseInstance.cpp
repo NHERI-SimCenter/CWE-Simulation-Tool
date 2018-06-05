@@ -92,8 +92,7 @@ CaseState CFDcaseInstance::getCaseState()
     case InternalCaseState::EMPTY_CASE :
     case InternalCaseState::RE_DATA_LOAD :
     case InternalCaseState::TYPE_SELECTED : return CaseState::LOADING;
-    case InternalCaseState::PARAM_SAVE :
-    case InternalCaseState::PARAM_SAVE_RUN : return CaseState::PARAM_SAVE;
+    case InternalCaseState::PARAM_SAVE : return CaseState::PARAM_SAVE;
     case InternalCaseState::COPYING_FOLDER :
     case InternalCaseState::INIT_PARAM_UPLOAD :
     case InternalCaseState::MAKING_FOLDER :
@@ -193,12 +192,6 @@ bool CFDcaseInstance::duplicateCase(QString newName, const FileNodeRef &containi
 
 bool CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
 {
-    QString empty;
-    return changeParameters(paramList, empty);
-}
-
-bool CFDcaseInstance::changeParameters(QMap<QString, QString> paramList, QString stageToRun)
-{
     if (defunct) return false;
 
     if (myState != InternalCaseState::READY) return false;
@@ -241,15 +234,7 @@ bool CFDcaseInstance::changeParameters(QMap<QString, QString> paramList, QString
     }
 
     varStore.setFileBuffer(NULL);
-    if (stageToRun.isEmpty())
-    {
-        emitNewState(InternalCaseState::PARAM_SAVE);
-    }
-    else
-    {
-        runningStage = stageToRun;
-        emitNewState(InternalCaseState::PARAM_SAVE_RUN);
-    }
+    emitNewState(InternalCaseState::PARAM_SAVE);
 
     return true;
 }
@@ -259,8 +244,7 @@ bool CFDcaseInstance::startStageApp(QString stageID)
     if (defunct) return false;
     if (!caseFolder.fileNodeExtant()) return false;
     if (myType == NULL) return false;
-    if ((myState != InternalCaseState::READY) &&
-            (myState != InternalCaseState::PARAM_SAVE_RUN))return false;
+    if (myState != InternalCaseState::READY) return false;
     if (storedStageStates.value(stageID, StageState::ERROR) != StageState::UNRUN) return false;
 
     QString appName = myType->getStageApp(stageID);
@@ -466,9 +450,6 @@ void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
 
     case InternalCaseState::PARAM_SAVE:
         state_Param_Save_taskDone(invokeStatus); return;
-
-    case InternalCaseState::PARAM_SAVE_RUN:
-        state_Param_Save_Run_taskDone(invokeStatus); return;
 
     default:
         return;
@@ -1131,32 +1112,6 @@ void CFDcaseInstance::state_Param_Save_taskDone(RequestState invokeStatus)
     //QThread::msleep(500);
 
     computeIdleState();
-}
-
-void CFDcaseInstance::state_Param_Save_Run_taskDone(RequestState invokeStatus)
-{
-    if (myState != InternalCaseState::PARAM_SAVE_RUN) return;
-
-    if (invokeStatus != RequestState::GOOD)
-    {
-        emitNewState(InternalCaseState::ERROR);
-        cwe_globals::displayPopup("Error: Unable to change parameters. Please reset and try again.", "Remote Filesystem error");
-        return;
-    }
-
-    storedParamList = prospectiveNewParamList;
-    prospectiveNewParamList.clear();
-    FileNodeRef paramNode = caseFolder.getChildWithName(caseParamFileName);
-    if (!paramNode.isNil())
-    {
-        paramNode.setFileBuffer(NULL);
-    }
-    if (!startStageApp(runningStage))
-    {
-        emitNewState(InternalCaseState::ERROR);
-        cwe_globals::displayPopup("Error: Unable to start task. Please reset and try again.", "Remote Job error");
-        return;
-    }
 }
 
 void CFDcaseInstance::computeIdleState()
