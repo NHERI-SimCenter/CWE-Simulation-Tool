@@ -42,6 +42,8 @@
 #include "../AgaveClientInterface/remotedatainterface.h"
 #include "cwe_globals.h"
 
+#include "utilWindows/DialogAbout.h"
+
 CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CWE_MainWindow)
@@ -286,4 +288,20 @@ void CWE_MainWindow::deactivateCurrentCase()
     QObject::disconnect(currentCase,0,0,0);
     currentCase->deleteLater();
     currentCase = NULL;
+}
+
+void CWE_MainWindow::on_actionAbout_CWE_triggered()
+{
+    DialogAbout *dlg = new DialogAbout();
+
+    //
+    // adjust size of application window to the available display
+    //
+    QRect rec = QApplication::desktop()->screenGeometry();
+    int height = 0.50*rec.height();
+    int width  = 0.50*rec.width();
+    dlg->resize(width, height);
+
+    dlg->exec();
+    delete dlg;
 }
