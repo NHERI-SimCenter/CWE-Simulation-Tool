@@ -50,6 +50,9 @@ public:
     explicit CWE_help(QWidget *parent = 0);
     ~CWE_help();
 
+public slots:
+    void setPageSource(const QUrl &url);
+
 private:
     Ui::CWE_help *ui;
 };

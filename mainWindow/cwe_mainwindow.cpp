@@ -48,8 +48,7 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CWE_MainWindow)
 {
-    ui->setupUi(this);// Main screen
-    //this->setWindowIcon(QIcon(":/icons/NHERI-CWE-Icon.icns"));
+    ui->setupUi(this);  // Main screen
 
     changeParamsAndResultsEnabled(false);
 
@@ -58,6 +57,9 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
 
     changeTabEnabled(ui->tab_spacer_1, false);
     changeTabEnabled(ui->tab_spacer_2, false);
+
+    QObject::connect(ui->tab_welcome_screen, SIGNAL(helpRequested(const QUrl &)),\
+                     this, SLOT(switchToHelpTab(const QUrl &)));
 
     // adjust application size to display
     QRect rec = QApplication::desktop()->screenGeometry();
@@ -85,6 +87,7 @@ void CWE_MainWindow::runSetupSteps()
     ui->header->appendWidget(username);
 
     QPushButton * logoutButton = new QPushButton("Logout");
+    logoutButton->setObjectName("logoutButton");
     QObject::connect(logoutButton, SIGNAL(clicked(bool)), cwe_globals::get_CWE_Driver(), SLOT(shutdown()));
     ui->header->appendWidget(logoutButton);
 
@@ -134,6 +137,21 @@ void CWE_MainWindow::menuCopyInfo()
 void CWE_MainWindow::menuExit()
 {
     cwe_globals::get_CWE_Driver()->shutdown();
+}
+
+void CWE_MainWindow::switchToHelpTab(const QUrl &url)
+{
+    qDebug() << "CWE_MainWindow::switchToHelpTab(" << url.toString() << ")";
+
+    if (ui->tabContainer->isTabEnabled(ui->tabContainer->indexOf(ui->tab_help)))
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_help);
+        ui->tab_help->setPageSource(url);
+    }
+    else
+    {
+        ui->tabContainer->setCurrentWidget(ui->tab_welcome_screen);
+    }
 }
 
 void CWE_MainWindow::switchToResultsTab()
