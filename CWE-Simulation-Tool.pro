@@ -121,7 +121,8 @@ SOURCES += main.cpp \
     SimCenter_widgets/sctrtextdatawidget.cpp \
     popupWindows/cwe_popup.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavethread.cpp \
-    ../AgaveExplorer/utilFuncs/fixforssl.cpp
+    ../AgaveExplorer/utilFuncs/fixforssl.cpp \
+    utilWindows/dialogabout.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -188,7 +189,8 @@ HEADERS  += \
     SimCenter_widgets/sctrtextdatawidget.h \
     popupWindows/cwe_popup.h \
     ../AgaveClientInterface/agaveInterfaces/agavethread.h \
-    ../AgaveExplorer/utilFuncs/fixforssl.h
+    ../AgaveExplorer/utilFuncs/fixforssl.h \
+    utilWindows/dialogabout.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -209,7 +211,8 @@ FORMS    += \
     cwe_guiWidgets/cwe_file_manager.ui \
     popupWindows/create_case_popup.ui \
     popupWindows/duplicate_case_popup.ui \
-    ../AgaveExplorer/utilFuncs/fixforssl.ui
+    ../AgaveExplorer/utilFuncs/fixforssl.ui \
+    utilWindows/dialogabout.ui
 
 RESOURCES += \
     cwe_resources.qrc \
