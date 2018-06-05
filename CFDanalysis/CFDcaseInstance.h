@@ -65,7 +65,7 @@ enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
                              TYPE_SELECTED, EMPTY_CASE,
                              MAKING_FOLDER, COPYING_FOLDER, INIT_PARAM_UPLOAD,
                              READY, READY_ERROR, EXTERN_FILE_OP,
-                             PARAM_SAVE, PARAM_SAVE_RUN,
+                             PARAM_SAVE,
                              WAITING_FOLDER_DEL, RE_DATA_LOAD,
                              STARTING_JOB, STOPPING_JOB, RUNNING_JOB,
                              DOWNLOAD};
@@ -95,7 +95,6 @@ public:
     bool createCase(QString newName, const FileNodeRef &containingFolder);
     bool duplicateCase(QString newName, const FileNodeRef &containingFolder, const FileNodeRef &oldCase);
     bool changeParameters(QMap<QString, QString> paramList);
-    bool changeParameters(QMap<QString, QString> paramList, QString stageToRun);
     bool startStageApp(QString stageID);
     bool rollBack(QString stageToDelete);
     bool stopJob();
@@ -143,7 +142,6 @@ private:
     void state_WaitingFolderDel_taskDone(RequestState invokeStatus);
     void state_Download_recursiveOpDone(RequestState invokeStatus);
     void state_Param_Save_taskDone(RequestState invokeStatus);
-    void state_Param_Save_Run_taskDone(RequestState invokeStatus);
 
     void computeIdleState();
 

@@ -60,7 +60,7 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     changeTabEnabled(ui->tab_spacer_2, false);
 
     // adjust application size to display
-    QRect rec = QApplication::desktop()->screenGeometry();
+    QRect rec = QGuiApplication::screens().at(0)->availableGeometry();
     int height = this->height()>0.75*rec.height()?this->height():0.75*rec.height();
     if ( height > 0.95*rec.height() ) { height = 0.95*rec.height(); }
     int width  = this->width()>0.65*rec.width()?this->width():0.65*rec.width();
