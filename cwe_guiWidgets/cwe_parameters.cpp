@@ -45,6 +45,9 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 
 #include "cwe_param_tabs/cwe_stagestatustab.h"
+#include "cwe_param_tabs/cwe_grouptab.h"
+
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
@@ -73,10 +76,7 @@ void CWE_Parameters::newCaseGiven()
 {
     CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
 
-    paramWidgetsExist = false;
-    stageButtonsExist = false;
-    groupButtonsExist = false;
-    //TODO: Create labels for loading message in param panel
+    clearParamScreen();
 
     if (newCase != NULL)
     {
@@ -221,8 +221,35 @@ void CWE_Parameters::setVisibleAccordingToStage()
     }
 }
 
+void CWE_Parameters::clearParamScreen()
+{
+    while (!paramWidgetList.isEmpty())
+    {
+        paramWidgetList.takeLast()->deleteLater();
+    }
+
+    while (!stageTabList.isEmpty())
+    {
+        stageTabList.takeLast()->deleteLater();
+    }
+
+    while (!groupTabList.isEmpty())
+    {
+        groupTabList.takeLast()->deleteLater();
+    }
+
+    //TODO: Create labels for loading message in param panel
+}
+
 bool CWE_Parameters::enactWidgetCreationSequence()
 {
+    if (paramWidgetsExist && stageButtonsExist && groupButtonsExist)
+    {
+        return true;
+    }
+
+
+
     //TODO check for and create if possible each of the 3 types of widgets
     return true; //if all widgets exist and panel is ready to use
 
@@ -270,7 +297,7 @@ bool CWE_Parameters::checkButtonEnactReady()
     return true;
 }
 
-bool paramsChanged()
+bool CWE_Parameters::paramsChanged()
 {
     //TODO: return true if param widgets have changed values
     return true;

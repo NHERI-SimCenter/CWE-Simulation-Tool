@@ -38,6 +38,7 @@
 #include "cwe_super.h"
 
 #include <QVector>
+#include <QLabel>
 #include <QJsonObject>
 
 #include "SimCenter_widgets/sctrstates.h"
@@ -45,6 +46,9 @@
 class CWE_MainWindow;
 
 class CWE_StageStatusTab;
+class CWE_GroupTab;
+class SCtrMasterDataWidget;
+
 enum class CaseState;
 enum class StageState;
 
@@ -82,17 +86,19 @@ private:
     void setButtonsAccordingToStage();
     void setVisibleAccordingToStage();
 
+    void clearParamScreen();
     bool enactWidgetCreationSequence();
     void createUnderlyingParamWidgets();
 
     static QString getStateText(StageState theState);
 
     Ui::CWE_Parameters *ui;
-    bool paramWidgetsExist = false;
-    bool stageButtonsExist = false;
-    bool groupButtonsExist = false;
 
     QVector<CWE_StageStatusTab *> stageTabList;
+    QVector<CWE_GroupTab *> groupTabList;
+    QVector<SCtrMasterDataWidget *> paramWidgetList;
+
+    QLabel * loadingLabel = NULL;
 };
 
 #endif // CWE_PARAMETERS_H

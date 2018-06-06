@@ -118,7 +118,7 @@ SOURCES += main.cpp \
     popupWindows/cwe_popup.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavethread.cpp \
     ../AgaveExplorer/utilFuncs/fixforssl.cpp \
-    utilWindows/dialogabout.cpp
+    utilWindows/dialogabout.cpp \
     cwe_guiWidgets/cwe_param_tabs/cwe_groupswidget.cpp \
     cwe_guiWidgets/cwe_param_tabs/cwe_parampanel.cpp \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.cpp \
@@ -187,7 +187,7 @@ HEADERS  += \
     popupWindows/cwe_popup.h \
     ../AgaveClientInterface/agaveInterfaces/agavethread.h \
     ../AgaveExplorer/utilFuncs/fixforssl.h \
-    utilWindows/dialogabout.h
+    utilWindows/dialogabout.h \
     cwe_guiWidgets/cwe_param_tabs/cwe_groupswidget.h \
     cwe_guiWidgets/cwe_param_tabs/cwe_parampanel.h \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.h \
@@ -211,7 +211,7 @@ FORMS    += \
     popupWindows/create_case_popup.ui \
     popupWindows/duplicate_case_popup.ui \
     ../AgaveExplorer/utilFuncs/fixforssl.ui \
-    utilWindows/dialogabout.ui
+    utilWindows/dialogabout.ui \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.ui \
     cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.ui
 

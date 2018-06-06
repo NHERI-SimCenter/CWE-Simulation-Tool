@@ -32,8 +32,8 @@
 
 // Contributors:
 
-#ifndef CWE_STAGESTATUSTAB_H
-#define CWE_STAGESTATUSTAB_H
+#ifndef CWE_GROUPTAB_H
+#define CWE_GROUPTAB_H
 
 #include <QFrame>
 
@@ -96,4 +96,4 @@ private:
     bool m_active;
 };
 
-#endif // CWE_STAGESTATUSTAB_H
+#endif // CWE_GROUPTAB_H
