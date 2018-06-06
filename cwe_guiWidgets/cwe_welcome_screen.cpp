@@ -47,10 +47,16 @@ CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
     if (frontMatter.open(QFile::ReadOnly))
     {
         ui->welcome_text->setText(frontMatter.readAll());
+        ui->welcome_text->setOpenLinks(false);
     }
 }
 
 CWE_welcome_screen::~CWE_welcome_screen()
 {
     delete ui;
+}
+
+void CWE_welcome_screen::on_welcome_text_anchorClicked(const QUrl &arg1)
+{
+    emit helpRequested(arg1);
 }

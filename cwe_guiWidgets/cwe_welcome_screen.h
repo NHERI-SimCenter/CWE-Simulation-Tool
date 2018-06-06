@@ -49,6 +49,12 @@ public:
     explicit CWE_welcome_screen(QWidget *parent = 0);
     ~CWE_welcome_screen();
 
+private slots:
+    void on_welcome_text_anchorClicked(const QUrl &arg1);
+
+signals:
+    void helpRequested(const QUrl &);
+
 private:
     Ui::CWE_welcome_screen *ui;
 };
