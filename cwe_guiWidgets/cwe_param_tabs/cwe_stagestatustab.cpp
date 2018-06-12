@@ -41,8 +41,10 @@ CWE_StageStatusTab::CWE_StageStatusTab(QString theStageKey, QString stageName, Q
 {
     ui->setupUi(this);
     stageKey = theStageKey;
-    this->setName(stageName);
-    this->setInActive();
+    ui->mainLabel->setText(stageName);
+
+    this->setStatus("INIT");
+    this->setButtonAppearance(false, false);
 }
 
 CWE_StageStatusTab::~CWE_StageStatusTab()
@@ -50,68 +52,90 @@ CWE_StageStatusTab::~CWE_StageStatusTab()
     delete ui;
 }
 
-void CWE_StageStatusTab::setCorrespondingPanel(CWE_GroupsWidget * newPanel)
+void CWE_StageStatusTab::setStatus(const QString str)
 {
-    myPanel = newPanel;
+    stageStatus = str;
+    ui->statusLabel->setText(str);
 }
 
-void CWE_StageStatusTab::setStatus(QString s)
+QString CWE_StageStatusTab::getStageKey()
 {
-    m_status = s;
-    ui->statusLabel->setText(s);
+    return stageKey;
 }
 
-void CWE_StageStatusTab::setText(QString s)
+QString CWE_StageStatusTab::status()
 {
-    m_text = s;
-    ui->mainLabel->setText(s);
+    return stageStatus;
+}
+
+bool CWE_StageStatusTab::tabIsActive()
+{
+    return tab_active;
+}
+
+void CWE_StageStatusTab::setActive(bool b)
+{
+    if (!b)
+    {
+        this->setInActive();
+        return;
+    }
+    setButtonAppearance(tab_pressed, true);
+}
+
+void CWE_StageStatusTab::setInActive(bool b)
+{
+    if (!b)
+    {
+        this->setActive();
+        return;
+    }
+    setButtonAppearance(tab_pressed, false);
 }
 
 void CWE_StageStatusTab::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
-        this->setActive(true);
-        this->setStyleSheet("QFrame {background: #B0BEC5;}");
-        emit btn_activated(this);
-        emit btn_pressed(myPanel);
+    //TODO: Test mouse release if mouse dragged off tab
+    if (event->button() == Qt::LeftButton)
+    {
+        setButtonAppearance(true, tab_active);
+        emit btn_pressed(this);
     }
 }
 
 void CWE_StageStatusTab::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
-        this->setActive();
-        emit btn_released(myPanel);
+    if (event->button() == Qt::LeftButton)
+    {
+        setButtonAppearance(false, tab_active);
+        emit btn_released(this);
     }
 }
 
-bool CWE_StageStatusTab::tabIsActive()
+void CWE_StageStatusTab::setButtonAppearance(bool tabPressed, bool tabActive)
 {
-    return m_active;
-}
-
-void CWE_StageStatusTab::setActive(bool b)
-{
-    this->setStyleSheet("QFrame {background: #64B5F6; border-color: #808080; border-width: 1.5px; border-radius: 3px; border-style: inset;} QLabel {border-style: none}");
-    if (!b) this->setInActive();
-    m_active = b;
-}
-
-void CWE_StageStatusTab::setInActive(bool b)
-{
-    this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none}");
-    if (!b) this->setActive();
-    m_active = !b;
-}
-
-
-void CWE_StageStatusTab::setName(const QString s)
-{
-    m_name = s;
-    ui->mainLabel->setText(s);
-}
-
-void CWE_StageStatusTab::linkWidget(CWE_GroupsWidget *ptr)
-{
-    myPanel = ptr;
+    tab_pressed = tabPressed;
+    tab_active = tabActive;
+    if (tab_pressed)
+    {
+        if (tab_active)
+        {
+            this->setStyleSheet("QFrame {background: #B0BEC5; border-color: #808080; border-width: 1.5px; border-radius: 3px; border-style: inset;} QLabel {border-style: none}");
+        }
+        else
+        {
+            this->setStyleSheet("QFrame {background: #B0BEC5; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none}");
+        }
+    }
+    else
+    {
+        if (tab_active)
+        {
+            this->setStyleSheet("QFrame {background: #64B5F6; border-color: #808080; border-width: 1.5px; border-radius: 3px; border-style: inset;} QLabel {border-style: none}");
+        }
+        else
+        {
+            this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none}");
+        }
+    }
 }

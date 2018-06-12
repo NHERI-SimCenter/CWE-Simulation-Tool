@@ -74,10 +74,8 @@ public:
     QString getName();
     QString getDescription();
     QString getIconName();
-    QStringList getStageNames();
-    QStringList getStageSequence();
+    QStringList getStageIds();
 
-    QString getStageName(QString stage);
     QStringList getStageGroups(QString stage);
     QList<RESULTS_STYLE> getStageResults(QString stage);
 
@@ -99,6 +97,8 @@ private:
     QIcon myIcon;
 
     QJsonDocument myConfiguration;
+
+    QStringList cachedOrderedStageList;
 
 };
 

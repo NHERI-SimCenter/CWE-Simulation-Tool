@@ -76,7 +76,7 @@ void CWE_Parameters::newCaseGiven()
 {
     CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
 
-    clearParamScreen();
+    clearStageTabs();
 
     if (newCase != NULL)
     {
@@ -86,30 +86,21 @@ void CWE_Parameters::newCaseGiven()
     }
     else
     {
-        //TODO: Change labels for loading message to no case selected
+        loadingLabel->setText("No Case Selected.");
     }
-}
-
-QString CWE_Parameters::getStateText(StageState theState)
-{
-    switch (theState)
-    {
-        case StageState::DOWNLOADING : return "Downloading . . .";
-        case StageState::ERROR : return "*** ERROR ***";
-        case StageState::FINISHED : return "Task Finished";
-        case StageState::FINISHED_PREREQ : return "Task Finished";
-        case StageState::LOADING : return "Loading Data ...";
-        case StageState::OFFLINE : return "Offline (Debug)";
-        case StageState::RUNNING : return "Task Running";
-        case StageState::UNREADY : return "Need Prev. \nStage";
-        case StageState::UNRUN : return "Not Yet Run";
-    }
-    return "*** TOTAL ERROR ***";
 }
 
 void CWE_Parameters::newCaseState(CaseState newState)
 {
-    if (!enactWidgetCreationSequence()) return;
+    CFDcaseInstance * theCase = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase();
+    if (theCase == NULL) return;
+    CFDanalysisType * theType = theCase->getMyType();
+    if (theType == NULL) return;
+
+    if (loadingLabel != NULL)
+    {
+        createStageTabs();
+    }
 
     //Sets the listed states of the stage tabs
     QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
@@ -160,6 +151,23 @@ void CWE_Parameters::newCaseState(CaseState newState)
         return;
         break;
     }
+}
+
+void CWE_Parameters::stageSelected(CWE_StageStatusTab * chosenTab)
+{
+    for (CWE_StageStatusTab * aTab : stageTabList)
+    {
+        aTab->setInActive();
+    }
+    chosenTab->setActive();
+
+    selectedStage = chosenTab;
+    createGroupTabs();
+}
+
+void CWE_Parameters::groupSelected(CWE_GroupTab * chosenGroup)
+{
+    //TODO
 }
 
 void CWE_Parameters::setButtonsAccordingToStage()
@@ -219,66 +227,6 @@ void CWE_Parameters::setVisibleAccordingToStage()
             ui->theTabWidget->setViewState(SimCenterViewState::editable, itr.key());
         }
     }
-}
-
-void CWE_Parameters::clearParamScreen()
-{
-    while (!paramWidgetList.isEmpty())
-    {
-        paramWidgetList.takeLast()->deleteLater();
-    }
-
-    while (!stageTabList.isEmpty())
-    {
-        stageTabList.takeLast()->deleteLater();
-    }
-
-    while (!groupTabList.isEmpty())
-    {
-        groupTabList.takeLast()->deleteLater();
-    }
-
-    //TODO: Create labels for loading message in param panel
-}
-
-bool CWE_Parameters::enactWidgetCreationSequence()
-{
-    if (paramWidgetsExist && stageButtonsExist && groupButtonsExist)
-    {
-        return true;
-    }
-
-
-
-    //TODO check for and create if possible each of the 3 types of widgets
-    return true; //if all widgets exist and panel is ready to use
-
-    //    if (!paramWidgetsExist) createUnderlyingParamWidgets();
-    //if (!paramWidgetsExist) return;
-}
-
-void CWE_Parameters::createUnderlyingParamWidgets()
-{
-    if (paramWidgetsExist) return;
-
-    CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
-
-    if (newCase == NULL) return;
-    if (newCase->getMyType() == NULL) return;
-    if (newCase->getCaseFolder().isNil()) return;
-
-    CFDanalysisType * myType = newCase->getMyType();
-
-    //QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
-
-    ui->label_theName->setText(newCase->getCaseName());
-    ui->label_theType->setText(myType->getName());
-    ui->label_theLocation->setText(newCase->getCaseFolder().getFullPath());
-
-    ui->theTabWidget->setParameterConfig(myType);
-    ui->theTabWidget->setViewState(SimCenterViewState::visible);
-
-    paramWidgetsExist = true;
 }
 
 void CWE_Parameters::setSaveAllButtonDisabled(bool newSetting)
@@ -368,4 +316,183 @@ void CWE_Parameters::rollback_button_clicked()
         cwe_globals::displayPopup("Unable to roll back this stage, please check that this stage is done and check your network connection.", "Network Issue");
         return;
     }
+}
+
+void CWE_Parameters::createStageTabs()
+{
+    CFDcaseInstance * theCase = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase();
+    if (theCase == NULL) return;
+    CFDanalysisType * theType = theCase->getMyType();
+    if (theType == NULL) return;
+
+    if ((selectedStage != NULL) || !stageTabList.isEmpty() || !ui->tabsBar->layout()->isEmpty())
+    {
+        clearStageTabs();
+    }
+
+    QVBoxLayout * tablayout = ui->tabsBar->layout();
+    tablayout->setMargin(0);
+    tablayout->setSpacing(0);
+
+    QMap<QString, StageState> stageStates = theCase->getStageStates();
+
+    for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
+    {
+        QString stageKey = itr.key();
+        QString stageLabel = theType->translateStageId(itr.key());
+        stageLabel += "\nParameters";
+
+        /* create a CWE_StageStatusTab */
+        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageKey, stageLabel, this);
+
+        tab->setStatus(getStateText(stageStates.value(stageKey)));
+
+        tablayout->addWidget(tab);
+        stageTabList.append(tab);
+
+        //DOLINE Start
+
+        /* connect signals and slots */
+        QObject::connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *)),this,SLOT(stageSelected(CWE_StageStatusTab*)));
+    }
+
+    tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+    if (stageTabList.length() < 1)
+    {
+        ae_globals::displayFatalPopup("Invalid Configuration for template, no stages given.", "Internal Program Error");
+    }
+
+    stageSelected(stageTabList.at(0));
+}
+
+void CWE_Parameters::createGroupTabs()
+{
+    CFDcaseInstance * theCase = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase();
+    if (theCase == NULL) return;
+    CFDanalysisType * theType = theCase->getMyType();
+    if (theType == NULL) return;
+    if (selectedStage == NULL) return;
+
+    if ((selectedGroup != NULL) || !groupTabList.isEmpty() || !ui->groupsBar->layout()->isEmpty())
+    {
+        clearStageTabs();
+    }
+
+    /* create a CWE_GroupsWidget */
+    //CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(this);
+    //ui->stagePanels->addWidget(groupWidget);
+
+    /* link tab and groupWidget */
+    //tab->linkWidget(groupWidget);
+    //groupWidget->linkWidget(tab);
+
+    /* set the parameter information for the CWE_GroupsWidget */
+    //groupWidget->setParameterConfig(stageName, myType);
+
+    //this->setButtonMode(SimCenterButtonMode_NONE);
+    //this->setViewState(SimCenterViewState::hidden);
+}
+
+void CWE_Parameters::createParamWidgets()
+{
+    if (paramWidgetsExist) return;
+
+    CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
+
+    if (newCase == NULL) return;
+    if (newCase->getMyType() == NULL) return;
+    if (newCase->getCaseFolder().isNil()) return;
+
+    CFDanalysisType * myType = newCase->getMyType();
+
+    //QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
+
+    ui->label_theName->setText(newCase->getCaseName());
+    ui->label_theType->setText(myType->getName());
+    ui->label_theLocation->setText(newCase->getCaseFolder().getFullPath());
+
+    ui->theTabWidget->setParameterConfig(myType);
+    ui->theTabWidget->setViewState(SimCenterViewState::visible);
+
+    paramWidgetsExist = true;
+}
+
+void CWE_Parameters::clearStageTabs()
+{
+    clearGroupTabs();
+
+    while (!stageTabList.isEmpty())
+    {
+        stageTabList.takeLast()->deleteLater();
+    }
+    selectedStage->deleteLater();
+    selectedStage = NULL;
+
+    QLayoutItem * stageItem = ui->tabsBar->layout()->takeAt(0);
+    while (stageItem != NULL)
+    {
+        delete stageItem;
+        stageItem = ui->tabsBar->layout()->takeAt(0);
+    }
+}
+
+void CWE_Parameters::clearGroupTabs()
+{
+    clearParamScreen();
+
+    while (!groupTabList.isEmpty())
+    {
+        groupTabList.takeLast()->deleteLater();
+    }
+    selectedGroup->deleteLater();
+    selectedGroup = NULL;
+
+    QLayoutItem * groupItem = ui->groupsBar->layout()->takeAt(0);
+    while (groupItem != NULL)
+    {
+        delete groupItem;
+        groupItem = ui->groupsBar->layout()->takeAt(0);
+    }
+}
+
+void CWE_Parameters::clearParamScreen()
+{
+    while (!paramWidgetList.isEmpty())
+    {
+        paramWidgetList.takeLast()->deleteLater();
+    }
+
+    if (loadingLabel != NULL)
+    {
+        loadingLabel->deleteLater();
+        loadingLabel = NULL;
+    }
+
+    QLayoutItem * paramItem = ui->parameterSpace->layout()->takeAt(0);
+    while (paramItem != NULL)
+    {
+        delete paramItem;
+        paramItem = ui->parameterSpace->layout()->takeAt(0);
+    }
+
+    loadingLabel = new QLabel("Loading parameter list . . .");
+    ui->parameterSpace->layout()->addWidget(loadingLabel);
+}
+
+QString CWE_Parameters::getStateText(StageState theState)
+{
+    switch (theState)
+    {
+        case StageState::DOWNLOADING : return "Downloading . . .";
+        case StageState::ERROR : return "*** ERROR ***";
+        case StageState::FINISHED : return "Task Finished";
+        case StageState::FINISHED_PREREQ : return "Task Finished";
+        case StageState::LOADING : return "Loading Data ...";
+        case StageState::OFFLINE : return "Offline (Debug)";
+        case StageState::RUNNING : return "Task Running";
+        case StageState::UNREADY : return "Need Prev. \nStage";
+        case StageState::UNRUN : return "Not Yet Run";
+    }
+    return "*** TOTAL ERROR ***";
 }

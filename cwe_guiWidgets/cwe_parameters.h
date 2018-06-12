@@ -79,6 +79,9 @@ private slots:
     void newCaseGiven();
     void newCaseState(CaseState newState);
 
+    void stageSelected(CWE_StageStatusTab * chosenTab);
+    void groupSelected(CWE_GroupTab * chosenTab);
+
 private:
     bool checkButtonEnactReady();
     bool paramsChanged();
@@ -86,9 +89,13 @@ private:
     void setButtonsAccordingToStage();
     void setVisibleAccordingToStage();
 
+    void createStageTabs();
+    void createGroupTabs();
+    void createParamWidgets();
+
+    void clearStageTabs();
+    void clearGroupTabs();
     void clearParamScreen();
-    bool enactWidgetCreationSequence();
-    void createUnderlyingParamWidgets();
 
     static QString getStateText(StageState theState);
 
@@ -97,6 +104,9 @@ private:
     QVector<CWE_StageStatusTab *> stageTabList;
     QVector<CWE_GroupTab *> groupTabList;
     QVector<SCtrMasterDataWidget *> paramWidgetList;
+
+    CWE_StageStatusTab * selectedStage = NULL;
+    CWE_GroupTab * selectedGroup = NULL;
 
     QLabel * loadingLabel = NULL;
 };

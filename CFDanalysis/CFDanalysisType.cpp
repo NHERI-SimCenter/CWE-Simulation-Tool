@@ -34,6 +34,8 @@
 
 #include "CFDanalysisType.h"
 
+#include "../AgaveExplorer/ae_globals.h"
+
 CFDanalysisType::CFDanalysisType(QString configFile)
 {
     QFile inFile(configFile);
@@ -43,10 +45,11 @@ CFDanalysisType::CFDanalysisType(QString configFile)
 
     myConfiguration = QJsonDocument::fromJson(val);
 
-    QJsonObject obj    = myConfiguration.object();
+    QJsonObject obj = myConfiguration.object();
     myName = obj["name"].toString();
     QString theIcon = obj["icon"].toString();
 
+    //Find the template icon
     QString theIconPath;
     if (theIcon == "")
     {
@@ -57,6 +60,28 @@ CFDanalysisType::CFDanalysisType(QString configFile)
         theIconPath = ":/buttons/images/" + theIcon;
     }
     myIcon = QIcon(theIconPath);
+
+    //Initialize the cached stage list
+    QStringList stageList = obj["stages"].toObject().keys();;
+
+    for (QJsonValue aStage : obj["sequence"].toArray())
+    {
+        QString stageID = aStage.toString();
+        if (stageID.isEmpty()) continue;
+        if (!stageList.contains(stageID))
+        {
+            qCDebug(agaveAppLayer, "Config Parse Error: Sequence list and stage list do not match");
+            continue;
+        }
+
+        cachedOrderedStageList.append(stageID);
+    }
+
+    if (cachedOrderedStageList.length() != stageList.length())
+    {
+        qCDebug(agaveAppLayer, "Config Parse Error: Sequence list and stage list do not match");
+        continue;
+    }
 }
 
 QJsonDocument * CFDanalysisType::getRawConfig()
@@ -86,17 +111,6 @@ QString CFDanalysisType::getIconName()
 {
     QJsonObject obj = myConfiguration.object();
     return obj["icon"].toString();
-}
-
-QString CFDanalysisType::getStageName(QString stage)
-{
-    QJsonObject obj = myConfiguration.object();
-    QString    name = obj["stages"].toObject().value(stage).toObject().value("name").toString();
-    if (name.isEmpty())
-    {
-        name = "unknown";
-    }
-    return name;
 }
 
 QStringList CFDanalysisType::getStageGroups(QString stage)
@@ -223,30 +237,9 @@ QString CFDanalysisType::getExtraInput(QString stageName)
     return tmpStr;
 }
 
-QStringList CFDanalysisType::getStageNames()
+QStringList CFDanalysisType::getStageIds()
 {
-    QJsonObject obj = myConfiguration.object();
-    QJsonObject stageList = obj["stages"].toObject();
-
-    return stageList.keys();
-}
-
-QStringList CFDanalysisType::getStageSequence()
-{
-    QJsonObject obj = myConfiguration.object();
-    QJsonArray stages = obj["sequence"].toArray();
-
-    QStringList ret;
-    for (auto itr = stages.constBegin(); itr != stages.constEnd(); itr++)
-    {
-        QString aStage = (*itr).toString();
-        if (!aStage.isEmpty())
-        {
-            ret.append(aStage);
-        }
-    }
-
-    return ret;
+    return cachedOrderedStageList;
 }
 
 QString CFDanalysisType::translateStageId(QString stageId)

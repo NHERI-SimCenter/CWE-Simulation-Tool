@@ -145,62 +145,7 @@ void CWE_TabWidget::resetView()
 
 void CWE_TabWidget::setParameterConfig(CFDanalysisType *myType)
 {
-    QVBoxLayout *tablayout = (QVBoxLayout *)ui->tabsBar->layout();
-    delete tablayout;
-    tablayout = new QVBoxLayout();
-    tablayout->setMargin(0);
-    tablayout->setSpacing(0);
-    ui->tabsBar->setLayout(tablayout);
 
-    stageTabList->clear();
-
-    QStringList stages = myType->getStageSequence();
-
-    QMap<QString, StageState> stageStates;
-    stageStates = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase()->getStageStates();
-
-    foreach (QString stageName, stages)
-    {
-        QString stageLabel = myType->getStageName(stageName);
-        stageLabel += "\nParameters";
-
-        /* create a CWE_StageStatusTab */
-        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageName, stageLabel, this);
-
-        tab->setStatus(getStateText(stageStates.value(stageName)));
-
-        tablayout->addWidget(tab);
-        stageTabList->insert(stageName, tab);
-        //QVBoxLayout *layout = (QVBoxLayout *)ui->tabsBar->layout();
-
-        /* create a CWE_GroupsWidget */
-        CWE_GroupsWidget *groupWidget = new CWE_GroupsWidget(this);
-        ui->stagePanels->addWidget(groupWidget);
-
-        /* link tab and groupWidget */
-        tab->linkWidget(groupWidget);
-        groupWidget->linkWidget(tab);
-
-        /* set the parameter information for the CWE_GroupsWidget */
-        groupWidget->setParameterConfig(stageName, myType);
-
-        /* connect signals and slots */
-        QObject::connect(tab,SIGNAL(btn_pressed(CWE_GroupsWidget *)),this,SLOT(on_groupTabSelected(CWE_GroupsWidget *)));
-        QObject::connect(tab,SIGNAL(btn_activated(CWE_StageStatusTab*)),this,SLOT(on_tabActivated(CWE_StageStatusTab *)));
-    }
-
-    tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
-
-    initQuickParameterPtr();
-
-    if (stages.length()>0)
-    {
-        QString firstTabKey = stages[0];
-        if (!firstTabKey.isEmpty()) { stageTabList->value(firstTabKey)->setActive(); }
-    }
-
-    this->setButtonMode(SimCenterButtonMode_NONE);
-    this->setViewState(SimCenterViewState::hidden);
 }
 
 void CWE_TabWidget::updateParameterValues(QMap<QString, QString> newValues)
