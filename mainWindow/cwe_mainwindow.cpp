@@ -42,7 +42,7 @@
 #include "../AgaveClientInterface/remotedatainterface.h"
 #include "cwe_globals.h"
 
-#include "utilWindows/DialogAbout.h"
+#include "utilWindows/dialogabout.h"
 
 CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -62,7 +62,7 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
                      this, SLOT(switchToHelpTab(const QUrl &)));
 
     // adjust application size to display
-    QRect rec = QApplication::desktop()->screenGeometry();
+    QRect rec = QGuiApplication::screens().at(0)->availableGeometry();
     int height = this->height()>0.75*rec.height()?this->height():0.75*rec.height();
     if ( height > 0.95*rec.height() ) { height = 0.95*rec.height(); }
     int width  = this->width()>0.65*rec.width()?this->width():0.65*rec.width();
@@ -315,7 +315,7 @@ void CWE_MainWindow::on_actionAbout_CWE_triggered()
     //
     // adjust size of application window to the available display
     //
-    QRect rec = QApplication::desktop()->screenGeometry();
+    QRect rec = QGuiApplication::screens().at(0)->availableGeometry();
     int height = 0.50*rec.height();
     int width  = 0.50*rec.width();
     dlg->resize(width, height);

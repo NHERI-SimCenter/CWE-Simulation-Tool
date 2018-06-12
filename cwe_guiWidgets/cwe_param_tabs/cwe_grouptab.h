@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -32,79 +32,68 @@
 
 // Contributors:
 
-#ifndef CWE_MAINWINDOW_H
-#define CWE_MAINWINDOW_H
+#ifndef CWE_GROUPTAB_H
+#define CWE_GROUPTAB_H
 
-#include <QMainWindow>
+#include <QFrame>
 
-#include <QDesktopWidget>
-#include <QPushButton>
-#include <QScreen>
+#include <QMouseEvent>
 
-#include "../AgaveExplorer/remoteModelViews/remotefilemodel.h"
+class CWE_GroupsWidget;
 
 namespace Ui {
-class CWE_MainWindow;
+class CWE_GroupTab;
 }
 
-class cwe_state_label;
-class CWE_InterfaceDriver;
-class CFDcaseInstance;
-class CFDanalysisType;
-enum class CaseState;
-
-class CWE_MainWindow : public QMainWindow
+class CWE_GroupTab : public QFrame
 {
     Q_OBJECT
 
 public:
-    explicit CWE_MainWindow(QWidget *parent = 0);
-    ~CWE_MainWindow();
+    explicit CWE_GroupTab(QString stageKey, QString stageName, QWidget *parent = 0);
+    ~CWE_GroupTab();
+    void setCorrespondingPanel(CWE_GroupsWidget * newPanel);
 
-    void runSetupSteps();
-
-    void setParameterConfig(QJsonDocument &obj);
-
-    void switchToParameterTab();
-    void switchToResultsTab();
-    void switchToFilesTab();
-
-    RemoteFileModel * getFileModel();
-
-    CFDcaseInstance * getCurrentCase();
-    void setCurrentCase();
-    void setCurrentCase(CFDcaseInstance * newCase);
-    void setCurrentCase(const FileNodeRef &caseNode);
-    void setCurrentCase(CFDanalysisType * newCaseType);
-
-    CFDcaseInstance * getCaseFromType(CFDanalysisType *caseType);
-    CFDcaseInstance * getCaseFromFolder(const FileNodeRef &caseNode);
+    void setStatus(QString);
+    void setText(QString);
+    void setName(const QString s);
+    //void setIndex(int idx) {m_index = idx;};
+    QString name() {return m_name;};
+    QString text() {return m_text;};
+    QString status() {return m_status;};
+    //int index() {return m_index;};
+    bool tabIsActive();
+    void setActive(bool b=true);
+    void setInActive(bool b=true);
+    void linkWidget(CWE_GroupsWidget *ptr);
+    CWE_GroupsWidget * groupWidget() { return myPanel; };
+    QString getStageKey() { return stageKey; }
+    bool isStage(QString key) { return (stageKey == key);}
+    CWE_GroupsWidget *getGroupsWidget() { return myPanel; }
 
 signals:
-    void haveNewCase();
+    void btn_pressed(CWE_GroupsWidget *);
+    void btn_released(CWE_GroupsWidget *);
+    void btn_activated(CWE_StageStatusTab *);
 
 private slots:
-    void newCaseState(CaseState newState);
 
-    void menuExit();
-    void menuCopyInfo();
-
-    void on_actionAbout_CWE_triggered();
-
-    void switchToHelpTab(const QUrl &url);
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
-    void deactivateCurrentCase();
+    Ui::CWE_StageStatusTab *ui;
+    //void paintEvent(QPaintEvent*);
 
-    void changeParamsAndResultsEnabled(bool setting);
-    void changeTabEnabled(QWidget *theTab, bool newSetting);
+    CWE_GroupsWidget * myPanel = NULL;
 
-    Ui::CWE_MainWindow *ui;
-
-    CFDcaseInstance * currentCase = NULL;
-
-    RemoteFileModel fileModel;
-    cwe_state_label        *stateLabel = NULL;
+    QString m_text;
+    QString stageKey = "UNKNOWN";
+    QString m_status = "unknown";
+    QString m_name = "label text";
+    //int m_index = -1;
+    bool m_active;
 };
 
-#endif // CWE_MAINWINDOW_H
+#endif // CWE_GROUPTAB_H

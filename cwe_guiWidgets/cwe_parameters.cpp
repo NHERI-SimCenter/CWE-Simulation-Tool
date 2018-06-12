@@ -44,8 +44,12 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "cwe_param_tabs/cwe_stagestatustab.h"
+#include "cwe_param_tabs/cwe_grouptab.h"
+
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
+
 #include "mainWindow/cwe_mainwindow.h"
-#include "cwe_tabwidget/cwe_tabwidget.h"
 
 #include "cwe_globals.h"
 
@@ -54,7 +58,6 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
-    ui->theTabWidget->setController(this);
 }
 
 CWE_Parameters::~CWE_Parameters()
@@ -69,35 +72,11 @@ void CWE_Parameters::linkMainWindow(CWE_MainWindow *theMainWin)
                      this, SLOT(newCaseGiven()));
 }
 
-void CWE_Parameters::resetViewInfo()
-{
-    paramWidgetsExist = false;
-
-    // erase all stage tabs
-    ui->theTabWidget->resetView();
-}
-
-void CWE_Parameters::on_pbtn_saveAllParameters_clicked()
-{
-    saveAllParams();
-}
-
-void CWE_Parameters::saveAllParams()
-{
-    CFDcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
-    if (linkedCFDCase == NULL) return;
-
-    if (!linkedCFDCase->changeParameters(ui->theTabWidget->collectParamData()))
-    {
-        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-    }
-}
-
 void CWE_Parameters::newCaseGiven()
 {
     CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
 
-    this->resetViewInfo();
+    clearParamScreen();
 
     if (newCase != NULL)
     {
@@ -105,26 +84,48 @@ void CWE_Parameters::newCaseGiven()
                          this, SLOT(newCaseState(CaseState)));
         newCaseState(newCase->getCaseState());
     }
+    else
+    {
+        //TODO: Change labels for loading message to no case selected
+    }
+}
+
+QString CWE_Parameters::getStateText(StageState theState)
+{
+    switch (theState)
+    {
+        case StageState::DOWNLOADING : return "Downloading . . .";
+        case StageState::ERROR : return "*** ERROR ***";
+        case StageState::FINISHED : return "Task Finished";
+        case StageState::FINISHED_PREREQ : return "Task Finished";
+        case StageState::LOADING : return "Loading Data ...";
+        case StageState::OFFLINE : return "Offline (Debug)";
+        case StageState::RUNNING : return "Task Running";
+        case StageState::UNREADY : return "Need Prev. \nStage";
+        case StageState::UNRUN : return "Not Yet Run";
+    }
+    return "*** TOTAL ERROR ***";
 }
 
 void CWE_Parameters::newCaseState(CaseState newState)
 {
-    if (!paramWidgetsExist)
-    {
-        createUnderlyingParamWidgets();
-    }
-
-    if (!paramWidgetsExist)
-    {
-        return;
-    }
+    if (!enactWidgetCreationSequence()) return;
 
     //Sets the listed states of the stage tabs
     QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
-    for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
+    for (CWE_StageStatusTab * aStageTab :  stageTabList)
     {
-        ui->theTabWidget->setTabStage(*itr, itr.key());
+        if (!stageStates.contains(aStageTab->getStageKey()))
+        {
+            qCDebug(agaveAppLayer, "Invalid internal use of non-existant stage");
+            continue;
+        }
+
+        aStageTab->setStatus(getStateText(newState));
     }
+
+    //DOLINE:
+    //From here, we only need to change the view state of the currently visible panel
 
     switch (newState)
     {
@@ -220,6 +221,42 @@ void CWE_Parameters::setVisibleAccordingToStage()
     }
 }
 
+void CWE_Parameters::clearParamScreen()
+{
+    while (!paramWidgetList.isEmpty())
+    {
+        paramWidgetList.takeLast()->deleteLater();
+    }
+
+    while (!stageTabList.isEmpty())
+    {
+        stageTabList.takeLast()->deleteLater();
+    }
+
+    while (!groupTabList.isEmpty())
+    {
+        groupTabList.takeLast()->deleteLater();
+    }
+
+    //TODO: Create labels for loading message in param panel
+}
+
+bool CWE_Parameters::enactWidgetCreationSequence()
+{
+    if (paramWidgetsExist && stageButtonsExist && groupButtonsExist)
+    {
+        return true;
+    }
+
+
+
+    //TODO check for and create if possible each of the 3 types of widgets
+    return true; //if all widgets exist and panel is ready to use
+
+    //    if (!paramWidgetsExist) createUnderlyingParamWidgets();
+    //if (!paramWidgetsExist) return;
+}
+
 void CWE_Parameters::createUnderlyingParamWidgets()
 {
     if (paramWidgetsExist) return;
@@ -244,46 +281,6 @@ void CWE_Parameters::createUnderlyingParamWidgets()
     paramWidgetsExist = true;
 }
 
-void CWE_Parameters::switchToResults()
-{
-    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToResultsTab();
-}
-
-void CWE_Parameters::performCaseCommand(QString stage, CaseCommand toEnact)
-{
-    if (theMainWindow->getCurrentCase() == NULL)
-    {
-        return;
-    }
-
-    //TODO: Check that commands are valid : PRS
-
-    if (toEnact == CaseCommand::CANCEL)
-    {
-        if (!theMainWindow->getCurrentCase()->stopJob())
-        {
-            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-            return;
-        }
-    }
-    else if (toEnact == CaseCommand::ROLLBACK)
-    {
-        if (!theMainWindow->getCurrentCase()->rollBack(stage))
-        {
-            cwe_globals::displayPopup("Unable to rool back this stage, please check that this stage is done and check your network connection.", "Network Issue");
-            return;
-        }
-    }
-    else if (toEnact == CaseCommand::RUN)
-    {
-        if (!theMainWindow->getCurrentCase()->changeParameters(ui->theTabWidget->collectParamData(), stage))
-        {
-            cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
-            return;
-        }
-    }
-}
-
 void CWE_Parameters::setSaveAllButtonDisabled(bool newSetting)
 {
     ui->pbtn_saveAllParameters->setDisabled(newSetting);
@@ -292,4 +289,83 @@ void CWE_Parameters::setSaveAllButtonDisabled(bool newSetting)
 void CWE_Parameters::setSaveAllButtonEnabled(bool newSetting)
 {
     ui->pbtn_saveAllParameters->setEnabled(newSetting);
+}
+
+bool CWE_Parameters::checkButtonEnactReady()
+{
+    //TODO
+    return true;
+}
+
+bool CWE_Parameters::paramsChanged()
+{
+    //TODO: return true if param widgets have changed values
+    return true;
+}
+
+void CWE_Parameters::save_all_button_clicked()
+{
+    CFDcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
+    if (linkedCFDCase == NULL) return;
+
+    // collect parameter values from all SCtrMasterDataWidget objects
+    QMap<QString, QString> newParams;
+    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
+
+    while (iter.hasNext())
+    {
+        //TODO: Check if new, if so, insert in into new param list
+        iter.next();
+
+
+        newParams.insert(iter.key(), (iter.value())->value());
+        count++;
+    }
+
+    if (newParams.isEmpty()) return;
+
+    if (!linkedCFDCase->changeParameters(newParams))
+    {
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+    }
+}
+
+void CWE_Parameters::run_button_clicked()
+{
+    if (!checkButtonEnactReady()) return;
+
+    if (!theMainWindow->getCurrentCase()->startStageApp(stage))
+    {
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+        return;
+    }
+}
+
+void CWE_Parameters::cancel_button_clicked()
+{
+    if (!checkButtonEnactReady()) return;
+
+    if (!theMainWindow->getCurrentCase()->stopJob())
+    {
+        cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
+        return;
+    }
+}
+
+void CWE_Parameters::results_button_clicked()
+{
+    if (!checkButtonEnactReady()) return;
+
+    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToResultsTab();
+}
+
+void CWE_Parameters::rollback_button_clicked()
+{
+    if (!checkButtonEnactReady()) return;
+
+    if (!theMainWindow->getCurrentCase()->rollBack(stage))
+    {
+        cwe_globals::displayPopup("Unable to roll back this stage, please check that this stage is done and check your network connection.", "Network Issue");
+        return;
+    }
 }

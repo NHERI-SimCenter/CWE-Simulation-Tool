@@ -69,10 +69,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.cpp \
     CFDanalysis/CFDanalysisType.cpp \
     CFDanalysis/CFDcaseInstance.cpp \
     SimCenter_widgets/sctrvalidators.cpp \
@@ -122,7 +118,12 @@ SOURCES += main.cpp \
     popupWindows/cwe_popup.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavethread.cpp \
     ../AgaveExplorer/utilFuncs/fixforssl.cpp \
-    utilWindows/dialogabout.cpp
+    utilWindows/dialogabout.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_groupswidget.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_parampanel.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_tabwidget.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -138,10 +139,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
     cwe_guiWidgets/cwe_state_label.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h \
     SimCenter_widgets/sctrvalidators.h \
     SimCenter_widgets/sctrmasterdatawidget.h \
     SimCenter_widgets/sctrstddatawidget.h \
@@ -190,7 +187,12 @@ HEADERS  += \
     popupWindows/cwe_popup.h \
     ../AgaveClientInterface/agaveInterfaces/agavethread.h \
     ../AgaveExplorer/utilFuncs/fixforssl.h \
-    utilWindows/dialogabout.h
+    utilWindows/dialogabout.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_groupswidget.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_parampanel.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_tabwidget.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -200,19 +202,18 @@ FORMS    += \
     cwe_guiWidgets/cwe_results.ui \
     cwe_guiWidgets/cwe_parameters.ui \
     cwe_guiWidgets/cwe_debug_widget.ui \
-    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
-    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
     cwe_guiWidgets/cwe_job_list.ui \
     visualUtils/resultvisualpopup.ui \
     cwe_guiWidgets/cwe_file_manager.ui \
     popupWindows/create_case_popup.ui \
     popupWindows/duplicate_case_popup.ui \
     ../AgaveExplorer/utilFuncs/fixforssl.ui \
-    utilWindows/dialogabout.ui
+    utilWindows/dialogabout.ui \
+    cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.ui \
+    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.ui
 
 RESOURCES += \
     cwe_resources.qrc \
