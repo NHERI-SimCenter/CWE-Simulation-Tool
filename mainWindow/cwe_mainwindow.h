@@ -91,6 +91,8 @@ private slots:
 
     void on_actionAbout_CWE_triggered();
 
+    void switchToHelpTab(const QUrl &url);
+
 private:
     void deactivateCurrentCase();
 

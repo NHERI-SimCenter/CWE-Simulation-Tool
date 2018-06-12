@@ -54,3 +54,8 @@ CWE_help::~CWE_help()
 {
     delete ui;
 }
+
+void CWE_help::setPageSource(const QUrl &url)
+{
+    ui->helpBrowser->setSource(url);
+}
