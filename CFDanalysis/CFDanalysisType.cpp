@@ -46,7 +46,6 @@ CFDanalysisType::CFDanalysisType(QString configFile)
     myConfiguration = QJsonDocument::fromJson(val);
 
     QJsonObject obj = myConfiguration.object();
-    myName = obj["name"].toString();
     QString theIcon = obj["icon"].toString();
 
     //Find the template icon
@@ -79,8 +78,7 @@ CFDanalysisType::CFDanalysisType(QString configFile)
 
     if (cachedOrderedStageList.length() != stageList.length())
     {
-        qCDebug(agaveAppLayer, "Config Parse Error: Sequence list and stage list do not match");
-        continue;
+        qCWarning(agaveAppLayer, "Config Parse Error: Sequence list and stage list do not match");
     }
 }
 
@@ -95,10 +93,10 @@ QString CFDanalysisType::getInternalName()
     return obj["internalName"].toString();
 }
 
-QString CFDanalysisType::getName()
+QString CFDanalysisType::getDisplayName()
 {
     QJsonObject obj = myConfiguration.object();
-    return obj["name"].toString();
+    return obj["displayName"].toString();
 }
 
 QString CFDanalysisType::getDescription()
@@ -141,7 +139,7 @@ QList<RESULTS_STYLE> CFDanalysisType::getStageResults(QString stage)
 
         RESULTS_STYLE res;
 
-        if (item.contains("name")) { res.name = item.value("name").toString(); }
+        if (item.contains("displayName")) { res.name = item.value("displayName").toString(); }
         if (item.contains("type")) { res.type = item.value("type").toString(); }
         if (item.contains("file")) { res.file = item.value("file").toString(); }
         if (item.contains("values")) { res.values = item.value("values").toString(); }
@@ -219,10 +217,10 @@ VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
     return res;
 }
 
-QString CFDanalysisType::getStageApp(QString stageName)
+QString CFDanalysisType::getStageApp(QString stageID)
 {
     QJsonObject obj = myConfiguration.object();
-    QString tmpStr = obj["stages"].toObject().value(stageName).toObject().value("app").toString();
+    QString tmpStr = obj["stages"].toObject().value(stageID).toObject().value("app").toString();
     if (tmpStr.isEmpty())
     {
         return "cwe-serial";
@@ -230,10 +228,10 @@ QString CFDanalysisType::getStageApp(QString stageName)
     return tmpStr;
 }
 
-QString CFDanalysisType::getExtraInput(QString stageName)
+QString CFDanalysisType::getExtraInput(QString stageID)
 {
     QJsonObject obj = myConfiguration.object();
-    QString tmpStr = obj["stages"].toObject().value(stageName).toObject().value("app_input").toString();
+    QString tmpStr = obj["stages"].toObject().value(stageID).toObject().value("app_input").toString();
     return tmpStr;
 }
 
@@ -247,12 +245,25 @@ QString CFDanalysisType::translateStageId(QString stageId)
     QJsonObject obj = myConfiguration.object();
     QJsonObject stageList = obj["stages"].toObject();
 
-    QString aStage = stageList[stageId].toObject()["name"].toString();
+    QString aStage = stageList[stageId].toObject()["displayName"].toString();
     if (aStage.isEmpty())
     {
         return "NULL";
     }
     return aStage;
+}
+
+QString CFDanalysisType::translateGroupId(QString groupId)
+{
+    QJsonObject obj = myConfiguration.object();
+    QJsonObject stageList = obj["groups"].toObject();
+
+    QString aGroup = stageList[groupId].toObject()["displayName"].toString();
+    if (aGroup.isEmpty())
+    {
+        return "NULL";
+    }
+    return aGroup;
 }
 
 QIcon * CFDanalysisType::getIcon()

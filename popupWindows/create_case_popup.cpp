@@ -136,7 +136,7 @@ void Create_Case_Popup::populateCaseTypes()
         QJsonDocument * configuration = caseType->getRawConfig();
 
         QJsonObject confObj = configuration->object();
-        QString theName = confObj["name"].toString();
+        QString theName = confObj["displayName"].toString();
         QString theDescription = confObj["description"].toString();
 
         /* create UI selection block */

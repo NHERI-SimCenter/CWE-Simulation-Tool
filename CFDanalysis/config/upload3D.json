@@ -1,12 +1,12 @@
 {
-    "name":"3D Building Geometry",
+    "displayName":"3D Building Geometry",
     "internalName":"upload3D",
     "description":"This model describes \nthe air flow around a building\n using an uploaded 3D geometry.",
     "icon":"upload3D.png",
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{
-            "name":"Mesh",
+            "displayname":"Mesh",
             "app":"cwe-serial",
             "app_input":"geoFile",
             "groups":[
@@ -17,24 +17,24 @@
             ],
             "results":[
                 {
-                    "name":"Mesh Agave Log",
+                    "displayname":"Mesh Agave Log",
                     "type":"text",
                     "file":"logs/.agave.log"
                 },
                 {
-                    "name":"Mesh Error Log",
+                    "displayname":"Mesh Error Log",
                     "type":"text",
                     "file":"logs/cwe-serial.err"
                 },
                 {
-                    "name":"Mesh Output Log",
+                    "displayname":"Mesh Output Log",
                     "type":"text",
                     "file":"logs/cwe-serial.out"
                 }
             ]
         },
         "sim":{
-            "name":"Simulation",
+            "displayname":"Simulation",
             "app":"cwe-parallel",
             "groups":[
                 "Simulation Control",
@@ -42,22 +42,22 @@
             ],
             "results":[
                 {
-                    "name":"Sim Agave Log",
+                    "displayname":"Sim Agave Log",
                     "type":"text",
                     "file":"logs/.agave.log"
                 },
                 {
-                    "name":"Sim Error Log",
+                    "displayname":"Sim Error Log",
                     "type":"text",
                     "file":"logs/cwe-parallel.err"
                 },
                 {
-                    "name":"Sim Output Log",
+                    "displayname":"Sim Output Log",
                     "type":"text",
                     "file":"logs/cwe-parallel.out"
                 },
                 {
-                    "name":"OpenFOAM Log",
+                    "displayname":"OpenFOAM Log",
                     "type":"text",
                     "file":"logs/sim.log"
                 }
@@ -66,7 +66,7 @@
     },
     "groups":{
         "Building Geometry":{
-            "name":"Building Geometry",
+            "displayname":"Building Geometry",
             "vars":[
                 "geoChoose",
                 "geoFile"
@@ -74,7 +74,7 @@
             "image":"placeholderIcon.png"
         },
         "Mesh Density":{
-            "name":"Mesh Density",
+            "displayname":"Mesh Density",
             "vars":[
                 "inPad",
                 "outPad",
@@ -87,7 +87,7 @@
             ]
         },
         "Subdomains":{
-            "name":"Subdomains",
+            "displayname":"Subdomains",
             "vars":[
                 "innerDomains",
                 "inPadDom1",
@@ -114,7 +114,7 @@
             ]
         },
         "Boundaries":{
-            "name":"Boundaries",
+            "displayname":"Boundaries",
             "vars":[
                 "lowYPlane",
                 "highYPlane",
@@ -123,7 +123,7 @@
             ]
         },
         "Simulation Control":{
-            "name":"Simulation Control",
+            "displayname":"Simulation Control",
             "vars":[
                 "endTime",
                 "deltaT",
@@ -132,7 +132,7 @@
             ]
         },
         "Advanced":{
-            "name":"Advanced",
+            "displayname":"Advanced",
             "vars":[
                 "turbModel",
                 "useForceCoeffs",

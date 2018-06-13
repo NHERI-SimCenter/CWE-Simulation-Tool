@@ -40,14 +40,14 @@
 class RemoteFileTree;
 class CWE_InterfaceDriver;
 class FileNodeRef;
-class CWE_MainWindow;
+class RemoteFileModel;
 
 //TODO: Need to write visibilty method
 
 class SCtrFileDataWidget: public SCtrMasterDataWidget
 {
 public:
-    SCtrFileDataWidget(CWE_MainWindow * mainWindow, QWidget *parent);
+    SCtrFileDataWidget(RemoteFileModel *aFileModel, QWidget *parent);
     void setData(VARIABLE_TYPE &);
     QString toString();
     bool toBool();
@@ -58,7 +58,7 @@ private slots:
     virtual void newFileSelected(FileNodeRef);
 
 private:
-    CWE_MainWindow * theMainWindow;
+    RemoteFileModel * theFileModel;
 
     RemoteFileTree * myFileTree = NULL;
     QLabel * selectedFile = NULL;

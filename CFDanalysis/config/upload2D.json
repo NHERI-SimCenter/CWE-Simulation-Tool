@@ -1,12 +1,12 @@
 {
-    "name":"2D Building Slice",
+    "displayName":"2D Building Slice",
     "internalName":"upload2D",
     "description":"This model describes \nthe air flow around a building\n using a 2D horizontal slice.",
     "icon":"upload2D.png",
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{
-            "name":"Mesh",
+            "displayname":"Mesh",
             "app":"cwe-serial",
             "app_input":"geoFile",
             "groups":[
@@ -17,28 +17,28 @@
             ],
             "results":[
                 {
-                    "name":"Mesh View",
+                    "displayName":"Mesh View",
                     "type":"GLmesh"
                 },
                 {
-                    "name":"Mesh Agave Log",
+                    "displayName":"Mesh Agave Log",
                     "type":"text",
                     "file":"logs/.agave.log"
                 },
                 {
-                    "name":"Mesh Error Log",
+                    "displayName":"Mesh Error Log",
                     "type":"text",
                     "file":"logs/cwe-serial.err"
                 },
                 {
-                    "name":"Mesh Output Log",
+                    "displayName":"Mesh Output Log",
                     "type":"text",
                     "file":"logs/cwe-serial.out"
                 }
             ]
         },
         "sim":{
-            "name":"Simulation",
+            "displayname":"Simulation",
             "app":"cwe-parallel",
             "groups":[
                 "Simulation Control",
@@ -46,39 +46,39 @@
             ],
             "results":[
                 {
-                    "name":"Final Flow Velocity Field",
+                    "displayName":"Final Flow Velocity Field",
                     "type":"GLdata",
                     "file":"U",
                     "values":"magnitude"
                 },
                 {
-                    "name":"Final Flow Pressure Field",
+                    "displayName":"Final Flow Pressure Field",
                     "type":"GLdata",
                     "file":"p",
                     "values":"scalar"
                 },
                 {
-                    "name":"Force Coefficients",
+                    "displayName":"Force Coefficients",
                     "type":"text",
                     "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat"
                 },
                 {
-                    "name":"Sim Agave Log",
+                    "displayName":"Sim Agave Log",
                     "type":"text",
                     "file":"logs/.agave.log"
                 },
                 {
-                    "name":"Sim Error Log",
+                    "displayName":"Sim Error Log",
                     "type":"text",
                     "file":"logs/cwe-parallel.err"
                 },
                 {
-                    "name":"Sim Output Log",
+                    "displayName":"Sim Output Log",
                     "type":"text",
                     "file":"logs/cwe-parallel.out"
                 },
                 {
-                    "name":"OpenFOAM Log",
+                    "displayName":"OpenFOAM Log",
                     "type":"text",
                     "file":"logs/sim.log"
                 }
@@ -87,7 +87,7 @@
     },
     "groups":{
         "Building Geometry":{
-            "name":"Building Geometry",
+            "displayname":"Building Geometry",
             "vars":[
                 "geoChoose",
                 "geoFile",
@@ -97,7 +97,7 @@
             "image":"placeholderIcon.png"
         },
         "Mesh Density":{
-            "name":"Mesh Density",
+            "displayname":"Mesh Density",
             "vars":[
                 "inPad",
                 "outPad",
@@ -108,7 +108,7 @@
             ]
         },
         "Subdomains":{
-            "name":"Subdomains",
+            "displayname":"Subdomains",
             "vars":[
                 "innerDomains",
                 "inPadDom1",
@@ -129,14 +129,14 @@
             ]
         },
         "Boundaries":{
-            "name":"Boundaries",
+            "displayname":"Boundaries",
             "vars":[
                 "lowYPlane",
                 "highYPlane"
             ]
         },
         "Simulation Control":{
-            "name":"Simulation Control",
+            "displayname":"Simulation Control",
             "vars":[
                 "endTime",
                 "deltaT",
@@ -145,7 +145,7 @@
             ]
         },
         "Advanced":{
-            "name":"Advanced",
+            "displayname":"Advanced",
             "vars":[
                 "turbModel",
                 "useForceCoeffs",

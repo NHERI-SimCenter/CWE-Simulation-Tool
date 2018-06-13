@@ -36,15 +36,14 @@
 #include "ui_cwe_stagestatustab.h"
 
 CWE_StageStatusTab::CWE_StageStatusTab(QString theStageKey, QString stageName, QWidget *parent) :
-    QFrame(parent),
+    CWE_ParamTab(theStageKey, stageName, parent),
     ui(new Ui::CWE_StageStatusTab)
 {
     ui->setupUi(this);
-    stageKey = theStageKey;
-    ui->mainLabel->setText(stageName);
+    ui->mainLabel->setText(tabDisplay);
 
     this->setStatus("INIT");
-    this->setButtonAppearance(false, false);
+    this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none}");
 }
 
 CWE_StageStatusTab::~CWE_StageStatusTab()
@@ -58,64 +57,13 @@ void CWE_StageStatusTab::setStatus(const QString str)
     ui->statusLabel->setText(str);
 }
 
-QString CWE_StageStatusTab::getStageKey()
-{
-    return stageKey;
-}
-
 QString CWE_StageStatusTab::status()
 {
     return stageStatus;
 }
 
-bool CWE_StageStatusTab::tabIsActive()
+void CWE_StageStatusTab::setButtonAppearance()
 {
-    return tab_active;
-}
-
-void CWE_StageStatusTab::setActive(bool b)
-{
-    if (!b)
-    {
-        this->setInActive();
-        return;
-    }
-    setButtonAppearance(tab_pressed, true);
-}
-
-void CWE_StageStatusTab::setInActive(bool b)
-{
-    if (!b)
-    {
-        this->setActive();
-        return;
-    }
-    setButtonAppearance(tab_pressed, false);
-}
-
-void CWE_StageStatusTab::mousePressEvent(QMouseEvent *event)
-{
-    //TODO: Test mouse release if mouse dragged off tab
-    if (event->button() == Qt::LeftButton)
-    {
-        setButtonAppearance(true, tab_active);
-        emit btn_pressed(this);
-    }
-}
-
-void CWE_StageStatusTab::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton)
-    {
-        setButtonAppearance(false, tab_active);
-        emit btn_released(this);
-    }
-}
-
-void CWE_StageStatusTab::setButtonAppearance(bool tabPressed, bool tabActive)
-{
-    tab_pressed = tabPressed;
-    tab_active = tabActive;
     if (tab_pressed)
     {
         if (tab_active)

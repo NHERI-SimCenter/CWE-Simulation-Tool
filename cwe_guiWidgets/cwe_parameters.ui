@@ -155,30 +155,6 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1" colspan="4">
-    <widget class="QScrollArea" name="paramScrollArea">
-     <property name="windowTitle">
-      <string>ScrollArea</string>
-     </property>
-     <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOn</enum>
-     </property>
-     <property name="widgetResizable">
-      <bool>true</bool>
-     </property>
-     <widget class="QWidget" name="parameterSpace">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>684</width>
-        <height>298</height>
-       </rect>
-      </property>
-      <layout class="QGridLayout" name="paramGridLayout"/>
-     </widget>
-    </widget>
-   </item>
    <item row="4" column="2">
     <widget class="QPushButton" name="pbtn_cancel">
      <property name="text">
@@ -250,6 +226,73 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="4">
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="optionalImage">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QScrollArea" name="paramScrollArea">
+        <property name="windowTitle">
+         <string>ScrollArea</string>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOn</enum>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="parameterSpace">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>678</width>
+           <height>296</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="paramSpaceLayout"/>
+        </widget>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

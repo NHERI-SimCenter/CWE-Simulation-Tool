@@ -35,17 +35,13 @@
 #ifndef CWE_STAGESTATUSTAB_H
 #define CWE_STAGESTATUSTAB_H
 
-#include <QFrame>
-
-#include <QMouseEvent>
-
-class CWE_GroupsWidget;
+#include "cwe_paramtab.h"
 
 namespace Ui {
 class CWE_StageStatusTab;
 }
 
-class CWE_StageStatusTab : public QFrame
+class CWE_StageStatusTab : public CWE_ParamTab
 {
     Q_OBJECT
 
@@ -54,32 +50,15 @@ public:
     ~CWE_StageStatusTab();
 
     void setStatus(const QString str);
-
-    QString getStageKey();
     QString status();
 
-    bool tabIsActive();
-    void setActive(bool b=true);
-    void setInActive(bool b=true);
-
-signals:
-    void btn_pressed(CWE_StageStatusTab *);
-    void btn_released(CWE_StageStatusTab *);
-
 protected:
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void setButtonAppearance();
 
 private:
-    void setButtonAppearance(bool tabPressed, bool tabActive);
-
     Ui::CWE_StageStatusTab *ui;
 
-    QString stageKey = "UNKNOWN";
     QString stageStatus = "unknown";
-
-    bool tab_active;
-    bool tab_pressed;
 };
 
 #endif // CWE_STAGESTATUSTAB_H

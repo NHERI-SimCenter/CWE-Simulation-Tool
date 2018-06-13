@@ -32,53 +32,68 @@
 
 // Contributors:
 
-#ifndef CWE_GROUPSWIDGET_H
-#define CWE_GROUPSWIDGET_H
+#include "cwe_paramtab.h"
 
-#include <QTabWidget>
-
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QScrollArea>
-#include "CFDanalysis/CFDanalysisType.h"
-
-class CWE_StageStatusTab;
-class CWE_ParamTab;
-class SCtrMasterDataWidget;
-class CWE_InterfaceDriver;
-enum class SimCenterViewState;
-enum class StageState;
-
-class CWE_GroupsWidget : public QTabWidget
+CWE_ParamTab::CWE_ParamTab(QString refKey, QString displayedText, QWidget *parent) :
+    QFrame(parent)
 {
-public:
-    CWE_GroupsWidget(QWidget *parent = NULL);
-    ~CWE_GroupsWidget();
-    void setCorrespondingTab(CWE_StageStatusTab * newTab);
+    tabKey = refKey;
+    tabDisplay = displayedText;
+}
 
-    void setViewState(SimCenterViewState);  // set the view state
-    void addVSpacer(const QString &key, const QString &label);
-    void addVarsToTab(QString key, const QString &label, QJsonArray *, QJsonObject *, QMap<QString,QString> * );
+CWE_ParamTab::~CWE_ParamTab() {}
 
-    void setParameterConfig(QString key, CFDanalysisType *myType);
-    void linkWidget(CWE_StageStatusTab *tab);
-    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
+QString CWE_ParamTab::getRefKey()
+{
+    return tabKey;
+}
 
-    void initQuickParameterPtr();
-    void updateParameterValues(QMap<QString, QString> );
-    int collectParamData(QMap<QString, QString> &);
+bool CWE_ParamTab::tabIsActive()
+{
+    return tab_active;
+}
 
+void CWE_ParamTab::setActive(bool b)
+{
+    if (!b)
+    {
+        this->setInActive();
+        return;
+    }
+    setButtonState(tab_pressed, true);
+}
 
-protected:
-    CWE_ParamTab *getGroupTab();  // returns pointer to group tab widget
+void CWE_ParamTab::setInActive(bool b)
+{
+    if (!b)
+    {
+        this->setActive();
+        return;
+    }
+    setButtonState(tab_pressed, false);
+}
 
-private:
-    SimCenterViewState m_viewState;
-    QJsonObject m_obj;
+void CWE_ParamTab::mousePressEvent(QMouseEvent *event)
+{
+    //TODO: Test mouse release if mouse dragged off tab
+    if (event->button() == Qt::LeftButton)
+    {
+        setButtonState(true, tab_active);
+        emit btn_pressed(this);
+    }
+}
+void CWE_ParamTab::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        setButtonState(false, tab_active);
+        emit btn_released(this);
+    }
+}
 
-    CWE_StageStatusTab * myTab;
-
-    QMap<QString, SCtrMasterDataWidget *> *quickParameterPtr;
-};
-
-#endif // CWE_GROUPSWIDGET_H
+void CWE_ParamTab::setButtonState(bool tabPressed, bool tabActive)
+{
+    tab_pressed = tabPressed;
+    tab_active = tabActive;
+    setButtonAppearance();
+}

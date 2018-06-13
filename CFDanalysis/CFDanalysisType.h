@@ -71,7 +71,7 @@ public:
     QJsonDocument * getRawConfig(); // should become a private method (?)
 
     QString getInternalName();
-    QString getName();
+    QString getDisplayName();
     QString getDescription();
     QString getIconName();
     QStringList getStageIds();
@@ -82,10 +82,11 @@ public:
     QStringList getVarGroup(QString group);
     VARIABLE_TYPE getVariableInfo(QString name);
 
-    QString getStageApp(QString stageName);
-    QString getExtraInput(QString stageName);
+    QString getStageApp(QString stageID);
+    QString getExtraInput(QString stageID);
 
     QString translateStageId(QString stageId);
+    QString translateGroupId(QString groupId);
 
     QIcon * getIcon();
 
@@ -93,7 +94,6 @@ public:
     bool isDisabled();
 
 private:
-    QString myName;
     QIcon myIcon;
 
     QJsonDocument myConfiguration;

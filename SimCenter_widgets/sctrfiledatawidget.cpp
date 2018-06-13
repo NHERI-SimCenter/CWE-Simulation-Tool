@@ -40,10 +40,10 @@
 #include "cwe_interfacedriver.h"
 #include "mainWindow/cwe_mainwindow.h"
 
-SCtrFileDataWidget::SCtrFileDataWidget(CWE_MainWindow *mainWindow, QWidget *parent):
+SCtrFileDataWidget::SCtrFileDataWidget(RemoteFileModel * aFileModel, QWidget *parent):
     SCtrMasterDataWidget(parent)
 {
-    theMainWindow = mainWindow;
+    theFileModel = aFileModel;
 }
 
 void SCtrFileDataWidget::initUI()
@@ -78,7 +78,7 @@ void SCtrFileDataWidget::setData(VARIABLE_TYPE &obj)
     layout->setMargin(0);
 
     myFileTree = new RemoteFileTree(this);
-    myFileTree->setModelLink(theMainWindow->getFileModel());
+    myFileTree->setModelLink(theFileModel);
     myFileTree->setEditTriggers(QTreeView::NoEditTriggers);
     layout->insertWidget(1, myFileTree, 4);
 

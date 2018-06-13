@@ -47,7 +47,10 @@ class CWE_MainWindow;
 
 class CWE_StageStatusTab;
 class CWE_GroupTab;
+class CWE_ParamTab;
 class SCtrMasterDataWidget;
+
+struct VARIABLE_TYPE;
 
 enum class CaseState;
 enum class StageState;
@@ -79,8 +82,8 @@ private slots:
     void newCaseGiven();
     void newCaseState(CaseState newState);
 
-    void stageSelected(CWE_StageStatusTab * chosenTab);
-    void groupSelected(CWE_GroupTab * chosenTab);
+    void stageSelected(CWE_ParamTab * chosenTab);
+    void groupSelected(CWE_ParamTab * chosenTab);
 
 private:
     bool checkButtonEnactReady();
@@ -89,9 +92,12 @@ private:
     void setButtonsAccordingToStage();
     void setVisibleAccordingToStage();
 
+    void setHeaderLabels();
+
     void createStageTabs();
     void createGroupTabs();
     void createParamWidgets();
+    void addVariable(QString varName, VARIABLE_TYPE &theVariable);
 
     void clearStageTabs();
     void clearGroupTabs();

@@ -203,7 +203,7 @@ QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
         for (auto itr2 = resultArray.constBegin(); itr2 != resultArray.constEnd(); itr2++)
         {
             QJsonObject aResult = (*itr2).toObject();
-            if (aResult.value("name").toString() == name)
+            if (aResult.value("displayName").toString() == name)
             {
                 for (auto itr3 = aResult.constBegin(); itr3 != aResult.constEnd(); itr3++)
                 {
@@ -297,7 +297,7 @@ void CWE_Results::populateResultsScreen()
     ui->resultsTreeView->header()->setSectionResizeMode(3,QHeaderView::Stretch);
 
     ui->label_theName->setText(currentCase->getCaseName());
-    ui->label_theType->setText(theTemplate->getName());
+    ui->label_theType->setText(theTemplate->getDisplayName());
     ui->label_theLocation->setText(currentCase->getCaseFolder().getFullPath());
 
     for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
@@ -318,15 +318,15 @@ void CWE_Results::populateResultsScreen()
             QString resultType = aResult.value("type").toString();
             if (resultType == "text")
             {
-                addResult(aResult.value("name").toString(),true,true,"Data File");
+                addResult(aResult.value("displayName").toString(),true,true,"Data File");
             }
             else if (resultType == "GLdata")
             {
-                addResult(aResult.value("name").toString(),true,false,"Flow Field Image");
+                addResult(aResult.value("displayName").toString(),true,false,"Flow Field Image");
             }
             else if (resultType == "GLmesh")
             {
-                addResult(aResult.value("name").toString(),true,false,"Mesh Image");
+                addResult(aResult.value("displayName").toString(),true,false,"Mesh Image");
             }
             else
             {

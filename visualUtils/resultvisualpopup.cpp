@@ -81,7 +81,7 @@ void ResultVisualPopup::performStandardInit(QMap<QString, QString> neededFiles)
         return;
     }
 
-    setupResultDisplay(myCase->getCaseName(), myCase->getMyType()->getName(), resultObj["name"]);
+    setupResultDisplay(myCase->getCaseName(), myCase->getMyType()->getDisplayName(), resultObj["displayName"]);
     initializeWithNeededFiles(trueBaseFolder, neededFiles);
 }
 

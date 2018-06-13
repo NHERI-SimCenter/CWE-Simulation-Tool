@@ -35,83 +35,43 @@
 #include "cwe_grouptab.h"
 #include "ui_cwe_grouptab.h"
 
-CWE_GroupTab::CWE_GroupTab(QString theStageKey, QString stageName, QWidget *parent) :
-    QFrame(parent),
-    ui(new Ui::CWE_StageStatusTab)
+CWE_GroupTab::CWE_GroupTab(QString groupKey, QString groupName, QWidget *parent) :
+    CWE_ParamTab(groupKey, groupName, parent),
+    ui(new Ui::CWE_GroupTab)
 {
     ui->setupUi(this);
-    stageKey = theStageKey;
-    this->setName(stageName);
-    this->setInActive();
+    ui->mainLabel->setText(tabDisplay);
+
+    this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none}");
 }
 
-CWE_GroupTab::~CWE_StageStatusTab()
+CWE_GroupTab::~CWE_GroupTab()
 {
     delete ui;
 }
 
-void CWE_GroupTab::setCorrespondingPanel(CWE_GroupsWidget * newPanel)
+void CWE_GroupTab::setButtonAppearance()
 {
-    myPanel = newPanel;
-}
-
-void CWE_GroupTab::setStatus(QString s)
-{
-    m_status = s;
-    ui->statusLabel->setText(s);
-}
-
-void CWE_GroupTab::setText(QString s)
-{
-    m_text = s;
-    ui->mainLabel->setText(s);
-}
-
-void CWE_GroupTab::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        this->setActive(true);
-        this->setStyleSheet("QFrame {background: #B0BEC5;}");
-        emit btn_activated(this);
-        emit btn_pressed(myPanel);
+    if (tab_pressed)
+    {
+        if (tab_active)
+        {
+            this->setStyleSheet("QFrame {background: #B0BEC5; border-color: #808080; border-width: 1.5px; border-radius: 3px; border-style: inset;} QLabel {border-style: none}");
+        }
+        else
+        {
+            this->setStyleSheet("QFrame {background: #B0BEC5; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none}");
+        }
     }
-}
-
-void CWE_GroupTab::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        this->setActive();
-        emit btn_released(myPanel);
+    else
+    {
+        if (tab_active)
+        {
+            this->setStyleSheet("QFrame {background: #64B5F6; border-color: #808080; border-width: 1.5px; border-radius: 3px; border-style: inset;} QLabel {border-style: none}");
+        }
+        else
+        {
+            this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none}");
+        }
     }
-}
-
-bool CWE_GroupTab::tabIsActive()
-{
-    return m_active;
-}
-
-void CWE_GroupTab::setActive(bool b)
-{
-    this->setStyleSheet("QFrame {background: #64B5F6; border-color: #808080; border-width: 1.5px; border-radius: 3px; border-style: inset;} QLabel {border-style: none}");
-    if (!b) this->setInActive();
-    m_active = b;
-}
-
-void CWE_GroupTab::setInActive(bool b)
-{
-    this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none}");
-    if (!b) this->setActive();
-    m_active = !b;
-}
-
-
-void CWE_GroupTab::setName(const QString s)
-{
-    m_name = s;
-    ui->mainLabel->setText(s);
-}
-
-void CWE_GroupTab::linkWidget(CWE_GroupsWidget *ptr)
-{
-    myPanel = ptr;
 }
