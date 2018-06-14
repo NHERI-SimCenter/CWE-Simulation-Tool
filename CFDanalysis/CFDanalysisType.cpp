@@ -185,7 +185,7 @@ VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
     {
         QJsonObject item = vals.value(name).toObject();
 
-        if (item.contains("displayname")) { res.displayName = item.value("displayname").toString(); }
+        if (item.contains("displayName")) { res.displayName = item.value("displayName").toString(); }
         if (item.contains("type"))        { res.type = item.value("type").toString(); }
         if (item.contains("default"))     { res.defaultValue = item.value("default").toString(); }
         if (item.contains("unit"))        { res.unit = item.value("unit").toString(); }

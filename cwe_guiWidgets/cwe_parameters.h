@@ -41,8 +41,6 @@
 #include <QLabel>
 #include <QJsonObject>
 
-#include "SimCenter_widgets/sctrstates.h"
-
 class CWE_MainWindow;
 
 class CWE_StageStatusTab;
@@ -54,6 +52,28 @@ struct VARIABLE_TYPE;
 
 enum class CaseState;
 enum class StageState;
+
+enum class SimCenterViewState;
+
+#define SimCenterButtonMode  std::uint32_t
+
+/*
+ * SimCenterButtonMode_NONE      0000 0000 0000 0000
+ * SimCenterButtonMode_RUN       0000 0000 0000 0001
+ * SimCenterButtonMode_CANCEL    0000 0000 0000 0010
+ * SimCenterButtonMode_RESET     0000 0000 0000 0100
+ * SimCenterButtonMode_RESULTS   0000 0000 0000 1000
+ * SimCenterButtonMode_ALL       0000 0001 0000 1111
+ * SimCenterButtonMode_SAVE_ALL  0000 0001 0000 0000
+ */
+
+#define SimCenterButtonMode_NONE      0x0000u
+#define SimCenterButtonMode_RUN       0x0001u
+#define SimCenterButtonMode_CANCEL    0x0002u
+#define SimCenterButtonMode_RESET     0x0004u
+#define SimCenterButtonMode_RESULTS   0x0008u
+#define SimCenterButtonMode_ALL       0x010fu
+#define SimCenterButtonMode_SAVE_ALL  0x0100u
 
 namespace Ui {
 class CWE_Parameters;
@@ -89,8 +109,8 @@ private:
     bool checkButtonEnactReady();
     bool paramsChanged();
 
-    void setButtonsAccordingToStage();
-    void setVisibleAccordingToStage();
+    void setButtonState(SimCenterButtonMode newMode);
+    void setViewState(SimCenterViewState newState);
 
     void setHeaderLabels();
 

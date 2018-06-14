@@ -164,44 +164,41 @@ void CWE_Parameters::newCaseState(CaseState newState)
         aStageTab->setStatus(getStateText(stageStates.value(aStageTab->getRefKey())));
     }
 
-    //DOLINE:
-    //From here, we only need to change the view state of the currently visible panel
+    //Once the state tabs are updated, we adjust the state of the shown parameters:
 
-    /*
     switch (newState)
     {
     case CaseState::DEFUNCT:
     case CaseState::ERROR:
     case CaseState::INVALID:
     case CaseState::OFFLINE:
-        ui->theTabWidget->setViewState(SimCenterViewState::hidden);
-        ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
+        setViewState(SimCenterViewState::hidden);
+        setButtonState(SimCenterButtonMode_NONE);
         return; //These states should be handled elsewhere
         break;
     case CaseState::LOADING:
     case CaseState::EXTERN_OP:
     case CaseState::PARAM_SAVE:
-        ui->theTabWidget->setViewState(SimCenterViewState::visible);
-        ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
+        setViewState(SimCenterViewState::visible);
+        setButtonState(SimCenterButtonMode_NONE);
         break;
     case CaseState::DOWNLOAD:
     case CaseState::OP_INVOKE:
     case CaseState::RUNNING:
-        ui->theTabWidget->setViewState(SimCenterViewState::visible);
-        setButtonsAccordingToStage();
+        setViewState(SimCenterViewState::visible);
+        //setButtonState();
         break;
     case CaseState::READY:
     case CaseState::READY_ERROR:
-        ui->theTabWidget->updateParameterValues(theMainWindow->getCurrentCase()->getCurrentParams());
-        setVisibleAccordingToStage();
-        setButtonsAccordingToStage();
+        //updateParameterValues(theMainWindow->getCurrentCase()->getCurrentParams());
+        //setViewState();
+        //setButtonState();
         break;
     default:
         cwe_globals::displayFatalPopup("Remote case has unhandled state");
         return;
         break;
     }
-    */
 }
 
 void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
@@ -242,7 +239,7 @@ void CWE_Parameters::groupSelected(CWE_ParamTab * chosenGroup)
     }
 }
 
-void CWE_Parameters::setButtonsAccordingToStage()
+void CWE_Parameters::setButtonState(SimCenterButtonMode newMode)
 {
     /*
     QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
@@ -279,7 +276,7 @@ void CWE_Parameters::setButtonsAccordingToStage()
     */
 }
 
-void CWE_Parameters::setVisibleAccordingToStage()
+void CWE_Parameters::setViewState(SimCenterViewState newState)
 {
     /*
     QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
@@ -408,7 +405,7 @@ void CWE_Parameters::createStageTabs()
         clearStageTabs();
     }
 
-    QVBoxLayout * tablayout = (QVBoxLayout *)ui->groupsBar->layout();
+    QVBoxLayout * tablayout = (QVBoxLayout *)ui->tabsBar->layout();
     tablayout->setMargin(0);
     tablayout->setSpacing(0);
 

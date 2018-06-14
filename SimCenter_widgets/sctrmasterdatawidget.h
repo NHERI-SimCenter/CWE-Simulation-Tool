@@ -44,11 +44,26 @@
 #include <QJsonObject>
 #include <QBoxLayout>
 
-#include "SimCenter_widgets/sctrstates.h"
 #include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 #include "CFDanalysis/CFDanalysisType.h"
 
 class FileTreeNode;
+
+enum class SimCenterDataType { integer,
+                               floatingpoint,
+                               boolean,
+                               string,
+                               selection,
+                               file,
+                               tensor2D,
+                               tensor3D,
+                               vector2D,
+                               vector3D,
+                               unknown};
+
+enum class SimCenterViewState  { visible,
+                                 editable,
+                                 hidden };
 
 class SCtrMasterDataWidget : public QFrame
 {
