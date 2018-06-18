@@ -63,6 +63,19 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
+
+    QVBoxLayout * stageLayout = (QVBoxLayout *)ui->tabsBar->layout();
+    stageLayout->setMargin(0);
+    stageLayout->setSpacing(0);
+    stageLayout->setAlignment(Qt::AlignTop);
+
+    QHBoxLayout * groupLayout = (QHBoxLayout *)ui->groupsBar->layout();
+    groupLayout->setMargin(0);
+    groupLayout->setSpacing(0);
+    groupLayout->setAlignment(Qt::AlignLeft);
+
+    QVBoxLayout * paramSpaceLayout = (QVBoxLayout *)ui->parameterSpace->layout();
+    paramSpaceLayout->setAlignment(Qt::AlignTop);
 }
 
 CWE_Parameters::~CWE_Parameters()
@@ -151,6 +164,11 @@ void CWE_Parameters::newCaseState(CaseState newState)
         createStageTabs();
     }
 
+    if (selectedStage == NULL)
+    {
+        cwe_globals::displayFatalPopup("Stage tab display does not have selected stage.", "Fatal Internal Error");
+    }
+
     //Sets the listed states of the stage tabs
     QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
     for (CWE_StageStatusTab * aStageTab :  stageTabList)
@@ -164,6 +182,7 @@ void CWE_Parameters::newCaseState(CaseState newState)
         aStageTab->setStatus(getStateText(stageStates.value(aStageTab->getRefKey())));
     }
 
+    StageState currentStageState = stageStates.value(selectedStage->getRefKey());
     //Once the state tabs are updated, we adjust the state of the shown parameters:
 
     switch (newState)
@@ -174,7 +193,7 @@ void CWE_Parameters::newCaseState(CaseState newState)
     case CaseState::OFFLINE:
         setViewState(SimCenterViewState::hidden);
         setButtonState(SimCenterButtonMode_NONE);
-        return; //These states should be handled elsewhere
+        return; //These states should be handled elsewhere, as the param tab should not be visible
         break;
     case CaseState::LOADING:
     case CaseState::EXTERN_OP:
@@ -186,13 +205,13 @@ void CWE_Parameters::newCaseState(CaseState newState)
     case CaseState::OP_INVOKE:
     case CaseState::RUNNING:
         setViewState(SimCenterViewState::visible);
-        //setButtonState();
+        setButtonState(currentStageState);
         break;
     case CaseState::READY:
     case CaseState::READY_ERROR:
         //updateParameterValues(theMainWindow->getCurrentCase()->getCurrentParams());
-        //setViewState();
-        //setButtonState();
+        setViewState(currentStageState);
+        setButtonState(currentStageState);
         break;
     default:
         cwe_globals::displayFatalPopup("Remote case has unhandled state");
@@ -239,67 +258,77 @@ void CWE_Parameters::groupSelected(CWE_ParamTab * chosenGroup)
     }
 }
 
+void CWE_Parameters::setButtonState(StageState newMode)
+{
+    switch (newMode)
+    {
+    case StageState::LOADING:
+    case StageState::OFFLINE:
+    case StageState::DOWNLOADING:
+    case StageState::UNREADY:
+        setButtonState(SimCenterButtonMode_NONE);
+        break;
+    case StageState::ERROR:
+        setButtonState(SimCenterButtonMode_RESET);
+        break;
+    case StageState::FINISHED:
+        setButtonState(SimCenterButtonMode_RESET | SimCenterButtonMode_RESULTS);
+        break;
+    case StageState::FINISHED_PREREQ:
+        setButtonState(SimCenterButtonMode_RESULTS);
+        break;
+    case StageState::RUNNING:
+        setButtonState(SimCenterButtonMode_CANCEL);
+        break;
+    case StageState::UNRUN:
+        setButtonState(SimCenterButtonMode_RUN);
+        break;
+    default:
+        cwe_globals::displayFatalPopup("Remote case has unhandled stage state");
+        return;
+        break;
+    }
+}
+
 void CWE_Parameters::setButtonState(SimCenterButtonMode newMode)
 {
-    /*
-    QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
-    for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
+    ui->pbtn_run->setDisabled(true);
+    ui->pbtn_cancel->setDisabled(true);
+    ui->pbtn_results->setDisabled(true);
+    ui->pbtn_rollback->setDisabled(true);
+
+    if (newMode & SimCenterButtonMode_RUN)     { ui->pbtn_run->setEnabled(true);     }
+    if (newMode & SimCenterButtonMode_CANCEL)  { ui->pbtn_cancel->setEnabled(true);  }
+    if (newMode & SimCenterButtonMode_RESET)   { ui->pbtn_rollback->setEnabled(true);}
+    if (newMode & SimCenterButtonMode_RESULTS) { ui->pbtn_results->setEnabled(true); }
+}
+
+void CWE_Parameters::setViewState(StageState newMode)
+{
+    switch (newMode)
     {
-        switch (*itr)
-        {
-        case StageState::ERROR:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESET, itr.key());
-            break;
-        case StageState::RUNNING:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_CANCEL, itr.key());
-            break;
-        case StageState::FINISHED:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESET | SimCenterButtonMode_RESULTS, itr.key());
-            break;
-        case StageState::FINISHED_PREREQ:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESULTS, itr.key());
-            break;
-        case StageState::UNRUN:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RUN | SimCenterButtonMode_SAVE_ALL, itr.key());
-            break;
-        case StageState::UNREADY:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_SAVE_ALL, itr.key());
-            break;
-        case StageState::LOADING:
-        case StageState::DOWNLOADING:
-        case StageState::OFFLINE:
-        default:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE, itr.key());
-            break;
-        }
+    case StageState::OFFLINE:
+    case StageState::UNREADY:
+    case StageState::UNRUN:
+        setViewState(SimCenterViewState::editable);
+        break;
+    case StageState::DOWNLOADING:
+    case StageState::ERROR:
+    case StageState::FINISHED:
+    case StageState::FINISHED_PREREQ:
+    case StageState::LOADING:
+    case StageState::RUNNING:
+    default:
+        setViewState(SimCenterViewState::visible);
     }
-    */
 }
 
 void CWE_Parameters::setViewState(SimCenterViewState newState)
 {
-    /*
-    QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
-    for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
+    for (SCtrMasterDataWidget * aWidget : paramWidgetList)
     {
-        switch (*itr)
-        {
-        case StageState::DOWNLOADING:
-        case StageState::ERROR:
-        case StageState::FINISHED:
-        case StageState::FINISHED_PREREQ:
-        case StageState::LOADING:
-        case StageState::RUNNING:
-            ui->theTabWidget->setViewState(SimCenterViewState::visible, itr.key());
-            break;
-        case StageState::OFFLINE:
-        case StageState::UNREADY:
-        case StageState::UNRUN:
-        default:
-            ui->theTabWidget->setViewState(SimCenterViewState::editable, itr.key());
-        }
+        aWidget->setViewState(newState);
     }
-    */
 }
 
 void CWE_Parameters::setSaveAllButtonDisabled(bool newSetting)
@@ -406,8 +435,6 @@ void CWE_Parameters::createStageTabs()
     }
 
     QVBoxLayout * tablayout = (QVBoxLayout *)ui->tabsBar->layout();
-    tablayout->setMargin(0);
-    tablayout->setSpacing(0);
 
     QMap<QString, StageState> stageStates = theCase->getStageStates();
 
@@ -453,8 +480,6 @@ void CWE_Parameters::createGroupTabs()
     }
 
     QHBoxLayout * tablayout = (QHBoxLayout *)ui->groupsBar->layout();
-    tablayout->setMargin(0);
-    tablayout->setSpacing(0);
 
     QStringList groupList = theType->getStageGroups(selectedStage->getRefKey());
 
