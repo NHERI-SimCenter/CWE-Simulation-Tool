@@ -46,8 +46,13 @@
 
 #include "cwe_param_tabs/cwe_stagestatustab.h"
 #include "cwe_param_tabs/cwe_grouptab.h"
+#include "cwe_param_tabs/cwe_paramtab.h"
 
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
+#include "SimCenter_widgets/sctrstddatawidget.h"
+#include "SimCenter_widgets/sctrbooldatawidget.h"
+#include "SimCenter_widgets/sctrfiledatawidget.h"
+#include "SimCenter_widgets/sctrchoicedatawidget.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
@@ -58,6 +63,19 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
     ui(new Ui::CWE_Parameters)
 {
     ui->setupUi(this);
+
+    QVBoxLayout * stageLayout = (QVBoxLayout *)ui->tabsBar->layout();
+    stageLayout->setMargin(0);
+    stageLayout->setSpacing(0);
+    stageLayout->setAlignment(Qt::AlignTop);
+
+    QHBoxLayout * groupLayout = (QHBoxLayout *)ui->groupsBar->layout();
+    groupLayout->setMargin(0);
+    groupLayout->setSpacing(0);
+    groupLayout->setAlignment(Qt::AlignLeft);
+
+    QVBoxLayout * paramSpaceLayout = (QVBoxLayout *)ui->parameterSpace->layout();
+    paramSpaceLayout->setAlignment(Qt::AlignTop);
 }
 
 CWE_Parameters::~CWE_Parameters()
@@ -76,7 +94,7 @@ void CWE_Parameters::newCaseGiven()
 {
     CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
 
-    clearParamScreen();
+    clearStageTabs();
 
     if (newCase != NULL)
     {
@@ -86,74 +104,160 @@ void CWE_Parameters::newCaseGiven()
     }
     else
     {
-        //TODO: Change labels for loading message to no case selected
+        setHeaderLabels();
+        loadingLabel->setText("No Case Selected.");
     }
 }
 
-QString CWE_Parameters::getStateText(StageState theState)
+void CWE_Parameters::setHeaderLabels()
 {
-    switch (theState)
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL)
     {
-        case StageState::DOWNLOADING : return "Downloading . . .";
-        case StageState::ERROR : return "*** ERROR ***";
-        case StageState::FINISHED : return "Task Finished";
-        case StageState::FINISHED_PREREQ : return "Task Finished";
-        case StageState::LOADING : return "Loading Data ...";
-        case StageState::OFFLINE : return "Offline (Debug)";
-        case StageState::RUNNING : return "Task Running";
-        case StageState::UNREADY : return "Need Prev. \nStage";
-        case StageState::UNRUN : return "Not Yet Run";
+        ui->label_theName->setText("N/A");
+        ui->label_theType->setText("N/A");
+        ui->label_theLocation->setText("N/A");
+        return;
     }
-    return "*** TOTAL ERROR ***";
+
+    CFDanalysisType * theType = theCase->getMyType();
+
+    if (theCase->getCaseName().isEmpty())
+    {
+        ui->label_theName->setText("Loading . . .");
+    }
+    else
+    {
+        ui->label_theName->setText(theCase->getCaseName());
+    }
+
+    if ((theType == NULL) || theType->getDisplayName().isEmpty())
+    {
+        ui->label_theType->setText("Loading . . .");
+    }
+    else
+    {
+        ui->label_theType->setText(theType->getDisplayName());
+    }
+
+    if (theCase->getCaseFolder().isNil())
+    {
+        ui->label_theLocation->setText("Loading . . .");
+    }
+    else
+    {
+        ui->label_theLocation->setText(theCase->getCaseFolder().getFullPath());
+    }
 }
 
 void CWE_Parameters::newCaseState(CaseState newState)
 {
-    if (!enactWidgetCreationSequence()) return;
+    setHeaderLabels();
+
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
+    CFDanalysisType * theType = theCase->getMyType();
+    if (theType == NULL) return;
+
+    if (loadingLabel != NULL)
+    {
+        createStageTabs();
+    }
+
+    if (selectedStage == NULL)
+    {
+        cwe_globals::displayFatalPopup("Stage tab display does not have selected stage.", "Fatal Internal Error");
+    }
 
     //Sets the listed states of the stage tabs
     QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
     for (CWE_StageStatusTab * aStageTab :  stageTabList)
     {
-        if (!stageStates.contains(aStageTab->getStageKey()))
+        if (!stageStates.contains(aStageTab->getRefKey()))
         {
             qCDebug(agaveAppLayer, "Invalid internal use of non-existant stage");
             continue;
         }
 
-        aStageTab->setStatus(getStateText(newState));
+        aStageTab->setStatus(getStateText(stageStates.value(aStageTab->getRefKey())));
     }
+    //Once the state tabs are updated, we adjust the state of the shown parameters:
+    resetButtonAndView();
+}
 
-    //DOLINE:
-    //From here, we only need to change the view state of the currently visible panel
+void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
+{
+    for (CWE_StageStatusTab * aTab : stageTabList)
+    {
+        aTab->setInActive();
+    }
+    chosenTab->setActive();
 
-    switch (newState)
+    selectedStage = qobject_cast<CWE_StageStatusTab *>(chosenTab);
+    if (selectedStage != NULL)
+    {
+        createGroupTabs();
+    }
+    else
+    {
+        clearGroupTabs();
+    }
+}
+
+void CWE_Parameters::groupSelected(CWE_ParamTab * chosenGroup)
+{
+    for (CWE_GroupTab * aTab : groupTabList)
+    {
+        aTab->setInActive();
+    }
+    chosenGroup->setActive();
+
+    selectedGroup = qobject_cast<CWE_GroupTab *>(chosenGroup);
+    if (selectedGroup != NULL)
+    {
+        createParamWidgets();
+    }
+    else
+    {
+        clearParamScreen();
+    }
+}
+
+void CWE_Parameters::resetButtonAndView()
+{
+    if (theMainWindow->getCurrentCase() == NULL) return;
+    if (selectedStage == NULL) return;
+
+    QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
+    StageState currentStageState = stageStates.value(selectedStage->getRefKey());
+
+    switch (theMainWindow->getCurrentCase()->getCaseState())
     {
     case CaseState::DEFUNCT:
     case CaseState::ERROR:
     case CaseState::INVALID:
     case CaseState::OFFLINE:
-        ui->theTabWidget->setViewState(SimCenterViewState::hidden);
-        ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
-        return; //These states should be handled elsewhere
+        setViewState(SimCenterViewState::hidden);
+        setButtonState(SimCenterButtonMode_NONE);
+        return; //These states should be handled elsewhere, as the param tab should not be visible
         break;
     case CaseState::LOADING:
     case CaseState::EXTERN_OP:
     case CaseState::PARAM_SAVE:
-        ui->theTabWidget->setViewState(SimCenterViewState::visible);
-        ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE);
+        setViewState(SimCenterViewState::visible);
+        setButtonState(SimCenterButtonMode_NONE);
         break;
     case CaseState::DOWNLOAD:
     case CaseState::OP_INVOKE:
     case CaseState::RUNNING:
-        ui->theTabWidget->setViewState(SimCenterViewState::visible);
-        setButtonsAccordingToStage();
+        setViewState(SimCenterViewState::visible);
+        setButtonState(currentStageState);
         break;
     case CaseState::READY:
     case CaseState::READY_ERROR:
-        ui->theTabWidget->updateParameterValues(theMainWindow->getCurrentCase()->getCurrentParams());
-        setVisibleAccordingToStage();
-        setButtonsAccordingToStage();
+        //updateParameterValues(theMainWindow->getCurrentCase()->getCurrentParams());
+        setViewState(currentStageState);
+        setButtonState(currentStageState);
         break;
     default:
         cwe_globals::displayFatalPopup("Remote case has unhandled state");
@@ -162,152 +266,113 @@ void CWE_Parameters::newCaseState(CaseState newState)
     }
 }
 
-void CWE_Parameters::setButtonsAccordingToStage()
+void CWE_Parameters::setButtonState(StageState newMode)
 {
-    QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
-    for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
+    switch (newMode)
     {
-        switch (*itr)
-        {
-        case StageState::ERROR:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESET, itr.key());
-            break;
-        case StageState::RUNNING:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_CANCEL, itr.key());
-            break;
-        case StageState::FINISHED:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESET | SimCenterButtonMode_RESULTS, itr.key());
-            break;
-        case StageState::FINISHED_PREREQ:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RESULTS, itr.key());
-            break;
-        case StageState::UNRUN:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_RUN | SimCenterButtonMode_SAVE_ALL, itr.key());
-            break;
-        case StageState::UNREADY:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_SAVE_ALL, itr.key());
-            break;
-        case StageState::LOADING:
-        case StageState::DOWNLOADING:
-        case StageState::OFFLINE:
-        default:
-            ui->theTabWidget->setButtonMode(SimCenterButtonMode_NONE, itr.key());
-            break;
-        }
+    case StageState::LOADING:
+    case StageState::OFFLINE:
+    case StageState::DOWNLOADING:
+    case StageState::UNREADY:
+        setButtonState(SimCenterButtonMode_NONE);
+        break;
+    case StageState::ERROR:
+        setButtonState(SimCenterButtonMode_RESET);
+        break;
+    case StageState::FINISHED:
+        setButtonState(SimCenterButtonMode_RESET | SimCenterButtonMode_RESULTS);
+        break;
+    case StageState::FINISHED_PREREQ:
+        setButtonState(SimCenterButtonMode_RESULTS);
+        break;
+    case StageState::RUNNING:
+        setButtonState(SimCenterButtonMode_CANCEL);
+        break;
+    case StageState::UNRUN:
+        setButtonState(SimCenterButtonMode_RUN);
+        break;
+    default:
+        cwe_globals::displayFatalPopup("Remote case has unhandled stage state");
+        return;
+        break;
     }
 }
 
-void CWE_Parameters::setVisibleAccordingToStage()
+void CWE_Parameters::setButtonState(SimCenterButtonMode newMode)
 {
-    QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
-    for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
+    ui->pbtn_run->setDisabled(true);
+    ui->pbtn_cancel->setDisabled(true);
+    ui->pbtn_results->setDisabled(true);
+    ui->pbtn_rollback->setDisabled(true);
+    ui->pbtn_saveAllParameters->setDisabled(true);
+
+    if (paramsChanged())
     {
-        switch (*itr)
-        {
-        case StageState::DOWNLOADING:
-        case StageState::ERROR:
-        case StageState::FINISHED:
-        case StageState::FINISHED_PREREQ:
-        case StageState::LOADING:
-        case StageState::RUNNING:
-            ui->theTabWidget->setViewState(SimCenterViewState::visible, itr.key());
-            break;
-        case StageState::OFFLINE:
-        case StageState::UNREADY:
-        case StageState::UNRUN:
-        default:
-            ui->theTabWidget->setViewState(SimCenterViewState::editable, itr.key());
-        }
+        ui->pbtn_saveAllParameters->setEnabled(true);
+        return;
+    }
+
+    if (newMode & SimCenterButtonMode_RUN)     { ui->pbtn_run->setEnabled(true);     }
+    if (newMode & SimCenterButtonMode_CANCEL)  { ui->pbtn_cancel->setEnabled(true);  }
+    if (newMode & SimCenterButtonMode_RESET)   { ui->pbtn_rollback->setEnabled(true);}
+    if (newMode & SimCenterButtonMode_RESULTS) { ui->pbtn_results->setEnabled(true); }
+}
+
+void CWE_Parameters::setViewState(StageState newMode)
+{
+    switch (newMode)
+    {
+    case StageState::OFFLINE:
+    case StageState::UNREADY:
+    case StageState::UNRUN:
+        setViewState(SimCenterViewState::editable);
+        break;
+    case StageState::DOWNLOADING:
+    case StageState::ERROR:
+    case StageState::FINISHED:
+    case StageState::FINISHED_PREREQ:
+    case StageState::LOADING:
+    case StageState::RUNNING:
+    default:
+        setViewState(SimCenterViewState::visible);
     }
 }
 
-void CWE_Parameters::clearParamScreen()
+void CWE_Parameters::setViewState(SimCenterViewState newState)
 {
-    while (!paramWidgetList.isEmpty())
+    for (SCtrMasterDataWidget * aWidget : paramWidgetList)
     {
-        paramWidgetList.takeLast()->deleteLater();
+        aWidget->setViewState(newState);
     }
-
-    while (!stageTabList.isEmpty())
-    {
-        stageTabList.takeLast()->deleteLater();
-    }
-
-    while (!groupTabList.isEmpty())
-    {
-        groupTabList.takeLast()->deleteLater();
-    }
-
-    //TODO: Create labels for loading message in param panel
-}
-
-bool CWE_Parameters::enactWidgetCreationSequence()
-{
-    if (paramWidgetsExist && stageButtonsExist && groupButtonsExist)
-    {
-        return true;
-    }
-
-
-
-    //TODO check for and create if possible each of the 3 types of widgets
-    return true; //if all widgets exist and panel is ready to use
-
-    //    if (!paramWidgetsExist) createUnderlyingParamWidgets();
-    //if (!paramWidgetsExist) return;
-}
-
-void CWE_Parameters::createUnderlyingParamWidgets()
-{
-    if (paramWidgetsExist) return;
-
-    CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
-
-    if (newCase == NULL) return;
-    if (newCase->getMyType() == NULL) return;
-    if (newCase->getCaseFolder().isNil()) return;
-
-    CFDanalysisType * myType = newCase->getMyType();
-
-    //QJsonObject rawConfig = newCase->getMyType()->getRawConfig()->object();
-
-    ui->label_theName->setText(newCase->getCaseName());
-    ui->label_theType->setText(myType->getName());
-    ui->label_theLocation->setText(newCase->getCaseFolder().getFullPath());
-
-    ui->theTabWidget->setParameterConfig(myType);
-    ui->theTabWidget->setViewState(SimCenterViewState::visible);
-
-    paramWidgetsExist = true;
-}
-
-void CWE_Parameters::setSaveAllButtonDisabled(bool newSetting)
-{
-    ui->pbtn_saveAllParameters->setDisabled(newSetting);
-}
-
-void CWE_Parameters::setSaveAllButtonEnabled(bool newSetting)
-{
-    ui->pbtn_saveAllParameters->setEnabled(newSetting);
 }
 
 bool CWE_Parameters::checkButtonEnactReady()
 {
-    //TODO
+    if (paramsChanged())
+    {
+        return false;
+    }
     return true;
 }
 
 bool CWE_Parameters::paramsChanged()
 {
     //TODO: return true if param widgets have changed values
+
+    for (SCtrMasterDataWidget * aWidget : paramWidgetList)
+    {
+        //aWidget->setViewState(newState);
+    }
     return true;
 }
 
 void CWE_Parameters::save_all_button_clicked()
 {
+    //TODO
     CFDcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
     if (linkedCFDCase == NULL) return;
 
+    /*
     // collect parameter values from all SCtrMasterDataWidget objects
     QMap<QString, QString> newParams;
     QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
@@ -328,13 +393,14 @@ void CWE_Parameters::save_all_button_clicked()
     {
         cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
     }
+    */
 }
 
 void CWE_Parameters::run_button_clicked()
 {
     if (!checkButtonEnactReady()) return;
 
-    if (!theMainWindow->getCurrentCase()->startStageApp(stage))
+    if (!theMainWindow->getCurrentCase()->startStageApp(selectedStage->getRefKey()))
     {
         cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
         return;
@@ -356,16 +422,243 @@ void CWE_Parameters::results_button_clicked()
 {
     if (!checkButtonEnactReady()) return;
 
-    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToResultsTab();
+    theMainWindow->switchToResultsTab();
 }
 
 void CWE_Parameters::rollback_button_clicked()
 {
     if (!checkButtonEnactReady()) return;
 
-    if (!theMainWindow->getCurrentCase()->rollBack(stage))
+    if (!theMainWindow->getCurrentCase()->rollBack(selectedStage->getRefKey()))
     {
         cwe_globals::displayPopup("Unable to roll back this stage, please check that this stage is done and check your network connection.", "Network Issue");
         return;
     }
+}
+
+void CWE_Parameters::createStageTabs()
+{
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
+    CFDanalysisType * theType = theCase->getMyType();
+    if (theType == NULL) return;
+
+    if ((selectedStage != NULL) || !stageTabList.isEmpty() || !ui->tabsBar->layout()->isEmpty())
+    {
+        clearStageTabs();
+    }
+
+    QVBoxLayout * tablayout = (QVBoxLayout *)ui->tabsBar->layout();
+
+    QMap<QString, StageState> stageStates = theCase->getStageStates();
+
+    for (auto itr = stageStates.cbegin(); itr != stageStates.cend(); itr++)
+    {
+        QString stageKey = itr.key();
+        QString stageLabel = theType->translateStageId(itr.key());
+        stageLabel += "\nParameters";
+
+        /* create a CWE_StageStatusTab */
+        CWE_StageStatusTab *tab = new CWE_StageStatusTab(stageKey, stageLabel, this);
+
+        tab->setStatus(getStateText(stageStates.value(stageKey)));
+
+        tablayout->addWidget(tab);
+        stageTabList.append(tab);
+
+        /* connect signals and slots */
+        QObject::connect(tab,SIGNAL(btn_pressed(CWE_ParamTab *)),this,SLOT(stageSelected(CWE_ParamTab*)));
+    }
+
+    tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+    if (stageTabList.length() < 1)
+    {
+        ae_globals::displayFatalPopup("Invalid Configuration for template, no stages given.", "Internal Program Error");
+    }
+
+    stageSelected(stageTabList.at(0));
+}
+
+void CWE_Parameters::createGroupTabs()
+{
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
+    CFDanalysisType * theType = theCase->getMyType();
+    if (theType == NULL) return;
+    if (selectedStage == NULL) return;
+
+    if ((selectedGroup != NULL) || !groupTabList.isEmpty() || !ui->groupsBar->layout()->isEmpty())
+    {
+        clearGroupTabs();
+    }
+
+    QHBoxLayout * tablayout = (QHBoxLayout *)ui->groupsBar->layout();
+
+    QStringList groupList = theType->getStageGroups(selectedStage->getRefKey());
+
+    for (QString aGroup : groupList)
+    {
+        CWE_GroupTab *tab = new CWE_GroupTab(aGroup, theType->translateGroupId(aGroup), this);
+
+        tablayout->addWidget(tab);
+        groupTabList.append(tab);
+
+        /* connect signals and slots */
+        QObject::connect(tab,SIGNAL(btn_pressed(CWE_ParamTab *)),this,SLOT(groupSelected(CWE_ParamTab*)));
+    }
+
+    tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
+    if (groupTabList.length() < 1)
+    {
+        ae_globals::displayFatalPopup("Invalid Configuration for template, no groups given.", "Internal Program Error");
+    }
+
+    groupSelected(groupTabList.at(0));
+}
+
+void CWE_Parameters::createParamWidgets()
+{
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
+    CFDanalysisType * theType = theCase->getMyType();
+    if (theType == NULL) return;
+    if (selectedStage == NULL) return;
+    if (selectedGroup == NULL) return;
+
+    if (!paramWidgetList.isEmpty() || (loadingLabel == NULL))
+    {
+        clearParamScreen();
+    }
+
+    QStringList groupVars = theType->getVarGroup(selectedGroup->getRefKey());
+
+    foreach (QString varName, groupVars)
+    {
+        VARIABLE_TYPE theVariable = theType->getVariableInfo(varName);
+        addVariable(varName, theVariable);
+    }
+}
+
+void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable)
+{
+    SCtrMasterDataWidget *theVar = NULL;
+
+    QLayout *layout = ui->parameterSpace->layout();
+
+    if (theVariable.type.toLower() == "std") {
+        theVar = new SCtrStdDataWidget(this);
+        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
+        layout->addWidget(theVar);
+    }
+    else if (theVariable.type.toLower() == "choose") {
+        theVar = new SCtrChoiceDataWidget(this);
+        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
+        layout->addWidget(theVar);
+    }
+    else if (theVariable.type.toLower() == "bool") {
+        theVar = new SCtrBoolDataWidget(this);
+        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
+        layout->addWidget(theVar);
+    }
+    else if (theVariable.type.toLower() == "file") {
+        theVar = new SCtrFileDataWidget(theMainWindow->getFileModel(), this);
+        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
+        layout->addWidget(theVar);
+    }
+    else {
+        // add an error message
+        qCWarning(agaveAppLayer, "Variable %s of unknown type %s. Variable ignored.", qPrintable(varName), qPrintable(theVariable.type));
+        theVar->deleteLater();
+        return;
+    }
+    theVar->setDataType(theVariable);
+
+    paramWidgetList.append(theVar);
+}
+
+void CWE_Parameters::clearStageTabs()
+{
+    clearGroupTabs();
+
+    while (!stageTabList.isEmpty())
+    {
+        stageTabList.takeLast()->deleteLater();
+    }
+    if (selectedStage != NULL)
+    {
+        selectedStage->deleteLater();
+        selectedStage = NULL;
+    }
+
+    QLayoutItem * stageItem = ui->tabsBar->layout()->takeAt(0);
+    while (stageItem != NULL)
+    {
+        delete stageItem;
+        stageItem = ui->tabsBar->layout()->takeAt(0);
+    }
+}
+
+void CWE_Parameters::clearGroupTabs()
+{
+    clearParamScreen();
+
+    while (!groupTabList.isEmpty())
+    {
+        groupTabList.takeLast()->deleteLater();
+    }
+    if (selectedGroup != NULL)
+    {
+        selectedGroup->deleteLater();
+        selectedGroup = NULL;
+    }
+
+    QLayoutItem * groupItem = ui->groupsBar->layout()->takeAt(0);
+    while (groupItem != NULL)
+    {
+        delete groupItem;
+        groupItem = ui->groupsBar->layout()->takeAt(0);
+    }
+}
+
+void CWE_Parameters::clearParamScreen()
+{
+    while (!paramWidgetList.isEmpty())
+    {
+        paramWidgetList.takeLast()->deleteLater();
+    }
+
+    if (loadingLabel != NULL)
+    {
+        loadingLabel->deleteLater();
+        loadingLabel = NULL;
+    }
+
+    QLayoutItem * paramItem = ui->parameterSpace->layout()->takeAt(0);
+    while (paramItem != NULL)
+    {
+        delete paramItem;
+        paramItem = ui->parameterSpace->layout()->takeAt(0);
+    }
+
+    loadingLabel = new QLabel("Loading parameter list . . .");
+    ui->parameterSpace->layout()->addWidget(loadingLabel);
+}
+
+QString CWE_Parameters::getStateText(StageState theState)
+{
+    switch (theState)
+    {
+        case StageState::DOWNLOADING : return "Downloading . . .";
+        case StageState::ERROR : return "*** ERROR ***";
+        case StageState::FINISHED : return "Task Finished";
+        case StageState::FINISHED_PREREQ : return "Task Finished";
+        case StageState::LOADING : return "Loading Data ...";
+        case StageState::OFFLINE : return "Offline (Debug)";
+        case StageState::RUNNING : return "Task Running";
+        case StageState::UNREADY : return "Need Prev. \nStage";
+        case StageState::UNRUN : return "Not Yet Run";
+    }
+    return "*** TOTAL ERROR ***";
 }

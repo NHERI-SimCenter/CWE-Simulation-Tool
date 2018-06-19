@@ -41,16 +41,35 @@
 #include <QLabel>
 #include <QJsonObject>
 
-#include "SimCenter_widgets/sctrstates.h"
-
 class CWE_MainWindow;
 
 class CWE_StageStatusTab;
 class CWE_GroupTab;
+class CWE_ParamTab;
 class SCtrMasterDataWidget;
+
+struct VARIABLE_TYPE;
 
 enum class CaseState;
 enum class StageState;
+
+enum class SimCenterViewState;
+
+#define SimCenterButtonMode  std::uint32_t
+
+/*
+ * SimCenterButtonMode_NONE      0000 0000 0000 0000
+ * SimCenterButtonMode_RUN       0000 0000 0000 0001
+ * SimCenterButtonMode_CANCEL    0000 0000 0000 0010
+ * SimCenterButtonMode_RESET     0000 0000 0000 0100
+ * SimCenterButtonMode_RESULTS   0000 0000 0000 1000
+ */
+
+#define SimCenterButtonMode_NONE      0x0000u
+#define SimCenterButtonMode_RUN       0x0001u
+#define SimCenterButtonMode_CANCEL    0x0002u
+#define SimCenterButtonMode_RESET     0x0004u
+#define SimCenterButtonMode_RESULTS   0x0008u
 
 namespace Ui {
 class CWE_Parameters;
@@ -66,9 +85,6 @@ public:
 
     virtual void linkMainWindow(CWE_MainWindow *theMainWin);
 
-    void setSaveAllButtonDisabled(bool newSetting);
-    void setSaveAllButtonEnabled(bool newSetting);
-
 private slots:
     void save_all_button_clicked();
     void run_button_clicked();
@@ -79,16 +95,29 @@ private slots:
     void newCaseGiven();
     void newCaseState(CaseState newState);
 
+    void stageSelected(CWE_ParamTab * chosenTab);
+    void groupSelected(CWE_ParamTab * chosenTab);
+
 private:
     bool checkButtonEnactReady();
     bool paramsChanged();
 
-    void setButtonsAccordingToStage();
-    void setVisibleAccordingToStage();
+    void resetButtonAndView();
+    void setButtonState(SimCenterButtonMode newMode);
+    void setButtonState(StageState newMode);
+    void setViewState(SimCenterViewState newState);
+    void setViewState(StageState newMode);
 
+    void setHeaderLabels();
+
+    void createStageTabs();
+    void createGroupTabs();
+    void createParamWidgets();
+    void addVariable(QString varName, VARIABLE_TYPE &theVariable);
+
+    void clearStageTabs();
+    void clearGroupTabs();
     void clearParamScreen();
-    bool enactWidgetCreationSequence();
-    void createUnderlyingParamWidgets();
 
     static QString getStateText(StageState theState);
 
@@ -97,6 +126,9 @@ private:
     QVector<CWE_StageStatusTab *> stageTabList;
     QVector<CWE_GroupTab *> groupTabList;
     QVector<SCtrMasterDataWidget *> paramWidgetList;
+
+    CWE_StageStatusTab * selectedStage = NULL;
+    CWE_GroupTab * selectedGroup = NULL;
 
     QLabel * loadingLabel = NULL;
 };

@@ -119,11 +119,9 @@ SOURCES += main.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavethread.cpp \
     ../AgaveExplorer/utilFuncs/fixforssl.cpp \
     utilWindows/dialogabout.cpp \
-    cwe_guiWidgets/cwe_param_tabs/cwe_groupswidget.cpp \
-    cwe_guiWidgets/cwe_param_tabs/cwe_parampanel.cpp \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.cpp \
-    cwe_guiWidgets/cwe_param_tabs/cwe_tabwidget.cpp \
-    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.cpp
+    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -142,7 +140,6 @@ HEADERS  += \
     SimCenter_widgets/sctrvalidators.h \
     SimCenter_widgets/sctrmasterdatawidget.h \
     SimCenter_widgets/sctrstddatawidget.h \
-    SimCenter_widgets/sctrstates.h \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
@@ -188,11 +185,9 @@ HEADERS  += \
     ../AgaveClientInterface/agaveInterfaces/agavethread.h \
     ../AgaveExplorer/utilFuncs/fixforssl.h \
     utilWindows/dialogabout.h \
-    cwe_guiWidgets/cwe_param_tabs/cwe_groupswidget.h \
-    cwe_guiWidgets/cwe_param_tabs/cwe_parampanel.h \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.h \
-    cwe_guiWidgets/cwe_param_tabs/cwe_tabwidget.h \
-    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.h
+    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -210,10 +205,14 @@ FORMS    += \
     cwe_guiWidgets/cwe_file_manager.ui \
     popupWindows/create_case_popup.ui \
     popupWindows/duplicate_case_popup.ui \
-    ../AgaveExplorer/utilFuncs/fixforssl.ui \
     utilWindows/dialogabout.ui \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.ui \
     cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.ui
+
+win32 {
+FORMS    += \
+    ../AgaveExplorer/utilFuncs/fixforssl.ui
+}
 
 RESOURCES += \
     cwe_resources.qrc \

@@ -41,7 +41,7 @@ class SCtrStdDataWidget: public SCtrMasterDataWidget
 {
 public:
     SCtrStdDataWidget(QWidget *parent);
-    void setData(VARIABLE_TYPE &);
+    void setDataType(VARIABLE_TYPE &);
     QString toString();
     double  toDouble();
     void updateValue(QString);

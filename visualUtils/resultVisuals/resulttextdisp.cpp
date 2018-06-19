@@ -37,7 +37,7 @@
 
 #include "../cfdglcanvas.h"
 
-ResultTextDisplay::ResultTextDisplay(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+ResultTextDisplay::ResultTextDisplay(CFDcaseInstance * theCase, RESULTS_STYLE * resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}
 
 ResultTextDisplay::~ResultTextDisplay(){}
@@ -45,7 +45,7 @@ ResultTextDisplay::~ResultTextDisplay(){}
 void ResultTextDisplay::initializeView()
 {
     QMap<QString, QString> neededFiles;
-    neededFiles["text"] = getResultObj()["file"];
+    neededFiles["text"] = getResultObj().file;
 
     performStandardInit(neededFiles);
 }

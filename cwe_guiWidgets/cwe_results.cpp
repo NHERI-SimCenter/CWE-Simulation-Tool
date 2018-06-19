@@ -138,44 +138,40 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
         return;
     }
 
-    QMap<QString, QString> resultObject = getResultObjectFromName(resultName);
-    if (resultObject.isEmpty())
-    {
-        return;
-    }
+    RESULTS_STYLE resultObject = getResultObjectFromName(resultName);
 
-    QString resultType = resultObject.value("type");
-    if (resultType == "text")
+    if (resultObject.type == "text")
     {
         if (theItem->column() == showCol)
         {
-            ResultTextDisplay * resultPopup = new ResultTextDisplay(currentCase, resultObject, NULL);
+            ResultTextDisplay * resultPopup = new ResultTextDisplay(currentCase, &resultObject, NULL);
             resultPopup->initializeView();;
         }
         else if (theItem->column() == downloadCol)
         {
-            performSingleFileDownload(resultObject["file"], resultObject["stage"]);
+            performSingleFileDownload(resultObject.file, resultObject.stage);
         }
     }
-    else if (resultType == "GLdata")
+    else if (resultObject.type == "GLdata")
     {
         if (theItem->column() != showCol) return;
 
-        ResultField2dWindow * resultPopup = new ResultField2dWindow(currentCase, resultObject, NULL);
+        ResultField2dWindow * resultPopup = new ResultField2dWindow(currentCase, &resultObject, NULL);
         resultPopup->initializeView();
     }
-    else if (resultType == "GLmesh")
+    else if (resultObject.type == "GLmesh")
     {
         if (theItem->column() != showCol) return;
 
-        ResultMesh2dWindow * resultPopup = new ResultMesh2dWindow(currentCase, resultObject, NULL);
+        ResultMesh2dWindow * resultPopup = new ResultMesh2dWindow(currentCase, &resultObject, NULL);
         resultPopup->initializeView();
     }
 }
 
-QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
+RESULTS_STYLE CWE_Results::getResultObjectFromName(QString name)
 {
-    QMap<QString, QString> ret;
+    RESULTS_STYLE ret;
+    ret.type = "null";
 
     if (!viewIsValid) return ret;
     CFDcaseInstance * currentCase = theMainWindow->getCurrentCase();
@@ -183,12 +179,10 @@ QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
     if (currentCase->getCaseFolder().isNil()) return ret;
     CFDanalysisType * theTemplate = currentCase->getMyType();
     if (theTemplate == NULL) return ret;
-    QJsonObject configobj    = theTemplate->getRawConfig()->object();
-    QJsonObject stagesobj = configobj.value("stages").toObject();
 
     QMap<QString, StageState> currentStates = currentCase->getStageStates();
 
-    for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
+    for (auto itr = currentStates.constBegin(); itr != currentStates.constEnd(); itr++)
     {
         QString stageName = itr.key();
         StageState theStageState = currentStates.value(stageName, StageState::OFFLINE);
@@ -199,22 +193,17 @@ QMap<QString, QString> CWE_Results::getResultObjectFromName(QString name)
             continue;
         }
 
-        QJsonArray resultArray = (*itr).toObject().value("results").toArray();
-        for (auto itr2 = resultArray.constBegin(); itr2 != resultArray.constEnd(); itr2++)
-        {
-            QJsonObject aResult = (*itr2).toObject();
-            if (aResult.value("name").toString() == name)
-            {
-                for (auto itr3 = aResult.constBegin(); itr3 != aResult.constEnd(); itr3++)
-                {
-                    ret.insert(itr3.key(),(*itr3).toString());
-                    ret.insert("stage",stageName);
-                }
+        QList<RESULTS_STYLE> resultList = currentCase->getMyType()->getStageResults(itr.key());
 
-                return ret;
+        for (RESULTS_STYLE aResult : resultList)
+        {
+            if (aResult.displayName  == name)
+            {
+                return aResult;
             }
         }
     }
+
     return ret;
 }
 
@@ -271,16 +260,12 @@ void CWE_Results::newCaseState(CaseState newState)
 
 void CWE_Results::populateResultsScreen()
 {
-    if (viewIsValid) return;
+    if (!viewIsValid) return;
     CFDcaseInstance * currentCase = theMainWindow->getCurrentCase();
     if (currentCase == NULL) return;
     if (currentCase->getCaseFolder().isNil()) return;
     CFDanalysisType * theTemplate = currentCase->getMyType();
     if (theTemplate == NULL) return;
-    QJsonObject configobj    = theTemplate->getRawConfig()->object();
-    QJsonObject stagesobj = configobj.value("stages").toObject();
-
-    QMap<QString, StageState> currentStates = currentCase->getStageStates();
 
     viewIsValid = true;
 
@@ -297,10 +282,12 @@ void CWE_Results::populateResultsScreen()
     ui->resultsTreeView->header()->setSectionResizeMode(3,QHeaderView::Stretch);
 
     ui->label_theName->setText(currentCase->getCaseName());
-    ui->label_theType->setText(theTemplate->getName());
+    ui->label_theType->setText(theTemplate->getDisplayName());
     ui->label_theLocation->setText(currentCase->getCaseFolder().getFullPath());
 
-    for (auto itr = stagesobj.constBegin(); itr != stagesobj.constEnd(); itr++)
+    QMap<QString, StageState> currentStates = currentCase->getStageStates();
+
+    for (auto itr = currentStates.constBegin(); itr != currentStates.constEnd(); itr++)
     {
         QString stageName = itr.key();
         StageState theStageState = currentStates.value(stageName, StageState::OFFLINE);
@@ -311,22 +298,21 @@ void CWE_Results::populateResultsScreen()
             continue;
         }
 
-        QJsonArray resultArray = (*itr).toObject().value("results").toArray();
-        for (auto itr2 = resultArray.constBegin(); itr2 != resultArray.constEnd(); itr2++)
+        QList<RESULTS_STYLE> resultList = currentCase->getMyType()->getStageResults(itr.key());
+
+        for (RESULTS_STYLE aResult : resultList)
         {
-            QJsonObject aResult = (*itr2).toObject();
-            QString resultType = aResult.value("type").toString();
-            if (resultType == "text")
+            if (aResult.type == "text")
             {
-                addResult(aResult.value("name").toString(),true,true,"Data File");
+                addResult(aResult.displayName,true,true,"Data File");
             }
-            else if (resultType == "GLdata")
+            else if (aResult.type == "GLdata")
             {
-                addResult(aResult.value("name").toString(),true,false,"Flow Field Image");
+                addResult(aResult.displayName,true,false,"Flow Field Image");
             }
-            else if (resultType == "GLmesh")
+            else if (aResult.type == "GLmesh")
             {
-                addResult(aResult.value("name").toString(),true,false,"Mesh Image");
+                addResult(aResult.displayName,true,false,"Mesh Image");
             }
             else
             {

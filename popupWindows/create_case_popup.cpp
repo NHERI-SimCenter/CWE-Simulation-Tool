@@ -120,7 +120,7 @@ void Create_Case_Popup::button_create_copy_clicked()
     myMainWindow->setCurrentCase(newCase);
 
     /* time to switch to the ParameterTab */
-    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToParameterTab();
+    myMainWindow->switchToParameterTab();
     this->close();
 }
 
@@ -133,11 +133,8 @@ void Create_Case_Popup::populateCaseTypes()
 
     foreach (CFDanalysisType * caseType, *templateList) {
         /* get analysis type and name info from JSON */
-        QJsonDocument * configuration = caseType->getRawConfig();
-
-        QJsonObject confObj = configuration->object();
-        QString theName = confObj["name"].toString();
-        QString theDescription = confObj["description"].toString();
+        QString theName = caseType->getDisplayName();
+        QString theDescription = caseType->getDescription();
 
         /* create UI selection block */
         QRadioButton *radioBtn = new QRadioButton(theName, ui->scroll_NewCase);

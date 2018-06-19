@@ -42,7 +42,7 @@ SCtrBoolDataWidget::SCtrBoolDataWidget(QWidget *parent):
 
 }
 
-void SCtrBoolDataWidget::setData(VARIABLE_TYPE &obj)
+void SCtrBoolDataWidget::setDataType(VARIABLE_TYPE &obj)
 {
     // set up the UI for the widget
     this->initUI();
@@ -61,8 +61,6 @@ void SCtrBoolDataWidget::setData(VARIABLE_TYPE &obj)
     if (label_varName != NULL) {
         label_varName->setText(m_obj.displayName);
     }
-
-    this->setLayout(layout);  // do I need this one?
 
     /* set default */
     if (m_obj.defaultValue.toLower() == "true")

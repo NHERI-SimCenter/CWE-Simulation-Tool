@@ -70,8 +70,6 @@ public:
 
     QList<CFDanalysisType *> * getTemplateList();
 
-    CWE_MainWindow * getMainWindow();
-
     bool inOfflineMode();
 
 private slots:

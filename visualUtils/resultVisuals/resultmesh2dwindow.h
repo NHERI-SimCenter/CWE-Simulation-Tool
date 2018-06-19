@@ -41,12 +41,13 @@
 #include "visualUtils/resultvisualpopup.h"
 
 class CFDglCanvas;
+struct RESULTS_STYLE;
 
 class ResultMesh2dWindow : public ResultVisualPopup
 {
     Q_OBJECT
 public:
-    ResultMesh2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent = 0);
+    ResultMesh2dWindow(CFDcaseInstance * theCase, RESULTS_STYLE * resultDesc, QWidget *parent = 0);
     ~ResultMesh2dWindow();
 
     virtual void initializeView();

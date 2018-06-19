@@ -339,7 +339,7 @@ bool CFDcaseInstance::downloadCase(QString destLocalFile)
 
     FileNodeRef lastCompleteNode;
 
-    for (QString aStage : myType->getStageSequence())
+    for (QString aStage : myType->getStageIds())
     {
         const FileNodeRef testNode = caseFolder.getChildWithName(aStage);
         if (!testNode.isNil())
@@ -598,7 +598,7 @@ bool CFDcaseInstance::caseDataLoaded()
     if (varFile.isNil()) return false;
     if (!varFile.fileBufferLoaded()) return false;
 
-    for (QString aStage : myType->getStageNames())
+    for (QString aStage : myType->getStageIds())
     {
         const FileNodeRef childFolder = caseFolder.getChildWithName(aStage);
         if (childFolder.isNil()) continue;
@@ -726,7 +726,7 @@ bool CFDcaseInstance::recomputeStageStates()
 
     QMap<QString, StageState> newStageStates;
 
-    QStringList stageList = myType->getStageSequence();
+    QStringList stageList = myType->getStageIds();
     CaseState currentState = getCaseState();
 
     if ((currentState == CaseState::DOWNLOAD) ||
@@ -1142,7 +1142,7 @@ void CFDcaseInstance::computeIdleState()
         }
         else if (myType != NULL)
         {
-            for (QString aStage : myType->getStageNames())
+            for (QString aStage : myType->getStageIds())
             {
                 const FileNodeRef childFolder = caseFolder.getChildWithName(aStage);
                 if (childFolder.isNil()) continue;
@@ -1198,7 +1198,7 @@ void CFDcaseInstance::computeIdleState()
     runningStage.clear();
     runningID.clear();
 
-    for (QString aStage : myType->getStageNames())
+    for (QString aStage : myType->getStageIds())
     {
         const FileNodeRef childFolder = caseFolder.getChildWithName(aStage);
         if (childFolder.isNil()) continue;
