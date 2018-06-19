@@ -48,7 +48,7 @@ class SCtrFileDataWidget: public SCtrMasterDataWidget
 {
 public:
     SCtrFileDataWidget(RemoteFileModel *aFileModel, QWidget *parent);
-    void setData(VARIABLE_TYPE &);
+    void setDataType(VARIABLE_TYPE &);
     QString toString();
     bool toBool();
     virtual void updateValue(QString);

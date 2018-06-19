@@ -33,6 +33,7 @@
 // Renamed, modifed by Peter Sempolinski
 
 #include "CFDanalysisType.h"
+#include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 #include "../AgaveExplorer/ae_globals.h"
 
@@ -139,10 +140,11 @@ QList<RESULTS_STYLE> CFDanalysisType::getStageResults(QString stage)
 
         RESULTS_STYLE res;
 
-        if (item.contains("displayName")) { res.name = item.value("displayName").toString(); }
+        if (item.contains("displayName")) { res.displayName = item.value("displayName").toString(); }
         if (item.contains("type")) { res.type = item.value("type").toString(); }
         if (item.contains("file")) { res.file = item.value("file").toString(); }
         if (item.contains("values")) { res.values = item.value("values").toString(); }
+        res.stage = stage;
 
         list.append(res);
     }
@@ -176,7 +178,7 @@ VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
     res.unit = "";
     res.precision = "";
     res.sign = "";
-    res.options = QList<KEY_VAL_PAIR>();
+    res.options.clear();
 
     QJsonObject obj = myConfiguration.object();
     QJsonObject vals = obj["vars"].toObject();
@@ -193,18 +195,10 @@ VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
         if (item.contains("sign"))        { res.sign = item.value("sign").toString(); }
         if (item.contains("options"))
         {
-            QList<KEY_VAL_PAIR> allOptions;
-
             foreach (QString key, item["options"].toObject().keys())
             {
-                KEY_VAL_PAIR pair;
-                pair.key   = key;
-                pair.value = item["options"].toObject().value(key).toString();
-
-                allOptions.append(pair);
+                res.options.insert(key, item["options"].toObject().value(key).toString());
             }
-
-            res.options = allOptions;
         }
     }
     else

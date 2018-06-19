@@ -209,13 +209,13 @@ void CWE_manage_simulation::duplicate_case_clicked()
 void CWE_manage_simulation::on_pb_viewParameters_clicked()
 {
     // switch main window to parameters tab
-    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToParameterTab();
+    theMainWindow->switchToParameterTab();
 }
 
 void CWE_manage_simulation::on_pb_viewResults_clicked()
 {
     // switch main window to results tab
-    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToResultsTab();
+    theMainWindow->switchToResultsTab();
 }
 
 void CWE_manage_simulation::clearSelectView()

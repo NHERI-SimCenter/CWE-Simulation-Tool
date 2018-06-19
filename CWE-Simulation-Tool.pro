@@ -205,10 +205,14 @@ FORMS    += \
     cwe_guiWidgets/cwe_file_manager.ui \
     popupWindows/create_case_popup.ui \
     popupWindows/duplicate_case_popup.ui \
-    ../AgaveExplorer/utilFuncs/fixforssl.ui \
     utilWindows/dialogabout.ui \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.ui \
     cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.ui
+
+win32 {
+FORMS    += \
+    ../AgaveExplorer/utilFuncs/fixforssl.ui
+}
 
 RESOURCES += \
     cwe_resources.qrc \

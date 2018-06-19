@@ -40,7 +40,7 @@ SCtrTextDataWidget::SCtrTextDataWidget(QWidget *parent):
 
 }
 
-void SCtrTextDataWidget::setData(VARIABLE_TYPE &obj)
+void SCtrTextDataWidget::setDataType(VARIABLE_TYPE &obj)
 {
     // set up the UI for the widget
     this->initUI();
@@ -54,8 +54,6 @@ void SCtrTextDataWidget::setData(VARIABLE_TYPE &obj)
     layout->insertWidget(1, theValue, 4);
 
     if (label_varName != NULL) { label_varName->setText(m_obj.displayName); }
-
-    this->setLayout(layout);  // do I need this one?
 
     /* set default */
     this->updateValue(m_obj.defaultValue);

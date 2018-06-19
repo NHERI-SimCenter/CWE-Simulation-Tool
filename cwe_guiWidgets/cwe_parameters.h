@@ -63,7 +63,6 @@ enum class SimCenterViewState;
  * SimCenterButtonMode_CANCEL    0000 0000 0000 0010
  * SimCenterButtonMode_RESET     0000 0000 0000 0100
  * SimCenterButtonMode_RESULTS   0000 0000 0000 1000
- * SimCenterButtonMode_ALL       0000 0000 0000 1111
  */
 
 #define SimCenterButtonMode_NONE      0x0000u
@@ -71,7 +70,6 @@ enum class SimCenterViewState;
 #define SimCenterButtonMode_CANCEL    0x0002u
 #define SimCenterButtonMode_RESET     0x0004u
 #define SimCenterButtonMode_RESULTS   0x0008u
-#define SimCenterButtonMode_ALL       0x000fu
 
 namespace Ui {
 class CWE_Parameters;
@@ -86,9 +84,6 @@ public:
     ~CWE_Parameters();
 
     virtual void linkMainWindow(CWE_MainWindow *theMainWin);
-
-    void setSaveAllButtonDisabled(bool newSetting);
-    void setSaveAllButtonEnabled(bool newSetting);
 
 private slots:
     void save_all_button_clicked();
@@ -107,6 +102,7 @@ private:
     bool checkButtonEnactReady();
     bool paramsChanged();
 
+    void resetButtonAndView();
     void setButtonState(SimCenterButtonMode newMode);
     void setButtonState(StageState newMode);
     void setViewState(SimCenterViewState newState);

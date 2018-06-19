@@ -111,7 +111,7 @@ void CWE_Parameters::newCaseGiven()
 
 void CWE_Parameters::setHeaderLabels()
 {
-    CFDcaseInstance * theCase = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase();
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == NULL)
     {
         ui->label_theName->setText("N/A");
@@ -154,7 +154,7 @@ void CWE_Parameters::newCaseState(CaseState newState)
 {
     setHeaderLabels();
 
-    CFDcaseInstance * theCase = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase();
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == NULL) return;
     CFDanalysisType * theType = theCase->getMyType();
     if (theType == NULL) return;
@@ -181,43 +181,8 @@ void CWE_Parameters::newCaseState(CaseState newState)
 
         aStageTab->setStatus(getStateText(stageStates.value(aStageTab->getRefKey())));
     }
-
-    StageState currentStageState = stageStates.value(selectedStage->getRefKey());
     //Once the state tabs are updated, we adjust the state of the shown parameters:
-
-    switch (newState)
-    {
-    case CaseState::DEFUNCT:
-    case CaseState::ERROR:
-    case CaseState::INVALID:
-    case CaseState::OFFLINE:
-        setViewState(SimCenterViewState::hidden);
-        setButtonState(SimCenterButtonMode_NONE);
-        return; //These states should be handled elsewhere, as the param tab should not be visible
-        break;
-    case CaseState::LOADING:
-    case CaseState::EXTERN_OP:
-    case CaseState::PARAM_SAVE:
-        setViewState(SimCenterViewState::visible);
-        setButtonState(SimCenterButtonMode_NONE);
-        break;
-    case CaseState::DOWNLOAD:
-    case CaseState::OP_INVOKE:
-    case CaseState::RUNNING:
-        setViewState(SimCenterViewState::visible);
-        setButtonState(currentStageState);
-        break;
-    case CaseState::READY:
-    case CaseState::READY_ERROR:
-        //updateParameterValues(theMainWindow->getCurrentCase()->getCurrentParams());
-        setViewState(currentStageState);
-        setButtonState(currentStageState);
-        break;
-    default:
-        cwe_globals::displayFatalPopup("Remote case has unhandled state");
-        return;
-        break;
-    }
+    resetButtonAndView();
 }
 
 void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
@@ -255,6 +220,49 @@ void CWE_Parameters::groupSelected(CWE_ParamTab * chosenGroup)
     else
     {
         clearParamScreen();
+    }
+}
+
+void CWE_Parameters::resetButtonAndView()
+{
+    if (theMainWindow->getCurrentCase() == NULL) return;
+    if (selectedStage == NULL) return;
+
+    QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
+    StageState currentStageState = stageStates.value(selectedStage->getRefKey());
+
+    switch (theMainWindow->getCurrentCase()->getCaseState())
+    {
+    case CaseState::DEFUNCT:
+    case CaseState::ERROR:
+    case CaseState::INVALID:
+    case CaseState::OFFLINE:
+        setViewState(SimCenterViewState::hidden);
+        setButtonState(SimCenterButtonMode_NONE);
+        return; //These states should be handled elsewhere, as the param tab should not be visible
+        break;
+    case CaseState::LOADING:
+    case CaseState::EXTERN_OP:
+    case CaseState::PARAM_SAVE:
+        setViewState(SimCenterViewState::visible);
+        setButtonState(SimCenterButtonMode_NONE);
+        break;
+    case CaseState::DOWNLOAD:
+    case CaseState::OP_INVOKE:
+    case CaseState::RUNNING:
+        setViewState(SimCenterViewState::visible);
+        setButtonState(currentStageState);
+        break;
+    case CaseState::READY:
+    case CaseState::READY_ERROR:
+        //updateParameterValues(theMainWindow->getCurrentCase()->getCurrentParams());
+        setViewState(currentStageState);
+        setButtonState(currentStageState);
+        break;
+    default:
+        cwe_globals::displayFatalPopup("Remote case has unhandled state");
+        return;
+        break;
     }
 }
 
@@ -296,6 +304,13 @@ void CWE_Parameters::setButtonState(SimCenterButtonMode newMode)
     ui->pbtn_cancel->setDisabled(true);
     ui->pbtn_results->setDisabled(true);
     ui->pbtn_rollback->setDisabled(true);
+    ui->pbtn_saveAllParameters->setDisabled(true);
+
+    if (paramsChanged())
+    {
+        ui->pbtn_saveAllParameters->setEnabled(true);
+        return;
+    }
 
     if (newMode & SimCenterButtonMode_RUN)     { ui->pbtn_run->setEnabled(true);     }
     if (newMode & SimCenterButtonMode_CANCEL)  { ui->pbtn_cancel->setEnabled(true);  }
@@ -331,30 +346,29 @@ void CWE_Parameters::setViewState(SimCenterViewState newState)
     }
 }
 
-void CWE_Parameters::setSaveAllButtonDisabled(bool newSetting)
-{
-    ui->pbtn_saveAllParameters->setDisabled(newSetting);
-}
-
-void CWE_Parameters::setSaveAllButtonEnabled(bool newSetting)
-{
-    ui->pbtn_saveAllParameters->setEnabled(newSetting);
-}
-
 bool CWE_Parameters::checkButtonEnactReady()
 {
-    //TODO
+    if (paramsChanged())
+    {
+        return false;
+    }
     return true;
 }
 
 bool CWE_Parameters::paramsChanged()
 {
     //TODO: return true if param widgets have changed values
+
+    for (SCtrMasterDataWidget * aWidget : paramWidgetList)
+    {
+        //aWidget->setViewState(newState);
+    }
     return true;
 }
 
 void CWE_Parameters::save_all_button_clicked()
 {
+    //TODO
     CFDcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
     if (linkedCFDCase == NULL) return;
 
@@ -408,7 +422,7 @@ void CWE_Parameters::results_button_clicked()
 {
     if (!checkButtonEnactReady()) return;
 
-    cwe_globals::get_CWE_Driver()->getMainWindow()->switchToResultsTab();
+    theMainWindow->switchToResultsTab();
 }
 
 void CWE_Parameters::rollback_button_clicked()
@@ -424,7 +438,7 @@ void CWE_Parameters::rollback_button_clicked()
 
 void CWE_Parameters::createStageTabs()
 {
-    CFDcaseInstance * theCase = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase();
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == NULL) return;
     CFDanalysisType * theType = theCase->getMyType();
     if (theType == NULL) return;
@@ -468,7 +482,7 @@ void CWE_Parameters::createStageTabs()
 
 void CWE_Parameters::createGroupTabs()
 {
-    CFDcaseInstance * theCase = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase();
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == NULL) return;
     CFDanalysisType * theType = theCase->getMyType();
     if (theType == NULL) return;
@@ -506,7 +520,7 @@ void CWE_Parameters::createGroupTabs()
 
 void CWE_Parameters::createParamWidgets()
 {
-    CFDcaseInstance * theCase = cwe_globals::get_CWE_Driver()->getMainWindow()->getCurrentCase();
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == NULL) return;
     CFDanalysisType * theType = theCase->getMyType();
     if (theType == NULL) return;
@@ -549,7 +563,7 @@ void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable)
         layout->addWidget(theVar);
     }
     else if (theVariable.type.toLower() == "file") {
-        theVar = new SCtrFileDataWidget(cwe_globals::get_CWE_Driver()->getMainWindow()->getFileModel(), this);
+        theVar = new SCtrFileDataWidget(theMainWindow->getFileModel(), this);
         theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
@@ -559,7 +573,7 @@ void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable)
         theVar->deleteLater();
         return;
     }
-    theVar->setData(theVariable);
+    theVar->setDataType(theVariable);
 
     paramWidgetList.append(theVar);
 }

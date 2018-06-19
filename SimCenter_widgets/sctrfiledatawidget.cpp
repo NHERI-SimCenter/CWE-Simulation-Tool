@@ -67,7 +67,7 @@ void SCtrFileDataWidget::initUI()
     this->setLayout(fullLayout);
 }
 
-void SCtrFileDataWidget::setData(VARIABLE_TYPE &obj)
+void SCtrFileDataWidget::setDataType(VARIABLE_TYPE &obj)
 {
     // set up the UI for the widget
     this->initUI();

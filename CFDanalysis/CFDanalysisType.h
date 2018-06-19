@@ -42,33 +42,19 @@
 #include <QFile>
 
 struct RESULTS_STYLE {
-    QString name;
+    QString displayName;
     QString type;
     QString file;
     QString values;
+    QString stage;
 };
 
-struct KEY_VAL_PAIR {
-    QString key;
-    QString value;
-};
-
-struct VARIABLE_TYPE {
-    QString displayName;
-    QString type;
-    QString defaultValue;
-    QString unit;
-    QString precision;
-    QString sign;
-    QList<KEY_VAL_PAIR> options;
-};
+struct VARIABLE_TYPE;
 
 class CFDanalysisType
 {
 public:
     CFDanalysisType(QString configFile);
-
-    QJsonDocument * getRawConfig(); // should become a private method (?)
 
     QString getInternalName();
     QString getDisplayName();
@@ -94,6 +80,8 @@ public:
     bool isDisabled();
 
 private:
+    QJsonDocument * getRawConfig();
+
     QIcon myIcon;
 
     QJsonDocument myConfiguration;
