@@ -71,7 +71,6 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
     CFDanalysis/CFDanalysisType.cpp \
     CFDanalysis/CFDcaseInstance.cpp \
-    SimCenter_widgets/sctrvalidators.cpp \
     SimCenter_widgets/sctrmasterdatawidget.cpp \
     SimCenter_widgets/sctrstddatawidget.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.cpp \
@@ -137,7 +136,6 @@ HEADERS  += \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
     cwe_guiWidgets/cwe_state_label.h \
-    SimCenter_widgets/sctrvalidators.h \
     SimCenter_widgets/sctrmasterdatawidget.h \
     SimCenter_widgets/sctrstddatawidget.h \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.h \

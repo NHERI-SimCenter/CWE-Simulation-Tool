@@ -48,21 +48,25 @@ class SCtrFileDataWidget: public SCtrMasterDataWidget
 {
 public:
     SCtrFileDataWidget(RemoteFileModel *aFileModel, QWidget *parent);
-    void setDataType(VARIABLE_TYPE &);
-    QString toString();
-    bool toBool();
-    virtual void updateValue(QString);
-    virtual void initUI();
+    ~SCtrFileDataWidget();
+
+    virtual QString shownValue();
 
 private slots:
     virtual void newFileSelected(FileNodeRef);
 
 private:
-    RemoteFileModel * theFileModel;
+    virtual void initUI();
+    virtual void setComponetsEnabled(bool newSetting);
+
+    virtual void setShownValue(QString newValue);
+
+    RemoteFileModel * theFileModel = NULL;
 
     RemoteFileTree * myFileTree = NULL;
     QLabel * selectedFile = NULL;
     QLabel * explainText = NULL;
+    QLabel * label_varName = NULL;
 };
 
 #endif // SCTRFILEDATAWIDGET_H

@@ -41,10 +41,21 @@ class SCtrStdDataWidget: public SCtrMasterDataWidget
 {
 public:
     SCtrStdDataWidget(QWidget *parent);
-    void setDataType(VARIABLE_TYPE &);
-    QString toString();
-    double  toDouble();
-    void updateValue(QString);
+    ~SCtrStdDataWidget();
+
+    virtual QString shownValue();
+    virtual QString savableValue();
+
+private:
+    virtual void initUI();
+    virtual void setComponetsEnabled(bool newSetting);
+
+    virtual void setShownValue(QString newValue);
+    virtual bool shownValueIsValid();
+
+    QLineEdit * theValue = NULL;
+    QLabel * label_unit = NULL;
+    QLabel * label_varName = NULL;
 };
 
 #endif // SCTRSTDDATAWIDGET_H
