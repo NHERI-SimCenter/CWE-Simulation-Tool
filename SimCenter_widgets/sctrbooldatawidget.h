@@ -39,6 +39,7 @@
 
 class SCtrBoolDataWidget: public SCtrMasterDataWidget
 {
+    Q_OBJECT
 public:
     SCtrBoolDataWidget(QWidget *parent);
     ~SCtrBoolDataWidget();

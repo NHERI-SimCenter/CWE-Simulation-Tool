@@ -41,6 +41,7 @@
 
 class SCtrChoiceDataWidget: public SCtrMasterDataWidget
 {
+    Q_OBJECT
 public:
     SCtrChoiceDataWidget(QWidget *parent);
     ~SCtrChoiceDataWidget();
