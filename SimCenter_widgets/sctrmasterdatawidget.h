@@ -68,7 +68,7 @@ enum class SimCenterViewState  { visible,
 
 struct VARIABLE_TYPE {
     QString displayName;
-    QString type;
+    SimCenterDataType type;
     QString defaultValue;
     QString unit;
     QString precision;
@@ -84,36 +84,32 @@ public:
     explicit SCtrMasterDataWidget(QWidget *parent = 0);
     ~SCtrMasterDataWidget();
     SimCenterViewState viewState();
-    virtual void setViewState(SimCenterViewState);
+    void setViewState(SimCenterViewState);
 
     void setDataType(VARIABLE_TYPE &);
     VARIABLE_TYPE getTypeInfo();
 
-    virtual void updateValue(QString) = 0;
-    virtual QString value() = 0;
+    void setValue(QString newValue); //Sets both saved and shown value to newValue
+    virtual QString shownValue() = 0; //Return string of raw value now shown in widget
+    virtual QString savableValue(); //Return parsed string guaranteed to be valid, from shown value as best it can
 
-    virtual bool valueChanged() = 0;
+    void saveShownValue(); //Sets saved value to shown value if shown value is valid
+    void revertShownValue(); //Reverts shown value to saved value
 
-protected:
-    //QLineEdit *theValue = NULL;
-    //QCheckBox *theCheckBox = NULL;
-    //QComboBox *theComboBox = NULL;
+    bool isValueChanged(); //Return true if value shown in widget differs from set, saved value
+    bool hasValidNewValue(); //Return true if above is true AND, now value is valid
 
-    //QLabel  *label_varName = NULL;
-    //QLabel  *label_unit = NULL;
+private:
+    virtual void initUI() = 0; //Called once, creates ui widgets
+    virtual void setComponetsEnabled(bool newSetting) = 0; //Set enabled/disabled for widgets as applicable
+
+    virtual void setShownValue(QString newValue) = 0; //Put the new value into the displayed widget
+    virtual bool shownValueIsValid(); //Return true if raw value now shown in widget is valid
 
     VARIABLE_TYPE m_obj;
 
-private:
-    virtual void initUI() = 0;
-    virtual setComponetsEnabled(bool newSetting) = 0;
-
-    QString currentValue;
-
+    QString savedValue;
     SimCenterViewState m_ViewState;
-
-    QValidator *m_validator = NULL;
-    SimCenterDataType m_dataType;
 };
 
 #endif // SCTRDATAWIDGET_H

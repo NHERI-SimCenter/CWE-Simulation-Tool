@@ -39,15 +39,21 @@
 
 class SCtrBoolDataWidget: public SCtrMasterDataWidget
 {
+    Q_OBJECT
 public:
     SCtrBoolDataWidget(QWidget *parent);
-    void setDataType(VARIABLE_TYPE &);
-    QString toString();
-    double  toDouble();
-    bool toBool();
-    void setChecked();
-    void setUnchecked();
-    void updateValue(QString);
+    ~SCtrBoolDataWidget();
+
+    virtual QString shownValue();
+
+private:
+    virtual void initUI();
+    virtual void setComponetsEnabled(bool newSetting);
+
+    virtual void setShownValue(QString newValue);
+
+    QCheckBox * theCheckBox = NULL;
+    QLabel * label_varName = NULL;
 };
 
 #endif // SCTRBOOLDATAWIDGET_H

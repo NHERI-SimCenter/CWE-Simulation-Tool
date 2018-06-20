@@ -44,21 +44,15 @@ SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
     m_ViewState = SimCenterViewState::hidden;
 
     m_obj.displayName = "";
-    m_obj.type = "unknown";
+    m_obj.type = SimCenterDataType::unknown;
     m_obj.defaultValue = "error in configuration file";
     m_obj.unit = "";
     m_obj.precision = "";
     m_obj.sign = "";
     m_obj.options.clear();
-
-    m_dataType = SimCenterDataType::unknown;
 }
 
-SCtrMasterDataWidget::~SCtrMasterDataWidget()
-{
-    if (m_validator != NULL) delete m_validator;
-    m_validator = NULL;
-}
+SCtrMasterDataWidget::~SCtrMasterDataWidget(){}
 
 SimCenterViewState SCtrMasterDataWidget::viewState()
 {
@@ -86,30 +80,61 @@ void SCtrMasterDataWidget::setViewState(SimCenterViewState state)
     }
 }
 
-void SCtrMasterDataWidget::setValue(QString s)
+void SCtrMasterDataWidget::setDataType(VARIABLE_TYPE & newTypeData)
 {
-    theValue->setText(s);
+    if (m_obj.type != SimCenterDataType::unknown)
+    {
+        cwe_globals::displayFatalPopup("Parameter widget initialized twice.", "Internal Error");
+        return;
+    }
+
+    m_obj = newTypeData;
+    initUI();
+
+    /* set default */
+    setValue(m_obj.defaultValue);
 }
 
-void SCtrMasterDataWidget::setValue(float v)
+VARIABLE_TYPE SCtrMasterDataWidget::getTypeInfo()
 {
-    QString s = QString("%f").arg(v);
-    theValue->setText(s);
+    return m_obj;
 }
 
-void SCtrMasterDataWidget::setValue(int i)
+void SCtrMasterDataWidget::setValue(QString newValue)
 {
-    QString s = QString("%d").arg(i);
-    theValue->setText(s);
+    savedValue = newValue;
+    setShownValue(savedValue);
 }
 
-void SCtrMasterDataWidget::setValue(bool b)
+QString SCtrMasterDataWidget::savableValue()
 {
-    QString s = b?"true":"false";
-    theValue->setText(s);
+    return shownValue();
 }
 
-QString SCtrMasterDataWidget::toString()
+void SCtrMasterDataWidget::saveShownValue()
 {
-    return QString("");
+    if (shownValueIsValid())
+    {
+        setValue(shownValue());
+    }
+}
+
+void SCtrMasterDataWidget::revertShownValue()
+{
+    setShownValue(savedValue);
+}
+
+bool SCtrMasterDataWidget::isValueChanged()
+{
+    return (savedValue != shownValue());
+}
+
+bool SCtrMasterDataWidget::hasValidNewValue()
+{
+    return (isValueChanged() && shownValueIsValid());
+}
+
+bool SCtrMasterDataWidget::shownValueIsValid()
+{
+    return true;
 }
