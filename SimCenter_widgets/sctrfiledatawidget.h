@@ -42,10 +42,9 @@ class CWE_InterfaceDriver;
 class FileNodeRef;
 class RemoteFileModel;
 
-//TODO: Need to write visibilty method
-
 class SCtrFileDataWidget: public SCtrMasterDataWidget
 {
+    Q_OBJECT
 public:
     SCtrFileDataWidget(RemoteFileModel *aFileModel, QWidget *parent);
     ~SCtrFileDataWidget();
@@ -53,7 +52,7 @@ public:
     virtual QString shownValue();
 
 private slots:
-    virtual void newFileSelected(FileNodeRef);
+    void newFileSelected(FileNodeRef);
 
 private:
     virtual void initUI();

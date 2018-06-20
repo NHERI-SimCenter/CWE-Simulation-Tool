@@ -99,9 +99,6 @@ public:
     bool isValueChanged(); //Return true if value shown in widget differs from set, saved value
     bool hasValidNewValue(); //Return true if above is true AND, now value is valid
 
-private slots:
-    virtual void newFileSelected(FileNodeRef); //Would prefer this does not appear in superclass, but error happens otherwise (TODO)
-
 private:
     virtual void initUI() = 0; //Called once, creates ui widgets
     virtual void setComponetsEnabled(bool newSetting) = 0; //Set enabled/disabled for widgets as applicable

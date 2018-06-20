@@ -134,39 +134,7 @@ bool SCtrMasterDataWidget::hasValidNewValue()
     return (isValueChanged() && shownValueIsValid());
 }
 
-void SCtrMasterDataWidget::newFileSelected(FileNodeRef) {} //TODO: Find a way to remove this
-
 bool SCtrMasterDataWidget::shownValueIsValid()
 {
     return true;
 }
-
-/*
-void SCtrMasterDataWidget::setValue(QString s)
-{
-    theValue->setText(s);
-}
-
-void SCtrMasterDataWidget::setValue(float v)
-{
-    QString s = QString("%f").arg(v);
-    theValue->setText(s);
-}
-
-void SCtrMasterDataWidget::setValue(int i)
-{
-    QString s = QString("%d").arg(i);
-    theValue->setText(s);
-}
-
-void SCtrMasterDataWidget::setValue(bool b)
-{
-    QString s = b?"true":"false";
-    theValue->setText(s);
-}
-
-QString SCtrMasterDataWidget::toString()
-{
-    return QString("");
-}
-*/

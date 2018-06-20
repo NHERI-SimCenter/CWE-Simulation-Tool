@@ -39,6 +39,7 @@
 
 class SCtrTextDataWidget: public SCtrMasterDataWidget
 {
+    Q_OBJECT
 public:
     SCtrTextDataWidget(QWidget *parent);
     ~SCtrTextDataWidget();
