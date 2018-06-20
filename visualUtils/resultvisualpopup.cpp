@@ -42,7 +42,7 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "cwe_globals.h"
 
-ResultVisualPopup::ResultVisualPopup(CFDcaseInstance *theCase, QMap<QString, QString> resultDesc, QWidget *parent) :
+ResultVisualPopup::ResultVisualPopup(CFDcaseInstance *theCase, RESULTS_STYLE * resultDesc, QWidget *parent) :
     ResultProcureBase(parent),
     ui(new Ui::ResultVisualPopup)
 {
@@ -57,7 +57,7 @@ ResultVisualPopup::ResultVisualPopup(CFDcaseInstance *theCase, QMap<QString, QSt
         return;
     }
 
-    resultObj = resultDesc;
+    resultObj = *resultDesc;
 
     displayFrameTenant = new QLabel("Loading result data. Please Wait.",this);
     resultFrameLayout = new QHBoxLayout(ui->displayFrame);
@@ -73,7 +73,7 @@ ResultVisualPopup::~ResultVisualPopup()
 
 void ResultVisualPopup::performStandardInit(QMap<QString, QString> neededFiles)
 {
-    FileNodeRef trueBaseFolder = myCase->getCaseFolder().getChildWithName(resultObj["stage"]);
+    FileNodeRef trueBaseFolder = myCase->getCaseFolder().getChildWithName(resultObj.stage);
     if (trueBaseFolder.isNil())
     {
         cwe_globals::displayPopup("ERROR: Result requested for stage that is not yet complete.");
@@ -81,7 +81,7 @@ void ResultVisualPopup::performStandardInit(QMap<QString, QString> neededFiles)
         return;
     }
 
-    setupResultDisplay(myCase->getCaseName(), myCase->getMyType()->getName(), resultObj["name"]);
+    setupResultDisplay(myCase->getCaseName(), myCase->getMyType()->getDisplayName(), resultObj.displayName);
     initializeWithNeededFiles(trueBaseFolder, neededFiles);
 }
 
@@ -111,7 +111,7 @@ void ResultVisualPopup::underlyingDataChanged(QString )
     //Note: This is deliberately blank. This result popup is static once the image displays.
 }
 
-QMap<QString, QString> ResultVisualPopup::getResultObj()
+RESULTS_STYLE ResultVisualPopup::getResultObj()
 {
     return resultObj;
 }

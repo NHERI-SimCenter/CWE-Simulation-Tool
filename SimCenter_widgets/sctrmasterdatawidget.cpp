@@ -32,6 +32,8 @@
 
 // Contributors:
 
+#include "cwe_globals.h"
+
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 #include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 #include "CFDanalysis/CFDanalysisType.h"
@@ -39,15 +41,17 @@
 SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
     QFrame(parent)
 {
-    this->setViewState(SimCenterViewState::visible);
+    m_ViewState = SimCenterViewState::hidden;
 
     m_obj.displayName = "";
-    m_obj.type = "text";
+    m_obj.type = "unknown";
     m_obj.defaultValue = "error in configuration file";
     m_obj.unit = "";
     m_obj.precision = "";
     m_obj.sign = "";
-    m_obj.options = QList<KEY_VAL_PAIR>();
+    m_obj.options.clear();
+
+    m_dataType = SimCenterDataType::unknown;
 }
 
 SCtrMasterDataWidget::~SCtrMasterDataWidget()
@@ -56,51 +60,29 @@ SCtrMasterDataWidget::~SCtrMasterDataWidget()
     m_validator = NULL;
 }
 
-
-void SCtrMasterDataWidget::initUI()
-{
-    if (label_unit == NULL) {
-        label_unit = new QLabel(this);
-    }
-    if (label_varName == NULL) {
-        label_varName = new QLabel(this);
-    }
-    QBoxLayout *layout = new QHBoxLayout();
-    layout->addWidget(label_varName, 3);
-    layout->addWidget(label_unit, 1);
-    this->setLayout(layout);
-}
-
-SimCenterViewState SCtrMasterDataWidget::ViewState()
+SimCenterViewState SCtrMasterDataWidget::viewState()
 {
     return m_ViewState;
 }
 
 void SCtrMasterDataWidget::setViewState(SimCenterViewState state)
 {
-    switch (state) {
+    m_ViewState = state;
+    switch (m_ViewState) {
     case SimCenterViewState::visible:
-        if (theValue    != NULL) theValue->setEnabled(false);
-        if (theComboBox != NULL) theComboBox->setEnabled(false);
-        if (theCheckBox != NULL) theCheckBox->setEnabled(false);
+        setComponetsEnabled(false);
         this->show();
-        m_ViewState = SimCenterViewState::editable;
         break;
     case SimCenterViewState::hidden:
-        if (theValue    != NULL) theValue->setEnabled(true);
-        if (theComboBox != NULL) theComboBox->setEnabled(true);
-        if (theCheckBox != NULL) theCheckBox->setEnabled(true);
+        setComponetsEnabled(false);
         this->hide();
-        m_ViewState = SimCenterViewState::hidden;
         break;
     case SimCenterViewState::editable:
-    default:
-        if (theValue    != NULL) theValue->setEnabled(true);
-        if (theComboBox != NULL) theComboBox->setEnabled(true);
-        if (theCheckBox != NULL) theCheckBox->setEnabled(true);
+        setComponetsEnabled(true);
         this->show();
-        m_ViewState = SimCenterViewState::visible;
         break;
+    default:
+        cwe_globals::displayFatalPopup("Invalid SimCenter View State in code.", "Fatal Error");
     }
 }
 
@@ -130,27 +112,4 @@ void SCtrMasterDataWidget::setValue(bool b)
 QString SCtrMasterDataWidget::toString()
 {
     return QString("");
-}
-
-/* ********** helper functions ********** */
-
-void SCtrMasterDataWidget::setVariableName(QString s)
-{
-    if (label_varName != NULL) label_varName->setText(s);
-}
-
-void SCtrMasterDataWidget::setUnit(QString u)
-{
-    if (label_unit != NULL) label_unit->setText(u);
-}
-
-/* ********** SLOTS ********** */
-void SCtrMasterDataWidget::on_theValue_editingFinished()
-{
-
-}
-
-void SCtrMasterDataWidget::newFileSelected(FileNodeRef)
-{
-
 }

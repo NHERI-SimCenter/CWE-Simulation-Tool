@@ -40,7 +40,7 @@ SCtrStdDataWidget::SCtrStdDataWidget(QWidget *parent):
 
 }
 
-void SCtrStdDataWidget::setData(VARIABLE_TYPE &obj)
+void SCtrStdDataWidget::setDataType(VARIABLE_TYPE &obj)
 {
     // set up the UI for the widget
     this->initUI();

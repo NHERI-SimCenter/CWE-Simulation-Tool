@@ -212,17 +212,12 @@ QString CWE_InterfaceDriver::getBanner()
 
 QString CWE_InterfaceDriver::getVersion()
 {
-    return "Version: 0.9.2";
+    return "Version: 0.10.0";
 }
 
 QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()
 {
     return &templateList;
-}
-
-CWE_MainWindow * CWE_InterfaceDriver::getMainWindow()
-{
-    return mainWindow;
 }
 
 void CWE_InterfaceDriver::checkAppList(RequestState replyState, QVariantList appList)

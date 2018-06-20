@@ -43,12 +43,38 @@
 #include <QLabel>
 #include <QJsonObject>
 #include <QBoxLayout>
+#include <QKeyValueIterator>
 
-#include "SimCenter_widgets/sctrstates.h"
 #include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 #include "CFDanalysis/CFDanalysisType.h"
 
 class FileTreeNode;
+
+enum class SimCenterDataType { integer,
+                               floatingpoint,
+                               boolean,
+                               string,
+                               selection,
+                               file,
+                               tensor2D,
+                               tensor3D,
+                               vector2D,
+                               vector3D,
+                               unknown};
+
+enum class SimCenterViewState  { visible,
+                                 editable,
+                                 hidden };
+
+struct VARIABLE_TYPE {
+    QString displayName;
+    QString type;
+    QString defaultValue;
+    QString unit;
+    QString precision;
+    QString sign;
+    QMap<QString, QString> options;
+};
 
 class SCtrMasterDataWidget : public QFrame
 {
@@ -57,36 +83,32 @@ class SCtrMasterDataWidget : public QFrame
 public:
     explicit SCtrMasterDataWidget(QWidget *parent = 0);
     ~SCtrMasterDataWidget();
-    SimCenterViewState ViewState();
+    SimCenterViewState viewState();
     virtual void setViewState(SimCenterViewState);
-    virtual void setData(VARIABLE_TYPE &) = 0;
-    virtual void initUI();
-    virtual void setValue(QString);
-    virtual void setValue(float);
-    virtual void setValue(int);
-    virtual void setValue(bool);
-    virtual QString toString();
-    virtual void updateValue(QString) = 0;
-    QString value() {return this->toString();}
 
-private slots:
-    void on_theValue_editingFinished();
-    virtual void newFileSelected(FileNodeRef);
-    //TODO: Need to rethink some of the polymorphism here
+    void setDataType(VARIABLE_TYPE &);
+    VARIABLE_TYPE getTypeInfo();
+
+    virtual void updateValue(QString) = 0;
+    virtual QString value() = 0;
+
+    virtual bool valueChanged() = 0;
 
 protected:
-    QLineEdit *theValue = NULL;
-    QCheckBox *theCheckBox = NULL;
-    QComboBox *theComboBox = NULL;
+    //QLineEdit *theValue = NULL;
+    //QCheckBox *theCheckBox = NULL;
+    //QComboBox *theComboBox = NULL;
 
-    QLabel  *label_varName = NULL;
-    QLabel  *label_unit = NULL;
+    //QLabel  *label_varName = NULL;
+    //QLabel  *label_unit = NULL;
 
     VARIABLE_TYPE m_obj;
 
 private:
-    void setVariableName(QString s);
-    void setUnit(QString u);
+    virtual void initUI() = 0;
+    virtual setComponetsEnabled(bool newSetting) = 0;
+
+    QString currentValue;
 
     SimCenterViewState m_ViewState;
 

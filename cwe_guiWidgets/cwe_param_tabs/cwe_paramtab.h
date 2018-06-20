@@ -32,43 +32,42 @@
 
 // Contributors:
 
-#ifndef CWE_PARAMPANEL_H
-#define CWE_PARAMPANEL_H
+#ifndef CWE_PARAMTAB_H
+#define CWE_PARAMTAB_H
 
 #include <QFrame>
-//#include <QJsonObject>
-//#include <QJsonArray>
-#include <QMap>
-#include <QLayout>
+#include <QMouseEvent>
 
-#include "SimCenter_widgets/sctrstates.h"
-#include "CFDanalysis/CFDanalysisType.h"
-
-class SCtrMasterDataWidget;
-class CWE_InterfaceDriver;
-enum class SimCenterViewState;
-
-namespace Ui {
-class CWE_ParamPanel;
-}
-
-class CWE_ParamPanel : public QFrame
+class CWE_ParamTab : public QFrame
 {
     Q_OBJECT
 
 public:
-    explicit CWE_ParamPanel(QWidget *parent = 0);
-    ~CWE_ParamPanel();
+    explicit CWE_ParamTab(QString refKey, QString displayedText, QWidget *parent = 0);
+    ~CWE_ParamTab();
 
-    void setViewState(SimCenterViewState);
-    SimCenterViewState getViewState();
-    void addVariable(QString varName, VARIABLE_TYPE &theVariable);
-    void addParameterConfig(QStringList &groupVars, CFDanalysisType *myType);
-    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
+    QString getRefKey();
 
-private:
-    SimCenterViewState m_viewState;
-    QMap<QString, SCtrMasterDataWidget *> *variableWidgets;
+    bool tabIsActive();
+    void setActive(bool b=true);
+    void setInActive(bool b=true);
+
+signals:
+    void btn_pressed(CWE_ParamTab *);
+    void btn_released(CWE_ParamTab *);
+
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
+    void setButtonState(bool tabPressed, bool tabActive);
+    virtual void setButtonAppearance() = 0;
+
+    QString tabKey = "UNKNOWN";
+    QString tabDisplay = "UNKNOWN";
+
+    bool tab_active = false;
+    bool tab_pressed = false;
 };
 
-#endif // CWE_PARAMPANEL_H
+#endif // PARAMTAB_H

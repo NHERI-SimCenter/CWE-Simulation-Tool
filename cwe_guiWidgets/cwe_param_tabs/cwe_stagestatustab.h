@@ -35,65 +35,30 @@
 #ifndef CWE_STAGESTATUSTAB_H
 #define CWE_STAGESTATUSTAB_H
 
-#include <QFrame>
-
-#include <QMouseEvent>
-
-class CWE_GroupsWidget;
+#include "cwe_paramtab.h"
 
 namespace Ui {
 class CWE_StageStatusTab;
 }
 
-class CWE_StageStatusTab : public QFrame
+class CWE_StageStatusTab : public CWE_ParamTab
 {
     Q_OBJECT
 
 public:
     explicit CWE_StageStatusTab(QString stageKey, QString stageName, QWidget *parent = 0);
     ~CWE_StageStatusTab();
-    void setCorrespondingPanel(CWE_GroupsWidget * newPanel);
 
-    void setStatus(QString);
-    void setText(QString);
-    void setName(const QString s);
-    //void setIndex(int idx) {m_index = idx;};
-    QString name() {return m_name;};
-    QString text() {return m_text;};
-    QString status() {return m_status;};
-    //int index() {return m_index;};
-    bool tabIsActive();
-    void setActive(bool b=true);
-    void setInActive(bool b=true);
-    void linkWidget(CWE_GroupsWidget *ptr);
-    CWE_GroupsWidget * groupWidget() { return myPanel; };
-    QString getStageKey() { return stageKey; }
-    bool isStage(QString key) { return (stageKey == key);}
-    CWE_GroupsWidget *getGroupsWidget() { return myPanel; }
-
-signals:
-    void btn_pressed(CWE_GroupsWidget *);
-    void btn_released(CWE_GroupsWidget *);
-    void btn_activated(CWE_StageStatusTab *);
-
-private slots:
+    void setStatus(const QString str);
+    QString status();
 
 protected:
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void setButtonAppearance();
 
 private:
     Ui::CWE_StageStatusTab *ui;
-    //void paintEvent(QPaintEvent*);
 
-    CWE_GroupsWidget * myPanel = NULL;
-
-    QString m_text;
-    QString stageKey = "UNKNOWN";
-    QString m_status = "unknown";
-    QString m_name = "label text";
-    //int m_index = -1;
-    bool m_active;
+    QString stageStatus = "unknown";
 };
 
 #endif // CWE_STAGESTATUSTAB_H

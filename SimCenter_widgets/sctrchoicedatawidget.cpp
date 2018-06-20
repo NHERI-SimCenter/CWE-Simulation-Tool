@@ -42,7 +42,7 @@ SCtrChoiceDataWidget::SCtrChoiceDataWidget(QWidget *parent):
 
 }
 
-void SCtrChoiceDataWidget::setData(VARIABLE_TYPE &obj)
+void SCtrChoiceDataWidget::setDataType(VARIABLE_TYPE &obj)
 {
     // set up the UI for the widget
     this->initUI();
@@ -63,16 +63,15 @@ void SCtrChoiceDataWidget::setData(VARIABLE_TYPE &obj)
 
     QString defaultValue = "";
 
-    foreach (KEY_VAL_PAIR option, m_obj.options)
+    for (auto itr = m_obj.options.cbegin(); itr != m_obj.options.cend(); itr++)
     {
         QList<QStandardItem *> newRow;
-        // newRow.clear();
-        newRow.append(new QStandardItem(option.key));
-        newRow.append(new QStandardItem(option.value));
+        newRow.append(new QStandardItem(itr.key()));
+        newRow.append(new QStandardItem(*itr));
 
         theModel->appendRow(newRow);
 
-        if (option.key == m_obj.defaultValue) defaultValue = option.value;
+        if (itr.key() == m_obj.defaultValue) defaultValue = *itr;
     }
 
     theComboBox = new QComboBox(this);
