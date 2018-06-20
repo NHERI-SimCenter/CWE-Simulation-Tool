@@ -42,77 +42,47 @@ SCtrBoolDataWidget::SCtrBoolDataWidget(QWidget *parent):
 
 }
 
-void SCtrBoolDataWidget::setDataType(VARIABLE_TYPE &obj)
+SCtrBoolDataWidget::~SCtrBoolDataWidget()
 {
-    // set up the UI for the widget
-    this->initUI();
+    if (theCheckBox != NULL) theCheckBox->deleteLater();
+    if (label_varName != NULL) label_varName->deleteLater();
+}
 
-    m_obj = obj;
+QString SCtrBoolDataWidget::shownValue()
+{
+    if (theCheckBox->isChecked())
+    {
+        return "true";
+    }
+    return "false";
+}
 
-    QHBoxLayout *layout = (QHBoxLayout *)this->layout();
+void SCtrBoolDataWidget::initUI()
+{
+    QBoxLayout *layout = new QHBoxLayout();
     layout->setMargin(0);
 
     theCheckBox = new QCheckBox(this);
-    layout->insertWidget(1, theCheckBox, 4);
+    label_varName = new QLabel(getTypeInfo().displayName, this);
 
-    if (label_unit != NULL) {
-        label_unit->setText(m_obj.unit);
-    }
-    if (label_varName != NULL) {
-        label_varName->setText(m_obj.displayName);
-    }
+    layout->addWidget(label_varName, 3);
+    layout->addWidget(theCheckBox, 4);
 
-    /* set default */
-    if (m_obj.defaultValue.toLower() == "true")
+    this->setLayout(layout);
+}
+
+void SCtrBoolDataWidget::setComponetsEnabled(bool newSetting)
+{
+    theCheckBox->setEnabled(newSetting);
+}
+
+void SCtrBoolDataWidget::setShownValue(QString newValue)
+{
+    if (newValue.toLower() == "true")
     {
         theCheckBox->setChecked(true);
-    }
-    else
-    {
-        theCheckBox->setChecked(false);
-    }
-}
-
-bool SCtrBoolDataWidget::toBool()
-{
-    bool checked = theCheckBox->checkState()==Qt::Checked?true:false;
-    return checked;
-}
-
-QString SCtrBoolDataWidget::toString()
-{
-    QString checked = theCheckBox->checkState()==Qt::Checked?QString("true"):QString("false");
-    return checked;
-}
-
-double SCtrBoolDataWidget::toDouble()
-{
-    double checked = theCheckBox->checkState()==Qt::Checked?1.0:0.0;
-    return checked;
-}
-
-void SCtrBoolDataWidget::setChecked()
-{
-    theCheckBox->setChecked(true);
-}
-
-void SCtrBoolDataWidget::setUnchecked()
-{
-    theCheckBox->setChecked(false);
-}
-
-void SCtrBoolDataWidget::updateValue(QString s)
-{
-    /* check if new information is an appropriate type */
-    if (s.toLower() == "true")
-        { setChecked(); }
-    else if (s.toLower() == "false")
-        {  setUnchecked(); }
-    else
-    {
-        /* add an error message */
-        cwe_globals::displayPopup(QString("Boolean variable %1 cannot be set to \'%2\'.\nVariable ignored.").arg(m_obj.displayName).arg(s), "Warning");
         return;
     }
+    theCheckBox->setChecked(false);
 }
 

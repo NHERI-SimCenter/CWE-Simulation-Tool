@@ -40,72 +40,71 @@ SCtrStdDataWidget::SCtrStdDataWidget(QWidget *parent):
 
 }
 
-void SCtrStdDataWidget::setDataType(VARIABLE_TYPE &obj)
+SCtrStdDataWidget::~SCtrStdDataWidget()
 {
-    // set up the UI for the widget
-    this->initUI();
+    if (theValue != NULL) theValue->deleteLater();
+    if (label_unit != NULL) label_unit->deleteLater();
+    if (label_varName != NULL) label_varName->deleteLater();
+}
 
-    m_obj = obj;
+QString SCtrStdDataWidget::shownValue()
+{
+    return theValue->text();
+}
 
-    QHBoxLayout *layout = (QHBoxLayout *)this->layout();
+QString SCtrStdDataWidget::savableValue()
+{
+    if (getTypeInfo().precision.toLower() == "int")
+    {
+        return QString::number(shownValue().toInt());
+    }
+    else
+    {
+        int prec = getTypeInfo().precision.toInt();
+        return QString::number(shownValue().toDouble(), 'f', prec);
+    }
+}
+
+void SCtrStdDataWidget::initUI()
+{
+    QBoxLayout *layout = new QHBoxLayout();
     layout->setMargin(0);
 
     theValue = new QLineEdit(this);
-    layout->insertWidget(1, theValue, 4);
+    label_unit = new QLabel(getTypeInfo().unit, this);
+    label_varName = new QLabel(getTypeInfo().displayName, this);
 
-    if (label_unit != NULL) {
-        label_unit->setText(m_obj.unit);
-    }
-    if (label_varName != NULL) {
-        label_varName->setText(m_obj.displayName);
-    }
+    layout->addWidget(label_varName, 3);
+    layout->addWidget(theValue, 4);
+    layout->addWidget(label_unit, 1);
 
-    this->setLayout(layout);  // do I need this one?
-
-    /* set default */
-    QString defaultValue = m_obj.defaultValue;
-    this->updateValue(defaultValue);
+    this->setLayout(layout);
 }
 
-QString SCtrStdDataWidget::toString()
+void SCtrStdDataWidget::setComponetsEnabled(bool newSetting)
 {
-    QString s = "";
+    theValue->setEnabled(newSetting);
+    label_unit->setEnabled(newSetting);
+}
 
-    QString precString  = m_obj.precision;
-    if (precString.toLower() == "int")
+void SCtrStdDataWidget::setShownValue(QString newValue)
+{
+    theValue->setText(newValue);
+}
+
+bool SCtrStdDataWidget::shownValueIsValid()
+{
+    QString toCheck = shownValue();
+
+    bool isOkay = false;
+
+    if (getTypeInfo().precision.toLower() == "int")
     {
-        s = QString("%1").arg(((theValue->text()).toInt()));
+        toCheck.toInt(&isOkay);
     }
     else
     {
-        int prec = precString.toInt();
-        s = QString("%1").arg(((theValue->text()).toDouble()), 0, 'f', prec);
+        toCheck.toDouble(&isOkay);
     }
-    return s;
-}
-
-double SCtrStdDataWidget::toDouble()
-{
-    return theValue->text().toDouble();
-}
-
-void SCtrStdDataWidget::updateValue(QString s)
-{
-    QString val = "";
-
-    /* check if new information is of an appropriate type */
-
-    QString precString  = m_obj.precision;
-    if (precString.toLower() == "int")
-    {
-        val = QString("%1").arg(s.toInt());
-    }
-    else
-    {
-        int prec = precString.toInt();
-        val = QString("%1").arg(s.toDouble(), 0, 'f', prec);
-    }
-
-    /* update the value */
-    theValue->setText(val);
+    return isOkay;
 }

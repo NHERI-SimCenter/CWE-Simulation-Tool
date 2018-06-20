@@ -53,6 +53,7 @@
 #include "SimCenter_widgets/sctrbooldatawidget.h"
 #include "SimCenter_widgets/sctrfiledatawidget.h"
 #include "SimCenter_widgets/sctrchoicedatawidget.h"
+#include "SimCenter_widgets/sctrtextdatawidget.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
@@ -547,30 +548,34 @@ void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable)
 
     QLayout *layout = ui->parameterSpace->layout();
 
-    if (theVariable.type.toLower() == "std") {
+    if (theVariable.type == SimCenterDataType::floatingpoint) {
         theVar = new SCtrStdDataWidget(this);
         theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
-    else if (theVariable.type.toLower() == "choose") {
+    else if (theVariable.type == SimCenterDataType::string) {
+        theVar = new SCtrTextDataWidget(this);
+        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
+        layout->addWidget(theVar);
+    }
+    else if (theVariable.type == SimCenterDataType::selection) {
         theVar = new SCtrChoiceDataWidget(this);
         theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
-    else if (theVariable.type.toLower() == "bool") {
+    else if (theVariable.type == SimCenterDataType::boolean) {
         theVar = new SCtrBoolDataWidget(this);
         theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
-    else if (theVariable.type.toLower() == "file") {
+    else if (theVariable.type == SimCenterDataType::file) {
         theVar = new SCtrFileDataWidget(theMainWindow->getFileModel(), this);
         theVar->setStyleSheet("QLineEdit {background-color: #fff}");
         layout->addWidget(theVar);
     }
     else {
         // add an error message
-        qCWarning(agaveAppLayer, "Variable %s of unknown type %s. Variable ignored.", qPrintable(varName), qPrintable(theVariable.type));
-        theVar->deleteLater();
+        qCWarning(agaveAppLayer, "Variable %s of unknown type. Variable ignored.", qPrintable(varName));
         return;
     }
     theVar->setDataType(theVariable);

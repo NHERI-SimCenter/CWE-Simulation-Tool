@@ -44,21 +44,15 @@ SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
     m_ViewState = SimCenterViewState::hidden;
 
     m_obj.displayName = "";
-    m_obj.type = "unknown";
+    m_obj.type = SimCenterDataType::unknown;
     m_obj.defaultValue = "error in configuration file";
     m_obj.unit = "";
     m_obj.precision = "";
     m_obj.sign = "";
     m_obj.options.clear();
-
-    m_dataType = SimCenterDataType::unknown;
 }
 
-SCtrMasterDataWidget::~SCtrMasterDataWidget()
-{
-    if (m_validator != NULL) delete m_validator;
-    m_validator = NULL;
-}
+SCtrMasterDataWidget::~SCtrMasterDataWidget(){}
 
 SimCenterViewState SCtrMasterDataWidget::viewState()
 {
@@ -86,6 +80,68 @@ void SCtrMasterDataWidget::setViewState(SimCenterViewState state)
     }
 }
 
+void SCtrMasterDataWidget::setDataType(VARIABLE_TYPE & newTypeData)
+{
+    if (m_obj.type != SimCenterDataType::unknown)
+    {
+        cwe_globals::displayFatalPopup("Parameter widget initialized twice.", "Internal Error");
+        return;
+    }
+
+    m_obj = newTypeData;
+    initUI();
+
+    /* set default */
+    setValue(m_obj.defaultValue);
+}
+
+VARIABLE_TYPE SCtrMasterDataWidget::getTypeInfo()
+{
+    return m_obj;
+}
+
+void SCtrMasterDataWidget::setValue(QString newValue)
+{
+    savedValue = newValue;
+    setShownValue(savedValue);
+}
+
+QString SCtrMasterDataWidget::savableValue()
+{
+    return shownValue();
+}
+
+void SCtrMasterDataWidget::saveShownValue()
+{
+    if (shownValueIsValid())
+    {
+        setValue(shownValue());
+    }
+}
+
+void SCtrMasterDataWidget::revertShownValue()
+{
+    setShownValue(savedValue);
+}
+
+bool SCtrMasterDataWidget::isValueChanged()
+{
+    return (savedValue != shownValue());
+}
+
+bool SCtrMasterDataWidget::hasValidNewValue()
+{
+    return (isValueChanged() && shownValueIsValid());
+}
+
+void SCtrMasterDataWidget::newFileSelected(FileNodeRef) {} //TODO: Find a way to remove this
+
+bool SCtrMasterDataWidget::shownValueIsValid()
+{
+    return true;
+}
+
+/*
 void SCtrMasterDataWidget::setValue(QString s)
 {
     theValue->setText(s);
@@ -113,3 +169,4 @@ QString SCtrMasterDataWidget::toString()
 {
     return QString("");
 }
+*/
