@@ -101,10 +101,6 @@ QTabBar::tab:disabled {
      background: transparent;
   }
 
-QWidget#parameterSpace {
-    background-color: white;
-}
-
 QToolBox::tab {
    background-color: #B0BEC5;
    border-style: outset;

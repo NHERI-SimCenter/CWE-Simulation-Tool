@@ -77,6 +77,9 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
 
     QVBoxLayout * paramSpaceLayout = (QVBoxLayout *)ui->parameterSpace->layout();
     paramSpaceLayout->setAlignment(Qt::AlignTop);
+
+    //TODO: Implement optional reference image
+    ui->optionalImage->setVisible(false);
 }
 
 CWE_Parameters::~CWE_Parameters()
@@ -531,6 +534,12 @@ void CWE_Parameters::createParamWidgets()
     if (!paramWidgetList.isEmpty() || (loadingLabel == NULL))
     {
         clearParamScreen();
+    }
+
+    if (loadingLabel != NULL)
+    {
+        loadingLabel->deleteLater();
+        loadingLabel = NULL;
     }
 
     QStringList groupVars = theType->getVarGroup(selectedGroup->getRefKey());
