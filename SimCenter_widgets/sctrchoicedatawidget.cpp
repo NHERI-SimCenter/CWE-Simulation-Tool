@@ -96,6 +96,9 @@ void SCtrChoiceDataWidget::initUI()
     layout->addWidget(label_unit, 1);
 
     this->setLayout(layout);
+
+    QObject::connect(theComboBox, SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(changeMadeToUnderlyingDataWidget()));
 }
 
 void SCtrChoiceDataWidget::setComponetsEnabled(bool newSetting)

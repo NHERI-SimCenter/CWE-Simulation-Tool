@@ -308,9 +308,9 @@
         "turbModel":{
             "displayName":"Turbulence Model",
             "type":"choose",
-            "default":"Laminar",
+            "default":"laminar",
             "options":{
-                "Laminar":"Laminar Flow model",
+                "laminar":"Laminar Flow model",
                 "SpalartAllmaras":"S-A one equation model (RANS)",
                 "kEpsilon":"k-epsilon model (RANS)",
                 "Smagorinsky":"Smagorinsky turbulence model (LES)",

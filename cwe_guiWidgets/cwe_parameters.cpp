@@ -154,7 +154,7 @@ void CWE_Parameters::setHeaderLabels()
     }
 }
 
-void CWE_Parameters::newCaseState(CaseState newState)
+void CWE_Parameters::newCaseState(CaseState)
 {
     setHeaderLabels();
 
@@ -225,6 +225,11 @@ void CWE_Parameters::groupSelected(CWE_ParamTab * chosenGroup)
     {
         clearParamScreen();
     }
+}
+
+void CWE_Parameters::paramWidgetChanged()
+{
+    resetButtonAndView();
 }
 
 void CWE_Parameters::resetButtonAndView()
@@ -365,9 +370,12 @@ bool CWE_Parameters::paramsChanged()
 
     for (SCtrMasterDataWidget * aWidget : paramWidgetList)
     {
-        //aWidget->setViewState(newState);
+        if (aWidget->isValueChanged())
+        {
+            return true;
+        }
     }
-    return true;
+    return false;
 }
 
 void CWE_Parameters::save_all_button_clicked()
@@ -549,6 +557,8 @@ void CWE_Parameters::createParamWidgets()
         VARIABLE_TYPE theVariable = theType->getVariableInfo(varName);
         addVariable(varName, theVariable);
     }
+
+    resetButtonAndView();
 }
 
 void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable)
@@ -590,6 +600,8 @@ void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable)
     theVar->setDataType(theVariable);
 
     paramWidgetList.append(theVar);
+    QObject::connect(theVar, SIGNAL(valueEdited()),
+                     this, SLOT(paramWidgetChanged()));
 }
 
 void CWE_Parameters::clearStageTabs()

@@ -173,6 +173,9 @@ QStringList CFDanalysisType::getVarGroup(QString group)
 
 VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
 {
+    //TODO: Clean up this method
+    //TODO: Default should always exist and be valid
+
     VARIABLE_TYPE res;
 
     res.unit = "";
@@ -188,10 +191,7 @@ VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
         QJsonObject item = vals.value(name).toObject();
 
         if (item.contains("displayName")) { res.displayName = item.value("displayName").toString(); }
-        if (item.contains("default"))     { res.defaultValue = item.value("default").toString(); }
-        if (item.contains("unit"))        { res.unit = item.value("unit").toString(); }
-        if (item.contains("precision"))   { res.precision = item.value("precision").toString(); }
-        if (item.contains("sign"))        { res.sign = item.value("sign").toString(); }
+
         if (item.contains("options"))
         {
             foreach (QString key, item["options"].toObject().keys())
@@ -224,6 +224,26 @@ VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
                 res.type = SimCenterDataType::unknown;
             }
         }
+
+        if (res.type == SimCenterDataType::boolean)
+        {
+            if (item.contains("default") && item.value("default").toBool())
+            {
+                res.defaultValue = "true";
+            }
+            else
+            {
+                res.defaultValue = "false";
+            }
+        }
+        else
+        {
+            if (item.contains("default"))     { res.defaultValue = item.value("default").toString(); }
+        }
+
+        if (item.contains("unit"))        { res.unit = item.value("unit").toString(); }
+        if (item.contains("precision"))   { res.precision = item.value("precision").toString(); }
+        if (item.contains("sign"))        { res.sign = item.value("sign").toString(); }
     }
     else
     {

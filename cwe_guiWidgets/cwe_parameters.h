@@ -98,6 +98,8 @@ private slots:
     void stageSelected(CWE_ParamTab * chosenTab);
     void groupSelected(CWE_ParamTab * chosenTab);
 
+    void paramWidgetChanged();
+
 private:
     bool checkButtonEnactReady();
     bool paramsChanged();
