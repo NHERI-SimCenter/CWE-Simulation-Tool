@@ -191,6 +191,8 @@ void CWE_Parameters::newCaseState(CaseState)
 
 void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
 {
+    if (chosenTab->tabIsActive()) return;
+
     for (CWE_StageStatusTab * aTab : stageTabList)
     {
         aTab->setInActive();
@@ -210,6 +212,8 @@ void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
 
 void CWE_Parameters::groupSelected(CWE_ParamTab * chosenGroup)
 {
+    if (chosenGroup->tabIsActive()) return;
+
     for (CWE_GroupTab * aTab : groupTabList)
     {
         aTab->setInActive();
@@ -355,19 +359,8 @@ void CWE_Parameters::setViewState(SimCenterViewState newState)
     }
 }
 
-bool CWE_Parameters::checkButtonEnactReady()
-{
-    if (paramsChanged())
-    {
-        return false;
-    }
-    return true;
-}
-
 bool CWE_Parameters::paramsChanged()
 {
-    //TODO: return true if param widgets have changed values
-
     for (SCtrMasterDataWidget * aWidget : paramWidgetList)
     {
         if (aWidget->isValueChanged())
@@ -380,23 +373,28 @@ bool CWE_Parameters::paramsChanged()
 
 void CWE_Parameters::save_all_button_clicked()
 {
-    //TODO
     CFDcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
     if (linkedCFDCase == NULL) return;
+    if (selectedStage == NULL) return;
+    if (!paramsChanged()) return;
 
-    /*
     // collect parameter values from all SCtrMasterDataWidget objects
     QMap<QString, QString> newParams;
-    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
 
-    while (iter.hasNext())
+    for (SCtrMasterDataWidget * aWidget : paramWidgetList)
     {
-        //TODO: Check if new, if so, insert in into new param list
-        iter.next();
-
-
-        newParams.insert(iter.key(), (iter.value())->value());
-        count++;
+        if (aWidget->hasValidNewValue())
+        {
+            newParams.insert(aWidget->getTypeInfo().internalName, aWidget->savableValue());
+            aWidget->saveShownValue();
+        }
+        else
+        {
+            if (aWidget->isValueChanged())
+            {
+                aWidget->revertShownValue();
+            }
+        }
     }
 
     if (newParams.isEmpty()) return;
@@ -405,12 +403,14 @@ void CWE_Parameters::save_all_button_clicked()
     {
         cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
     }
-    */
 }
 
 void CWE_Parameters::run_button_clicked()
 {
-    if (!checkButtonEnactReady()) return;
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
+    if (selectedStage == NULL) return;
+    if (paramsChanged()) return;
 
     if (!theMainWindow->getCurrentCase()->startStageApp(selectedStage->getRefKey()))
     {
@@ -421,7 +421,10 @@ void CWE_Parameters::run_button_clicked()
 
 void CWE_Parameters::cancel_button_clicked()
 {
-    if (!checkButtonEnactReady()) return;
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
+    if (selectedStage == NULL) return;
+    if (paramsChanged()) return;
 
     if (!theMainWindow->getCurrentCase()->stopJob())
     {
@@ -432,14 +435,18 @@ void CWE_Parameters::cancel_button_clicked()
 
 void CWE_Parameters::results_button_clicked()
 {
-    if (!checkButtonEnactReady()) return;
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
 
     theMainWindow->switchToResultsTab();
 }
 
 void CWE_Parameters::rollback_button_clicked()
 {
-    if (!checkButtonEnactReady()) return;
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
+    if (selectedStage == NULL) return;
+    if (paramsChanged()) return;
 
     if (!theMainWindow->getCurrentCase()->rollBack(selectedStage->getRefKey()))
     {

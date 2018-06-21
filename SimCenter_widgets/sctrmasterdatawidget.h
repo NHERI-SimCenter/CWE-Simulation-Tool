@@ -65,6 +65,7 @@ enum class SimCenterViewState  { visible,
                                  hidden };
 
 struct VARIABLE_TYPE {
+    QString internalName;
     QString displayName;
     SimCenterDataType type;
     QString defaultValue;

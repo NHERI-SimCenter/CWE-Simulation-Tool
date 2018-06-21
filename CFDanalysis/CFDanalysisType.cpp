@@ -178,6 +178,7 @@ VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
 
     VARIABLE_TYPE res;
 
+    res.internalName = "ERROR";
     res.unit = "";
     res.precision = "";
     res.sign = "";
@@ -189,6 +190,8 @@ VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
     if (vals.contains(name))
     {
         QJsonObject item = vals.value(name).toObject();
+
+        res.internalName = name;
 
         if (item.contains("displayName")) { res.displayName = item.value("displayName").toString(); }
 

@@ -101,7 +101,6 @@ private slots:
     void paramWidgetChanged();
 
 private:
-    bool checkButtonEnactReady();
     bool paramsChanged();
 
     void resetButtonAndView();
