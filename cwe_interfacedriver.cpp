@@ -71,9 +71,6 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
     tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
     tmpHandle->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
 
-    tmpHandle->registerAgaveAppInfo("cwe-serial", "cwe-serial-0.2.0", {"stage"}, {"directory", "file_input"}, "directory");
-    tmpHandle->registerAgaveAppInfo("cwe-parallel", "cwe-parallel-0.2.0", {"stage"}, {"directory", "file_input"}, "directory");
-
     theConnectThread = tmpHandle;
 
     /* populate with available cases */
@@ -228,26 +225,52 @@ void CWE_InterfaceDriver::checkAppList(RequestState replyState, QVariantList app
         return;
     }
 
-    QList<QString> neededApps = {"cwe-serial", "cwe-parallel"};
+    if (!registerOneAppByVersion(appList, "cwe-serial", {"stage"}, {"directory", "file_input"}, "directory"))
+    {
+        cwe_globals::displayFatalPopup("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.", "Permission Error");
+        return;
+    }
+    if (!registerOneAppByVersion(appList, "cwe-parallel", {"stage"}, {"directory", "file_input"}, "directory"))
+    {
+        cwe_globals::displayFatalPopup("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.", "Permission Error");
+        return;
+    }
+
+}
+
+bool CWE_InterfaceDriver::registerOneAppByVersion(QVariantList appList, QString agaveAppName, QStringList parameterList, QStringList inputList, QString workingDirParameter)
+{
+    QString idToUse;
+    QString versionToUse;
 
     for (auto itr = appList.constBegin(); itr != appList.constEnd(); itr++)
     {
         QString appName = (*itr).toJsonObject().value("name").toString();
+        QString appID = (*itr).toJsonObject().value("id").toString();
+        QString appVersion = (*itr).toJsonObject().value("version").toString();
 
-        if (appName.isEmpty())
+        if (appName != agaveAppName)
         {
             continue;
         }
-        if (neededApps.contains(appName))
+
+        if ((idToUse.isEmpty()) || (QString::localeAwareCompare(appVersion, versionToUse) > 0))
         {
-            neededApps.removeAll(appName);
+            idToUse = appID;
+            versionToUse = appVersion;
         }
     }
 
-    if (!neededApps.isEmpty())
+    if (idToUse.isEmpty())
     {
-        cwe_globals::displayFatalPopup("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.");
+        qCDebug(remoteInterface, "App searched for was not found.");
+        return false;
     }
+
+    AgaveThread * tmpThread = (AgaveThread *)theConnectThread;
+    tmpThread->registerAgaveAppInfo(agaveAppName, idToUse, parameterList, inputList, workingDirParameter);
+    return true;
+
 }
 
 bool CWE_InterfaceDriver::inOfflineMode()
