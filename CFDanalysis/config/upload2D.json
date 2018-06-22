@@ -337,7 +337,8 @@
             "default":"2",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains!=0"
         },
         "outPadDom1":{
             "displayName":"Subdomain 1 Length (Outlet)",
@@ -345,7 +346,8 @@
             "default":"4",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains!=0"
         },
         "topPadDom1":{
             "displayName":"Subdomain 1 Length (Top)",
@@ -353,7 +355,8 @@
             "default":"2",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains!=0"
         },
         "bottomPadDom1":{
             "displayName":"Subdomain 1 Length (Bottom)",
@@ -361,7 +364,8 @@
             "default":"2",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains!=0"
         },
         "meshDensityDom1":{
             "displayName":"Grid Size (Edge of Subdomain 1)",
@@ -369,7 +373,8 @@
             "default":"3",
             "unit":"m",
             "precision":"2",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains!=0"
         },
         "inPadDom2":{
             "displayName":"Subdomain 2 Length (Inlet)",

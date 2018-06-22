@@ -73,6 +73,8 @@ struct VARIABLE_TYPE {
     QString precision;
     QString sign;
     QMap<QString, QString> options;
+    QString hideCondition;
+    QString showCondition;
 };
 
 class SCtrMasterDataWidget : public QFrame

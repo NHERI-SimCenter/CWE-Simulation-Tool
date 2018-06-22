@@ -354,9 +354,100 @@ void CWE_Parameters::setViewState(StageState newMode)
 void CWE_Parameters::setViewState(SimCenterViewState newState)
 {
     for (SCtrMasterDataWidget * aWidget : paramWidgetList)
-    {
-        aWidget->setViewState(newState);
+    {   
+        if (!aWidget->getTypeInfo().showCondition.isEmpty())
+        {
+            if (checkVarCondition(aWidget->getTypeInfo().showCondition))
+            {
+                aWidget->setViewState(newState);
+            }
+            else
+            {
+                aWidget->setViewState(SimCenterViewState::hidden);
+            }
+        }
+        else if (!aWidget->getTypeInfo().hideCondition.isEmpty())
+        {
+            if (checkVarCondition(aWidget->getTypeInfo().hideCondition))
+            {
+                aWidget->setViewState(SimCenterViewState::hidden);
+            }
+            else
+            {
+                aWidget->setViewState(newState);
+            }
+        }
+        else
+        {
+            aWidget->setViewState(newState);
+        }
     }
+}
+
+bool CWE_Parameters::checkVarCondition(QString conditionToCheck)
+{
+    QString leftSide;
+    QString rightSide;
+
+    QStringList strParts;
+
+    QString compareOp;
+
+    if (conditionToCheck.contains("=="))
+    {
+        compareOp = "==";
+        strParts = conditionToCheck.split("==");
+    }
+    else if (conditionToCheck.contains("!="))
+    {
+        compareOp = "!=";
+        strParts = conditionToCheck.split("!=");
+    }
+    else
+    {
+        return false;
+    }
+    leftSide = strParts.first();
+    rightSide = strParts.last();
+
+    if (leftSide.at(0) == '$')
+    {
+        leftSide = getVarValByName(leftSide.remove(0,1));
+    }
+    if (rightSide.at(0) == '$')
+    {
+        rightSide = getVarValByName(rightSide.remove(0,1));
+    }
+
+    if (compareOp == "==")
+    {
+        return (leftSide == rightSide);
+    }
+    if (compareOp == "!=")
+    {
+        return (leftSide != rightSide);
+    }
+
+    return false;
+}
+
+QString CWE_Parameters::getVarValByName(QString varName)
+{
+    //TODO: Consider a more efficient data structure here
+    for (SCtrMasterDataWidget * aWidget : paramWidgetList)
+    {
+        if (aWidget->getTypeInfo().internalName == varName)
+        {
+            return aWidget->shownValue();
+        }
+    }
+
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return QString();
+    CFDanalysisType * theType = theCase->getMyType();
+    if (theType == NULL) return QString();
+
+    return theType->getVariableInfo(varName).defaultValue;
 }
 
 bool CWE_Parameters::paramsChanged()

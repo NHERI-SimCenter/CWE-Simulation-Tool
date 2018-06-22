@@ -109,6 +109,9 @@ private:
     void setViewState(SimCenterViewState newState);
     void setViewState(StageState newMode);
 
+    bool checkVarCondition(QString conditionToCheck);
+    QString getVarValByName(QString varName);
+
     void setHeaderLabels();
 
     void createStageTabs();
