@@ -139,7 +139,8 @@
                 "useFieldUmean",
                 "useFieldPmean",
                 "pisoCorrectors",
-                "pisoNonOrthCorrect"
+                "pisoNonOrthCorrect",
+                "turbintensity"
             ]
         }
     },
@@ -156,7 +157,8 @@
         },
         "geoFile":{
             "displayName":"Uploaded File",
-            "type":"file"
+            "type":"file",
+            "showCondition":"$geoChoose=uploaded"
         },
         "endTime":{
             "displayName":"Simulation Duration",
@@ -185,7 +187,7 @@
         "nu":{
             "displayName":"Kinematic Viscosity",
             "type":"std",
-            "default":"1.5e-05",
+            "default":"1.48e-05",
             "unit":"m^2/s",
             "precision":"9",
             "sign":"+"
@@ -317,6 +319,14 @@
                 "dynOneEqEddy":"Dynamic One Equation model (LES)"
             }
         },
+        "turbintensity":{
+            "displayName":"Turbulence Intensity",
+            "type":"std",
+            "default":"0.1",
+            "precision":"2",
+            "sign":"+",
+            "showCondition":"$turbModel!laminar"
+        },
         "pisoCorrectors":{
             "displayName":"Number of PISO Correctors",
             "type":"std",
@@ -333,10 +343,14 @@
         },
         "innerDomains":{
             "displayName":"Number of Subdomains",
-            "type":"std",
+            "type":"choose",
             "default":"0",
-            "precision":"int",
-            "sign":"+0"
+            "options":{
+                "0":"0",
+                "1":"1",
+                "2":"2",
+                "3":"3"
+            }
         },
         "inPadDom1":{
             "displayName":"Subdomain 1 Length (Inlet)",
@@ -344,7 +358,8 @@
             "default":"2",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=1"
         },
         "outPadDom1":{
             "displayName":"Subdomain 1 Length (Outlet)",
@@ -352,7 +367,8 @@
             "default":"4",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=1"
         },
         "lowYDom1":{
             "displayName":"Subdomain 1 Length (Y-)",
@@ -360,7 +376,8 @@
             "default":"2",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=1"
         },
         "highYDom1":{
             "displayName":"Subdomain 1 Length (Y+)",
@@ -368,7 +385,8 @@
             "default":"2",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=1"
         },
         "lowZDom1":{
             "displayName":"Subdomain 1 Length (Z-)",
@@ -376,7 +394,8 @@
             "default":"0",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=1"
         },
         "highZDom1":{
             "displayName":"Subdomain 1 Length (Z+)",
@@ -384,7 +403,8 @@
             "default":"2",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=1"
         },
         "meshDensityDom1":{
             "displayName":"Grid Size (Edge of Subdomain 2)",
@@ -392,7 +412,8 @@
             "default":"3",
             "unit":"m",
             "precision":"2",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=1"
         },
         "inPadDom2":{
             "displayName":"Subdomain 2 Length (Inlet)",
@@ -400,7 +421,8 @@
             "default":"4",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=2"
         },
         "outPadDom2":{
             "displayName":"Subdomain 2 Length (Outlet)",
@@ -408,7 +430,8 @@
             "default":"6",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=2"
         },
         "lowYDom2":{
             "displayName":"Subdomain 2 Length (Y-)",
@@ -416,7 +439,8 @@
             "default":"4",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=2"
         },
         "highYDom2":{
             "displayName":"Subdomain 2 Length (Y+)",
@@ -424,7 +448,8 @@
             "default":"4",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=2"
         },
         "lowZDom2":{
             "displayName":"Subdomain 2 Length (Z-)",
@@ -432,7 +457,8 @@
             "default":"0",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=2"
         },
         "highZDom2":{
             "displayName":"Subdomain 2 Length (Z+)",
@@ -440,7 +466,8 @@
             "default":"4",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=2"
         },
         "meshDensityDom2":{
             "displayName":"Grid Size (Edge of Subdomain 2)",
@@ -448,7 +475,8 @@
             "default":"3",
             "unit":"m",
             "precision":"2",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=2"
         },
         "inPadDom3":{
             "displayName":"Subdomain 3 Length (Inlet)",
@@ -456,7 +484,8 @@
             "default":"6",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=3"
         },
         "outPadDom3":{
             "displayName":"Subdomain 3 Length (Outlet)",
@@ -464,7 +493,8 @@
             "default":"8",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=3"
         },
         "lowYDom3":{
             "displayName":"Subdomain 3 Length (Y-)",
@@ -472,7 +502,8 @@
             "default":"6",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=3"
         },
         "highYDom3":{
             "displayName":"Subdomain 3 Length (Y+)",
@@ -480,7 +511,8 @@
             "default":"6",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=3"
         },
         "lowZDom3":{
             "displayName":"Subdomain 3 Length (Z-)",
@@ -488,7 +520,8 @@
             "default":"0",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=3"
         },
         "highZDom3":{
             "displayName":"Subdomain 3 Length (Z+)",
@@ -496,7 +529,8 @@
             "default":"6",
             "unit":"times max size of object",
             "precision":"1",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=3"
         },
         "meshDensityDom3":{
             "displayName":"Grid Size (Edge of Subdomain 3)",
@@ -504,7 +538,8 @@
             "default":"3",
             "unit":"m",
             "precision":"2",
-            "sign":"+"
+            "sign":"+",
+            "showCondition":"$innerDomains>=3"
         }
     }
 }

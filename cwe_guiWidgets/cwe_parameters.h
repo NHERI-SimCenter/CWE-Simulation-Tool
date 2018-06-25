@@ -109,7 +109,9 @@ private:
     void setViewState(SimCenterViewState newState);
     void setViewState(StageState newMode);
 
+    bool widgetIsHiddenByCondition(SCtrMasterDataWidget * aWidget);
     bool checkVarCondition(QString conditionToCheck);
+    bool lexifyConditionString(QString conditionToCheck, QString & leftSide, QString & rightSide, QString condition);
     QString getVarValByName(QString varName);
 
     void setHeaderLabels();
@@ -117,7 +119,7 @@ private:
     void createStageTabs();
     void createGroupTabs();
     void createParamWidgets();
-    void addVariable(QString varName, VARIABLE_TYPE &theVariable);
+    void addVariable(QString varName, VARIABLE_TYPE &theVariable, QString *nonDefaultValue = NULL);
 
     void clearStageTabs();
     void clearGroupTabs();

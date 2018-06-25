@@ -355,27 +355,9 @@ void CWE_Parameters::setViewState(SimCenterViewState newState)
 {
     for (SCtrMasterDataWidget * aWidget : paramWidgetList)
     {   
-        if (!aWidget->getTypeInfo().showCondition.isEmpty())
+        if (widgetIsHiddenByCondition(aWidget))
         {
-            if (checkVarCondition(aWidget->getTypeInfo().showCondition))
-            {
-                aWidget->setViewState(newState);
-            }
-            else
-            {
-                aWidget->setViewState(SimCenterViewState::hidden);
-            }
-        }
-        else if (!aWidget->getTypeInfo().hideCondition.isEmpty())
-        {
-            if (checkVarCondition(aWidget->getTypeInfo().hideCondition))
-            {
-                aWidget->setViewState(SimCenterViewState::hidden);
-            }
-            else
-            {
-                aWidget->setViewState(newState);
-            }
+            aWidget->setViewState(SimCenterViewState::hidden);
         }
         else
         {
@@ -384,31 +366,59 @@ void CWE_Parameters::setViewState(SimCenterViewState newState)
     }
 }
 
-bool CWE_Parameters::checkVarCondition(QString conditionToCheck)
+bool CWE_Parameters::widgetIsHiddenByCondition(SCtrMasterDataWidget * aWidget)
 {
-    QString leftSide;
-    QString rightSide;
-
-    QStringList strParts;
-
-    QString compareOp;
-
-    if (conditionToCheck.contains("=="))
+    if (!aWidget->getTypeInfo().showCondition.isEmpty())
     {
-        compareOp = "==";
-        strParts = conditionToCheck.split("==");
+        if (checkVarCondition(aWidget->getTypeInfo().showCondition))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
-    else if (conditionToCheck.contains("!="))
+    else if (!aWidget->getTypeInfo().hideCondition.isEmpty())
     {
-        compareOp = "!=";
-        strParts = conditionToCheck.split("!=");
+        if (checkVarCondition(aWidget->getTypeInfo().hideCondition))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {
         return false;
     }
-    leftSide = strParts.first();
-    rightSide = strParts.last();
+}
+
+bool CWE_Parameters::checkVarCondition(QString conditionToCheck)
+{
+    //==, !=: compare as numbers
+    //=, !: compare as string
+
+    QString leftSide;
+    QString rightSide;
+
+    QString compareOp;
+
+    //Note: order of entries matters here: later entries cannot contain earlier ones:
+    QStringList comparePossiblities = {"==", "!=", "<=", ">=", "<", ">", "=", "!"};
+
+    for (QString aCompareOperator: comparePossiblities)
+    {
+        if (lexifyConditionString(conditionToCheck, leftSide, rightSide, aCompareOperator))
+        {
+            compareOp = aCompareOperator;
+            break;
+        }
+    }
+
+    if (compareOp.isEmpty()) return false;
 
     if (leftSide.at(0) == '$')
     {
@@ -419,16 +429,59 @@ bool CWE_Parameters::checkVarCondition(QString conditionToCheck)
         rightSide = getVarValByName(rightSide.remove(0,1));
     }
 
-    if (compareOp == "==")
+    if (compareOp == "=") return (leftSide == rightSide);
+    if (compareOp == "!") return (leftSide != rightSide);
+
+    //First check if both int:
+    bool leftInt = false;
+    bool rightInt = false;
+
+    int leftNum = leftSide.toInt(&leftInt);
+    int rightNum = rightSide.toInt(&rightInt);
+
+    if (leftInt && rightInt)
     {
-        return (leftSide == rightSide);
-    }
-    if (compareOp == "!=")
-    {
-        return (leftSide != rightSide);
+        if (compareOp == "==") return (leftNum == rightNum);
+        if (compareOp == "!=") return (leftNum != rightNum);
+        if (compareOp == "<") return (leftNum < rightNum);
+        if (compareOp == ">") return (leftNum > rightNum);
+        if (compareOp == "<=") return (leftNum <= rightNum);
+        if (compareOp == ">=") return (leftNum >= rightNum);
+        return false;
     }
 
+    bool leftFloat = false;
+    bool rightFloat = false;
+
+    float leftDecimal = leftSide.toFloat(&leftFloat);
+    float rightDecimal = rightSide.toFloat(&rightFloat);
+
+    if (!leftDecimal || !rightDecimal) return false;
+
+    if (compareOp == "==") return (leftDecimal == rightDecimal);
+    if (compareOp == "!=") return (leftDecimal != rightDecimal);
+    if (compareOp == "<") return (leftDecimal < rightDecimal);
+    if (compareOp == ">") return (leftDecimal > rightDecimal);
+    if (compareOp == "<=") return (leftDecimal <= rightDecimal);
+    if (compareOp == ">=") return (leftDecimal >= rightDecimal);
     return false;
+}
+
+bool CWE_Parameters::lexifyConditionString(QString conditionToCheck, QString & leftSide, QString & rightSide, QString condition)
+{
+    QStringList strParts;
+
+    if (conditionToCheck.contains(condition))
+    {
+        strParts = conditionToCheck.split(condition);
+    }
+    else
+    {
+        return false;
+    }
+    leftSide = strParts.first();
+    rightSide = strParts.last();
+    return true;
 }
 
 QString CWE_Parameters::getVarValByName(QString varName)
@@ -444,16 +497,15 @@ QString CWE_Parameters::getVarValByName(QString varName)
 
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == NULL) return QString();
-    CFDanalysisType * theType = theCase->getMyType();
-    if (theType == NULL) return QString();
-
-    return theType->getVariableInfo(varName).defaultValue;
+    return theCase->getCurrentParams().value(varName);
 }
 
 bool CWE_Parameters::paramsChanged()
 {
     for (SCtrMasterDataWidget * aWidget : paramWidgetList)
     {
+        if (widgetIsHiddenByCondition(aWidget)) continue;
+
         if (aWidget->isValueChanged())
         {
             return true;
@@ -474,18 +526,17 @@ void CWE_Parameters::save_all_button_clicked()
 
     for (SCtrMasterDataWidget * aWidget : paramWidgetList)
     {
-        if (aWidget->hasValidNewValue())
-        {
-            newParams.insert(aWidget->getTypeInfo().internalName, aWidget->savableValue());
-            aWidget->saveShownValue();
-        }
-        else
+        if (widgetIsHiddenByCondition(aWidget) || !aWidget->hasValidNewValue())
         {
             if (aWidget->isValueChanged())
             {
                 aWidget->revertShownValue();
             }
+            continue;
         }
+
+        newParams.insert(aWidget->getTypeInfo().internalName, aWidget->savableValue());
+        aWidget->saveShownValue();
     }
 
     if (newParams.isEmpty()) return;
@@ -637,6 +688,8 @@ void CWE_Parameters::createParamWidgets()
     if (selectedStage == NULL) return;
     if (selectedGroup == NULL) return;
 
+    QMap<QString, QString> currentParams = theCase->getCurrentParams();
+
     if (!paramWidgetList.isEmpty() || (loadingLabel == NULL))
     {
         clearParamScreen();
@@ -653,13 +706,21 @@ void CWE_Parameters::createParamWidgets()
     foreach (QString varName, groupVars)
     {
         VARIABLE_TYPE theVariable = theType->getVariableInfo(varName);
-        addVariable(varName, theVariable);
+        if (currentParams.contains(varName))
+        {
+            QString currentValue = currentParams.value(varName);
+            addVariable(varName, theVariable, &currentValue);
+        }
+        else
+        {
+            addVariable(varName, theVariable);
+        }
     }
 
     resetButtonAndView();
 }
 
-void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable)
+void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable, QString * nonDefaultValue)
 {
     SCtrMasterDataWidget *theVar = NULL;
 
@@ -698,6 +759,11 @@ void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable)
     theVar->setDataType(theVariable);
 
     paramWidgetList.append(theVar);
+    if (nonDefaultValue != NULL)
+    {
+        theVar->setValue(*nonDefaultValue);
+    }
+
     QObject::connect(theVar, SIGNAL(valueEdited()),
                      this, SLOT(paramWidgetChanged()));
 }
