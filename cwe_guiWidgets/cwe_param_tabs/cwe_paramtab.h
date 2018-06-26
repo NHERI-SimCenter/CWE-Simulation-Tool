@@ -53,8 +53,7 @@ public:
     void setInActive(bool b=true);
 
 signals:
-    void btn_pressed(CWE_ParamTab *);
-    void btn_released(CWE_ParamTab *);
+    void btn_clicked(CWE_ParamTab *);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

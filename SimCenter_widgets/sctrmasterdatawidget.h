@@ -48,8 +48,6 @@
 #include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 #include "CFDanalysis/CFDanalysisType.h"
 
-class FileTreeNode;
-
 enum class SimCenterDataType { integer,
                                floatingpoint,
                                boolean,
@@ -67,6 +65,7 @@ enum class SimCenterViewState  { visible,
                                  hidden };
 
 struct VARIABLE_TYPE {
+    QString internalName;
     QString displayName;
     SimCenterDataType type;
     QString defaultValue;
@@ -74,6 +73,8 @@ struct VARIABLE_TYPE {
     QString precision;
     QString sign;
     QMap<QString, QString> options;
+    QString hideCondition;
+    QString showCondition;
 };
 
 class SCtrMasterDataWidget : public QFrame
@@ -99,6 +100,12 @@ public:
     bool isValueChanged(); //Return true if value shown in widget differs from set, saved value
     bool hasValidNewValue(); //Return true if above is true AND, now value is valid
 
+signals:
+    void valueEdited();
+
+private slots:
+    void changeMadeToUnderlyingDataWidget();
+
 private:
     virtual void initUI() = 0; //Called once, creates ui widgets
     virtual void setComponetsEnabled(bool newSetting) = 0; //Set enabled/disabled for widgets as applicable
@@ -108,6 +115,7 @@ private:
 
     VARIABLE_TYPE m_obj;
 
+    bool doingManualUpdate = false;
     QString savedValue;
     SimCenterViewState m_ViewState;
 };

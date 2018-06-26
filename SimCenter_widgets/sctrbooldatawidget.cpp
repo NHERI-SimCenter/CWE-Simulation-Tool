@@ -69,6 +69,9 @@ void SCtrBoolDataWidget::initUI()
     layout->addWidget(theCheckBox, 4);
 
     this->setLayout(layout);
+
+    QObject::connect(theCheckBox, SIGNAL(stateChanged(int)),
+                     this, SLOT(changeMadeToUnderlyingDataWidget()));
 }
 
 void SCtrBoolDataWidget::setComponetsEnabled(bool newSetting)

@@ -76,6 +76,8 @@ private slots:
     void checkAppList(RequestState replyState, QVariantList appList);
 
 private:
+    bool registerOneAppByVersion(QVariantList appList, QString agaveAppName, QStringList parameterList, QStringList inputList, QString workingDirParameter);
+
     CWE_MainWindow * mainWindow;
     QList<CFDanalysisType *> templateList;
 

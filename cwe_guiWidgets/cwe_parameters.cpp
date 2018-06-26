@@ -77,6 +77,9 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
 
     QVBoxLayout * paramSpaceLayout = (QVBoxLayout *)ui->parameterSpace->layout();
     paramSpaceLayout->setAlignment(Qt::AlignTop);
+
+    //TODO: Implement optional reference image
+    ui->optionalImage->setVisible(false);
 }
 
 CWE_Parameters::~CWE_Parameters()
@@ -88,6 +91,8 @@ void CWE_Parameters::linkMainWindow(CWE_MainWindow *theMainWin)
 {
     CWE_Super::linkMainWindow(theMainWin);
     QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
+                     this, SLOT(newCaseGiven()));
+    QObject::connect(theMainWindow, SIGNAL(newTabSelected(CWE_Super*)),
                      this, SLOT(newCaseGiven()));
 }
 
@@ -151,7 +156,7 @@ void CWE_Parameters::setHeaderLabels()
     }
 }
 
-void CWE_Parameters::newCaseState(CaseState newState)
+void CWE_Parameters::newCaseState(CaseState)
 {
     setHeaderLabels();
 
@@ -186,8 +191,28 @@ void CWE_Parameters::newCaseState(CaseState newState)
     resetButtonAndView();
 }
 
+void CWE_Parameters::panelNoLongerActive()
+{
+    if (panelSwitchPermitted())
+    {
+        for (SCtrMasterDataWidget * aWidget : paramWidgetList)
+        {
+            if (aWidget->isValueChanged())
+            {
+                aWidget->revertShownValue();
+            }
+        }
+        return;
+    }
+
+    theMainWindow->switchToParameterTab();
+}
+
 void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
 {
+    if (chosenTab->tabIsActive()) return;
+    if (!panelSwitchPermitted()) return;
+
     for (CWE_StageStatusTab * aTab : stageTabList)
     {
         aTab->setInActive();
@@ -207,6 +232,9 @@ void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
 
 void CWE_Parameters::groupSelected(CWE_ParamTab * chosenGroup)
 {
+    if (chosenGroup->tabIsActive()) return;
+    if (!panelSwitchPermitted()) return;
+
     for (CWE_GroupTab * aTab : groupTabList)
     {
         aTab->setInActive();
@@ -222,6 +250,11 @@ void CWE_Parameters::groupSelected(CWE_ParamTab * chosenGroup)
     {
         clearParamScreen();
     }
+}
+
+void CWE_Parameters::paramWidgetChanged()
+{
+    resetButtonAndView();
 }
 
 void CWE_Parameters::resetButtonAndView()
@@ -342,50 +375,204 @@ void CWE_Parameters::setViewState(StageState newMode)
 void CWE_Parameters::setViewState(SimCenterViewState newState)
 {
     for (SCtrMasterDataWidget * aWidget : paramWidgetList)
-    {
-        aWidget->setViewState(newState);
+    {   
+        if (widgetIsHiddenByCondition(aWidget))
+        {
+            aWidget->setViewState(SimCenterViewState::hidden);
+        }
+        else
+        {
+            aWidget->setViewState(newState);
+        }
     }
 }
 
-bool CWE_Parameters::checkButtonEnactReady()
+bool CWE_Parameters::widgetIsHiddenByCondition(SCtrMasterDataWidget * aWidget)
 {
-    if (paramsChanged())
+    if (!aWidget->getTypeInfo().showCondition.isEmpty())
+    {
+        if (checkVarCondition(aWidget->getTypeInfo().showCondition))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    else if (!aWidget->getTypeInfo().hideCondition.isEmpty())
+    {
+        if (checkVarCondition(aWidget->getTypeInfo().hideCondition))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
     {
         return false;
     }
+}
+
+bool CWE_Parameters::checkVarCondition(QString conditionToCheck)
+{
+    //==, !=: compare as numbers
+    //=, !: compare as string
+
+    QString leftSide;
+    QString rightSide;
+
+    QString compareOp;
+
+    //Note: order of entries matters here: later entries cannot contain earlier ones:
+    QStringList comparePossiblities = {"==", "!=", "<=", ">=", "<", ">", "=", "!"};
+
+    for (QString aCompareOperator: comparePossiblities)
+    {
+        if (lexifyConditionString(conditionToCheck, leftSide, rightSide, aCompareOperator))
+        {
+            compareOp = aCompareOperator;
+            break;
+        }
+    }
+
+    if (compareOp.isEmpty()) return false;
+
+    if (leftSide.at(0) == '$')
+    {
+        leftSide = getVarValByName(leftSide.remove(0,1));
+    }
+    if (rightSide.at(0) == '$')
+    {
+        rightSide = getVarValByName(rightSide.remove(0,1));
+    }
+
+    if (compareOp == "=") return (leftSide == rightSide);
+    if (compareOp == "!") return (leftSide != rightSide);
+
+    //First check if both int:
+    bool leftInt = false;
+    bool rightInt = false;
+
+    int leftNum = leftSide.toInt(&leftInt);
+    int rightNum = rightSide.toInt(&rightInt);
+
+    if (leftInt && rightInt)
+    {
+        if (compareOp == "==") return (leftNum == rightNum);
+        if (compareOp == "!=") return (leftNum != rightNum);
+        if (compareOp == "<") return (leftNum < rightNum);
+        if (compareOp == ">") return (leftNum > rightNum);
+        if (compareOp == "<=") return (leftNum <= rightNum);
+        if (compareOp == ">=") return (leftNum >= rightNum);
+        return false;
+    }
+
+    bool leftFloat = false;
+    bool rightFloat = false;
+
+    float leftDecimal = leftSide.toFloat(&leftFloat);
+    float rightDecimal = rightSide.toFloat(&rightFloat);
+
+    if (!leftDecimal || !rightDecimal) return false;
+
+    if (compareOp == "==") return (leftDecimal == rightDecimal);
+    if (compareOp == "!=") return (leftDecimal != rightDecimal);
+    if (compareOp == "<") return (leftDecimal < rightDecimal);
+    if (compareOp == ">") return (leftDecimal > rightDecimal);
+    if (compareOp == "<=") return (leftDecimal <= rightDecimal);
+    if (compareOp == ">=") return (leftDecimal >= rightDecimal);
+    return false;
+}
+
+bool CWE_Parameters::lexifyConditionString(QString conditionToCheck, QString & leftSide, QString & rightSide, QString condition)
+{
+    QStringList strParts;
+
+    if (conditionToCheck.contains(condition))
+    {
+        strParts = conditionToCheck.split(condition);
+    }
+    else
+    {
+        return false;
+    }
+    leftSide = strParts.first();
+    rightSide = strParts.last();
     return true;
+}
+
+QString CWE_Parameters::getVarValByName(QString varName)
+{
+    //TODO: Consider a more efficient data structure here
+    for (SCtrMasterDataWidget * aWidget : paramWidgetList)
+    {
+        if (aWidget->getTypeInfo().internalName == varName)
+        {
+            return aWidget->shownValue();
+        }
+    }
+
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return QString();
+    return theCase->getCurrentParams().value(varName);
 }
 
 bool CWE_Parameters::paramsChanged()
 {
-    //TODO: return true if param widgets have changed values
-
     for (SCtrMasterDataWidget * aWidget : paramWidgetList)
     {
-        //aWidget->setViewState(newState);
+        if (widgetIsHiddenByCondition(aWidget)) continue;
+
+        if (aWidget->isValueChanged())
+        {
+            return true;
+        }
     }
-    return true;
+    return false;
+}
+
+bool CWE_Parameters::panelSwitchPermitted()
+{
+    if (!paramsChanged()) return true;
+
+    QMessageBox approveBox;
+    approveBox.setText("You have unsaved changes to the parameters. Are you sure you wish to discard those changes?");
+    QPushButton *discardButton = approveBox.addButton("Discard Parameter Changes", QMessageBox::ActionRole);
+    QPushButton *goBackButton = approveBox.addButton("Go Back To Parameters", QMessageBox::ActionRole);
+    int ret = approveBox.exec();
+
+    if (approveBox.clickedButton() == discardButton) return true;
+    if (approveBox.clickedButton() == goBackButton) return false;
+    return false;
 }
 
 void CWE_Parameters::save_all_button_clicked()
 {
-    //TODO
     CFDcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
     if (linkedCFDCase == NULL) return;
+    if (selectedStage == NULL) return;
+    if (!paramsChanged()) return;
 
-    /*
     // collect parameter values from all SCtrMasterDataWidget objects
     QMap<QString, QString> newParams;
-    QMapIterator<QString, SCtrMasterDataWidget *> iter(*quickParameterPtr);
 
-    while (iter.hasNext())
+    for (SCtrMasterDataWidget * aWidget : paramWidgetList)
     {
-        //TODO: Check if new, if so, insert in into new param list
-        iter.next();
+        if (widgetIsHiddenByCondition(aWidget) || !aWidget->hasValidNewValue())
+        {
+            if (aWidget->isValueChanged())
+            {
+                aWidget->revertShownValue();
+            }
+            continue;
+        }
 
-
-        newParams.insert(iter.key(), (iter.value())->value());
-        count++;
+        newParams.insert(aWidget->getTypeInfo().internalName, aWidget->savableValue());
+        aWidget->saveShownValue();
     }
 
     if (newParams.isEmpty()) return;
@@ -394,12 +581,14 @@ void CWE_Parameters::save_all_button_clicked()
     {
         cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");
     }
-    */
 }
 
 void CWE_Parameters::run_button_clicked()
 {
-    if (!checkButtonEnactReady()) return;
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
+    if (selectedStage == NULL) return;
+    if (paramsChanged()) return;
 
     if (!theMainWindow->getCurrentCase()->startStageApp(selectedStage->getRefKey()))
     {
@@ -410,7 +599,10 @@ void CWE_Parameters::run_button_clicked()
 
 void CWE_Parameters::cancel_button_clicked()
 {
-    if (!checkButtonEnactReady()) return;
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
+    if (selectedStage == NULL) return;
+    if (paramsChanged()) return;
 
     if (!theMainWindow->getCurrentCase()->stopJob())
     {
@@ -421,14 +613,18 @@ void CWE_Parameters::cancel_button_clicked()
 
 void CWE_Parameters::results_button_clicked()
 {
-    if (!checkButtonEnactReady()) return;
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
 
     theMainWindow->switchToResultsTab();
 }
 
 void CWE_Parameters::rollback_button_clicked()
 {
-    if (!checkButtonEnactReady()) return;
+    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    if (theCase == NULL) return;
+    if (selectedStage == NULL) return;
+    if (paramsChanged()) return;
 
     if (!theMainWindow->getCurrentCase()->rollBack(selectedStage->getRefKey()))
     {
@@ -468,7 +664,7 @@ void CWE_Parameters::createStageTabs()
         stageTabList.append(tab);
 
         /* connect signals and slots */
-        QObject::connect(tab,SIGNAL(btn_pressed(CWE_ParamTab *)),this,SLOT(stageSelected(CWE_ParamTab*)));
+        QObject::connect(tab,SIGNAL(btn_clicked(CWE_ParamTab*)),this,SLOT(stageSelected(CWE_ParamTab*)));
     }
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -506,7 +702,7 @@ void CWE_Parameters::createGroupTabs()
         groupTabList.append(tab);
 
         /* connect signals and slots */
-        QObject::connect(tab,SIGNAL(btn_pressed(CWE_ParamTab *)),this,SLOT(groupSelected(CWE_ParamTab*)));
+        QObject::connect(tab,SIGNAL(btn_clicked(CWE_ParamTab*)),this,SLOT(groupSelected(CWE_ParamTab*)));
     }
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Expanding, QSizePolicy::Minimum));
@@ -528,9 +724,17 @@ void CWE_Parameters::createParamWidgets()
     if (selectedStage == NULL) return;
     if (selectedGroup == NULL) return;
 
+    QMap<QString, QString> currentParams = theCase->getCurrentParams();
+
     if (!paramWidgetList.isEmpty() || (loadingLabel == NULL))
     {
         clearParamScreen();
+    }
+
+    if (loadingLabel != NULL)
+    {
+        loadingLabel->deleteLater();
+        loadingLabel = NULL;
     }
 
     QStringList groupVars = theType->getVarGroup(selectedGroup->getRefKey());
@@ -538,11 +742,21 @@ void CWE_Parameters::createParamWidgets()
     foreach (QString varName, groupVars)
     {
         VARIABLE_TYPE theVariable = theType->getVariableInfo(varName);
-        addVariable(varName, theVariable);
+        if (currentParams.contains(varName))
+        {
+            QString currentValue = currentParams.value(varName);
+            addVariable(varName, theVariable, &currentValue);
+        }
+        else
+        {
+            addVariable(varName, theVariable);
+        }
     }
+
+    resetButtonAndView();
 }
 
-void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable)
+void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable, QString * nonDefaultValue)
 {
     SCtrMasterDataWidget *theVar = NULL;
 
@@ -581,6 +795,13 @@ void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable)
     theVar->setDataType(theVariable);
 
     paramWidgetList.append(theVar);
+    if (nonDefaultValue != NULL)
+    {
+        theVar->setValue(*nonDefaultValue);
+    }
+
+    QObject::connect(theVar, SIGNAL(valueEdited()),
+                     this, SLOT(paramWidgetChanged()));
 }
 
 void CWE_Parameters::clearStageTabs()
