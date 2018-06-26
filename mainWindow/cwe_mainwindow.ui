@@ -71,6 +71,9 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
+      <property name="usesScrollButtons">
+       <bool>false</bool>
+      </property>
       <widget class="CWE_welcome_screen" name="tab_welcome_screen">
        <attribute name="title">
         <string>Welcome</string>

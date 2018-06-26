@@ -96,6 +96,9 @@ void SCtrFileDataWidget::initUI()
     fullLayout->addItem(leftLayout);
     fullLayout->addWidget(myFileTree);
     this->setLayout(fullLayout);
+
+    QObject::connect(myFileTree, SIGNAL(clicked(QModelIndex)),
+                     this, SLOT(changeMadeToUnderlyingDataWidget()));
 }
 
 void SCtrFileDataWidget::setComponetsEnabled(bool newSetting)

@@ -173,64 +173,84 @@ QStringList CFDanalysisType::getVarGroup(QString group)
 
 VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
 {
+    //TODO: Clean up this method
+    //TODO: Default should always exist and be valid
+
     VARIABLE_TYPE res;
 
-    res.unit = "";
-    res.precision = "";
-    res.sign = "";
+    res.internalName = "ERROR";
     res.options.clear();
 
     QJsonObject obj = myConfiguration.object();
     QJsonObject vals = obj["vars"].toObject();
 
-    if (vals.contains(name))
-    {
-        QJsonObject item = vals.value(name).toObject();
-
-        if (item.contains("displayName")) { res.displayName = item.value("displayName").toString(); }
-        if (item.contains("default"))     { res.defaultValue = item.value("default").toString(); }
-        if (item.contains("unit"))        { res.unit = item.value("unit").toString(); }
-        if (item.contains("precision"))   { res.precision = item.value("precision").toString(); }
-        if (item.contains("sign"))        { res.sign = item.value("sign").toString(); }
-        if (item.contains("options"))
-        {
-            foreach (QString key, item["options"].toObject().keys())
-            {
-                res.options.insert(key, item["options"].toObject().value(key).toString());
-            }
-        }
-        if (item.contains("type"))
-        {
-            QString typeName = item.value("type").toString();
-
-            if (typeName == "std")
-            {
-                res.type = SimCenterDataType::floatingpoint;
-            }
-            else if (typeName == "file")
-            {
-                res.type = SimCenterDataType::file;
-            }
-            else if (typeName == "choose")
-            {
-                res.type = SimCenterDataType::selection;
-            }
-            else if (typeName == "bool")
-            {
-                res.type = SimCenterDataType::boolean;
-            }
-            else
-            {
-                res.type = SimCenterDataType::unknown;
-            }
-        }
-    }
-    else
+    if (!vals.contains(name))
     {
         res.displayName   = "none";
         res.type          = SimCenterDataType::unknown;
         res.defaultValue  = QString("missing definition for variable '%1'").arg(name);
     }
+
+    QJsonObject item = vals.value(name).toObject();
+
+    res.internalName = name;
+
+    if (item.contains("displayName")) { res.displayName = item.value("displayName").toString(); }
+
+    if (item.contains("options"))
+    {
+        foreach (QString key, item["options"].toObject().keys())
+        {
+            res.options.insert(key, item["options"].toObject().value(key).toString());
+        }
+    }
+    if (item.contains("type"))
+    {
+        QString typeName = item.value("type").toString();
+
+        if (typeName == "std")
+        {
+            res.type = SimCenterDataType::floatingpoint;
+        }
+        else if (typeName == "file")
+        {
+            res.type = SimCenterDataType::file;
+        }
+        else if (typeName == "choose")
+        {
+            res.type = SimCenterDataType::selection;
+        }
+        else if (typeName == "bool")
+        {
+            res.type = SimCenterDataType::boolean;
+        }
+        else
+        {
+            res.type = SimCenterDataType::unknown;
+        }
+    }
+
+    if (res.type == SimCenterDataType::boolean)
+    {
+        if (item.contains("default") && item.value("default").toBool())
+        {
+            res.defaultValue = "true";
+        }
+        else
+        {
+            res.defaultValue = "false";
+        }
+    }
+    else
+    {
+        if (item.contains("default"))     { res.defaultValue = item.value("default").toString(); }
+    }
+
+    if (item.contains("unit"))          { res.unit = item.value("unit").toString(); }
+    if (item.contains("precision"))     { res.precision = item.value("precision").toString(); }
+    if (item.contains("sign"))          { res.sign = item.value("sign").toString(); }
+    if (item.contains("hideCondition")) { res.hideCondition = item.value("hideCondition").toString(); }
+    if (item.contains("showCondition")) { res.showCondition = item.value("showCondition").toString(); }
 
     return res;
 }

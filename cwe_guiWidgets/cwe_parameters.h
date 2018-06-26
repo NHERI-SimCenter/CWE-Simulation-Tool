@@ -94,13 +94,16 @@ private slots:
 
     void newCaseGiven();
     void newCaseState(CaseState newState);
+    void panelNoLongerActive();
 
     void stageSelected(CWE_ParamTab * chosenTab);
     void groupSelected(CWE_ParamTab * chosenTab);
 
+    void paramWidgetChanged();
+
 private:
-    bool checkButtonEnactReady();
     bool paramsChanged();
+    bool panelSwitchPermitted();
 
     void resetButtonAndView();
     void setButtonState(SimCenterButtonMode newMode);
@@ -108,12 +111,17 @@ private:
     void setViewState(SimCenterViewState newState);
     void setViewState(StageState newMode);
 
+    bool widgetIsHiddenByCondition(SCtrMasterDataWidget * aWidget);
+    bool checkVarCondition(QString conditionToCheck);
+    bool lexifyConditionString(QString conditionToCheck, QString & leftSide, QString & rightSide, QString condition);
+    QString getVarValByName(QString varName);
+
     void setHeaderLabels();
 
     void createStageTabs();
     void createGroupTabs();
     void createParamWidgets();
-    void addVariable(QString varName, VARIABLE_TYPE &theVariable);
+    void addVariable(QString varName, VARIABLE_TYPE &theVariable, QString *nonDefaultValue = NULL);
 
     void clearStageTabs();
     void clearGroupTabs();

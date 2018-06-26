@@ -32,7 +32,7 @@
 
 // Contributors:
 
-#include "SimCenter_widgets/sctrstddatawidget.h"
+#include "sctrstddatawidget.h"
 
 SCtrStdDataWidget::SCtrStdDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)
@@ -79,6 +79,9 @@ void SCtrStdDataWidget::initUI()
     layout->addWidget(label_unit, 1);
 
     this->setLayout(layout);
+
+    QObject::connect(theValue, SIGNAL(textChanged(QString)),
+                     this, SLOT(changeMadeToUnderlyingDataWidget()));
 }
 
 void SCtrStdDataWidget::setComponetsEnabled(bool newSetting)

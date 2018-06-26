@@ -79,7 +79,6 @@ void CWE_ParamTab::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         setButtonState(true, tab_active);
-        emit btn_pressed(this);
     }
 }
 void CWE_ParamTab::mouseReleaseEvent(QMouseEvent *event)
@@ -87,7 +86,7 @@ void CWE_ParamTab::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         setButtonState(false, tab_active);
-        emit btn_released(this);
+        emit btn_clicked(this);
     }
 }
 

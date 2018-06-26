@@ -93,6 +93,11 @@ void SCtrMasterDataWidget::setDataType(VARIABLE_TYPE & newTypeData)
 
     /* set default */
     setValue(m_obj.defaultValue);
+
+    if (savedValue != shownValue())
+    {
+         qCDebug(agaveAppLayer, "ERROR: Invalid defaults specified for parameter config");
+    }
 }
 
 VARIABLE_TYPE SCtrMasterDataWidget::getTypeInfo()
@@ -103,7 +108,9 @@ VARIABLE_TYPE SCtrMasterDataWidget::getTypeInfo()
 void SCtrMasterDataWidget::setValue(QString newValue)
 {
     savedValue = newValue;
+    doingManualUpdate = true;
     setShownValue(savedValue);
+    doingManualUpdate = false;
 }
 
 QString SCtrMasterDataWidget::savableValue()
@@ -132,6 +139,12 @@ bool SCtrMasterDataWidget::isValueChanged()
 bool SCtrMasterDataWidget::hasValidNewValue()
 {
     return (isValueChanged() && shownValueIsValid());
+}
+
+void SCtrMasterDataWidget::changeMadeToUnderlyingDataWidget()
+{
+    if (doingManualUpdate) return;
+    emit valueEdited();
 }
 
 bool SCtrMasterDataWidget::shownValueIsValid()
