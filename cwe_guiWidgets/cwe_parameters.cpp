@@ -92,6 +92,8 @@ void CWE_Parameters::linkMainWindow(CWE_MainWindow *theMainWin)
     CWE_Super::linkMainWindow(theMainWin);
     QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
+    QObject::connect(theMainWindow, SIGNAL(newTabSelected(CWE_Super*)),
+                     this, SLOT(newCaseGiven()));
 }
 
 void CWE_Parameters::newCaseGiven()
@@ -189,9 +191,27 @@ void CWE_Parameters::newCaseState(CaseState)
     resetButtonAndView();
 }
 
+void CWE_Parameters::panelNoLongerActive()
+{
+    if (panelSwitchPermitted())
+    {
+        for (SCtrMasterDataWidget * aWidget : paramWidgetList)
+        {
+            if (aWidget->isValueChanged())
+            {
+                aWidget->revertShownValue();
+            }
+        }
+        return;
+    }
+
+    theMainWindow->switchToParameterTab();
+}
+
 void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
 {
     if (chosenTab->tabIsActive()) return;
+    if (!panelSwitchPermitted()) return;
 
     for (CWE_StageStatusTab * aTab : stageTabList)
     {
@@ -213,6 +233,7 @@ void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
 void CWE_Parameters::groupSelected(CWE_ParamTab * chosenGroup)
 {
     if (chosenGroup->tabIsActive()) return;
+    if (!panelSwitchPermitted()) return;
 
     for (CWE_GroupTab * aTab : groupTabList)
     {
@@ -514,6 +535,21 @@ bool CWE_Parameters::paramsChanged()
     return false;
 }
 
+bool CWE_Parameters::panelSwitchPermitted()
+{
+    if (!paramsChanged()) return true;
+
+    QMessageBox approveBox;
+    approveBox.setText("You have unsaved changes to the parameters. Are you sure you wish to discard those changes?");
+    QPushButton *discardButton = approveBox.addButton("Discard Parameter Changes", QMessageBox::ActionRole);
+    QPushButton *goBackButton = approveBox.addButton("Go Back To Parameters", QMessageBox::ActionRole);
+    int ret = approveBox.exec();
+
+    if (approveBox.clickedButton() == discardButton) return true;
+    if (approveBox.clickedButton() == goBackButton) return false;
+    return false;
+}
+
 void CWE_Parameters::save_all_button_clicked()
 {
     CFDcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
@@ -628,7 +664,7 @@ void CWE_Parameters::createStageTabs()
         stageTabList.append(tab);
 
         /* connect signals and slots */
-        QObject::connect(tab,SIGNAL(btn_pressed(CWE_ParamTab *)),this,SLOT(stageSelected(CWE_ParamTab*)));
+        QObject::connect(tab,SIGNAL(btn_clicked(CWE_ParamTab*)),this,SLOT(stageSelected(CWE_ParamTab*)));
     }
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -666,7 +702,7 @@ void CWE_Parameters::createGroupTabs()
         groupTabList.append(tab);
 
         /* connect signals and slots */
-        QObject::connect(tab,SIGNAL(btn_pressed(CWE_ParamTab *)),this,SLOT(groupSelected(CWE_ParamTab*)));
+        QObject::connect(tab,SIGNAL(btn_clicked(CWE_ParamTab*)),this,SLOT(groupSelected(CWE_ParamTab*)));
     }
 
     tablayout->addSpacerItem(new QSpacerItem(10,40, QSizePolicy::Expanding, QSizePolicy::Minimum));

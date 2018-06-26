@@ -51,6 +51,7 @@ class cwe_state_label;
 class CWE_InterfaceDriver;
 class CFDcaseInstance;
 class CFDanalysisType;
+class CWE_Super;
 enum class CaseState;
 
 class CWE_MainWindow : public QMainWindow
@@ -82,6 +83,7 @@ public:
 
 signals:
     void haveNewCase();
+    void newTabSelected(CWE_Super * newTab);
 
 private slots:
     void newCaseState(CaseState newState);

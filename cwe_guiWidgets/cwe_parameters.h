@@ -94,6 +94,7 @@ private slots:
 
     void newCaseGiven();
     void newCaseState(CaseState newState);
+    void panelNoLongerActive();
 
     void stageSelected(CWE_ParamTab * chosenTab);
     void groupSelected(CWE_ParamTab * chosenTab);
@@ -102,6 +103,7 @@ private slots:
 
 private:
     bool paramsChanged();
+    bool panelSwitchPermitted();
 
     void resetButtonAndView();
     void setButtonState(SimCenterButtonMode newMode);
