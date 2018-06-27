@@ -41,7 +41,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>1037</width>
     <height>600</height>
    </rect>
   </property>
@@ -61,64 +61,28 @@
      </widget>
     </item>
     <item>
-     <widget class="QTabWidget" name="tabContainer">
-      <property name="enabled">
-       <bool>true</bool>
+     <widget class="QWidget" name="panelTabs" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
       </property>
-      <property name="tabPosition">
-       <enum>QTabWidget::North</enum>
-      </property>
+      <layout class="QHBoxLayout" name="panelTabsLayout"/>
+     </widget>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="tab_panel_stack">
       <property name="currentIndex">
-       <number>0</number>
+       <number>6</number>
       </property>
-      <property name="usesScrollButtons">
-       <bool>false</bool>
-      </property>
-      <widget class="CWE_welcome_screen" name="tab_welcome_screen">
-       <attribute name="title">
-        <string>Welcome</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_help" name="tab_help">
-       <attribute name="title">
-        <string>Help</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_spacer_1">
-       <attribute name="title">
-        <string>Page text space</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_manage_simulation" name="tab_manage_and_run">
-       <attribute name="title">
-        <string>Simulation Cases</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_job_list" name="tab_jobs_page">
-       <attribute name="title">
-        <string>Remote Jobs</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_file_manager" name="tab_files">
-       <attribute name="title">
-        <string>Remote Files</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_spacer_2">
-       <attribute name="title">
-        <string>some text for size</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_Parameters" name="tab_parameters">
-       <attribute name="title">
-        <string>Parameters</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_Results" name="tab_results">
-       <attribute name="title">
-        <string>Results</string>
-       </attribute>
-      </widget>
+      <widget class="CWE_welcome_screen" name="tab_welcome_screen"/>
+      <widget class="CWE_help" name="tab_help"/>
+      <widget class="CWE_manage_simulation" name="tab_manage_and_run"/>
+      <widget class="CWE_job_list" name="tab_jobs_page"/>
+      <widget class="CWE_file_manager" name="tab_files"/>
+      <widget class="CWE_Parameters" name="tab_parameters"/>
+      <widget class="CWE_Results" name="tab_results"/>
      </widget>
     </item>
     <item>
@@ -138,7 +102,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1037</width>
      <height>23</height>
     </rect>
    </property>
@@ -265,9 +229,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_job_list</class>
+   <class>CWE_welcome_screen</class>
    <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_job_list.h</header>
+   <header>cwe_guiWidgets/cwe_welcome_screen.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -277,33 +241,33 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_file_manager</class>
-   <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_file_manager.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>CWE_manage_simulation</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_manage_simulation.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_welcome_screen</class>
+   <class>CWE_job_list</class>
    <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_welcome_screen.h</header>
+   <header>cwe_guiWidgets/cwe_job_list.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_Results</class>
+   <class>CWE_file_manager</class>
    <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_results.h</header>
+   <header>cwe_guiWidgets/cwe_file_manager.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>CWE_Parameters</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_parameters.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_Results</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_results.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

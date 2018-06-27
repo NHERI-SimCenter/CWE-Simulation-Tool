@@ -1,12 +1,12 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 1. Redistributions of source code must retain the above copyright notice, this 
+** 1. Redistributions of source code must retain the above copyright notice, this
 ** list of conditions and the following disclaimer.
 **
 ** 2. Redistributions in binary form must reproduce the above copyright notice, this
@@ -32,30 +32,32 @@
 
 // Contributors:
 
-#ifndef CWE_WELCOME_SCREEN_H
-#define CWE_WELCOME_SCREEN_H
+#ifndef CWE_PANELTAB_H
+#define CWE_PANELTAB_H
 
-#include "cwe_super.h"
-
-#include <QFile>
+#include "cwe_paramtab.h"
 
 namespace Ui {
-class CWE_welcome_screen;
+class CWE_PanelTab;
 }
 
-class CWE_welcome_screen : public CWE_Super
+class CWE_PanelTab : public CWE_ParamTab
 {
     Q_OBJECT
 
 public:
-    explicit CWE_welcome_screen(QWidget *parent = 0);
-    ~CWE_welcome_screen();
+    explicit CWE_PanelTab(QWidget * panelWidget, QString panelKey, QString panelName, QWidget *parent = 0);
+    ~CWE_PanelTab();
 
-private slots:
-    void on_welcome_text_anchorClicked(const QUrl &arg1);
+    QWidget * getPanelWidget();
+
+protected:
+    virtual void setButtonAppearance();
 
 private:
-    Ui::CWE_welcome_screen *ui;
+    Ui::CWE_PanelTab *ui;
+
+    QWidget * myWidget;
 };
 
-#endif // CWE_WELCOME_SCREEN_H
+#endif // CWE_PANELTAB_H
