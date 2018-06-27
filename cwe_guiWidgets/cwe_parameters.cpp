@@ -543,7 +543,7 @@ bool CWE_Parameters::panelSwitchPermitted()
     approveBox.setText("You have unsaved changes to the parameters. Are you sure you wish to discard those changes?");
     QPushButton *discardButton = approveBox.addButton("Discard Parameter Changes", QMessageBox::ActionRole);
     QPushButton *goBackButton = approveBox.addButton("Go Back To Parameters", QMessageBox::ActionRole);
-    int ret = approveBox.exec();
+    approveBox.exec();
 
     if (approveBox.clickedButton() == discardButton) return true;
     if (approveBox.clickedButton() == goBackButton) return false;

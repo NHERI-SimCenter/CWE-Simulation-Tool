@@ -120,7 +120,8 @@ SOURCES += main.cpp \
     utilWindows/dialogabout.cpp \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.cpp \
     cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.cpp \
-    cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.cpp
+    cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -185,7 +186,8 @@ HEADERS  += \
     utilWindows/dialogabout.h \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.h \
     cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.h \
-    cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.h
+    cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -205,7 +207,8 @@ FORMS    += \
     popupWindows/duplicate_case_popup.ui \
     utilWindows/dialogabout.ui \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.ui \
-    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.ui
+    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.ui \
+    cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.ui
 
 win32 {
 FORMS    += \
