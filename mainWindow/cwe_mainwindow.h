@@ -47,6 +47,8 @@ namespace Ui {
 class CWE_MainWindow;
 }
 
+class CWE_ParamTab;
+class CWE_PanelTab;
 class cwe_state_label;
 class CWE_InterfaceDriver;
 class CFDcaseInstance;
@@ -69,6 +71,7 @@ public:
     void switchToParameterTab();
     void switchToResultsTab();
     void switchToFilesTab();
+    void switchToHelpTab(const QUrl &url);
 
     RemoteFileModel * getFileModel();
 
@@ -91,19 +94,25 @@ private slots:
     void menuExit();
     void menuCopyInfo();
 
+    void panelTabClicked(CWE_ParamTab * newTab);
+
     void on_actionAbout_CWE_triggered();
 
-    void switchToHelpTab(const QUrl &url);
-
 private:
+    void addWindowPanel(QWidget * thePanel, QString panelName, QString tabText);
     void deactivateCurrentCase();
 
+    bool panelIsActive(QWidget * panelToCheck);
+    void setCurrentPanel(QWidget * newActivePanel);
+
     void changeParamsAndResultsEnabled(bool setting);
-    void changeTabEnabled(QWidget *theTab, bool newSetting);
+    void changeTabEnabled(QWidget *thePanel, bool newSetting);
 
     Ui::CWE_MainWindow *ui;
 
     CFDcaseInstance * currentCase = NULL;
+
+    QMap<QWidget *, CWE_PanelTab *> listOfPanelTabs;
 
     RemoteFileModel fileModel;
     cwe_state_label        *stateLabel = NULL;
