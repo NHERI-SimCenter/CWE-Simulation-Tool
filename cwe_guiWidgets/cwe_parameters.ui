@@ -418,11 +418,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pbtn_saveAllParameters</sender>
+   <signal>clicked()</signal>
+   <receiver>CWE_Parameters</receiver>
+   <slot>save_all_button_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>464</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>411</x>
+     <y>230</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>run_button_clicked()</slot>
   <slot>cancel_button_clicked()</slot>
   <slot>results_button_clicked()</slot>
   <slot>rollback_button_clicked()</slot>
+  <slot>save_all_button_clicked()</slot>
  </slots>
 </ui>

@@ -321,6 +321,8 @@ bool CFDglCanvas::loadMeshData2D(QByteArray * rawPointFile, QByteArray * rawFace
     if (!loadMeshData(rawPointFile, rawFaceFile, rawOwnerFile)) return false;
 
     haveValidMeshData = true;
+
+    return true;
 }
 
 bool CFDglCanvas::loadMeshData3D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile)
@@ -339,6 +341,8 @@ bool CFDglCanvas::loadMeshData3D(QByteArray * rawPointFile, QByteArray * rawFace
     }
 
     haveValidMeshData = true;
+
+    return true;
 }
 
 bool CFDglCanvas::loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile)
