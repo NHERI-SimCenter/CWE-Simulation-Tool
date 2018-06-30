@@ -96,6 +96,21 @@ void CWE_Parameters::linkMainWindow(CWE_MainWindow *theMainWin)
                      this, SLOT(newCaseGiven()));
 }
 
+bool CWE_Parameters::allowClickAway()
+{
+    if (!panelSwitchPermitted()) return false;
+
+    for (SCtrMasterDataWidget * aWidget : paramWidgetList)
+    {
+        if (aWidget->isValueChanged())
+        {
+            aWidget->revertShownValue();
+        }
+    }
+
+    return true;
+}
+
 void CWE_Parameters::newCaseGiven()
 {
     CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
@@ -189,23 +204,6 @@ void CWE_Parameters::newCaseState(CaseState)
     }
     //Once the state tabs are updated, we adjust the state of the shown parameters:
     resetButtonAndView();
-}
-
-void CWE_Parameters::panelNoLongerActive()
-{
-    if (panelSwitchPermitted())
-    {
-        for (SCtrMasterDataWidget * aWidget : paramWidgetList)
-        {
-            if (aWidget->isValueChanged())
-            {
-                aWidget->revertShownValue();
-            }
-        }
-        return;
-    }
-
-    theMainWindow->switchToParameterTab();
 }
 
 void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)

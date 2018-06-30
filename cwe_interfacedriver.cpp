@@ -148,6 +148,15 @@ void CWE_InterfaceDriver::closeAuthScreen()
         authWindow->deleteLater();
         authWindow = NULL;
     }
+
+    if (!inDebugMode)
+    {
+        AgaveThread * theThread = qobject_cast<AgaveThread *>(theConnectThread);
+        if (theThread != NULL)
+        {
+            theThread->sendCounterPing("http://opensees.berkeley.edu/OpenSees/developer/cwe/use.php");
+        }
+    }
 }
 
 void CWE_InterfaceDriver::startOffline()

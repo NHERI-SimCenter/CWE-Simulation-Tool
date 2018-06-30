@@ -42,3 +42,8 @@ void CWE_Super::linkMainWindow(CWE_MainWindow * newMainWindow)
 {
     theMainWindow = newMainWindow;
 }
+
+bool CWE_Super::allowClickAway()
+{
+    return true;
+}

@@ -163,6 +163,14 @@ void CWE_MainWindow::panelTabClicked(CWE_ParamTab * newTab)
         cwe_globals::displayFatalPopup("UI Error, unable to find main window panel", "Internal Error");
     }
 
+    if (thePanel->tabIsActive()) return;
+    CWE_Super * panelWidget = qobject_cast<CWE_Super *>(ui->tab_panel_stack->currentWidget());
+    if (panelWidget == NULL)
+    {
+        cwe_globals::displayFatalPopup("UI Error, unable connet main window panel", "Internal Error");
+    }
+    if (!panelWidget->allowClickAway()) return;
+
     setCurrentPanel(thePanel->getPanelWidget());
 }
 

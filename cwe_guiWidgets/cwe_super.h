@@ -46,6 +46,7 @@ class CWE_Super : public QFrame
 public:
     explicit CWE_Super(QWidget *parent = nullptr);
     virtual void linkMainWindow(CWE_MainWindow * newMainWindow);
+    virtual bool allowClickAway();
 
 protected:
     CWE_MainWindow * theMainWindow;
