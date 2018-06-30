@@ -764,27 +764,27 @@ void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable, QS
 
     if (theVariable.type == SimCenterDataType::floatingpoint) {
         theVar = new SCtrStdDataWidget(this);
-        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
+        theVar->setStyleSheet("QLineEdit {background-color: #f8f8f8}");
         layout->addWidget(theVar);
     }
     else if (theVariable.type == SimCenterDataType::string) {
         theVar = new SCtrTextDataWidget(this);
-        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
+        theVar->setStyleSheet("QLineEdit {background-color: #f8f8f8}");
         layout->addWidget(theVar);
     }
     else if (theVariable.type == SimCenterDataType::selection) {
         theVar = new SCtrChoiceDataWidget(this);
-        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
+        theVar->setStyleSheet("QLineEdit {background-color: #f8f8f8}");
         layout->addWidget(theVar);
     }
     else if (theVariable.type == SimCenterDataType::boolean) {
         theVar = new SCtrBoolDataWidget(this);
-        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
+        theVar->setStyleSheet("QLineEdit {background-color: #f8f8f8}");
         layout->addWidget(theVar);
     }
     else if (theVariable.type == SimCenterDataType::file) {
         theVar = new SCtrFileDataWidget(theMainWindow->getFileModel(), this);
-        theVar->setStyleSheet("QLineEdit {background-color: #fff}");
+        theVar->setStyleSheet("QLineEdit {background-color: #f8f8f8}");
         layout->addWidget(theVar);
     }
     else {
