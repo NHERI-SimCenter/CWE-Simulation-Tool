@@ -65,7 +65,7 @@ void ResultField2dWindow::allFilesLoaded()
     CFDglCanvas * myCanvas;
     changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
-    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
+    myCanvas->loadMeshData2D(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
     if (!myCanvas->haveMeshData())
     {

@@ -33,85 +33,40 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CFDGLCANVAS_H
-#define CFDGLCANVAS_H
+#include "resultmesh3dwindow.h"
 
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include "../cfdglcanvas.h"
 
-#include <QMatrix4x4>
+ResultMesh3dWindow::ResultMesh3dWindow(CFDcaseInstance * theCase, RESULTS_STYLE *resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
 
-#include <math.h>
+ResultMesh3dWindow::~ResultMesh3dWindow(){}
 
-enum class CFDDisplayState
+void ResultMesh3dWindow::initializeView()
 {
-    TEST_BOX,
-    MESH,
-    MESH3D,
-    FIELD
-};
+    QMap<QString, QString> neededFiles;
+    neededFiles["points"] = "/constant/polyMesh/points.gz";
+    neededFiles["faces"] = "/constant/polyMesh/faces.gz";
+    neededFiles["owner"] = "/constant/polyMesh/owner.gz";
 
-class CFDglCanvas : public QOpenGLWidget, protected QOpenGLFunctions
+    performStandardInit(neededFiles);
+}
+
+void ResultMesh3dWindow::allFilesLoaded()
 {
-public:
-    CFDglCanvas(QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
-    ~CFDglCanvas();
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-    bool loadMeshData2D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
-    bool loadMeshData3D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
-    bool loadFieldData(QByteArray * rawDataFile, QString valueType);
-    bool haveMeshData();
-    QString getDisplayError();
+    CFDglCanvas * myCanvas;
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
-    void setDisplayState(CFDDisplayState newState);
+    myCanvas->loadMeshData3D(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
-protected:
-    virtual void initializeGL();
-    virtual void resizeGL(int w, int h);
-    virtual void paintGL();
+    if (!myCanvas->haveMeshData())
+    {
+        changeDisplayFrameTenant(new QLabel("Error: Data for 3D mesh result is unreadable. Please reset and try again."));
+        return;
+    }
 
-private:
-    bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
-
-    CFDDisplayState myState = CFDDisplayState::TEST_BOX;
-    int myWidth;
-    int myHeight;
-
-    //Note: this should probably be static const
-    double PRECISION = 0.000000001;
-
-    void recomputeProjectionMat(int w, int h);
-    void clearMeshData();
-
-    bool isAllZ0(QList<int> aFace);
-
-    QString currentDisplayError;
-
-    QMatrix4x4 projectionMat;
-
-    //Current Mesh Data:
-    bool haveValidMeshData = false;
-    QList<QList<double>> pointList;
-    QList<QList<int>> faceList;
-    QList<int> ownerList;
-
-    QList<double> dataList;
-
-    QRectF displayBounds2D;
-    double highz;
-    double lowz;
-
-    double lowDataVal;
-    double highDataVal;
-    double dataSpan;
-
-    //QOpenGLVertexArrayObject myVertexArray;
-    //QOpenGLBuffer myBuffer;
-    /*
-    QOpenGLShaderProgram * myShaderProgram = NULL;
-    QOpenGLShader * myShader = NULL;
-    QOpenGLTexture * myTexture = NULL;
-    */
-};
-
-#endif // CFDGLCANVAS_H
+    myCanvas->setDisplayState(CFDDisplayState::MESH3D);
+}

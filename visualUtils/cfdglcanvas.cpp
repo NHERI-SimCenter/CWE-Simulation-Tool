@@ -82,15 +82,14 @@ void CFDglCanvas::recomputeProjectionMat(int w, int h)
         projectionMat.setToIdentity();
         projectionMat.ortho(-5.0f,5.0f,-5.0f,5.0f,-1.0f,1.0f);
     }
-
-    if ((myState == CFDDisplayState::MESH) || (myState == CFDDisplayState::FIELD))
+    else if ((myState == CFDDisplayState::MESH) || (myState == CFDDisplayState::FIELD))
     {
         projectionMat.setToIdentity();
 
-        double rawleft = displayBounds.left();
-        double rawright = displayBounds.right();
-        double rawbottom = displayBounds.bottom();
-        double rawtop = displayBounds.top();
+        double rawleft = displayBounds2D.left();
+        double rawright = displayBounds2D.right();
+        double rawbottom = displayBounds2D.bottom();
+        double rawtop = displayBounds2D.top();
 
         double rawXCenter = ((rawright - rawleft) / 2.0) + rawleft;
         double rawYCenter = ((rawtop - rawbottom) / 2.0) + rawbottom;
@@ -116,6 +115,44 @@ void CFDglCanvas::recomputeProjectionMat(int w, int h)
             double newRight = rawXCenter + (newFactor * (rawright - rawXCenter));
 
             projectionMat.ortho(newLeft, newRight, rawbottom, rawtop, -1.0f,1.0f);
+        }
+    }
+    else if (myState == CFDDisplayState::MESH3D)
+    {
+        //Temporary TODO:
+        //projectionMat.perspective(0,1.0,0.0,100.0);
+
+        projectionMat.setToIdentity();
+
+        double rawleft = displayBounds2D.left();
+        double rawright = displayBounds2D.right();
+        double rawbottom = displayBounds2D.bottom();
+        double rawtop = displayBounds2D.top();
+
+        double rawXCenter = ((rawright - rawleft) / 2.0) + rawleft;
+        double rawYCenter = ((rawtop - rawbottom) / 2.0) + rawbottom;
+
+        double imgRatio = ((rawright - rawleft)/(rawtop - rawbottom));
+        double viewRatio = ((double)w)/((double)h);
+        if (imgRatio == viewRatio)
+        {
+            projectionMat.ortho(rawleft, rawright, rawbottom, rawtop, lowz, highz);
+        }
+        else if (imgRatio > viewRatio)
+        {
+            double newFactor = imgRatio / viewRatio;
+            double newBottom = rawYCenter - (newFactor * (rawYCenter - rawbottom));
+            double newTop = rawYCenter + (newFactor * (rawtop - rawYCenter));
+
+            projectionMat.ortho(rawleft, rawright, newBottom, newTop, lowz, highz);
+        }
+        else
+        {
+            double newFactor = viewRatio / imgRatio;
+            double newLeft = rawXCenter - (newFactor * (rawXCenter - rawleft));
+            double newRight = rawXCenter + (newFactor * (rawright - rawXCenter));
+
+            projectionMat.ortho(newLeft-(rawright - rawleft)/2.0, newRight+(rawright - rawleft)/2.0, rawbottom-(rawtop - rawbottom)/2.0, rawtop+(rawtop - rawbottom)/2.0, lowz-(highz-lowz)*3.0, highz+(highz-lowz));
         }
     }
 }
@@ -167,6 +204,43 @@ void CFDglCanvas::paintGL()
                     glVertex3f(pointList.at(aFace.at(ind)).at(0),
                                pointList.at(aFace.at(ind)).at(1),0.0);
                 }
+            }
+        }
+        glEnd();
+    }
+
+    if (myState == CFDDisplayState::MESH3D)
+    {
+        QMatrix4x4 translationMatrix;
+        translationMatrix.rotate(-45.0, 1.0,0.0,0.0);
+        translationMatrix.rotate(-45.0, 0.0,1.0,0.0);
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glLoadMatrixf(translationMatrix.data());
+
+        glColor3f(0.0, 0.0, 0.0);
+        glBegin(GL_LINES);
+
+        for (auto faceItr = faceList.cbegin(); faceItr != faceList.cend(); faceItr++)
+        {
+            QList<int> aFace = (*faceItr);
+
+            glVertex3f(pointList.at(aFace.last()).at(0),
+                       pointList.at(aFace.last()).at(1),
+                       pointList.at(aFace.last()).at(2));
+            glVertex3f(pointList.at(aFace.first()).at(0),
+                       pointList.at(aFace.first()).at(1),
+                       pointList.at(aFace.first()).at(2));
+
+            for (int ind = 1; ind < aFace.size(); ind++)
+            {
+                glVertex3f(pointList.at(aFace.at(ind - 1)).at(0),
+                           pointList.at(aFace.at(ind - 1)).at(1),
+                           pointList.at(aFace.at(ind - 1)).at(2));
+                glVertex3f(pointList.at(aFace.at(ind)).at(0),
+                           pointList.at(aFace.at(ind)).at(1),
+                           pointList.at(aFace.at(ind)).at(2));
             }
         }
         glEnd();
@@ -240,6 +314,31 @@ void CFDglCanvas::setDisplayState(CFDDisplayState newState)
     myState = newState;
     //recomputeProjectionMat();
     this->update();
+}
+
+bool CFDglCanvas::loadMeshData2D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile)
+{
+    if (!loadMeshData(rawPointFile, rawFaceFile, rawOwnerFile)) return false;
+
+    haveValidMeshData = true;
+}
+
+bool CFDglCanvas::loadMeshData3D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile)
+{
+    if (!loadMeshData(rawPointFile, rawFaceFile, rawOwnerFile)) return false;
+
+    highz = pointList.at(0).at(2);
+    lowz = pointList.at(0).at(2);
+
+    for (auto itr = pointList.cbegin(); itr != pointList.cend(); itr++)
+    {
+        double zVal = (*itr).at(2);
+
+        if (zVal > highz) highz = zVal;
+        if (zVal < lowz) lowz = zVal;
+    }
+
+    haveValidMeshData = true;
 }
 
 bool CFDglCanvas::loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile)
@@ -353,23 +452,21 @@ bool CFDglCanvas::loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFi
     delete faceRoot;
     delete ownerRoot;
 
-    displayBounds.setBottom(pointList.at(0).at(1));
-    displayBounds.setTop(pointList.at(0).at(1));
-    displayBounds.setLeft(pointList.at(0).at(0));
-    displayBounds.setRight(pointList.at(0).at(0));
+    displayBounds2D.setBottom(pointList.at(0).at(1));
+    displayBounds2D.setTop(pointList.at(0).at(1));
+    displayBounds2D.setLeft(pointList.at(0).at(0));
+    displayBounds2D.setRight(pointList.at(0).at(0));
 
     for (auto itr = pointList.cbegin(); itr != pointList.cend(); itr++)
     {
         double xVal = (*itr).at(0);
         double yVal = (*itr).at(1);
 
-        if (xVal < displayBounds.left()) displayBounds.setLeft(xVal);
-        if (xVal > displayBounds.right()) displayBounds.setRight(xVal);
-        if (yVal > displayBounds.top()) displayBounds.setTop(yVal);
-        if (yVal < displayBounds.bottom()) displayBounds.setBottom(yVal);
+        if (xVal < displayBounds2D.left()) displayBounds2D.setLeft(xVal);
+        if (xVal > displayBounds2D.right()) displayBounds2D.setRight(xVal);
+        if (yVal > displayBounds2D.top()) displayBounds2D.setTop(yVal);
+        if (yVal < displayBounds2D.bottom()) displayBounds2D.setBottom(yVal);
     }
-
-    haveValidMeshData = true;
 
     return true;
 }
