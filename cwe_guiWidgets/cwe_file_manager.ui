@@ -49,6 +49,18 @@
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QFrame" name="localFrame">
      <property name="minimumSize">
@@ -229,6 +241,12 @@
       </item>
       <item>
        <widget class="QFrame" name="remote_panel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="frameShape">
          <enum>QFrame::Panel</enum>
         </property>
@@ -257,6 +275,12 @@
             <iconset resource="../cwe_resources.qrc">
              <normaloff>:/icons/folder.png</normaloff>:/icons/folder.png</iconset>
            </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
           </widget>
          </item>
          <item row="0" column="3">
@@ -268,6 +292,12 @@
             <iconset resource="../cwe_resources.qrc">
              <normaloff>:/icons/burst.png</normaloff>:/icons/burst.png</iconset>
            </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
           </widget>
          </item>
          <item row="0" column="4">
@@ -278,6 +308,12 @@
            <property name="icon">
             <iconset resource="../cwe_resources.qrc">
              <normaloff>:/icons/dir.gif</normaloff>:/icons/dir.gif</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
            </property>
           </widget>
          </item>
