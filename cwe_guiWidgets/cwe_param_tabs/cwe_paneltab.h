@@ -50,6 +50,7 @@ public:
     ~CWE_PanelTab();
 
     QWidget * getPanelWidget();
+    void setTabEnabled(bool setting);
 
 protected:
     virtual void setButtonAppearance();
@@ -58,6 +59,7 @@ private:
     Ui::CWE_PanelTab *ui;
 
     QWidget * myWidget;
+    bool tabEnabled = true;
 };
 
 #endif // CWE_PANELTAB_H

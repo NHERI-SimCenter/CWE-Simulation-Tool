@@ -62,12 +62,10 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     addWindowPanel(ui->tab_jobs_page,"jobs","Remote Jobs");
     addWindowPanel(ui->tab_files,"files","Remote Files");
     ui->panelTabsLayout->addItem(new QSpacerItem(150, 0));
-    addWindowPanel(ui->tab_parameters,"welcome","Parameters");
+    addWindowPanel(ui->tab_parameters,"parameters","Parameters");
     addWindowPanel(ui->tab_results,"results","Results");
 
     changeParamsAndResultsEnabled(false);
-
-    setCurrentPanel(ui->tab_welcome_screen);
 
     // adjust application size to display
     QRect rec = QGuiApplication::screens().at(0)->availableGeometry();
@@ -117,6 +115,8 @@ void CWE_MainWindow::runSetupSteps()
         CWE_Super * aWidget = (CWE_Super *) rawWidget;
         aWidget->linkMainWindow(this);
     }
+
+    setCurrentPanel(ui->tab_welcome_screen);
 }
 
 void CWE_MainWindow::newCaseState(CaseState newState)
@@ -238,7 +238,7 @@ void CWE_MainWindow::changeParamsAndResultsEnabled(bool setting)
 void CWE_MainWindow::changeTabEnabled(QWidget * thePanel, bool newSetting)
 {
     //TODO: Want these visible but disabled when disabled
-    listOfPanelTabs.value(thePanel)->setEnabled(newSetting);
+    listOfPanelTabs.value(thePanel)->setTabEnabled(newSetting);
 }
 
 CFDcaseInstance * CWE_MainWindow::getCurrentCase()

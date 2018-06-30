@@ -51,7 +51,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
-     <number>-1</number>
+     <number>6</number>
     </property>
     <property name="leftMargin">
      <number>6</number>
@@ -147,40 +147,22 @@
      <x>0</x>
      <y>0</y>
      <width>1037</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen"/>
-    <addaction name="actionOpen_existing"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_As"/>
     <addaction name="action_Quit"/>
-   </widget>
-   <widget class="QMenu" name="menuWindow">
-    <property name="title">
-     <string>Window</string>
-    </property>
-    <addaction name="action_Landing_Page"/>
-    <addaction name="actionCreate_New_Simulation"/>
-    <addaction name="actionManage_Simulation"/>
-    <addaction name="actionManage_and_Download_Files"/>
-    <addaction name="actionManage_Remote_Jobs"/>
-    <addaction name="actionTutorials_and_Help"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>About</string>
     </property>
-    <addaction name="actionAbout_CWE"/>
-    <addaction name="actionHelp"/>
     <addaction name="actionCopyright_and_License"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionCreate_New_Simulation">
@@ -329,6 +311,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCopyright_and_License</sender>
+   <signal>triggered()</signal>
+   <receiver>CWE_MainWindow</receiver>
+   <slot>menuCopyInfo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>518</x>
      <y>299</y>
     </hint>
    </hints>
