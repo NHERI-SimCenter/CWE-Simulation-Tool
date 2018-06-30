@@ -47,6 +47,7 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "visualUtils/resultVisuals/resultmesh3dwindow.h"
 #include "visualUtils/resultVisuals/resultmesh2dwindow.h"
 #include "visualUtils/resultVisuals/resultfield2dwindow.h"
 #include "visualUtils/resultVisuals/resulttextdisp.h"
@@ -166,6 +167,13 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
         ResultMesh2dWindow * resultPopup = new ResultMesh2dWindow(currentCase, &resultObject, NULL);
         resultPopup->initializeView();
     }
+    else if (resultObject.type == "GLmesh3D")
+    {
+        if (theItem->column() != showCol) return;
+
+        ResultMesh3dWindow * resultPopup = new ResultMesh3dWindow(currentCase, &resultObject, NULL);
+        resultPopup->initializeView();
+    }
 }
 
 RESULTS_STYLE CWE_Results::getResultObjectFromName(QString name)
@@ -260,7 +268,7 @@ void CWE_Results::newCaseState(CaseState newState)
 
 void CWE_Results::populateResultsScreen()
 {
-    if (!viewIsValid) return;
+    if (viewIsValid) return;
     CFDcaseInstance * currentCase = theMainWindow->getCurrentCase();
     if (currentCase == NULL) return;
     if (currentCase->getCaseFolder().isNil()) return;
@@ -313,6 +321,10 @@ void CWE_Results::populateResultsScreen()
             else if (aResult.type == "GLmesh")
             {
                 addResult(aResult.displayName,true,false,"Mesh Image");
+            }
+            else if (aResult.type == "GLmesh3D")
+            {
+                addResult(aResult.displayName,true,false,"3D Mesh Image");
             }
             else
             {

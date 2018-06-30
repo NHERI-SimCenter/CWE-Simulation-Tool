@@ -30,7 +30,13 @@
                     "displayName":"Mesh Output Log",
                     "type":"text",
                     "file":"logs/cwe-serial.out"
+                },
+                {
+                    "displayName":"Visualize 3D Mesh",
+                    "type":"GLmesh3D",
+                    "file":"logs/cwe-serial.out"
                 }
+
             ]
         },
         "sim":{

@@ -84,6 +84,7 @@ public:
     ~CWE_Parameters();
 
     virtual void linkMainWindow(CWE_MainWindow *theMainWin);
+    virtual bool allowClickAway();
 
 private slots:
     void save_all_button_clicked();
@@ -94,7 +95,6 @@ private slots:
 
     void newCaseGiven();
     void newCaseState(CaseState newState);
-    void panelNoLongerActive();
 
     void stageSelected(CWE_ParamTab * chosenTab);
     void groupSelected(CWE_ParamTab * chosenTab);

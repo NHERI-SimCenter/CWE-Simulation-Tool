@@ -33,85 +33,27 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CFDGLCANVAS_H
-#define CFDGLCANVAS_H
+#ifndef RESULTMESH3DWINDOW_H
+#define RESULTMESH3DWINDOW_H
 
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QObject>
+#include <QWidget>
+#include "visualUtils/resultvisualpopup.h"
 
-#include <QMatrix4x4>
+class CFDglCanvas;
+struct RESULTS_STYLE;
 
-#include <math.h>
-
-enum class CFDDisplayState
+class ResultMesh3dWindow : public ResultVisualPopup
 {
-    TEST_BOX,
-    MESH,
-    MESH3D,
-    FIELD
-};
-
-class CFDglCanvas : public QOpenGLWidget, protected QOpenGLFunctions
-{
+    Q_OBJECT
 public:
-    CFDglCanvas(QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
-    ~CFDglCanvas();
+    ResultMesh3dWindow(CFDcaseInstance * theCase, RESULTS_STYLE * resultDesc, QWidget *parent = 0);
+    ~ResultMesh3dWindow();
 
-    bool loadMeshData2D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
-    bool loadMeshData3D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
-    bool loadFieldData(QByteArray * rawDataFile, QString valueType);
-    bool haveMeshData();
-    QString getDisplayError();
-
-    void setDisplayState(CFDDisplayState newState);
-
-protected:
-    virtual void initializeGL();
-    virtual void resizeGL(int w, int h);
-    virtual void paintGL();
+    virtual void initializeView();
 
 private:
-    bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
-
-    CFDDisplayState myState = CFDDisplayState::TEST_BOX;
-    int myWidth;
-    int myHeight;
-
-    //Note: this should probably be static const
-    double PRECISION = 0.000000001;
-
-    void recomputeProjectionMat(int w, int h);
-    void clearMeshData();
-
-    bool isAllZ0(QList<int> aFace);
-
-    QString currentDisplayError;
-
-    QMatrix4x4 projectionMat;
-
-    //Current Mesh Data:
-    bool haveValidMeshData = false;
-    QList<QList<double>> pointList;
-    QList<QList<int>> faceList;
-    QList<int> ownerList;
-
-    QList<double> dataList;
-
-    QRectF displayBounds2D;
-    double highz;
-    double lowz;
-
-    double lowDataVal;
-    double highDataVal;
-    double dataSpan;
-
-    //QOpenGLVertexArrayObject myVertexArray;
-    //QOpenGLBuffer myBuffer;
-    /*
-    QOpenGLShaderProgram * myShaderProgram = NULL;
-    QOpenGLShader * myShader = NULL;
-    QOpenGLTexture * myTexture = NULL;
-    */
+    virtual void allFilesLoaded();
 };
 
-#endif // CFDGLCANVAS_H
+#endif // RESULTMESH3DWINDOW_H
