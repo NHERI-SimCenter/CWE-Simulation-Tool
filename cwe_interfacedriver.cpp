@@ -151,11 +151,7 @@ void CWE_InterfaceDriver::closeAuthScreen()
 
     if (!inDebugMode)
     {
-        AgaveThread * theThread = qobject_cast<AgaveThread *>(theConnectThread);
-        if (theThread != NULL)
-        {
-            theThread->sendCounterPing("http://opensees.berkeley.edu/OpenSees/developer/cwe/use.php");
-        }
+        tmpHandle->sendCounterPing("http://opensees.berkeley.edu/OpenSees/developer/cwe/use.php");
     }
 }
 
