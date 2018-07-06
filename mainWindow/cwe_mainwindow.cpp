@@ -37,28 +37,38 @@
 #include "CFDanalysis/CFDcaseInstance.h"
 #include "cwe_guiWidgets/cwe_state_label.h"
 
+#include "cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.h"
+
 #include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
 #include "cwe_interfacedriver.h"
 #include "../AgaveClientInterface/remotedatainterface.h"
 #include "cwe_globals.h"
 
+#include "utilWindows/dialogabout.h"
+
 CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CWE_MainWindow)
 {
-    ui->setupUi(this);// Main screen
-    //this->setWindowIcon(QIcon(":/icons/NHERI-CWE-Icon.icns"));
-
-    changeParamsAndResultsEnabled(false);
+    ui->setupUi(this);
 
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
 
-    changeTabEnabled(ui->tab_spacer_1, false);
-    changeTabEnabled(ui->tab_spacer_2, false);
+    addWindowPanel(ui->tab_welcome_screen,"welcome","Welcome");
+    addWindowPanel(ui->tab_help,"help","Help");
+    ui->panelTabsLayout->addItem(new QSpacerItem(150, 0));
+    addWindowPanel(ui->tab_manage_and_run,"manage","Simulation Cases");
+    addWindowPanel(ui->tab_jobs_page,"jobs","Remote Jobs");
+    addWindowPanel(ui->tab_files,"files","Remote Files");
+    ui->panelTabsLayout->addItem(new QSpacerItem(150, 0));
+    addWindowPanel(ui->tab_parameters,"parameters","Parameters");
+    addWindowPanel(ui->tab_results,"results","Results");
+
+    changeParamsAndResultsEnabled(false);
 
     // adjust application size to display
-    QRect rec = QApplication::desktop()->screenGeometry();
+    QRect rec = QGuiApplication::screens().at(0)->availableGeometry();
     int height = this->height()>0.75*rec.height()?this->height():0.75*rec.height();
     if ( height > 0.95*rec.height() ) { height = 0.95*rec.height(); }
     int width  = this->width()>0.65*rec.width()?this->width():0.65*rec.width();
@@ -69,6 +79,14 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
 CWE_MainWindow::~CWE_MainWindow()
 {
     delete ui;
+}
+
+void CWE_MainWindow::addWindowPanel(QWidget * thePanel, QString panelName, QString tabText)
+{
+    CWE_PanelTab * panelPtr = new CWE_PanelTab(thePanel,panelName,tabText, this);
+    listOfPanelTabs.insert(thePanel, panelPtr);
+    ui->panelTabsLayout->addWidget(panelPtr);
+    QObject::connect(panelPtr, SIGNAL(btn_clicked(CWE_ParamTab*)), this, SLOT(panelTabClicked(CWE_ParamTab*)));
 }
 
 void CWE_MainWindow::runSetupSteps()
@@ -83,12 +101,13 @@ void CWE_MainWindow::runSetupSteps()
     ui->header->appendWidget(username);
 
     QPushButton * logoutButton = new QPushButton("Logout");
+    logoutButton->setObjectName("logoutButton");
     QObject::connect(logoutButton, SIGNAL(clicked(bool)), cwe_globals::get_CWE_Driver(), SLOT(shutdown()));
     ui->header->appendWidget(logoutButton);
 
-    for (int i = 0; i < ui->tabContainer->count(); i++)
+    for (int i = 0; i < ui->tab_panel_stack->count(); i++)
     {
-        QWidget * rawWidget = ui->tabContainer->widget(i);
+        QWidget * rawWidget = ui->tab_panel_stack->widget(i);
         if (!rawWidget->inherits("CWE_Super"))
         {
             continue;
@@ -96,6 +115,8 @@ void CWE_MainWindow::runSetupSteps()
         CWE_Super * aWidget = (CWE_Super *) rawWidget;
         aWidget->linkMainWindow(this);
     }
+
+    setCurrentPanel(ui->tab_welcome_screen);
 }
 
 void CWE_MainWindow::newCaseState(CaseState newState)
@@ -134,33 +155,60 @@ void CWE_MainWindow::menuExit()
     cwe_globals::get_CWE_Driver()->shutdown();
 }
 
+void CWE_MainWindow::panelTabClicked(CWE_ParamTab * newTab)
+{
+    CWE_PanelTab * thePanel = qobject_cast<CWE_PanelTab *>(newTab);
+    if (thePanel == NULL)
+    {
+        cwe_globals::displayFatalPopup("UI Error, unable to find main window panel", "Internal Error");
+    }
+
+    if (thePanel->tabIsActive()) return;
+    CWE_Super * panelWidget = qobject_cast<CWE_Super *>(ui->tab_panel_stack->currentWidget());
+    if (panelWidget == NULL)
+    {
+        cwe_globals::displayFatalPopup("UI Error, unable connet main window panel", "Internal Error");
+    }
+    if (!panelWidget->allowClickAway()) return;
+
+    setCurrentPanel(thePanel->getPanelWidget());
+}
+
+void CWE_MainWindow::switchToHelpTab(const QUrl &url)
+{
+    qDebug() << "CWE_MainWindow::switchToHelpTab(" << url.toString() << ")";
+
+    setCurrentPanel(ui->tab_help);
+    ui->tab_help->setPageSource(url);
+}
+
 void CWE_MainWindow::switchToResultsTab()
 {
-    if (ui->tabContainer->isTabEnabled(ui->tabContainer->indexOf(ui->tab_results)))
+    if (listOfPanelTabs.value(ui->tab_results)->isEnabled())
     {
-        ui->tabContainer->setCurrentWidget(ui->tab_results);
+        setCurrentPanel(ui->tab_results);
     }
     else
     {
-        ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
+        setCurrentPanel(ui->tab_manage_and_run);
     }
 }
 
 void CWE_MainWindow::switchToParameterTab()
 {
-    if (ui->tabContainer->isTabEnabled(ui->tabContainer->indexOf(ui->tab_parameters)))
+    if (listOfPanelTabs.value(ui->tab_parameters)->isEnabled())
     {
-        ui->tabContainer->setCurrentWidget(ui->tab_parameters);
+        setCurrentPanel(ui->tab_parameters);
     }
     else
     {
-        ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
+        setCurrentPanel(ui->tab_manage_and_run);
     }
 }
 
 void CWE_MainWindow::switchToFilesTab()
 {
-    ui->tabContainer->setCurrentWidget(ui->tab_files);
+    setCurrentPanel(ui->tab_files);
 }
 
 RemoteFileModel * CWE_MainWindow::getFileModel()
@@ -178,20 +226,19 @@ void CWE_MainWindow::changeParamsAndResultsEnabled(bool setting)
         return;
     }
 
-    if ((ui->tabContainer->currentWidget() == ui->tab_parameters) ||
-        (ui->tabContainer->currentWidget() == ui->tab_results))
+    if (panelIsActive(ui->tab_parameters) || panelIsActive(ui->tab_results))
     {
-        ui->tabContainer->setCurrentWidget(ui->tab_manage_and_run);
+        setCurrentPanel(ui->tab_manage_and_run);
     }
 
-    //TODO: Want these visible but disabled: How?
     changeTabEnabled(ui->tab_parameters, false);
     changeTabEnabled(ui->tab_results, false);
 }
 
-void CWE_MainWindow::changeTabEnabled(QWidget * theTab, bool newSetting)
+void CWE_MainWindow::changeTabEnabled(QWidget * thePanel, bool newSetting)
 {
-    ui->tabContainer->setTabEnabled(ui->tabContainer->indexOf(theTab),newSetting);
+    //TODO: Want these visible but disabled when disabled
+    listOfPanelTabs.value(thePanel)->setTabEnabled(newSetting);
 }
 
 CFDcaseInstance * CWE_MainWindow::getCurrentCase()
@@ -286,4 +333,41 @@ void CWE_MainWindow::deactivateCurrentCase()
     QObject::disconnect(currentCase,0,0,0);
     currentCase->deleteLater();
     currentCase = NULL;
+}
+
+bool CWE_MainWindow::panelIsActive(QWidget * panelToCheck)
+{
+    return listOfPanelTabs.value(panelToCheck)->tabIsActive();
+}
+
+void CWE_MainWindow::setCurrentPanel(QWidget *newActivePanel)
+{
+    for (CWE_PanelTab * aTab : listOfPanelTabs)
+    {
+        if (aTab->getPanelWidget() == newActivePanel)
+        {
+            aTab->setActive();
+            ui->tab_panel_stack->setCurrentWidget(newActivePanel);
+        }
+        else
+        {
+            aTab->setInActive();
+        }
+    }
+}
+
+void CWE_MainWindow::on_actionAbout_CWE_triggered()
+{
+    DialogAbout *dlg = new DialogAbout();
+
+    //
+    // adjust size of application window to the available display
+    //
+    QRect rec = QGuiApplication::screens().at(0)->availableGeometry();
+    int height = 0.50*rec.height();
+    int width  = 0.50*rec.width();
+    dlg->resize(width, height);
+
+    dlg->exec();
+    delete dlg;
 }

@@ -32,31 +32,33 @@
 
 // Contributors:
 
-#ifndef SCTRVALIDATORS_H
-#define SCTRVALIDATORS_H
+#ifndef CWE_STAGESTATUSTAB_H
+#define CWE_STAGESTATUSTAB_H
 
-#include <QValidator>
+#include "cwe_paramtab.h"
 
-class SCtrNoValidator: public QValidator
+namespace Ui {
+class CWE_StageStatusTab;
+}
+
+class CWE_StageStatusTab : public CWE_ParamTab
 {
-public:
-    SCtrNoValidator(QObject *parent = 0);
-    // ~SCtrNoValidator();
-    QValidator::State validate(QString &input, int &pos) const;
-};
+    Q_OBJECT
 
-
-class SCtrBoolValidator: public QValidator
-{
 public:
-    SCtrBoolValidator(QObject *parent = 0);
-    // ~SCtrBoolValidator();
-    QValidator::State validate(QString &input, int &pos) const;
+    explicit CWE_StageStatusTab(QString stageKey, QString stageName, QWidget *parent = 0);
+    ~CWE_StageStatusTab();
+
+    void setStatus(const QString str);
+    QString status();
 
 protected:
+    virtual void setButtonAppearance();
 
 private:
+    Ui::CWE_StageStatusTab *ui;
 
+    QString stageStatus = "unknown";
 };
 
-#endif // SCTRVALIDATORS_H
+#endif // CWE_STAGESTATUSTAB_H

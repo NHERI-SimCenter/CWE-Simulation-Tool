@@ -39,11 +39,21 @@
 
 class SCtrTextDataWidget: public SCtrMasterDataWidget
 {
+    Q_OBJECT
 public:
     SCtrTextDataWidget(QWidget *parent);
-    void setData(VARIABLE_TYPE &);
-    QString toString();
-    void updateValue(QString);
+    ~SCtrTextDataWidget();
+
+    virtual QString shownValue();
+
+private:
+    virtual void initUI();
+    virtual void setComponetsEnabled(bool newSetting);
+
+    virtual void setShownValue(QString newValue);
+
+    QLineEdit * theValue = NULL;
+    QLabel * label_varName = NULL;
 };
 
 #endif // SCTRTEXTDATAWIDGET_H

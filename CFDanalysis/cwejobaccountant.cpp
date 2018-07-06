@@ -34,6 +34,7 @@
 
 #include "cwejobaccountant.h"
 
+#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 #include "../AgaveClientInterface/remotejobdata.h"
 #include "cwe_globals.h"
@@ -104,6 +105,8 @@ bool CWEjobAccountant::allRunningDetailsLoaded()
 
 void CWEjobAccountant::reloadJobLists()
 {
+    QMap<QString, const RemoteJobData *> prevRunningJobs = detailedRunningJobs;
+
     detailedRunningJobs.clear();
     undetailedRunningJobs.clear();
     terminatedJobs.clear();
@@ -132,5 +135,19 @@ void CWEjobAccountant::reloadJobLists()
             undetailedRunningJobs.insert(aJob->getID(),aJob);
         }
     }
+
+    for (const RemoteJobData * anOldJob : prevRunningJobs)
+    {
+        if (!anOldJob->detailsLoaded()) continue;
+        if (detailedRunningJobs.contains(anOldJob->getID())) continue;
+
+        QString folderName = anOldJob->getInputs().value("directory");
+        if (folderName.isEmpty()) continue;
+        FileNodeRef folderToRefresh = cwe_globals::get_file_handle()->speculateFileWithName(folderName,true);
+        if (folderToRefresh.isNil()) continue;
+
+        folderToRefresh.enactFolderRefresh();
+    }
+
     emit haveNewJobInfo();
 }

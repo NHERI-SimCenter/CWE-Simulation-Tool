@@ -40,76 +40,27 @@
 #include "cwe_interfacedriver.h"
 #include "mainWindow/cwe_mainwindow.h"
 
-SCtrFileDataWidget::SCtrFileDataWidget(CWE_MainWindow *mainWindow, QWidget *parent):
+SCtrFileDataWidget::SCtrFileDataWidget(RemoteFileModel * aFileModel, QWidget *parent):
     SCtrMasterDataWidget(parent)
 {
-    theMainWindow = mainWindow;
+    theFileModel = aFileModel;
 }
 
-void SCtrFileDataWidget::initUI()
+SCtrFileDataWidget::~SCtrFileDataWidget()
 {
-    if (label_varName == NULL) {
-        label_varName = new QLabel(this);
-    }
-    if (selectedFile == NULL)
+    if (myFileTree != NULL) myFileTree->deleteLater();
+    if (selectedFile != NULL) selectedFile->deleteLater();
+    if (explainText != NULL) explainText->deleteLater();
+    if (label_varName != NULL) label_varName->deleteLater();
+}
+
+QString SCtrFileDataWidget::shownValue()
+{
+    if (myFileTree->getSelectedFile().isNil())
     {
-        selectedFile = new QLabel(this);
+        return QString();
     }
-    explainText = new QLabel("\nIn order to run a simulation, a geometry file must be selected.\nIf you selected \"Uploaded File\", above, you will need to choose a geometry file you have uploaded.\nClick on the files tab to go to the upload/download screen.\nCWE can use \"Alias Mesh\" .obj files exported from FreeCAD, as well as our own JSON geometry format.\n\nSelected File:");
-    explainText->setMaximumWidth(500);
-    explainText->setWordWrap(true);
-    QBoxLayout *fullLayout = new QHBoxLayout();
-    QBoxLayout *leftLayout = new QVBoxLayout();
-    leftLayout->addWidget(label_varName);
-    leftLayout->addWidget(explainText);
-    leftLayout->addWidget(selectedFile);
-    fullLayout->addItem(leftLayout);
-    this->setLayout(fullLayout);
-}
-
-void SCtrFileDataWidget::setData(VARIABLE_TYPE &obj)
-{
-    // set up the UI for the widget
-    this->initUI();
-
-    m_obj = obj;
-
-    QHBoxLayout *layout = (QHBoxLayout *)this->layout();
-    layout->setMargin(0);
-
-    myFileTree = new RemoteFileTree(this);
-    myFileTree->setModelLink(theMainWindow->getFileModel());
-    myFileTree->setEditTriggers(QTreeView::NoEditTriggers);
-    layout->insertWidget(1, myFileTree, 4);
-
-    if (label_varName != NULL) {
-        label_varName->setText(m_obj.displayName);
-    }
-
-    if (selectedFile != NULL) {
-        selectedFile->setText(m_obj.defaultValue);
-    }
-
-    QObject::connect(myFileTree, SIGNAL(newFileSelected(FileNodeRef)),
-                     this, SLOT(newFileSelected(FileNodeRef)));
-}
-
-bool SCtrFileDataWidget::toBool()
-{
-    QString text = selectedFile->text();
-    return !text.isEmpty();
-}
-
-QString SCtrFileDataWidget::toString()
-{
-    return selectedFile->text();
-}
-
-void SCtrFileDataWidget::updateValue(QString s)
-{
-    /* update the value */
-    selectedFile->setText(s);
-    myFileTree->clearSelection();
+    return myFileTree->getSelectedFile().getFullPath();
 }
 
 void SCtrFileDataWidget::newFileSelected(FileNodeRef newFile)
@@ -119,4 +70,45 @@ void SCtrFileDataWidget::newFileSelected(FileNodeRef newFile)
         selectedFile->setText("");
     }
     selectedFile->setText(newFile.getFullPath());
+}
+
+void SCtrFileDataWidget::initUI()
+{
+    QBoxLayout *fullLayout = new QHBoxLayout();
+    QBoxLayout *leftLayout = new QVBoxLayout();
+    fullLayout->setMargin(0);
+
+    selectedFile = new QLabel(this);
+    explainText = new QLabel("\nIn order to run a simulation, a geometry file must be selected.\nIf you selected \"Uploaded File\", above, you will need to choose a geometry file you have uploaded.\nClick on the files tab to go to the upload/download screen.\nCWE can use \"Alias Mesh\" .obj files exported from FreeCAD, as well as our own JSON geometry format.\n\nSelected File:");
+    explainText->setMaximumWidth(500);
+    explainText->setWordWrap(true);
+    label_varName = new QLabel(getTypeInfo().displayName, this);
+
+    myFileTree = new RemoteFileTree(this);
+    myFileTree->setModelLink(theFileModel);
+    myFileTree->setEditTriggers(QTreeView::NoEditTriggers);
+    QObject::connect(myFileTree, SIGNAL(newFileSelected(FileNodeRef)),
+                     this, SLOT(newFileSelected(FileNodeRef)));
+
+    leftLayout->addWidget(label_varName);
+    leftLayout->addWidget(explainText);
+    leftLayout->addWidget(selectedFile);
+    fullLayout->addItem(leftLayout);
+    fullLayout->addWidget(myFileTree);
+    this->setLayout(fullLayout);
+
+    QObject::connect(myFileTree, SIGNAL(clicked(QModelIndex)),
+                     this, SLOT(changeMadeToUnderlyingDataWidget()));
+}
+
+void SCtrFileDataWidget::setComponetsEnabled(bool newSetting)
+{
+    selectedFile->setEnabled(newSetting);
+    myFileTree->setEnabled(newSetting);
+}
+
+void SCtrFileDataWidget::setShownValue(QString newValue)
+{
+    selectedFile->setText(newValue);
+    myFileTree->clearSelection();
 }

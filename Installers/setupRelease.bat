@@ -10,8 +10,9 @@ SET GENERATOR_DIR=%~dp0
 
 rem ----- adjust user settings -----------------------------
 
-SET QT_WIN_DEPLOY=D:\QT\5.10.1\msvc2017_64\bin\windeployqt
+SET QT_WIN_DEPLOY=D:\QT\5.11.1\msvc2017_64\bin\windeployqt
 SET QT_BIN_CREATE=D:\QT\Tools\QtInstallerFramework\3.0\bin\binarycreator.exe
+SET EXEC_NAME=SetupSimCenterCWE_Win_1_0_0.exe
 
 rem ----- do not modify below here -------------------------
 
@@ -36,7 +37,7 @@ XCOPY /S /I release\* installer\packages\nheri.simcenter.cfdclient\data
 
 cd installer
 
-%QT_BIN_CREATE% --offline-only -c config\winconfig.xml -p packages ..\SetupSimCenterCWE.exe
+%QT_BIN_CREATE% --offline-only -c config\winconfig.xml -p packages ..\%EXEC_NAME%
 
 PAUSE
 

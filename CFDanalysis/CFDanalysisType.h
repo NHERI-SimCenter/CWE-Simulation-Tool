@@ -42,52 +42,37 @@
 #include <QFile>
 
 struct RESULTS_STYLE {
-    QString name;
+    QString displayName;
     QString type;
     QString file;
     QString values;
+    QString stage;
 };
 
-struct KEY_VAL_PAIR {
-    QString key;
-    QString value;
-};
-
-struct VARIABLE_TYPE {
-    QString displayName;
-    QString type;
-    QString defaultValue;
-    QString unit;
-    QString precision;
-    QString sign;
-    QList<KEY_VAL_PAIR> options;
-};
+struct VARIABLE_TYPE;
 
 class CFDanalysisType
 {
 public:
     CFDanalysisType(QString configFile);
 
-    QJsonDocument * getRawConfig(); // should become a private method (?)
-
     QString getInternalName();
-    QString getName();
+    QString getDisplayName();
     QString getDescription();
     QString getIconName();
-    QStringList getStageNames();
-    QStringList getStageSequence();
+    QStringList getStageIds();
 
-    QString getStageName(QString stage);
     QStringList getStageGroups(QString stage);
     QList<RESULTS_STYLE> getStageResults(QString stage);
 
     QStringList getVarGroup(QString group);
     VARIABLE_TYPE getVariableInfo(QString name);
 
-    QString getStageApp(QString stageName);
-    QString getExtraInput(QString stageName);
+    QString getStageApp(QString stageID);
+    QString getExtraInput(QString stageID);
 
     QString translateStageId(QString stageId);
+    QString translateGroupId(QString groupId);
 
     QIcon * getIcon();
 
@@ -95,10 +80,13 @@ public:
     bool isDisabled();
 
 private:
-    QString myName;
+    QJsonDocument * getRawConfig();
+
     QIcon myIcon;
 
     QJsonDocument myConfiguration;
+
+    QStringList cachedOrderedStageList;
 
 };
 

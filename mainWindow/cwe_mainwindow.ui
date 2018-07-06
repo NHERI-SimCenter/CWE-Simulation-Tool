@@ -41,7 +41,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>1037</width>
     <height>600</height>
    </rect>
   </property>
@@ -50,6 +50,21 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>6</number>
+    </property>
+    <property name="leftMargin">
+     <number>6</number>
+    </property>
+    <property name="topMargin">
+     <number>6</number>
+    </property>
+    <property name="rightMargin">
+     <number>6</number>
+    </property>
+    <property name="bottomMargin">
+     <number>6</number>
+    </property>
     <item>
      <widget class="HeaderWidget" name="header">
       <property name="frameShape">
@@ -61,61 +76,57 @@
      </widget>
     </item>
     <item>
-     <widget class="QTabWidget" name="tabContainer">
-      <property name="enabled">
-       <bool>true</bool>
+     <widget class="QWidget" name="panelTabs" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="tabPosition">
-       <enum>QTabWidget::North</enum>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
       </property>
+      <layout class="QHBoxLayout" name="panelTabsLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="Line" name="line">
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QStackedWidget" name="tab_panel_stack">
       <property name="currentIndex">
-       <number>0</number>
+       <number>6</number>
       </property>
-      <widget class="CWE_welcome_screen" name="tab_welcome_screen">
-       <attribute name="title">
-        <string>Welcome</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_help" name="tab_help">
-       <attribute name="title">
-        <string>Help</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_spacer_1">
-       <attribute name="title">
-        <string>Page text space</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_manage_simulation" name="tab_manage_and_run">
-       <attribute name="title">
-        <string>Simulation Cases</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_job_list" name="tab_jobs_page">
-       <attribute name="title">
-        <string>Remote Jobs</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_file_manager" name="tab_files">
-       <attribute name="title">
-        <string>Remote Files</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_spacer_2">
-       <attribute name="title">
-        <string>some text for size</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_Parameters" name="tab_parameters">
-       <attribute name="title">
-        <string>Parameters</string>
-       </attribute>
-      </widget>
-      <widget class="CWE_Results" name="tab_results">
-       <attribute name="title">
-        <string>Results</string>
-       </attribute>
-      </widget>
+      <widget class="CWE_welcome_screen" name="tab_welcome_screen"/>
+      <widget class="CWE_help" name="tab_help"/>
+      <widget class="CWE_manage_simulation" name="tab_manage_and_run"/>
+      <widget class="CWE_job_list" name="tab_jobs_page"/>
+      <widget class="CWE_file_manager" name="tab_files"/>
+      <widget class="CWE_Parameters" name="tab_parameters"/>
+      <widget class="CWE_Results" name="tab_results"/>
      </widget>
     </item>
     <item>
@@ -135,7 +146,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1037</width>
      <height>23</height>
     </rect>
    </property>
@@ -143,33 +154,15 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen"/>
-    <addaction name="actionOpen_existing"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_As"/>
     <addaction name="action_Quit"/>
-   </widget>
-   <widget class="QMenu" name="menuWindow">
-    <property name="title">
-     <string>Window</string>
-    </property>
-    <addaction name="action_Landing_Page"/>
-    <addaction name="actionCreate_New_Simulation"/>
-    <addaction name="actionManage_Simulation"/>
-    <addaction name="actionManage_and_Download_Files"/>
-    <addaction name="actionManage_Remote_Jobs"/>
-    <addaction name="actionTutorials_and_Help"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>About</string>
     </property>
-    <addaction name="actionAbout_CWE"/>
-    <addaction name="actionHelp"/>
     <addaction name="actionCopyright_and_License"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionCreate_New_Simulation">
@@ -262,9 +255,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_job_list</class>
+   <class>CWE_welcome_screen</class>
    <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_job_list.h</header>
+   <header>cwe_guiWidgets/cwe_welcome_screen.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -274,33 +267,33 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_file_manager</class>
-   <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_file_manager.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>CWE_manage_simulation</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_manage_simulation.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_welcome_screen</class>
+   <class>CWE_job_list</class>
    <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_welcome_screen.h</header>
+   <header>cwe_guiWidgets/cwe_job_list.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CWE_Results</class>
+   <class>CWE_file_manager</class>
    <extends>QWidget</extends>
-   <header>cwe_guiWidgets/cwe_results.h</header>
+   <header>cwe_guiWidgets/cwe_file_manager.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>CWE_Parameters</class>
    <extends>QWidget</extends>
    <header>cwe_guiWidgets/cwe_parameters.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CWE_Results</class>
+   <extends>QWidget</extends>
+   <header>cwe_guiWidgets/cwe_results.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -318,6 +311,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCopyright_and_License</sender>
+   <signal>triggered()</signal>
+   <receiver>CWE_MainWindow</receiver>
+   <slot>menuCopyInfo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>518</x>
      <y>299</y>
     </hint>
    </hints>

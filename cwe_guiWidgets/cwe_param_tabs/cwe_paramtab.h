@@ -32,52 +32,41 @@
 
 // Contributors:
 
-#ifndef SCTRSTATES_H
-#define SCTRSTATES_H
+#ifndef CWE_PARAMTAB_H
+#define CWE_PARAMTAB_H
 
-enum class SimCenterViewState { visible,
-                                editable,
-                                hidden };
+#include <QFrame>
+#include <QMouseEvent>
 
-/*
- * we want to use this enum as binary selector
- *
- * use: SimCenterButtonMode_ALL == SimCenterButtonMode_RUN|SimCenterButtonMode_CANCEL
- *                                     |SimCenterButtonMode_RESULTS|SimCenterButtonMode_RESET
- *
- * While this enum class is initially used for the 4 buttons in the CWE_TabWidget,
- * it may be extended to more, maybe all buttons of the CWE tool.
- */
-#define SimCenterButtonMode  std::uint32_t
+class CWE_ParamTab : public QFrame
+{
+    Q_OBJECT
 
-/*
- * SimCenterButtonMode_NONE      0000 0000 0000 0000
- * SimCenterButtonMode_RUN       0000 0000 0000 0001
- * SimCenterButtonMode_CANCEL    0000 0000 0000 0010
- * SimCenterButtonMode_RESET     0000 0000 0000 0100
- * SimCenterButtonMode_RESULTS   0000 0000 0000 1000
- * SimCenterButtonMode_ALL       0000 0001 0000 1111
- * SimCenterButtonMode_SAVE_ALL  0000 0001 0000 0000
- */
+public:
+    explicit CWE_ParamTab(QString refKey, QString displayedText, QWidget *parent = 0);
+    ~CWE_ParamTab();
 
-#define SimCenterButtonMode_NONE      0x0000u
-#define SimCenterButtonMode_RUN       0x0001u
-#define SimCenterButtonMode_CANCEL    0x0002u
-#define SimCenterButtonMode_RESET     0x0004u
-#define SimCenterButtonMode_RESULTS   0x0008u
-#define SimCenterButtonMode_ALL       0x010fu
-#define SimCenterButtonMode_SAVE_ALL  0x0100u
+    QString getRefKey();
 
-enum class SimCenterDataType { integer,
-                               floatingpoint,
-                               boolean,
-                               string,
-                               selection,
-                               file,
-                               tensor2D,
-                               tensor3D,
-                               vector2D,
-                               vector3D,
-                               unknown};
+    bool tabIsActive();
+    void setActive(bool b=true);
+    void setInActive(bool b=true);
 
-#endif // SCTRSTATES_H
+signals:
+    void btn_clicked(CWE_ParamTab *);
+
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
+    void setButtonState(bool tabPressed, bool tabActive);
+    virtual void setButtonAppearance() = 0;
+
+    QString tabKey = "UNKNOWN";
+    QString tabDisplay = "UNKNOWN";
+
+    bool tab_active = false;
+    bool tab_pressed = false;
+};
+
+#endif // PARAMTAB_H

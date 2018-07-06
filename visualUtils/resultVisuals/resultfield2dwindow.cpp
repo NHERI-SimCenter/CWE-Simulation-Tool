@@ -37,7 +37,7 @@
 
 #include "../cfdglcanvas.h"
 
-ResultField2dWindow::ResultField2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+ResultField2dWindow::ResultField2dWindow(CFDcaseInstance * theCase, RESULTS_STYLE *resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}
 
 ResultField2dWindow::~ResultField2dWindow(){}
@@ -49,7 +49,7 @@ void ResultField2dWindow::initializeView()
     neededFiles["faces"] = "/constant/polyMesh/faces.gz";
     neededFiles["owner"] = "/constant/polyMesh/owner.gz";
 
-    QString fieldName = getResultObj()["file"];
+    QString fieldName = getResultObj().file;
     QString fieldFile = "[final]/";
     fieldFile.append(fieldName).append(".gz");
     neededFiles["data"] = fieldFile;
@@ -65,7 +65,7 @@ void ResultField2dWindow::allFilesLoaded()
     CFDglCanvas * myCanvas;
     changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
-    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
+    myCanvas->loadMeshData2D(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
     if (!myCanvas->haveMeshData())
     {
@@ -73,6 +73,6 @@ void ResultField2dWindow::allFilesLoaded()
         return;
     }
 
-    myCanvas->loadFieldData(fileBuffers["data"], getResultObj()["values"]);
+    myCanvas->loadFieldData(fileBuffers["data"], getResultObj().values);
     myCanvas->setDisplayState(CFDDisplayState::FIELD);
 }

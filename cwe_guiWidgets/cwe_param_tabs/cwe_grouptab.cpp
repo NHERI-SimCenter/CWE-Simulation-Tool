@@ -32,68 +32,46 @@
 
 // Contributors:
 
-#ifndef CWE_STAGESTATUSTAB_H
-#define CWE_STAGESTATUSTAB_H
+#include "cwe_grouptab.h"
+#include "ui_cwe_grouptab.h"
 
-#include <QFrame>
+CWE_GroupTab::CWE_GroupTab(QString groupKey, QString groupName, QWidget *parent) :
+    CWE_ParamTab(groupKey, groupName, parent),
+    ui(new Ui::CWE_GroupTab)
+{
+    ui->setupUi(this);
+    ui->mainLabel->setText(tabDisplay);
 
-#include <QMouseEvent>
-
-class CWE_GroupsWidget;
-
-namespace Ui {
-class CWE_StageStatusTab;
+    this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
 }
 
-class CWE_StageStatusTab : public QFrame
+CWE_GroupTab::~CWE_GroupTab()
 {
-    Q_OBJECT
+    delete ui;
+}
 
-public:
-    explicit CWE_StageStatusTab(QString stageKey, QString stageName, QWidget *parent = 0);
-    ~CWE_StageStatusTab();
-    void setCorrespondingPanel(CWE_GroupsWidget * newPanel);
-
-    void setStatus(QString);
-    void setText(QString);
-    void setName(const QString s);
-    //void setIndex(int idx) {m_index = idx;};
-    QString name() {return m_name;};
-    QString text() {return m_text;};
-    QString status() {return m_status;};
-    //int index() {return m_index;};
-    bool tabIsActive();
-    void setActive(bool b=true);
-    void setInActive(bool b=true);
-    void linkWidget(CWE_GroupsWidget *ptr);
-    CWE_GroupsWidget * groupWidget() { return myPanel; };
-    QString getStageKey() { return stageKey; }
-    bool isStage(QString key) { return (stageKey == key);}
-    CWE_GroupsWidget *getGroupsWidget() { return myPanel; }
-
-signals:
-    void btn_pressed(CWE_GroupsWidget *);
-    void btn_released(CWE_GroupsWidget *);
-    void btn_activated(CWE_StageStatusTab *);
-
-private slots:
-
-protected:
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-
-private:
-    Ui::CWE_StageStatusTab *ui;
-    //void paintEvent(QPaintEvent*);
-
-    CWE_GroupsWidget * myPanel = NULL;
-
-    QString m_text;
-    QString stageKey = "UNKNOWN";
-    QString m_status = "unknown";
-    QString m_name = "label text";
-    //int m_index = -1;
-    bool m_active;
-};
-
-#endif // CWE_STAGESTATUSTAB_H
+void CWE_GroupTab::setButtonAppearance()
+{
+    if (tab_pressed)
+    {
+        if (tab_active)
+        {
+            this->setStyleSheet("QFrame {background: #63a39d; border-color: #63a39d; border-width: 2px; border-radius: 5px; border-style: inset; } QLabel {border-style: none; font: 12pt bold; color: #101010;}");
+        }
+        else
+        {
+            this->setStyleSheet("QFrame {background: #B0BEC5; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
+        }
+    }
+    else
+    {
+        if (tab_active)
+        {
+            this->setStyleSheet("QFrame {background: #63a39d; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: inset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
+        }
+        else
+        {
+            this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
+        }
+    }
+}

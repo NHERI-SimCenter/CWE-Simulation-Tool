@@ -42,55 +42,17 @@ SCtrChoiceDataWidget::SCtrChoiceDataWidget(QWidget *parent):
 
 }
 
-void SCtrChoiceDataWidget::setData(VARIABLE_TYPE &obj)
+SCtrChoiceDataWidget::~SCtrChoiceDataWidget()
 {
-    // set up the UI for the widget
-    this->initUI();
-
-    m_obj = obj;
-
-    QHBoxLayout *layout = (QHBoxLayout *)this->layout();
-    layout->setMargin(0);
-
-    if (label_unit != NULL) {
-        label_unit->setText(m_obj.unit);
-    }
-    if (label_varName != NULL) {
-        label_varName->setText(m_obj.displayName);
-    }
-
-    QStandardItemModel *theModel = new QStandardItemModel(this);
-
-    QString defaultValue = "";
-
-    foreach (KEY_VAL_PAIR option, m_obj.options)
-    {
-        QList<QStandardItem *> newRow;
-        // newRow.clear();
-        newRow.append(new QStandardItem(option.key));
-        newRow.append(new QStandardItem(option.value));
-
-        theModel->appendRow(newRow);
-
-        if (option.key == m_obj.defaultValue) defaultValue = option.value;
-    }
-
-    theComboBox = new QComboBox(this);
-    layout->insertWidget(1, theComboBox, 4);
-    theComboBox->setModel(theModel);
-    theComboBox->setModelColumn(1);
-    if (!defaultValue.isEmpty())
-    {
-        theComboBox->setCurrentText(defaultValue);
-    }
-
-    this->setLayout(layout);
+    if (theComboBox != NULL) theComboBox->deleteLater();
+    if (label_unit != NULL) label_unit->deleteLater();
+    if (label_varName != NULL) label_varName->deleteLater();
+    if (theModel != NULL) theModel->deleteLater();
 }
 
-QString SCtrChoiceDataWidget::toString()
+QString SCtrChoiceDataWidget::shownValue()
 {
-    /* *** update the value ***
-     *
+    /*
      * the model contains two columns:
      *   col 0: the variable name
      *   col 1: the human readable variable description
@@ -106,36 +68,58 @@ QString SCtrChoiceDataWidget::toString()
     return item->text();
 }
 
-void SCtrChoiceDataWidget::updateValue(QString s)
+void SCtrChoiceDataWidget::initUI()
 {
-    /* *** update the value ***
-     *
-     * the model contains two columns:
-     *   col 0: the variable name
-     *   col 1: the human readable variable description
-     *
-     * theComboBox displays col 1
-     * the driver uses the associated value from col 0
-     */
+    QBoxLayout *layout = new QHBoxLayout();
+    layout->setMargin(0);
 
+    label_unit = new QLabel(getTypeInfo().unit, this);
+    label_varName = new QLabel(getTypeInfo().displayName, this);
 
-    /* check if new information is an appropriate type */
+    theModel = new QStandardItemModel(this);
+
+    for (auto itr = getTypeInfo().options.cbegin(); itr != getTypeInfo().options.cend(); itr++)
+    {
+        QList<QStandardItem *> newRow;
+        newRow.append(new QStandardItem(itr.key()));
+        newRow.append(new QStandardItem(*itr));
+
+        theModel->appendRow(newRow);
+    }
+
+    theComboBox = new QComboBox(this);
+    theComboBox->setModel(theModel);
+    theComboBox->setModelColumn(1);
+
+    layout->addWidget(label_varName, 3);
+    layout->addWidget(theComboBox, 4);
+    layout->addWidget(label_unit, 1);
+
+    this->setLayout(layout);
+
+    QObject::connect(theComboBox, SIGNAL(currentIndexChanged(int)),
+                     this, SLOT(changeMadeToUnderlyingDataWidget()));
+}
+
+void SCtrChoiceDataWidget::setComponetsEnabled(bool newSetting)
+{
+    theComboBox->setEnabled(newSetting);
+    label_unit->setEnabled(newSetting);
+}
+
+void SCtrChoiceDataWidget::setShownValue(QString newValue)
+{
     QStandardItemModel *theModel = (QStandardItemModel *)theComboBox->model();
-    QList<QStandardItem *> itemList = theModel->findItems(s, Qt::MatchExactly, 0);
+    QList<QStandardItem *> itemList = theModel->findItems(newValue, Qt::MatchExactly, 0);
 
     if (itemList.isEmpty())
     {
-        /* add an error message */
-        cwe_globals::displayPopup(QString("Variable %1 of unknown selection option \'%2\'.\nVariable ignored.").arg(m_obj.displayName).arg(s), "Warning");
+        QString varName = getTypeInfo().displayName;
+        qCDebug(agaveAppLayer, "Variable %s of unknown selection option \'%s\'.\nVariable ignored.", qPrintable(varName), qPrintable(newValue));
         return;
     }
 
     /* the following loop should never have more than one item in the itemList ...  */
-    foreach (QStandardItem *item, itemList)
-    {
-        QModelIndex idx = theModel->indexFromItem(item);
-        theComboBox->setCurrentIndex(idx.row());
-    }
-
+    QModelIndex idx = theModel->indexFromItem(itemList.at(0));
+    theComboBox->setCurrentIndex(idx.row());
 }
-

@@ -37,13 +37,39 @@
 
 #include "cwe_super.h"
 
+#include <QVector>
+#include <QLabel>
 #include <QJsonObject>
 
-#include "SimCenter_widgets/sctrstates.h"
-
 class CWE_MainWindow;
+
+class CWE_StageStatusTab;
+class CWE_GroupTab;
+class CWE_ParamTab;
+class SCtrMasterDataWidget;
+
+struct VARIABLE_TYPE;
+
 enum class CaseState;
-enum class CaseCommand { ROLLBACK, RUN, CANCEL };
+enum class StageState;
+
+enum class SimCenterViewState;
+
+#define SimCenterButtonMode  std::uint32_t
+
+/*
+ * SimCenterButtonMode_NONE      0000 0000 0000 0000
+ * SimCenterButtonMode_RUN       0000 0000 0000 0001
+ * SimCenterButtonMode_CANCEL    0000 0000 0000 0010
+ * SimCenterButtonMode_RESET     0000 0000 0000 0100
+ * SimCenterButtonMode_RESULTS   0000 0000 0000 1000
+ */
+
+#define SimCenterButtonMode_NONE      0x0000u
+#define SimCenterButtonMode_RUN       0x0001u
+#define SimCenterButtonMode_CANCEL    0x0002u
+#define SimCenterButtonMode_RESET     0x0004u
+#define SimCenterButtonMode_RESULTS   0x0008u
 
 namespace Ui {
 class CWE_Parameters;
@@ -58,29 +84,61 @@ public:
     ~CWE_Parameters();
 
     virtual void linkMainWindow(CWE_MainWindow *theMainWin);
-    void resetViewInfo();
-
-    void switchToResults();
-    void performCaseCommand(QString stage, CaseCommand toEnact);
-    void setSaveAllButtonDisabled(bool newSetting);
-    void setSaveAllButtonEnabled(bool newSetting);
+    virtual bool allowClickAway();
 
 private slots:
-    void on_pbtn_saveAllParameters_clicked();
+    void save_all_button_clicked();
+    void run_button_clicked();
+    void cancel_button_clicked();
+    void results_button_clicked();
+    void rollback_button_clicked();
 
     void newCaseGiven();
     void newCaseState(CaseState newState);
 
-private:
-    void setButtonsAccordingToStage();
-    void setVisibleAccordingToStage();
-    void createUnderlyingParamWidgets();
+    void stageSelected(CWE_ParamTab * chosenTab);
+    void groupSelected(CWE_ParamTab * chosenTab);
 
-    void saveAllParams();
+    void paramWidgetChanged();
+
+private:
+    bool paramsChanged();
+    bool panelSwitchPermitted();
+
+    void resetButtonAndView();
+    void setButtonState(SimCenterButtonMode newMode);
+    void setButtonState(StageState newMode);
+    void setViewState(SimCenterViewState newState);
+    void setViewState(StageState newMode);
+
+    bool widgetIsHiddenByCondition(SCtrMasterDataWidget * aWidget);
+    bool checkVarCondition(QString conditionToCheck);
+    bool lexifyConditionString(QString conditionToCheck, QString & leftSide, QString & rightSide, QString condition);
+    QString getVarValByName(QString varName);
+
+    void setHeaderLabels();
+
+    void createStageTabs();
+    void createGroupTabs();
+    void createParamWidgets();
+    void addVariable(QString varName, VARIABLE_TYPE &theVariable, QString *nonDefaultValue = NULL);
+
+    void clearStageTabs();
+    void clearGroupTabs();
+    void clearParamScreen();
+
+    static QString getStateText(StageState theState);
 
     Ui::CWE_Parameters *ui;
-    bool paramWidgetsExist = false;
 
+    QVector<CWE_StageStatusTab *> stageTabList;
+    QVector<CWE_GroupTab *> groupTabList;
+    QVector<SCtrMasterDataWidget *> paramWidgetList;
+
+    CWE_StageStatusTab * selectedStage = NULL;
+    CWE_GroupTab * selectedGroup = NULL;
+
+    QLabel * loadingLabel = NULL;
 };
 
 #endif // CWE_PARAMETERS_H

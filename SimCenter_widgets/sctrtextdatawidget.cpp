@@ -32,7 +32,7 @@
 
 // Contributors:
 
-#include "SimCenter_widgets/sctrtextdatawidget.h"
+#include "sctrtextdatawidget.h"
 
 SCtrTextDataWidget::SCtrTextDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)
@@ -40,34 +40,40 @@ SCtrTextDataWidget::SCtrTextDataWidget(QWidget *parent):
 
 }
 
-void SCtrTextDataWidget::setData(VARIABLE_TYPE &obj)
+SCtrTextDataWidget::~SCtrTextDataWidget()
 {
-    // set up the UI for the widget
-    this->initUI();
+    if (theValue != NULL) theValue->deleteLater();
+    if (label_varName != NULL) label_varName->deleteLater();
+}
 
-    m_obj = obj;
+QString SCtrTextDataWidget::shownValue()
+{
+    return theValue->text();
+}
 
-    QHBoxLayout *layout = (QHBoxLayout *)this->layout();
+void SCtrTextDataWidget::initUI()
+{
+    QBoxLayout *layout = new QHBoxLayout();
     layout->setMargin(0);
 
     theValue = new QLineEdit(this);
-    layout->insertWidget(1, theValue, 4);
+    label_varName = new QLabel(getTypeInfo().displayName, this);
 
-    if (label_varName != NULL) { label_varName->setText(m_obj.displayName); }
+    layout->addWidget(label_varName, 3);
+    layout->addWidget(theValue, 4);
 
-    this->setLayout(layout);  // do I need this one?
+    this->setLayout(layout);
 
-    /* set default */
-    this->updateValue(m_obj.defaultValue);
+    QObject::connect(theValue, SIGNAL(textChanged(QString)),
+                     this, SLOT(changeMadeToUnderlyingDataWidget()));
 }
 
-QString SCtrTextDataWidget::toString()
+void SCtrTextDataWidget::setComponetsEnabled(bool newSetting)
 {
-    return m_obj.defaultValue;
+    theValue->setEnabled(newSetting);
 }
 
-void SCtrTextDataWidget::updateValue(QString s)
+void SCtrTextDataWidget::setShownValue(QString newValue)
 {
-    /* update the value */
-    theValue->setText(s);
+    theValue->setText(newValue);
 }

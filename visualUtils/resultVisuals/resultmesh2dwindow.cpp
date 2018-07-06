@@ -37,7 +37,7 @@
 
 #include "../cfdglcanvas.h"
 
-ResultMesh2dWindow::ResultMesh2dWindow(CFDcaseInstance * theCase, QMap<QString, QString> resultDesc, QWidget *parent):
+ResultMesh2dWindow::ResultMesh2dWindow(CFDcaseInstance * theCase, RESULTS_STYLE *resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}
 
 ResultMesh2dWindow::~ResultMesh2dWindow(){}
@@ -60,7 +60,7 @@ void ResultMesh2dWindow::allFilesLoaded()
     CFDglCanvas * myCanvas;
     changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
-    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
+    myCanvas->loadMeshData2D(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
     if (!myCanvas->haveMeshData())
     {

@@ -41,11 +41,23 @@
 
 class SCtrChoiceDataWidget: public SCtrMasterDataWidget
 {
+    Q_OBJECT
 public:
     SCtrChoiceDataWidget(QWidget *parent);
-    void setData(VARIABLE_TYPE &);
-    QString toString();
-    void updateValue(QString);
+    ~SCtrChoiceDataWidget();
+
+    virtual QString shownValue();
+
+private:
+    virtual void initUI();
+    virtual void setComponetsEnabled(bool newSetting);
+
+    virtual void setShownValue(QString newValue);
+
+    QComboBox * theComboBox = NULL;
+    QStandardItemModel * theModel = NULL;
+    QLabel * label_unit = NULL;
+    QLabel * label_varName = NULL;
 };
 
 #endif // SCTRCHOICEDATAWIDGET_H

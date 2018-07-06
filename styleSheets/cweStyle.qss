@@ -20,6 +20,23 @@ QPushButton:disabled {
     border-color: #B5B5B5;
 }
 
+QPushButton#logoutButton {
+    color: white;
+    background-color: #ba5048;
+    border-color: white;
+    border-style: outset;
+    border-width: 1px;
+    border-radius: 5px;
+    padding: 3px;
+}
+
+QPushButton#logoutButton:pressed {
+    background-color: #B0BEC5;
+    border-style: inset;
+    border-color: black;
+}
+
+
 QComboBox {
     border: 1px solid gray;
     border-radius: 3px;
@@ -83,10 +100,6 @@ QTabBar::tab:disabled {
      color: transparent;
      background: transparent;
   }
-
-QWidget#parameterSpace {
-    background-color: white;
-}
 
 QToolBox::tab {
    background-color: #B0BEC5;
@@ -238,7 +251,7 @@ QTextBrowser {
     background-color: white;
     border-style: outset;
     border-width: 1px;
-    border-radius: 50px;
+    border-radius: 5px;
     border-color: #607D8B;
    font: 12pt slanted;
 }
@@ -247,7 +260,7 @@ QTextBrowser#helpBrowser {
     background-color: white;
     border-style: outset;
     border-width: 1px;
-    border-radius: 15px;
+    border-radius: 10px;
     border-color: #607D8B;
    font: 12pt;
 }
@@ -256,7 +269,7 @@ QTextBrowser#welcome_text {
     background-color: #ECECEC;
     border-style: outset;
     border-width: 1px;
-    border-radius: 15px;
+    border-radius: 10px;
     border-color: #607D8B;
    font: 12pt;
 }

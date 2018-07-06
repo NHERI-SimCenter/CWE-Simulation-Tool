@@ -35,7 +35,8 @@
 
 #include "cwe_welcome_screen.h"
 #include "ui_cwe_welcome_screen.h"
-#include <QFile>
+
+#include "../mainWindow/cwe_mainwindow.h"
 
 CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
     CWE_Super(parent),
@@ -47,10 +48,16 @@ CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
     if (frontMatter.open(QFile::ReadOnly))
     {
         ui->welcome_text->setText(frontMatter.readAll());
+        ui->welcome_text->setOpenLinks(false);
     }
 }
 
 CWE_welcome_screen::~CWE_welcome_screen()
 {
     delete ui;
+}
+
+void CWE_welcome_screen::on_welcome_text_anchorClicked(const QUrl &arg1)
+{
+    theMainWindow->switchToHelpTab(arg1);
 }

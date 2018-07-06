@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2018 The University of Notre Dame
-** Copyright (c) 2018 The Regents of the University of California
+** Copyright (c) 2017 The University of Notre Dame
+** Copyright (c) 2017 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -31,37 +31,42 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "sctrvalidators.h"
+#include "resultmesh3dwindow.h"
 
-SCtrNoValidator::SCtrNoValidator(QObject *parent):
-    QValidator(parent)
+#include "../cfdglcanvas.h"
+
+ResultMesh3dWindow::ResultMesh3dWindow(CFDcaseInstance * theCase, RESULTS_STYLE *resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
+
+ResultMesh3dWindow::~ResultMesh3dWindow(){}
+
+void ResultMesh3dWindow::initializeView()
 {
+    QMap<QString, QString> neededFiles;
+    neededFiles["points"] = "/constant/polyMesh/points.gz";
+    neededFiles["faces"] = "/constant/polyMesh/faces.gz";
+    neededFiles["owner"] = "/constant/polyMesh/owner.gz";
 
+    performStandardInit(neededFiles);
 }
 
-QValidator::State SCtrNoValidator::validate(QString &, int &) const
+void ResultMesh3dWindow::allFilesLoaded()
 {
-    return QValidator::Acceptable;
-}
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-SCtrBoolValidator::SCtrBoolValidator(QObject *parent):
-    QValidator(parent)
-{
+    CFDglCanvas * myCanvas;
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
-}
+    myCanvas->loadMeshData3D(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
-QValidator::State SCtrBoolValidator::validate(QString &input, int &) const
-{
-    if (input.toLower() == "f")     return QValidator::Acceptable;
-    if (input.toLower() == "fa")    return QValidator::Acceptable;
-    if (input.toLower() == "fal")   return QValidator::Acceptable;
-    if (input.toLower() == "fals")  return QValidator::Acceptable;
-    if (input.toLower() == "false") return QValidator::Acceptable;
-    if (input.toLower() == "t")     return QValidator::Acceptable;
-    if (input.toLower() == "tr")    return QValidator::Acceptable;
-    if (input.toLower() == "tru")   return QValidator::Acceptable;
-    if (input.toLower() == "true")  return QValidator::Acceptable;
+    if (!myCanvas->haveMeshData())
+    {
+        changeDisplayFrameTenant(new QLabel("Error: Data for 3D mesh result is unreadable. Please reset and try again."));
+        return;
+    }
 
-    return QValidator::Invalid;
+    myCanvas->setDisplayState(CFDDisplayState::MESH3D);
 }

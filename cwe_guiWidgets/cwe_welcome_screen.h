@@ -37,6 +37,8 @@
 
 #include "cwe_super.h"
 
+#include <QFile>
+
 namespace Ui {
 class CWE_welcome_screen;
 }
@@ -48,6 +50,9 @@ class CWE_welcome_screen : public CWE_Super
 public:
     explicit CWE_welcome_screen(QWidget *parent = 0);
     ~CWE_welcome_screen();
+
+private slots:
+    void on_welcome_text_anchorClicked(const QUrl &arg1);
 
 private:
     Ui::CWE_welcome_screen *ui;

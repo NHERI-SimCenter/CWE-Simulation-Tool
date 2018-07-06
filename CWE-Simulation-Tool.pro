@@ -69,13 +69,8 @@ SOURCES += main.cpp \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.cpp \
-    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.cpp \
     CFDanalysis/CFDanalysisType.cpp \
     CFDanalysis/CFDcaseInstance.cpp \
-    SimCenter_widgets/sctrvalidators.cpp \
     SimCenter_widgets/sctrmasterdatawidget.cpp \
     SimCenter_widgets/sctrstddatawidget.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.cpp \
@@ -121,7 +116,13 @@ SOURCES += main.cpp \
     SimCenter_widgets/sctrtextdatawidget.cpp \
     popupWindows/cwe_popup.cpp \
     ../AgaveClientInterface/agaveInterfaces/agavethread.cpp \
-    ../AgaveExplorer/utilFuncs/fixforssl.cpp
+    ../AgaveExplorer/utilFuncs/fixforssl.cpp \
+    utilWindows/dialogabout.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.cpp \
+    cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.cpp \
+    visualUtils/resultVisuals/resultmesh3dwindow.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -137,14 +138,8 @@ HEADERS  += \
     cwe_guiWidgets/cwe_results.h \
     cwe_guiWidgets/cwe_parameters.h \
     cwe_guiWidgets/cwe_state_label.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.h \
-    cwe_guiWidgets/cwe_tabwidget/cwe_groupswidget.h \
-    SimCenter_widgets/sctrvalidators.h \
     SimCenter_widgets/sctrmasterdatawidget.h \
     SimCenter_widgets/sctrstddatawidget.h \
-    SimCenter_widgets/sctrstates.h \
     ../AgaveClientInterface/agaveInterfaces/agavehandler.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskguide.h \
     ../AgaveClientInterface/agaveInterfaces/agavetaskreply.h \
@@ -188,7 +183,13 @@ HEADERS  += \
     SimCenter_widgets/sctrtextdatawidget.h \
     popupWindows/cwe_popup.h \
     ../AgaveClientInterface/agaveInterfaces/agavethread.h \
-    ../AgaveExplorer/utilFuncs/fixforssl.h
+    ../AgaveExplorer/utilFuncs/fixforssl.h \
+    utilWindows/dialogabout.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.h \
+    cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.h \
+    visualUtils/resultVisuals/resultmesh3dwindow.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -198,18 +199,23 @@ FORMS    += \
     cwe_guiWidgets/cwe_results.ui \
     cwe_guiWidgets/cwe_parameters.ui \
     cwe_guiWidgets/cwe_debug_widget.ui \
-    cwe_guiWidgets/cwe_tabwidget/cwe_tabwidget.ui \
     ../AgaveExplorer/utilFuncs/authform.ui \
     ../AgaveExplorer/utilFuncs/copyrightdialog.ui \
     ../AgaveExplorer/utilFuncs/singlelinedialog.ui \
-    cwe_guiWidgets/cwe_tabwidget/cwe_stagestatustab.ui \
-    cwe_guiWidgets/cwe_tabwidget/cwe_parampanel.ui \
     cwe_guiWidgets/cwe_job_list.ui \
     visualUtils/resultvisualpopup.ui \
     cwe_guiWidgets/cwe_file_manager.ui \
     popupWindows/create_case_popup.ui \
     popupWindows/duplicate_case_popup.ui \
+    utilWindows/dialogabout.ui \
+    cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.ui \
+    cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.ui \
+    cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.ui
+
+win32 {
+FORMS    += \
     ../AgaveExplorer/utilFuncs/fixforssl.ui
+}
 
 RESOURCES += \
     cwe_resources.qrc \

@@ -43,12 +43,39 @@
 #include <QLabel>
 #include <QJsonObject>
 #include <QBoxLayout>
+#include <QKeyValueIterator>
 
-#include "SimCenter_widgets/sctrstates.h"
 #include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 #include "CFDanalysis/CFDanalysisType.h"
 
-class FileTreeNode;
+enum class SimCenterDataType { integer,
+                               floatingpoint,
+                               boolean,
+                               string,
+                               selection,
+                               file,
+                               tensor2D,
+                               tensor3D,
+                               vector2D,
+                               vector3D,
+                               unknown};
+
+enum class SimCenterViewState  { visible,
+                                 editable,
+                                 hidden };
+
+struct VARIABLE_TYPE {
+    QString internalName;
+    QString displayName;
+    SimCenterDataType type;
+    QString defaultValue;
+    QString unit;
+    QString precision;
+    QString sign;
+    QMap<QString, QString> options;
+    QString hideCondition;
+    QString showCondition;
+};
 
 class SCtrMasterDataWidget : public QFrame
 {
@@ -57,41 +84,40 @@ class SCtrMasterDataWidget : public QFrame
 public:
     explicit SCtrMasterDataWidget(QWidget *parent = 0);
     ~SCtrMasterDataWidget();
-    SimCenterViewState ViewState();
-    virtual void setViewState(SimCenterViewState);
-    virtual void setData(VARIABLE_TYPE &) = 0;
-    virtual void initUI();
-    virtual void setValue(QString);
-    virtual void setValue(float);
-    virtual void setValue(int);
-    virtual void setValue(bool);
-    virtual QString toString();
-    virtual void updateValue(QString) = 0;
-    QString value() {return this->toString();}
+    SimCenterViewState viewState();
+    void setViewState(SimCenterViewState);
+
+    void setDataType(VARIABLE_TYPE &);
+    VARIABLE_TYPE getTypeInfo();
+
+    void setValue(QString newValue); //Sets both saved and shown value to newValue
+    virtual QString shownValue() = 0; //Return string of raw value now shown in widget
+    virtual QString savableValue(); //Return parsed string guaranteed to be valid, from shown value as best it can
+
+    void saveShownValue(); //Sets saved value to shown value if shown value is valid
+    void revertShownValue(); //Reverts shown value to saved value
+
+    bool isValueChanged(); //Return true if value shown in widget differs from set, saved value
+    bool hasValidNewValue(); //Return true if above is true AND, now value is valid
+
+signals:
+    void valueEdited();
 
 private slots:
-    void on_theValue_editingFinished();
-    virtual void newFileSelected(FileNodeRef);
-    //TODO: Need to rethink some of the polymorphism here
+    void changeMadeToUnderlyingDataWidget();
 
-protected:
-    QLineEdit *theValue = NULL;
-    QCheckBox *theCheckBox = NULL;
-    QComboBox *theComboBox = NULL;
+private:
+    virtual void initUI() = 0; //Called once, creates ui widgets
+    virtual void setComponetsEnabled(bool newSetting) = 0; //Set enabled/disabled for widgets as applicable
 
-    QLabel  *label_varName = NULL;
-    QLabel  *label_unit = NULL;
+    virtual void setShownValue(QString newValue) = 0; //Put the new value into the displayed widget
+    virtual bool shownValueIsValid(); //Return true if raw value now shown in widget is valid
 
     VARIABLE_TYPE m_obj;
 
-private:
-    void setVariableName(QString s);
-    void setUnit(QString u);
-
+    bool doingManualUpdate = false;
+    QString savedValue;
     SimCenterViewState m_ViewState;
-
-    QValidator *m_validator = NULL;
-    SimCenterDataType m_dataType;
 };
 
 #endif // SCTRDATAWIDGET_H

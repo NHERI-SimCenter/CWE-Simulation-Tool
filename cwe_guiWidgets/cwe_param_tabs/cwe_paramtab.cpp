@@ -32,43 +32,67 @@
 
 // Contributors:
 
-#ifndef CWE_PARAMPANEL_H
-#define CWE_PARAMPANEL_H
+#include "cwe_paramtab.h"
 
-#include <QFrame>
-//#include <QJsonObject>
-//#include <QJsonArray>
-#include <QMap>
-#include <QLayout>
-
-#include "SimCenter_widgets/sctrstates.h"
-#include "CFDanalysis/CFDanalysisType.h"
-
-class SCtrMasterDataWidget;
-class CWE_InterfaceDriver;
-enum class SimCenterViewState;
-
-namespace Ui {
-class CWE_ParamPanel;
+CWE_ParamTab::CWE_ParamTab(QString refKey, QString displayedText, QWidget *parent) :
+    QFrame(parent)
+{
+    tabKey = refKey;
+    tabDisplay = displayedText;
 }
 
-class CWE_ParamPanel : public QFrame
+CWE_ParamTab::~CWE_ParamTab() {}
+
+QString CWE_ParamTab::getRefKey()
 {
-    Q_OBJECT
+    return tabKey;
+}
 
-public:
-    explicit CWE_ParamPanel(QWidget *parent = 0);
-    ~CWE_ParamPanel();
+bool CWE_ParamTab::tabIsActive()
+{
+    return tab_active;
+}
 
-    void setViewState(SimCenterViewState);
-    SimCenterViewState getViewState();
-    void addVariable(QString varName, VARIABLE_TYPE &theVariable);
-    void addParameterConfig(QStringList &groupVars, CFDanalysisType *myType);
-    QMap<QString, SCtrMasterDataWidget *> getParameterWidgetMap();
+void CWE_ParamTab::setActive(bool b)
+{
+    if (!b)
+    {
+        this->setInActive();
+        return;
+    }
+    setButtonState(tab_pressed, true);
+}
 
-private:
-    SimCenterViewState m_viewState;
-    QMap<QString, SCtrMasterDataWidget *> *variableWidgets;
-};
+void CWE_ParamTab::setInActive(bool b)
+{
+    if (!b)
+    {
+        this->setActive();
+        return;
+    }
+    setButtonState(tab_pressed, false);
+}
 
-#endif // CWE_PARAMPANEL_H
+void CWE_ParamTab::mousePressEvent(QMouseEvent *event)
+{
+    //TODO: Test mouse release if mouse dragged off tab
+    if (event->button() == Qt::LeftButton)
+    {
+        setButtonState(true, tab_active);
+    }
+}
+void CWE_ParamTab::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        setButtonState(false, tab_active);
+        emit btn_clicked(this);
+    }
+}
+
+void CWE_ParamTab::setButtonState(bool tabPressed, bool tabActive)
+{
+    tab_pressed = tabPressed;
+    tab_active = tabActive;
+    setButtonAppearance();
+}

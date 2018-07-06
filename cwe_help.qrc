@@ -12,6 +12,7 @@
         <file>help/tut_case.html</file>
         <file>help/tut_geo.html</file>
         <file>help/tut_mesh.html</file>
+        <file>help/tut_jobs.html</file>
         <file>help/tut_result.html</file>
         <file>help/tut_sim.html</file>
         <file>help/help_default.html</file>
@@ -39,5 +40,9 @@
         <file>help/workflow_clone_case.html</file>
         <file>help/workflow_continue.html</file>
         <file>help/workflow_new_case.html</file>
+        <file>help/About/Peter-Sempolinski.png</file>
+        <file>help/About/McKenna-Frank.png</file>
+        <file>help/About/Mackenzie-Helnwein-Peter.png</file>
+        <file>help/About/CWEabout.html</file>
     </qresource>
 </RCC>
