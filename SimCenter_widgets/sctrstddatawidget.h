@@ -54,9 +54,9 @@ private:
     virtual void setShownValue(QString newValue);
     virtual bool shownValueIsValid();
 
-    QLineEdit * theValue = NULL;
-    QLabel * label_unit = NULL;
-    QLabel * label_varName = NULL;
+    QLineEdit * theValue = nullptr;
+    QLabel * label_unit = nullptr;
+    QLabel * label_varName = nullptr;
 };
 
 #endif // SCTRSTDDATAWIDGET_H

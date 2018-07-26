@@ -61,7 +61,7 @@ class CWE_MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit CWE_MainWindow(QWidget *parent = 0);
+    explicit CWE_MainWindow(QWidget *parent = nullptr);
     ~CWE_MainWindow();
 
     void runSetupSteps();
@@ -110,12 +110,12 @@ private:
 
     Ui::CWE_MainWindow *ui;
 
-    CFDcaseInstance * currentCase = NULL;
+    CFDcaseInstance * currentCase = nullptr;
 
     QMap<QWidget *, CWE_PanelTab *> listOfPanelTabs;
 
     RemoteFileModel fileModel;
-    cwe_state_label        *stateLabel = NULL;
+    cwe_state_label        *stateLabel = nullptr;
 };
 
 #endif // CWE_MAINWINDOW_H

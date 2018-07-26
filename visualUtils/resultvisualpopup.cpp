@@ -51,7 +51,7 @@ ResultVisualPopup::ResultVisualPopup(CFDcaseInstance *theCase, RESULTS_STYLE * r
     setAttribute(Qt::WA_DeleteOnClose, true);
 
     myCase = theCase;
-    if (myCase == NULL)
+    if (myCase == nullptr)
     {
         cwe_globals::displayFatalPopup("Internal error: Empty case passed to result display");
         return;
@@ -66,8 +66,8 @@ ResultVisualPopup::ResultVisualPopup(CFDcaseInstance *theCase, RESULTS_STYLE * r
 
 ResultVisualPopup::~ResultVisualPopup()
 {
-    if (displayFrameTenant != NULL) delete displayFrameTenant;
-    if (resultFrameLayout != NULL) delete resultFrameLayout;
+    if (displayFrameTenant != nullptr) delete displayFrameTenant;
+    if (resultFrameLayout != nullptr) delete resultFrameLayout;
     delete ui;
 }
 
@@ -95,13 +95,13 @@ void ResultVisualPopup::setupResultDisplay(QString caseName, QString caseType, Q
 
 void ResultVisualPopup::changeDisplayFrameTenant(QWidget * newDisplay)
 {
-    if (displayFrameTenant != NULL)
+    if (displayFrameTenant != nullptr)
     {
         displayFrameTenant->deleteLater();
     }
     displayFrameTenant = newDisplay;
 
-    if (displayFrameTenant == NULL) return;
+    if (displayFrameTenant == nullptr) return;
     resultFrameLayout->addWidget(displayFrameTenant);
     displayFrameTenant->show();
 }

@@ -33,8 +33,7 @@
                 },
                 {
                     "displayName":"Visualize 3D Mesh",
-                    "type":"GLmesh3D",
-                    "file":"logs/cwe-serial.out"
+                    "type":"GLmesh3D"
                 }
 
             ]

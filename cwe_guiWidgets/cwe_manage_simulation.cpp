@@ -97,7 +97,7 @@ void CWE_manage_simulation::newCaseGiven()
     ui->pb_viewParameters->setEnabled(false);
     ui->pb_viewResults->setEnabled(false);
 
-    if (newCase != NULL)
+    if (newCase != nullptr)
     {
         ui->treeView->selectRowByFile(newCase->getCaseFolder());
         ui->label_caseName->setText(newCase->getCaseName());
@@ -160,7 +160,7 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
 
         CFDanalysisType * theType = theCase->getMyType();
-        if (theType == NULL)
+        if (theType == nullptr)
         {
             cwe_globals::displayFatalPopup("Type/stage mismatch for case.");
             return;
@@ -184,7 +184,7 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
 
 void CWE_manage_simulation::create_new_case_clicked()
 {
-    Create_Case_Popup * createCase = new Create_Case_Popup(theMainWindow, NULL);
+    Create_Case_Popup * createCase = new Create_Case_Popup(theMainWindow, nullptr);
     createCase->show();
 }
 

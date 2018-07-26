@@ -37,21 +37,21 @@
 
 #include "cwe_interfacedriver.h"
 
-CWEjobAccountant * cwe_globals::theJobAccountant = NULL;
+CWEjobAccountant * cwe_globals::theJobAccountant = nullptr;
 
 cwe_globals::cwe_globals() {}
 
 CWE_InterfaceDriver * cwe_globals::get_CWE_Driver()
 {
     AgaveSetupDriver * theDriver = ae_globals::get_Driver();
-    if (theDriver == NULL) return NULL;
+    if (theDriver == nullptr) return nullptr;
 
     return qobject_cast<CWE_InterfaceDriver *>(theDriver);
 }
 
 void cwe_globals::set_CWE_Job_Accountant(CWEjobAccountant * theAccountant)
 {
-    if (theJobAccountant != NULL)
+    if (theJobAccountant != nullptr)
     {
         displayFatalPopup("Job Accountant object has multiple definitions. Please note the circumstances of this error and report it to the developers.", "Internal Error");
         return;

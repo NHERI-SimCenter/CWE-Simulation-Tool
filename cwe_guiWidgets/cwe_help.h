@@ -47,7 +47,7 @@ class CWE_help : public CWE_Super
     Q_OBJECT
 
 public:
-    explicit CWE_help(QWidget *parent = 0);
+    explicit CWE_help(QWidget *parent = nullptr);
     ~CWE_help();
 
 public slots:

@@ -59,7 +59,7 @@ double CFDtoken::getFloatVal()
 {
     if (myType == CFDtokenType::INT)
     {
-        return (double) myInt;
+        return static_cast<double>(myInt);
     }
     return myFloat;
 }
@@ -89,7 +89,7 @@ int CFDtoken::getChildSize()
 
 CFDtoken * CFDtoken::getLargestChildArray()
 {
-    CFDtoken * ret = NULL;
+    CFDtoken * ret = nullptr;
     int refSize = -1;
     for (auto itr = childList.begin(); itr != childList.end(); itr++)
     {

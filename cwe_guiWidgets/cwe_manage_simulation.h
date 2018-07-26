@@ -53,7 +53,7 @@ class CWE_manage_simulation : public CWE_Super
     Q_OBJECT
 
 public:
-    explicit CWE_manage_simulation(QWidget *parent = 0);
+    explicit CWE_manage_simulation(QWidget *parent = nullptr);
     ~CWE_manage_simulation();
 
     virtual void linkMainWindow(CWE_MainWindow *theMainWin);

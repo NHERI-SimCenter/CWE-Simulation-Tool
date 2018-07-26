@@ -58,7 +58,7 @@ public:
     static QByteArray * getConditionalCompressedFileContents(QString fileName);
 
 private:
-    QByteArray * myRefArray = NULL;
+    QByteArray * myRefArray = nullptr;
 };
 
 #endif // DECOMPRESSWRAPPER_H

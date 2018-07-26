@@ -52,8 +52,8 @@ private:
 
     virtual void setShownValue(QString newValue);
 
-    QCheckBox * theCheckBox = NULL;
-    QLabel * label_varName = NULL;
+    QCheckBox * theCheckBox = nullptr;
+    QLabel * label_varName = nullptr;
 };
 
 #endif // SCTRBOOLDATAWIDGET_H
