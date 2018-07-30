@@ -48,7 +48,7 @@ class CWE_GroupTab;
 class CWE_ParamTab;
 class SCtrMasterDataWidget;
 
-struct VARIABLE_TYPE;
+struct PARAM_VARIABLE_TYPE;
 
 enum class CaseState;
 enum class StageState;
@@ -121,7 +121,7 @@ private:
     void createStageTabs();
     void createGroupTabs();
     void createParamWidgets();
-    void addVariable(QString varName, VARIABLE_TYPE &theVariable, QString *nonDefaultValue = nullptr);
+    void addVariable(QString varName, PARAM_VARIABLE_TYPE &theVariable, QString *nonDefaultValue = nullptr);
 
     void clearStageTabs();
     void clearGroupTabs();

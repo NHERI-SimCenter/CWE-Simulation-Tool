@@ -730,7 +730,7 @@ void CWE_Parameters::createParamWidgets()
 
     foreach (QString varName, groupVars)
     {
-        VARIABLE_TYPE theVariable = theType->getVariableInfo(varName);
+        PARAM_VARIABLE_TYPE theVariable = theType->getVariableInfo(varName);
         if (currentParams.contains(varName))
         {
             QString currentValue = currentParams.value(varName);
@@ -745,7 +745,7 @@ void CWE_Parameters::createParamWidgets()
     resetButtonAndView();
 }
 
-void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable, QString * nonDefaultValue)
+void CWE_Parameters::addVariable(QString varName, PARAM_VARIABLE_TYPE &theVariable, QString * nonDefaultValue)
 {
     SCtrMasterDataWidget *theVar = nullptr;
 

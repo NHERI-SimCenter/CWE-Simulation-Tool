@@ -171,12 +171,12 @@ QStringList CFDanalysisType::getVarGroup(QString group)
     return list;
 }
 
-VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
+PARAM_VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
 {
     //TODO: Clean up this method
     //TODO: Default should always exist and be valid
 
-    VARIABLE_TYPE res;
+    PARAM_VARIABLE_TYPE res;
 
     res.internalName = "ERROR";
     res.options.clear();

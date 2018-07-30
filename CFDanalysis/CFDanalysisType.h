@@ -40,6 +40,7 @@
 #include <QJsonArray>
 #include <QIcon>
 #include <QFile>
+#include <QMap>
 
 struct RESULTS_STYLE {
     QString displayName;
@@ -49,7 +50,31 @@ struct RESULTS_STYLE {
     QString stage;
 };
 
-struct VARIABLE_TYPE;
+
+enum class SimCenterDataType { integer,
+                               floatingpoint,
+                               boolean,
+                               string,
+                               selection,
+                               file,
+                               tensor2D,
+                               tensor3D,
+                               vector2D,
+                               vector3D,
+                               unknown};
+
+struct PARAM_VARIABLE_TYPE {
+    QString internalName;
+    QString displayName;
+    SimCenterDataType type;
+    QString defaultValue;
+    QString unit;
+    QString precision;
+    QString sign;
+    QMap<QString, QString> options;
+    QString hideCondition;
+    QString showCondition;
+};
 
 class CFDanalysisType
 {
@@ -66,7 +91,7 @@ public:
     QList<RESULTS_STYLE> getStageResults(QString stage);
 
     QStringList getVarGroup(QString group);
-    VARIABLE_TYPE getVariableInfo(QString name);
+    PARAM_VARIABLE_TYPE getVariableInfo(QString name);
 
     QString getStageApp(QString stageID);
     QString getExtraInput(QString stageID);
