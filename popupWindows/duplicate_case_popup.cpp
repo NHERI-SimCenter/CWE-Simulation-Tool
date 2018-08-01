@@ -105,7 +105,7 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
     }
 
     CFDcaseInstance * tempCase = myMainWindow->getCaseFromFolder(clonedFolder);
-    if (tempCase == NULL)
+    if (tempCase == nullptr)
     {
         cwe_globals::displayPopup("Folder to duplicated is invalid.", "ERROR");
         return;

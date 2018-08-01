@@ -33,23 +33,40 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef RESULTFIELD2DWINDOW_H
-#define RESULTFIELD2DWINDOW_H
+#include "resultmesh3dwindow.h"
 
-#include "visualUtils/resultvisualpopup.h"
+#include "../cfdglcanvas.h"
 
-struct RESULTS_STYLE;
+ResultMesh3dWindow::ResultMesh3dWindow(CFDcaseInstance * theCase, RESULTS_STYLE *resultDesc, QWidget *parent):
+    ResultVisualPopup(theCase, resultDesc, parent) {}
 
-class ResultField2dWindow : public ResultVisualPopup
+ResultMesh3dWindow::~ResultMesh3dWindow(){}
+
+void ResultMesh3dWindow::initializeView()
 {
-public:
-    ResultField2dWindow(CFDcaseInstance * theCase, RESULTS_STYLE * resultDesc, QWidget *parent = nullptr);
-    ~ResultField2dWindow();
+    QMap<QString, QString> neededFiles;
+    neededFiles["points"] = "/constant/polyMesh/points.gz";
+    neededFiles["faces"] = "/constant/polyMesh/faces.gz";
+    neededFiles["owner"] = "/constant/polyMesh/owner.gz";
 
-    virtual void initializeView();
+    performStandardInit(neededFiles);
+}
 
-private:
-    virtual void allFilesLoaded();
-};
+void ResultMesh3dWindow::allFilesLoaded()
+{
+    QObject::disconnect(this);
+    QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
-#endif // RESULTFIELD2DWINDOW_H
+    CFDglCanvas * myCanvas;
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
+
+    myCanvas->loadMeshData3D(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
+
+    if (!myCanvas->haveMeshData())
+    {
+        changeDisplayFrameTenant(new QLabel("Error: Data for 3D mesh result is unreadable. Please reset and try again."));
+        return;
+    }
+
+    myCanvas->setDisplayState(CFDDisplayState::MESH3D);
+}

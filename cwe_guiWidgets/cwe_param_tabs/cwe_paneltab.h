@@ -46,10 +46,11 @@ class CWE_PanelTab : public CWE_ParamTab
     Q_OBJECT
 
 public:
-    explicit CWE_PanelTab(QWidget * panelWidget, QString panelKey, QString panelName, QWidget *parent = 0);
+    explicit CWE_PanelTab(QWidget * panelWidget, QString panelKey, QString panelName, QWidget *parent = nullptr);
     ~CWE_PanelTab();
 
     QWidget * getPanelWidget();
+    void setTabEnabled(bool setting);
 
 protected:
     virtual void setButtonAppearance();
@@ -58,6 +59,7 @@ private:
     Ui::CWE_PanelTab *ui;
 
     QWidget * myWidget;
+    bool tabEnabled = true;
 };
 
 #endif // CWE_PANELTAB_H

@@ -42,7 +42,7 @@ CWE_GroupTab::CWE_GroupTab(QString groupKey, QString groupName, QWidget *parent)
     ui->setupUi(this);
     ui->mainLabel->setText(tabDisplay);
 
-    this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #ffffff;}");
+    this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
 }
 
 CWE_GroupTab::~CWE_GroupTab()
@@ -56,22 +56,22 @@ void CWE_GroupTab::setButtonAppearance()
     {
         if (tab_active)
         {
-            this->setStyleSheet("QFrame {background: #63a39d; border-color: #63a39d; border-width: 2px; border-radius: 5px; border-style: inset; } QLabel {border-style: none; font: 12pt bold; color: #ffffff;}");
+            this->setStyleSheet("QFrame {background: #63a39d; border-color: #63a39d; border-width: 2px; border-radius: 5px; border-style: inset; } QLabel {border-style: none; font: 12pt bold; color: #101010;}");
         }
         else
         {
-            this->setStyleSheet("QFrame {background: #B0BEC5; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #ffffff;}");
+            this->setStyleSheet("QFrame {background: #B0BEC5; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
         }
     }
     else
     {
         if (tab_active)
         {
-            this->setStyleSheet("QFrame {background: #63a39d; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: inset;} QLabel {border-style: none; font: 12pt bold; color: #ffffff;}");
+            this->setStyleSheet("QFrame {background: #63a39d; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: inset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
         }
         else
         {
-            this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #ffffff;}");
+            this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
         }
     }
 }

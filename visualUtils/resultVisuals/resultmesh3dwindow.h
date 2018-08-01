@@ -33,18 +33,22 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef RESULTFIELD2DWINDOW_H
-#define RESULTFIELD2DWINDOW_H
+#ifndef RESULTMESH3DWINDOW_H
+#define RESULTMESH3DWINDOW_H
 
+#include <QObject>
+#include <QWidget>
 #include "visualUtils/resultvisualpopup.h"
 
+class CFDglCanvas;
 struct RESULTS_STYLE;
 
-class ResultField2dWindow : public ResultVisualPopup
+class ResultMesh3dWindow : public ResultVisualPopup
 {
+    Q_OBJECT
 public:
-    ResultField2dWindow(CFDcaseInstance * theCase, RESULTS_STYLE * resultDesc, QWidget *parent = nullptr);
-    ~ResultField2dWindow();
+    ResultMesh3dWindow(CFDcaseInstance * theCase, RESULTS_STYLE * resultDesc, QWidget *parent = nullptr);
+    ~ResultMesh3dWindow();
 
     virtual void initializeView();
 
@@ -52,4 +56,4 @@ private:
     virtual void allFilesLoaded();
 };
 
-#endif // RESULTFIELD2DWINDOW_H
+#endif // RESULTMESH3DWINDOW_H

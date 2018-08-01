@@ -11,5 +11,6 @@
         <file>rectangle2D.json</file>
         <file>rectangle3D.json</file>
         <file>triangle2D.json</file>
+        <file>customInflow3D.json</file>
     </qresource>
 </RCC>

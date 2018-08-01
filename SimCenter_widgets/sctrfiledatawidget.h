@@ -60,12 +60,12 @@ private:
 
     virtual void setShownValue(QString newValue);
 
-    RemoteFileModel * theFileModel = NULL;
+    RemoteFileModel * theFileModel = nullptr;
 
-    RemoteFileTree * myFileTree = NULL;
-    QLabel * selectedFile = NULL;
-    QLabel * explainText = NULL;
-    QLabel * label_varName = NULL;
+    RemoteFileTree * myFileTree = nullptr;
+    QLabel * selectedFile = nullptr;
+    QLabel * explainText = nullptr;
+    QLabel * label_varName = nullptr;
 };
 
 #endif // SCTRFILEDATAWIDGET_H

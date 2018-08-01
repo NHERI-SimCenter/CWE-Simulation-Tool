@@ -42,17 +42,17 @@ DeCompressWrapper::DeCompressWrapper(QByteArray *ref)
 
 QByteArray * DeCompressWrapper::getDecompressedFile()
 {
-    QByteArray * myResultArray = NULL;
+    QByteArray * myResultArray = nullptr;
 
-    if (myRefArray == NULL)
+    if (myRefArray == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
     QTemporaryFile compressedFile;
     if (!compressedFile.open())
     {
-        return NULL;
+        return nullptr;
     }
     QByteArray qFileName = compressedFile.fileName().toLatin1();
     const char * realFileName = qFileName.data();
@@ -72,8 +72,8 @@ QByteArray * DeCompressWrapper::getDecompressedFile()
         if (resultVal < 0)
         {
             delete myResultArray;
-            myResultArray = NULL;
-            return NULL;
+            myResultArray = nullptr;
+            return nullptr;
         }
         myResultArray->append(dataBuff, resultVal);
     }
@@ -87,7 +87,7 @@ QByteArray * DeCompressWrapper::getConditionalCompressedFileContents(QString fil
     QFile uncompressedFile(fileName);
     if (uncompressedFile.exists())
     {
-        QByteArray * ret = NULL;
+        QByteArray * ret = nullptr;
         uncompressedFile.open(QIODevice::ReadOnly);
         *ret = uncompressedFile.readAll();
         uncompressedFile.close();
@@ -99,7 +99,7 @@ QByteArray * DeCompressWrapper::getConditionalCompressedFileContents(QString fil
     QFile compressedFile(fileName);
     if (!compressedFile.exists())
     {
-        return NULL;
+        return nullptr;
     }
 
     compressedFile.open(QIODevice::ReadOnly);

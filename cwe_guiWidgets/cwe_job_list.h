@@ -48,7 +48,7 @@ class CWE_job_list : public CWE_Super
     Q_OBJECT
 
 public:
-    explicit CWE_job_list(QWidget *parent = 0);
+    explicit CWE_job_list(QWidget *parent = nullptr);
     ~CWE_job_list();
 
 private slots:

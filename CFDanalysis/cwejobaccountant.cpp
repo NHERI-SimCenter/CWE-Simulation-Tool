@@ -34,6 +34,7 @@
 
 #include "cwejobaccountant.h"
 
+#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 #include "../AgaveClientInterface/remotejobdata.h"
 #include "cwe_globals.h"
@@ -60,12 +61,12 @@ const RemoteJobData * CWEjobAccountant::getJobByID(QString IDstr)
     {
         return terminatedJobs.value(IDstr);
     }
-    return NULL;
+    return nullptr;
 }
 
 const RemoteJobData * CWEjobAccountant::getJobByFolder(QString folderName)
 {
-    const RemoteJobData * retJob = NULL;
+    const RemoteJobData * retJob = nullptr;
 
     for (const RemoteJobData * aJob : detailedRunningJobs)
     {
@@ -73,14 +74,14 @@ const RemoteJobData * CWEjobAccountant::getJobByFolder(QString folderName)
 
         if (cwe_globals::folderNamesMatch(folderName, aJob->getInputs().value("directory")))
         {
-            if ((retJob == NULL) || (aJob->getTimeCreated() > retJob->getTimeCreated()))
+            if ((retJob == nullptr) || (aJob->getTimeCreated() > retJob->getTimeCreated()))
             {
                 retJob = aJob;
             }
         }
     }
 
-    if (retJob != NULL) return retJob;
+    if (retJob != nullptr) return retJob;
 
     for (const RemoteJobData * aJob : terminatedJobs)
     {
@@ -88,7 +89,7 @@ const RemoteJobData * CWEjobAccountant::getJobByFolder(QString folderName)
 
         if (cwe_globals::folderNamesMatch(folderName, aJob->getInputs().value("directory")))
         {
-            if ((retJob == NULL) || (aJob->getTimeCreated() > retJob->getTimeCreated()))
+            if ((retJob == nullptr) || (aJob->getTimeCreated() > retJob->getTimeCreated()))
             {
                 retJob = aJob;
             }
@@ -104,6 +105,8 @@ bool CWEjobAccountant::allRunningDetailsLoaded()
 
 void CWEjobAccountant::reloadJobLists()
 {
+    QMap<QString, const RemoteJobData *> prevRunningJobs = detailedRunningJobs;
+
     detailedRunningJobs.clear();
     undetailedRunningJobs.clear();
     terminatedJobs.clear();
@@ -132,5 +135,19 @@ void CWEjobAccountant::reloadJobLists()
             undetailedRunningJobs.insert(aJob->getID(),aJob);
         }
     }
+
+    for (const RemoteJobData * anOldJob : prevRunningJobs)
+    {
+        if (!anOldJob->detailsLoaded()) continue;
+        if (detailedRunningJobs.contains(anOldJob->getID())) continue;
+
+        QString folderName = anOldJob->getInputs().value("directory");
+        if (folderName.isEmpty()) continue;
+        FileNodeRef folderToRefresh = cwe_globals::get_file_handle()->speculateFileWithName(folderName,true);
+        if (folderToRefresh.isNil()) continue;
+
+        folderToRefresh.enactFolderRefresh();
+    }
+
     emit haveNewJobInfo();
 }

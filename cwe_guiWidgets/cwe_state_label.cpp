@@ -44,12 +44,12 @@ cwe_state_label::cwe_state_label(QWidget *parent) : QLabel(parent)
 
 void cwe_state_label::setCurrentCase(CFDcaseInstance * newCase)
 {
-    if (currentCase != NULL)
+    if (currentCase != nullptr)
     {
-        QObject::disconnect(currentCase, 0, this, 0);
+        QObject::disconnect(currentCase, nullptr, this, nullptr);
     }
     currentCase = newCase;
-    if (currentCase == NULL)
+    if (currentCase == nullptr)
     {
         this->setText("No Case Selected");
         return;

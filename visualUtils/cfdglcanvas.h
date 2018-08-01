@@ -47,6 +47,7 @@ enum class CFDDisplayState
 {
     TEST_BOX,
     MESH,
+    MESH3D,
     FIELD
 };
 
@@ -56,7 +57,8 @@ public:
     CFDglCanvas(QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~CFDglCanvas();
 
-    bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
+    bool loadMeshData2D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
+    bool loadMeshData3D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
     bool loadFieldData(QByteArray * rawDataFile, QString valueType);
     bool haveMeshData();
     QString getDisplayError();
@@ -69,6 +71,8 @@ protected:
     virtual void paintGL();
 
 private:
+    bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
+
     CFDDisplayState myState = CFDDisplayState::TEST_BOX;
     int myWidth;
     int myHeight;
@@ -93,7 +97,10 @@ private:
 
     QList<double> dataList;
 
-    QRectF displayBounds;
+    QRectF displayBounds2D;
+    double highz;
+    double lowz;
+
     double lowDataVal;
     double highDataVal;
     double dataSpan;
@@ -101,9 +108,9 @@ private:
     //QOpenGLVertexArrayObject myVertexArray;
     //QOpenGLBuffer myBuffer;
     /*
-    QOpenGLShaderProgram * myShaderProgram = NULL;
-    QOpenGLShader * myShader = NULL;
-    QOpenGLTexture * myTexture = NULL;
+    QOpenGLShaderProgram * myShaderProgram = nullptr;
+    QOpenGLShader * myShader = nullptr;
+    QOpenGLTexture * myTexture = nullptr;
     */
 };
 

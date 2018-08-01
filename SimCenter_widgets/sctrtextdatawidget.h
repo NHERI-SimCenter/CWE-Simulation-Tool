@@ -52,8 +52,8 @@ private:
 
     virtual void setShownValue(QString newValue);
 
-    QLineEdit * theValue = NULL;
-    QLabel * label_varName = NULL;
+    QLineEdit * theValue = nullptr;
+    QLabel * label_varName = nullptr;
 };
 
 #endif // SCTRTEXTDATAWIDGET_H

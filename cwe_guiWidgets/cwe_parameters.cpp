@@ -65,17 +65,17 @@ CWE_Parameters::CWE_Parameters(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QVBoxLayout * stageLayout = (QVBoxLayout *)ui->tabsBar->layout();
+    QVBoxLayout * stageLayout = qobject_cast<QVBoxLayout *>(ui->tabsBar->layout());
     stageLayout->setMargin(0);
     stageLayout->setSpacing(0);
     stageLayout->setAlignment(Qt::AlignTop);
 
-    QHBoxLayout * groupLayout = (QHBoxLayout *)ui->groupsBar->layout();
+    QHBoxLayout * groupLayout = qobject_cast<QHBoxLayout *>(ui->groupsBar->layout());
     groupLayout->setMargin(0);
     groupLayout->setSpacing(0);
     groupLayout->setAlignment(Qt::AlignLeft);
 
-    QVBoxLayout * paramSpaceLayout = (QVBoxLayout *)ui->parameterSpace->layout();
+    QVBoxLayout * paramSpaceLayout = qobject_cast<QVBoxLayout *>(ui->parameterSpace->layout());
     paramSpaceLayout->setAlignment(Qt::AlignTop);
 
     //TODO: Implement optional reference image
@@ -96,13 +96,28 @@ void CWE_Parameters::linkMainWindow(CWE_MainWindow *theMainWin)
                      this, SLOT(newCaseGiven()));
 }
 
+bool CWE_Parameters::allowClickAway()
+{
+    if (!panelSwitchPermitted()) return false;
+
+    for (SCtrMasterDataWidget * aWidget : paramWidgetList)
+    {
+        if (aWidget->isValueChanged())
+        {
+            aWidget->revertShownValue();
+        }
+    }
+
+    return true;
+}
+
 void CWE_Parameters::newCaseGiven()
 {
     CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
 
     clearStageTabs();
 
-    if (newCase != NULL)
+    if (newCase != nullptr)
     {
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
@@ -118,7 +133,7 @@ void CWE_Parameters::newCaseGiven()
 void CWE_Parameters::setHeaderLabels()
 {
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
-    if (theCase == NULL)
+    if (theCase == nullptr)
     {
         ui->label_theName->setText("N/A");
         ui->label_theType->setText("N/A");
@@ -137,7 +152,7 @@ void CWE_Parameters::setHeaderLabels()
         ui->label_theName->setText(theCase->getCaseName());
     }
 
-    if ((theType == NULL) || theType->getDisplayName().isEmpty())
+    if ((theType == nullptr) || theType->getDisplayName().isEmpty())
     {
         ui->label_theType->setText("Loading . . .");
     }
@@ -161,16 +176,16 @@ void CWE_Parameters::newCaseState(CaseState)
     setHeaderLabels();
 
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
-    if (theCase == NULL) return;
+    if (theCase == nullptr) return;
     CFDanalysisType * theType = theCase->getMyType();
-    if (theType == NULL) return;
+    if (theType == nullptr) return;
 
-    if (loadingLabel != NULL)
+    if (loadingLabel != nullptr)
     {
         createStageTabs();
     }
 
-    if (selectedStage == NULL)
+    if (selectedStage == nullptr)
     {
         cwe_globals::displayFatalPopup("Stage tab display does not have selected stage.", "Fatal Internal Error");
     }
@@ -191,23 +206,6 @@ void CWE_Parameters::newCaseState(CaseState)
     resetButtonAndView();
 }
 
-void CWE_Parameters::panelNoLongerActive()
-{
-    if (panelSwitchPermitted())
-    {
-        for (SCtrMasterDataWidget * aWidget : paramWidgetList)
-        {
-            if (aWidget->isValueChanged())
-            {
-                aWidget->revertShownValue();
-            }
-        }
-        return;
-    }
-
-    theMainWindow->switchToParameterTab();
-}
-
 void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
 {
     if (chosenTab->tabIsActive()) return;
@@ -220,7 +218,7 @@ void CWE_Parameters::stageSelected(CWE_ParamTab * chosenTab)
     chosenTab->setActive();
 
     selectedStage = qobject_cast<CWE_StageStatusTab *>(chosenTab);
-    if (selectedStage != NULL)
+    if (selectedStage != nullptr)
     {
         createGroupTabs();
     }
@@ -242,7 +240,7 @@ void CWE_Parameters::groupSelected(CWE_ParamTab * chosenGroup)
     chosenGroup->setActive();
 
     selectedGroup = qobject_cast<CWE_GroupTab *>(chosenGroup);
-    if (selectedGroup != NULL)
+    if (selectedGroup != nullptr)
     {
         createParamWidgets();
     }
@@ -259,8 +257,8 @@ void CWE_Parameters::paramWidgetChanged()
 
 void CWE_Parameters::resetButtonAndView()
 {
-    if (theMainWindow->getCurrentCase() == NULL) return;
-    if (selectedStage == NULL) return;
+    if (theMainWindow->getCurrentCase() == nullptr) return;
+    if (selectedStage == nullptr) return;
 
     QMap<QString, StageState> stageStates = theMainWindow->getCurrentCase()->getStageStates();
     StageState currentStageState = stageStates.value(selectedStage->getRefKey());
@@ -293,10 +291,6 @@ void CWE_Parameters::resetButtonAndView()
         setViewState(currentStageState);
         setButtonState(currentStageState);
         break;
-    default:
-        cwe_globals::displayFatalPopup("Remote case has unhandled state");
-        return;
-        break;
     }
 }
 
@@ -324,10 +318,6 @@ void CWE_Parameters::setButtonState(StageState newMode)
         break;
     case StageState::UNRUN:
         setButtonState(SimCenterButtonMode_RUN);
-        break;
-    default:
-        cwe_globals::displayFatalPopup("Remote case has unhandled stage state");
-        return;
         break;
     }
 }
@@ -367,7 +357,6 @@ void CWE_Parameters::setViewState(StageState newMode)
     case StageState::FINISHED_PREREQ:
     case StageState::LOADING:
     case StageState::RUNNING:
-    default:
         setViewState(SimCenterViewState::visible);
     }
 }
@@ -477,10 +466,10 @@ bool CWE_Parameters::checkVarCondition(QString conditionToCheck)
     float leftDecimal = leftSide.toFloat(&leftFloat);
     float rightDecimal = rightSide.toFloat(&rightFloat);
 
-    if (!leftDecimal || !rightDecimal) return false;
+    if (!leftFloat || !rightFloat) return false;
 
-    if (compareOp == "==") return (leftDecimal == rightDecimal);
-    if (compareOp == "!=") return (leftDecimal != rightDecimal);
+    if (compareOp == "==") return (false);
+    if (compareOp == "!=") return (true);
     if (compareOp == "<") return (leftDecimal < rightDecimal);
     if (compareOp == ">") return (leftDecimal > rightDecimal);
     if (compareOp == "<=") return (leftDecimal <= rightDecimal);
@@ -517,7 +506,7 @@ QString CWE_Parameters::getVarValByName(QString varName)
     }
 
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
-    if (theCase == NULL) return QString();
+    if (theCase == nullptr) return QString();
     return theCase->getCurrentParams().value(varName);
 }
 
@@ -553,8 +542,8 @@ bool CWE_Parameters::panelSwitchPermitted()
 void CWE_Parameters::save_all_button_clicked()
 {
     CFDcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
-    if (linkedCFDCase == NULL) return;
-    if (selectedStage == NULL) return;
+    if (linkedCFDCase == nullptr) return;
+    if (selectedStage == nullptr) return;
     if (!paramsChanged()) return;
 
     // collect parameter values from all SCtrMasterDataWidget objects
@@ -586,8 +575,8 @@ void CWE_Parameters::save_all_button_clicked()
 void CWE_Parameters::run_button_clicked()
 {
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
-    if (theCase == NULL) return;
-    if (selectedStage == NULL) return;
+    if (theCase == nullptr) return;
+    if (selectedStage == nullptr) return;
     if (paramsChanged()) return;
 
     if (!theMainWindow->getCurrentCase()->startStageApp(selectedStage->getRefKey()))
@@ -600,8 +589,8 @@ void CWE_Parameters::run_button_clicked()
 void CWE_Parameters::cancel_button_clicked()
 {
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
-    if (theCase == NULL) return;
-    if (selectedStage == NULL) return;
+    if (theCase == nullptr) return;
+    if (selectedStage == nullptr) return;
     if (paramsChanged()) return;
 
     if (!theMainWindow->getCurrentCase()->stopJob())
@@ -614,7 +603,7 @@ void CWE_Parameters::cancel_button_clicked()
 void CWE_Parameters::results_button_clicked()
 {
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
-    if (theCase == NULL) return;
+    if (theCase == nullptr) return;
 
     theMainWindow->switchToResultsTab();
 }
@@ -622,8 +611,8 @@ void CWE_Parameters::results_button_clicked()
 void CWE_Parameters::rollback_button_clicked()
 {
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
-    if (theCase == NULL) return;
-    if (selectedStage == NULL) return;
+    if (theCase == nullptr) return;
+    if (selectedStage == nullptr) return;
     if (paramsChanged()) return;
 
     if (!theMainWindow->getCurrentCase()->rollBack(selectedStage->getRefKey()))
@@ -636,16 +625,16 @@ void CWE_Parameters::rollback_button_clicked()
 void CWE_Parameters::createStageTabs()
 {
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
-    if (theCase == NULL) return;
+    if (theCase == nullptr) return;
     CFDanalysisType * theType = theCase->getMyType();
-    if (theType == NULL) return;
+    if (theType == nullptr) return;
 
-    if ((selectedStage != NULL) || !stageTabList.isEmpty() || !ui->tabsBar->layout()->isEmpty())
+    if ((selectedStage != nullptr) || !stageTabList.isEmpty() || !ui->tabsBar->layout()->isEmpty())
     {
         clearStageTabs();
     }
 
-    QVBoxLayout * tablayout = (QVBoxLayout *)ui->tabsBar->layout();
+    QVBoxLayout * tablayout = qobject_cast<QVBoxLayout *>(ui->tabsBar->layout());
 
     QMap<QString, StageState> stageStates = theCase->getStageStates();
 
@@ -680,17 +669,17 @@ void CWE_Parameters::createStageTabs()
 void CWE_Parameters::createGroupTabs()
 {
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
-    if (theCase == NULL) return;
+    if (theCase == nullptr) return;
     CFDanalysisType * theType = theCase->getMyType();
-    if (theType == NULL) return;
-    if (selectedStage == NULL) return;
+    if (theType == nullptr) return;
+    if (selectedStage == nullptr) return;
 
-    if ((selectedGroup != NULL) || !groupTabList.isEmpty() || !ui->groupsBar->layout()->isEmpty())
+    if ((selectedGroup != nullptr) || !groupTabList.isEmpty() || !ui->groupsBar->layout()->isEmpty())
     {
         clearGroupTabs();
     }
 
-    QHBoxLayout * tablayout = (QHBoxLayout *)ui->groupsBar->layout();
+    QHBoxLayout * tablayout = qobject_cast<QHBoxLayout *>(ui->groupsBar->layout());
 
     QStringList groupList = theType->getStageGroups(selectedStage->getRefKey());
 
@@ -718,23 +707,23 @@ void CWE_Parameters::createGroupTabs()
 void CWE_Parameters::createParamWidgets()
 {
     CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
-    if (theCase == NULL) return;
+    if (theCase == nullptr) return;
     CFDanalysisType * theType = theCase->getMyType();
-    if (theType == NULL) return;
-    if (selectedStage == NULL) return;
-    if (selectedGroup == NULL) return;
+    if (theType == nullptr) return;
+    if (selectedStage == nullptr) return;
+    if (selectedGroup == nullptr) return;
 
     QMap<QString, QString> currentParams = theCase->getCurrentParams();
 
-    if (!paramWidgetList.isEmpty() || (loadingLabel == NULL))
+    if (!paramWidgetList.isEmpty() || (loadingLabel == nullptr))
     {
         clearParamScreen();
     }
 
-    if (loadingLabel != NULL)
+    if (loadingLabel != nullptr)
     {
         loadingLabel->deleteLater();
-        loadingLabel = NULL;
+        loadingLabel = nullptr;
     }
 
     QStringList groupVars = theType->getVarGroup(selectedGroup->getRefKey());
@@ -758,7 +747,7 @@ void CWE_Parameters::createParamWidgets()
 
 void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable, QString * nonDefaultValue)
 {
-    SCtrMasterDataWidget *theVar = NULL;
+    SCtrMasterDataWidget *theVar = nullptr;
 
     QLayout *layout = ui->parameterSpace->layout();
 
@@ -795,7 +784,7 @@ void CWE_Parameters::addVariable(QString varName, VARIABLE_TYPE &theVariable, QS
     theVar->setDataType(theVariable);
 
     paramWidgetList.append(theVar);
-    if (nonDefaultValue != NULL)
+    if (nonDefaultValue != nullptr)
     {
         theVar->setValue(*nonDefaultValue);
     }
@@ -812,14 +801,14 @@ void CWE_Parameters::clearStageTabs()
     {
         stageTabList.takeLast()->deleteLater();
     }
-    if (selectedStage != NULL)
+    if (selectedStage != nullptr)
     {
         selectedStage->deleteLater();
-        selectedStage = NULL;
+        selectedStage = nullptr;
     }
 
     QLayoutItem * stageItem = ui->tabsBar->layout()->takeAt(0);
-    while (stageItem != NULL)
+    while (stageItem != nullptr)
     {
         delete stageItem;
         stageItem = ui->tabsBar->layout()->takeAt(0);
@@ -834,14 +823,14 @@ void CWE_Parameters::clearGroupTabs()
     {
         groupTabList.takeLast()->deleteLater();
     }
-    if (selectedGroup != NULL)
+    if (selectedGroup != nullptr)
     {
         selectedGroup->deleteLater();
-        selectedGroup = NULL;
+        selectedGroup = nullptr;
     }
 
     QLayoutItem * groupItem = ui->groupsBar->layout()->takeAt(0);
-    while (groupItem != NULL)
+    while (groupItem != nullptr)
     {
         delete groupItem;
         groupItem = ui->groupsBar->layout()->takeAt(0);
@@ -855,14 +844,14 @@ void CWE_Parameters::clearParamScreen()
         paramWidgetList.takeLast()->deleteLater();
     }
 
-    if (loadingLabel != NULL)
+    if (loadingLabel != nullptr)
     {
         loadingLabel->deleteLater();
-        loadingLabel = NULL;
+        loadingLabel = nullptr;
     }
 
     QLayoutItem * paramItem = ui->parameterSpace->layout()->takeAt(0);
-    while (paramItem != NULL)
+    while (paramItem != nullptr)
     {
         delete paramItem;
         paramItem = ui->parameterSpace->layout()->takeAt(0);

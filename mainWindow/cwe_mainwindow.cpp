@@ -62,19 +62,17 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     addWindowPanel(ui->tab_jobs_page,"jobs","Remote Jobs");
     addWindowPanel(ui->tab_files,"files","Remote Files");
     ui->panelTabsLayout->addItem(new QSpacerItem(150, 0));
-    addWindowPanel(ui->tab_parameters,"welcome","Parameters");
+    addWindowPanel(ui->tab_parameters,"parameters","Parameters");
     addWindowPanel(ui->tab_results,"results","Results");
 
     changeParamsAndResultsEnabled(false);
 
-    setCurrentPanel(ui->tab_welcome_screen);
-
     // adjust application size to display
     QRect rec = QGuiApplication::screens().at(0)->availableGeometry();
-    int height = this->height()>0.75*rec.height()?this->height():0.75*rec.height();
-    if ( height > 0.95*rec.height() ) { height = 0.95*rec.height(); }
-    int width  = this->width()>0.65*rec.width()?this->width():0.65*rec.width();
-    if ( width > 0.95*rec.width() ) { width = 0.95*rec.width(); }
+    int height = static_cast<int>(this->height()>0.75*rec.height()?this->height():0.75*rec.height());
+    if ( height > 0.95*rec.height() ) { height = static_cast<int>(0.95*rec.height()); }
+    int width  = static_cast<int>(this->width()>0.65*rec.width()?this->width():0.65*rec.width());
+    if ( width > 0.95*rec.width() ) { width = static_cast<int>(0.95*rec.width()); }
     this->resize(width, height);
 }
 
@@ -114,17 +112,19 @@ void CWE_MainWindow::runSetupSteps()
         {
             continue;
         }
-        CWE_Super * aWidget = (CWE_Super *) rawWidget;
+        CWE_Super * aWidget = qobject_cast<CWE_Super *>(rawWidget);
         aWidget->linkMainWindow(this);
     }
+
+    setCurrentPanel(ui->tab_welcome_screen);
 }
 
 void CWE_MainWindow::newCaseState(CaseState newState)
 {
     QObject * theSender = sender();
-    if (theSender != NULL)
+    if (theSender != nullptr)
     {
-        CFDcaseInstance * theCase = (CFDcaseInstance *) theSender;
+        CFDcaseInstance * theCase = qobject_cast<CFDcaseInstance *>(theSender);
         if (theCase != currentCase) return;
     }
 
@@ -158,10 +158,18 @@ void CWE_MainWindow::menuExit()
 void CWE_MainWindow::panelTabClicked(CWE_ParamTab * newTab)
 {
     CWE_PanelTab * thePanel = qobject_cast<CWE_PanelTab *>(newTab);
-    if (thePanel == NULL)
+    if (thePanel == nullptr)
     {
         cwe_globals::displayFatalPopup("UI Error, unable to find main window panel", "Internal Error");
     }
+
+    if (thePanel->tabIsActive()) return;
+    CWE_Super * panelWidget = qobject_cast<CWE_Super *>(ui->tab_panel_stack->currentWidget());
+    if (panelWidget == nullptr)
+    {
+        cwe_globals::displayFatalPopup("UI Error, unable connet main window panel", "Internal Error");
+    }
+    if (!panelWidget->allowClickAway()) return;
 
     setCurrentPanel(thePanel->getPanelWidget());
 }
@@ -230,7 +238,7 @@ void CWE_MainWindow::changeParamsAndResultsEnabled(bool setting)
 void CWE_MainWindow::changeTabEnabled(QWidget * thePanel, bool newSetting)
 {
     //TODO: Want these visible but disabled when disabled
-    listOfPanelTabs.value(thePanel)->setEnabled(newSetting);
+    listOfPanelTabs.value(thePanel)->setTabEnabled(newSetting);
 }
 
 CFDcaseInstance * CWE_MainWindow::getCurrentCase()
@@ -240,10 +248,10 @@ CFDcaseInstance * CWE_MainWindow::getCurrentCase()
 
 void CWE_MainWindow::setCurrentCase()
 {
-    if (currentCase == NULL) return;
+    if (currentCase == nullptr) return;
 
     deactivateCurrentCase();
-    currentCase = NULL;
+    currentCase = nullptr;
     stateLabel->setCurrentCase(currentCase);
     emit haveNewCase();
 }
@@ -257,7 +265,7 @@ void CWE_MainWindow::setCurrentCase(CFDcaseInstance * newCase)
 
     deactivateCurrentCase();
     currentCase = newCase;
-    if (currentCase == NULL) return;
+    if (currentCase == nullptr) return;
 
     QObject::connect(currentCase, SIGNAL(haveNewState(CaseState)),
                     this, SLOT(newCaseState(CaseState)),
@@ -270,7 +278,7 @@ void CWE_MainWindow::setCurrentCase(CFDcaseInstance * newCase)
 void CWE_MainWindow::setCurrentCase(const FileNodeRef &caseNode)
 {
     CFDcaseInstance * newCase = getCaseFromFolder(caseNode);
-    if (newCase == NULL)
+    if (newCase == nullptr)
     {
         setCurrentCase();
         return;
@@ -281,7 +289,7 @@ void CWE_MainWindow::setCurrentCase(const FileNodeRef &caseNode)
 void CWE_MainWindow::setCurrentCase(CFDanalysisType * newCaseType)
 {
     CFDcaseInstance * newCase = getCaseFromType(newCaseType);
-    if (newCase == NULL)
+    if (newCase == nullptr)
     {
         setCurrentCase();
         return;
@@ -291,14 +299,14 @@ void CWE_MainWindow::setCurrentCase(CFDanalysisType * newCaseType)
 
 CFDcaseInstance * CWE_MainWindow::getCaseFromFolder(const FileNodeRef &caseNode)
 {
-    if ((currentCase != NULL) && (currentCase->getCaseFolder().getFullPath() == caseNode.getFullPath()))
+    if ((currentCase != nullptr) && (currentCase->getCaseFolder().getFullPath() == caseNode.getFullPath()))
     {
         return currentCase;
     }
 
     if (caseNode.getFileType() != FileType::DIR)
     {
-        return NULL;
+        return nullptr;
     }
 
     CFDcaseInstance * newCase = new CFDcaseInstance(caseNode);
@@ -308,7 +316,7 @@ CFDcaseInstance * CWE_MainWindow::getCaseFromFolder(const FileNodeRef &caseNode)
 CFDcaseInstance * CWE_MainWindow::getCaseFromType(CFDanalysisType * caseType)
 {
     CFDcaseInstance * ret;
-    if (caseType == NULL)
+    if (caseType == nullptr)
     {
         ret = new CFDcaseInstance();
     }
@@ -321,10 +329,10 @@ CFDcaseInstance * CWE_MainWindow::getCaseFromType(CFDanalysisType * caseType)
 
 void CWE_MainWindow::deactivateCurrentCase()
 {
-    if (currentCase == NULL) return;
-    QObject::disconnect(currentCase,0,0,0);
+    if (currentCase == nullptr) return;
+    QObject::disconnect(currentCase,nullptr,nullptr,nullptr);
     currentCase->deleteLater();
-    currentCase = NULL;
+    currentCase = nullptr;
 }
 
 bool CWE_MainWindow::panelIsActive(QWidget * panelToCheck)
@@ -356,8 +364,8 @@ void CWE_MainWindow::on_actionAbout_CWE_triggered()
     // adjust size of application window to the available display
     //
     QRect rec = QGuiApplication::screens().at(0)->availableGeometry();
-    int height = 0.50*rec.height();
-    int width  = 0.50*rec.width();
+    int height = static_cast<int>(0.50*rec.height());
+    int width  = static_cast<int>(0.50*rec.width());
     dlg->resize(width, height);
 
     dlg->exec();

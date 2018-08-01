@@ -44,7 +44,7 @@ CWE_PanelTab::CWE_PanelTab(QWidget * panelWidget, QString groupKey, QString grou
 
     myWidget = panelWidget;
 
-    this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 3px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #ffffff;}");
+    this->setStyleSheet("QFrame {background: #B0B0B8; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
 }
 
 CWE_PanelTab::~CWE_PanelTab()
@@ -57,28 +57,46 @@ QWidget * CWE_PanelTab::getPanelWidget()
     return myWidget;
 }
 
+void CWE_PanelTab::setTabEnabled(bool setting)
+{
+    this->setEnabled(setting);
+    tabEnabled = setting;
+    setButtonAppearance();
+}
+
 void CWE_PanelTab::setButtonAppearance()
 {
+    if (!tabEnabled)
+    {
+        this->setStyleSheet("QFrame {background: #D0D0D0; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
+        ui->mainLabel->setVisible(false);
+        return;
+    }
+    else
+    {
+        ui->mainLabel->setVisible(true);
+    }
+
     if (tab_pressed)
     {
         if (tab_active)
         {
-            this->setStyleSheet("QFrame {background: #63a39d; border-color: #63a39d; border-width: 2px; border-radius: 5px; border-style: inset; } QLabel {border-style: none; font: 12pt bold; color: #ffffff;}");
+            this->setStyleSheet("QFrame {background: #63a39d; border-color: #63a39d; border-width: 2px; border-radius: 5px; border-style: inset; } QLabel {border-style: none; font: 12pt bold; color: #101010;}");
         }
         else
         {
-            this->setStyleSheet("QFrame {background: #B0BEC5; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #ffffff;}");
+            this->setStyleSheet("QFrame {background: #B0BEC5; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
         }
     }
     else
     {
         if (tab_active)
         {
-            this->setStyleSheet("QFrame {background: #63a39d; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: inset;} QLabel {border-style: none; font: 12pt bold; color: #ffffff;}");
+            this->setStyleSheet("QFrame {background: #63a39d; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: inset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
         }
         else
         {
-            this->setStyleSheet("QFrame {background: #C0C0C8; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #ffffff;}");
+            this->setStyleSheet("QFrame {background: #B0B0B8; border-color: #808080; border-width: 2px; border-radius: 5px; border-style: onset;} QLabel {border-style: none; font: 12pt bold; color: #101010;}");
         }
     }
 }

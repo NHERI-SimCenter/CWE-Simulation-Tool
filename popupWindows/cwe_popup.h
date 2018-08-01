@@ -44,6 +44,7 @@ class CWE_Popup : public QMainWindow
     Q_OBJECT
 public:
     explicit CWE_Popup(CWE_MainWindow * controlWindow, QWidget *parent = nullptr);
+    ~CWE_Popup();
 
 protected:
     CWE_MainWindow * myMainWindow;

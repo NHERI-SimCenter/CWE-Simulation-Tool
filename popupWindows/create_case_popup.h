@@ -58,7 +58,7 @@ class Create_Case_Popup : public CWE_Popup
     Q_OBJECT
 
 public:
-    explicit Create_Case_Popup(CWE_MainWindow * controlWindow, QWidget *parent = 0);
+    explicit Create_Case_Popup(CWE_MainWindow * controlWindow, QWidget *parent = nullptr);
     ~Create_Case_Popup();
 
 private slots:
@@ -71,7 +71,7 @@ private:
     void populateCaseTypes();
     void create_new_case_from_template(QString filename);
 
-    CFDanalysisType * selectedTemplate = NULL;
+    CFDanalysisType * selectedTemplate = nullptr;
 
     QVector<CASE_TYPE_DATA> caseTypeDataList;
 };

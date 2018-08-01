@@ -80,10 +80,11 @@ class CWE_Parameters : public CWE_Super
     Q_OBJECT
 
 public:
-    explicit CWE_Parameters(QWidget *parent = 0);
+    explicit CWE_Parameters(QWidget *parent = nullptr);
     ~CWE_Parameters();
 
     virtual void linkMainWindow(CWE_MainWindow *theMainWin);
+    virtual bool allowClickAway();
 
 private slots:
     void save_all_button_clicked();
@@ -94,7 +95,6 @@ private slots:
 
     void newCaseGiven();
     void newCaseState(CaseState newState);
-    void panelNoLongerActive();
 
     void stageSelected(CWE_ParamTab * chosenTab);
     void groupSelected(CWE_ParamTab * chosenTab);
@@ -121,7 +121,7 @@ private:
     void createStageTabs();
     void createGroupTabs();
     void createParamWidgets();
-    void addVariable(QString varName, VARIABLE_TYPE &theVariable, QString *nonDefaultValue = NULL);
+    void addVariable(QString varName, VARIABLE_TYPE &theVariable, QString *nonDefaultValue = nullptr);
 
     void clearStageTabs();
     void clearGroupTabs();
@@ -135,10 +135,10 @@ private:
     QVector<CWE_GroupTab *> groupTabList;
     QVector<SCtrMasterDataWidget *> paramWidgetList;
 
-    CWE_StageStatusTab * selectedStage = NULL;
-    CWE_GroupTab * selectedGroup = NULL;
+    CWE_StageStatusTab * selectedStage = nullptr;
+    CWE_GroupTab * selectedGroup = nullptr;
 
-    QLabel * loadingLabel = NULL;
+    QLabel * loadingLabel = nullptr;
 };
 
 #endif // CWE_PARAMETERS_H

@@ -154,7 +154,7 @@ private:
     InternalCaseState myState = InternalCaseState::ERROR;
 
     FileNodeRef caseFolder;
-    CFDanalysisType * myType = NULL;
+    CFDanalysisType * myType = nullptr;
 
     QString expectedNewCaseFolder;
     QString downloadDest;

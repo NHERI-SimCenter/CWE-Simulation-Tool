@@ -43,8 +43,8 @@ class CWE_ParamTab : public QFrame
     Q_OBJECT
 
 public:
-    explicit CWE_ParamTab(QString refKey, QString displayedText, QWidget *parent = 0);
-    ~CWE_ParamTab();
+    explicit CWE_ParamTab(QString refKey, QString displayedText, QWidget *parent = nullptr);
+    ~CWE_ParamTab() override;
 
     QString getRefKey();
 

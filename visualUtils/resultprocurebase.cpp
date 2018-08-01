@@ -112,7 +112,7 @@ void ResultProcureBase::computeFileBuffers()
             cwe_globals::displayFatalPopup("Internal Error: result file not loaded after load");
             return;
         }
-        QByteArray * rawBuffer = NULL;
+        QByteArray * rawBuffer = nullptr;
 
         if (theFile.getFileName().endsWith(".gz"))
         {
@@ -125,7 +125,7 @@ void ResultProcureBase::computeFileBuffers()
             rawBuffer = new QByteArray(theFile.getFileBuffer());
         }
 
-        if (rawBuffer == NULL)
+        if (rawBuffer == nullptr)
         {
             cwe_globals::displayFatalPopup("Internal Error: result buffer not loaded after load");
             return;

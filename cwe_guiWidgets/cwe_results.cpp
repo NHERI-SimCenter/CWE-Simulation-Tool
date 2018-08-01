@@ -47,6 +47,7 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
+#include "visualUtils/resultVisuals/resultmesh3dwindow.h"
 #include "visualUtils/resultVisuals/resultmesh2dwindow.h"
 #include "visualUtils/resultVisuals/resultfield2dwindow.h"
 #include "visualUtils/resultVisuals/resulttextdisp.h"
@@ -94,7 +95,7 @@ void CWE_Results::resetViewInfo()
 
 void CWE_Results::on_downloadEntireCaseButton_clicked()
 {
-    if (theMainWindow->getCurrentCase() == NULL)
+    if (theMainWindow->getCurrentCase() == nullptr)
     {
         return;
     }
@@ -112,7 +113,7 @@ void CWE_Results::newCaseGiven()
     CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
     resetViewInfo();
 
-    if (newCase != NULL)
+    if (newCase != nullptr)
     {
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
@@ -123,9 +124,9 @@ void CWE_Results::newCaseGiven()
 void CWE_Results::resultViewClicked(QModelIndex modelID)
 {
     QStandardItem * theItem = resultListModel->itemFromIndex(modelID);
-    if (theItem == NULL) return;
+    if (theItem == nullptr) return;
     CFDcaseInstance * currentCase = theMainWindow->getCurrentCase();
-    if (currentCase == NULL) return;
+    if (currentCase == nullptr) return;
 
     if (!(theItem->column() == showCol) && !(theItem->column() == downloadCol))
     {
@@ -144,7 +145,7 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
     {
         if (theItem->column() == showCol)
         {
-            ResultTextDisplay * resultPopup = new ResultTextDisplay(currentCase, &resultObject, NULL);
+            ResultTextDisplay * resultPopup = new ResultTextDisplay(currentCase, &resultObject, nullptr);
             resultPopup->initializeView();;
         }
         else if (theItem->column() == downloadCol)
@@ -156,14 +157,21 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
     {
         if (theItem->column() != showCol) return;
 
-        ResultField2dWindow * resultPopup = new ResultField2dWindow(currentCase, &resultObject, NULL);
+        ResultField2dWindow * resultPopup = new ResultField2dWindow(currentCase, &resultObject, nullptr);
         resultPopup->initializeView();
     }
     else if (resultObject.type == "GLmesh")
     {
         if (theItem->column() != showCol) return;
 
-        ResultMesh2dWindow * resultPopup = new ResultMesh2dWindow(currentCase, &resultObject, NULL);
+        ResultMesh2dWindow * resultPopup = new ResultMesh2dWindow(currentCase, &resultObject, nullptr);
+        resultPopup->initializeView();
+    }
+    else if (resultObject.type == "GLmesh3D")
+    {
+        if (theItem->column() != showCol) return;
+
+        ResultMesh3dWindow * resultPopup = new ResultMesh3dWindow(currentCase, &resultObject, nullptr);
         resultPopup->initializeView();
     }
 }
@@ -175,10 +183,10 @@ RESULTS_STYLE CWE_Results::getResultObjectFromName(QString name)
 
     if (!viewIsValid) return ret;
     CFDcaseInstance * currentCase = theMainWindow->getCurrentCase();
-    if (currentCase == NULL) return ret;
+    if (currentCase == nullptr) return ret;
     if (currentCase->getCaseFolder().isNil()) return ret;
     CFDanalysisType * theTemplate = currentCase->getMyType();
-    if (theTemplate == NULL) return ret;
+    if (theTemplate == nullptr) return ret;
 
     QMap<QString, StageState> currentStates = currentCase->getStageStates();
 
@@ -251,21 +259,17 @@ void CWE_Results::newCaseState(CaseState newState)
         populateResultsScreen();
         return;
         break;
-    default:
-        cwe_globals::displayFatalPopup("Remote case has unhandled state");
-        return;
-        break;
     }
 }
 
 void CWE_Results::populateResultsScreen()
 {
-    if (!viewIsValid) return;
+    if (viewIsValid) return;
     CFDcaseInstance * currentCase = theMainWindow->getCurrentCase();
-    if (currentCase == NULL) return;
+    if (currentCase == nullptr) return;
     if (currentCase->getCaseFolder().isNil()) return;
     CFDanalysisType * theTemplate = currentCase->getMyType();
-    if (theTemplate == NULL) return;
+    if (theTemplate == nullptr) return;
 
     viewIsValid = true;
 
@@ -313,6 +317,10 @@ void CWE_Results::populateResultsScreen()
             else if (aResult.type == "GLmesh")
             {
                 addResult(aResult.displayName,true,false,"Mesh Image");
+            }
+            else if (aResult.type == "GLmesh3D")
+            {
+                addResult(aResult.displayName,true,false,"3D Mesh Image");
             }
             else
             {
