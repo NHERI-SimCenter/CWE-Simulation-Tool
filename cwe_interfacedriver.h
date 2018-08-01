@@ -81,7 +81,7 @@ private:
     CWE_MainWindow * mainWindow;
     QList<CFDanalysisType *> templateList;
 
-    CWEjobAccountant * myJobAccountant = NULL;
+    CWEjobAccountant * myJobAccountant = nullptr;
 
     bool offlineMode = false;
 };

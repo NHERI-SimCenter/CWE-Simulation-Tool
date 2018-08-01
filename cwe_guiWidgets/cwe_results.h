@@ -56,7 +56,7 @@ class CWE_Results : public CWE_Super
     Q_OBJECT
 
 public:
-    explicit CWE_Results(QWidget *parent = 0);
+    explicit CWE_Results(QWidget *parent = nullptr);
     ~CWE_Results();
 
     virtual void linkMainWindow(CWE_MainWindow *theMainWin);

@@ -38,3 +38,5 @@ CWE_Popup::CWE_Popup(CWE_MainWindow *controlWindow, QWidget *parent) : QMainWind
 {
     myMainWindow = controlWindow;
 }
+
+CWE_Popup::~CWE_Popup() {}

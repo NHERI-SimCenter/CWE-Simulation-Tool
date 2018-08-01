@@ -55,7 +55,7 @@ class Duplicate_Case_Popup : public CWE_Popup
     Q_OBJECT
 
 public:
-    explicit Duplicate_Case_Popup(FileNodeRef toClone, CWE_MainWindow * controlWindow, QWidget *parent = 0);
+    explicit Duplicate_Case_Popup(FileNodeRef toClone, CWE_MainWindow * controlWindow, QWidget *parent = nullptr);
     ~Duplicate_Case_Popup();
 
 private slots:

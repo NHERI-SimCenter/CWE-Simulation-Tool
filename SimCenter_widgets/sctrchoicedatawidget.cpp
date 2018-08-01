@@ -44,10 +44,10 @@ SCtrChoiceDataWidget::SCtrChoiceDataWidget(QWidget *parent):
 
 SCtrChoiceDataWidget::~SCtrChoiceDataWidget()
 {
-    if (theComboBox != NULL) theComboBox->deleteLater();
-    if (label_unit != NULL) label_unit->deleteLater();
-    if (label_varName != NULL) label_varName->deleteLater();
-    if (theModel != NULL) theModel->deleteLater();
+    if (theComboBox != nullptr) theComboBox->deleteLater();
+    if (label_unit != nullptr) label_unit->deleteLater();
+    if (label_varName != nullptr) label_varName->deleteLater();
+    if (theModel != nullptr) theModel->deleteLater();
 }
 
 QString SCtrChoiceDataWidget::shownValue()
@@ -62,7 +62,7 @@ QString SCtrChoiceDataWidget::shownValue()
      * thus, the return value is the associate QString from col 0
      */
 
-    QStandardItemModel *model = (QStandardItemModel *)theComboBox->model();
+    QStandardItemModel *model = qobject_cast<QStandardItemModel *>(theComboBox->model());
     QStandardItem *item = model->item(theComboBox->currentIndex(), 0);
 
     return item->text();
@@ -109,7 +109,7 @@ void SCtrChoiceDataWidget::setComponetsEnabled(bool newSetting)
 
 void SCtrChoiceDataWidget::setShownValue(QString newValue)
 {
-    QStandardItemModel *theModel = (QStandardItemModel *)theComboBox->model();
+    QStandardItemModel *theModel = qobject_cast<QStandardItemModel *>(theComboBox->model());
     QList<QStandardItem *> itemList = theModel->findItems(newValue, Qt::MatchExactly, 0);
 
     if (itemList.isEmpty())

@@ -54,10 +54,10 @@ private:
 
     virtual void setShownValue(QString newValue);
 
-    QComboBox * theComboBox = NULL;
-    QStandardItemModel * theModel = NULL;
-    QLabel * label_unit = NULL;
-    QLabel * label_varName = NULL;
+    QComboBox * theComboBox = nullptr;
+    QStandardItemModel * theModel = nullptr;
+    QLabel * label_unit = nullptr;
+    QLabel * label_varName = nullptr;
 };
 
 #endif // SCTRCHOICEDATAWIDGET_H

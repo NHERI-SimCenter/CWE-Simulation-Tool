@@ -42,8 +42,8 @@ SCtrTextDataWidget::SCtrTextDataWidget(QWidget *parent):
 
 SCtrTextDataWidget::~SCtrTextDataWidget()
 {
-    if (theValue != NULL) theValue->deleteLater();
-    if (label_varName != NULL) label_varName->deleteLater();
+    if (theValue != nullptr) theValue->deleteLater();
+    if (label_varName != nullptr) label_varName->deleteLater();
 }
 
 QString SCtrTextDataWidget::shownValue()

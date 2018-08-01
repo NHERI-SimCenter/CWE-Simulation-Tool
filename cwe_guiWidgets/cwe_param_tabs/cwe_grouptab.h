@@ -46,7 +46,7 @@ class CWE_GroupTab : public CWE_ParamTab
     Q_OBJECT
 
 public:
-    explicit CWE_GroupTab(QString groupKey, QString groupName, QWidget *parent = 0);
+    explicit CWE_GroupTab(QString groupKey, QString groupName, QWidget *parent = nullptr);
     ~CWE_GroupTab();
 
 protected:

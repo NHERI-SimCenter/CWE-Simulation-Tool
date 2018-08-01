@@ -52,7 +52,7 @@ public slots:
     void setNewState(CaseState newState);
 
 private:
-    CFDcaseInstance * currentCase = NULL;
+    CFDcaseInstance * currentCase = nullptr;
 };
 
 #endif // CWE_STATE_LABEL_H

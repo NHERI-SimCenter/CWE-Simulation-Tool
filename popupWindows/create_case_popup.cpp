@@ -96,7 +96,7 @@ void Create_Case_Popup::button_create_copy_clicked()
         return;
     }
 
-    if (selectedTemplate == NULL)
+    if (selectedTemplate == nullptr)
     {
         cwe_globals::displayPopup("Please select a valid case type.");
         return;
@@ -170,7 +170,7 @@ void Create_Case_Popup::populateCaseTypes()
     }
 
     QLayout *lyt = ui->scroll_NewCase->layout();
-    if (lyt != NULL) {delete lyt;}
+    if (lyt != nullptr) {delete lyt;}
 
     ui->scroll_NewCase->setLayout(layout);
 }
@@ -181,14 +181,16 @@ void Create_Case_Popup::selectCaseTemplate()
     QVector<CASE_TYPE_DATA>::iterator i;
 
     for (i = caseTypeDataList.begin(); i != caseTypeDataList.end(); i++) {
-        if  (i->pbtn == (QPushButton *)sender) {
+        if  (i->pbtn == qobject_cast<QPushButton *>(sender))
+        {
             i->radioBtn->setChecked(true);
 
             selectedTemplate = i->templateData;
 
             break;
         }
-        else if  (i->radioBtn == (void *)sender ) {
+        else if  (i->radioBtn == qobject_cast<QRadioButton *>(sender))
+        {
             /* QRadioButton toggled -- Qt is taking care of this */
             //i->radioBtn->setChecked(true);
 

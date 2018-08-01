@@ -98,7 +98,7 @@ private:
 
     CFDtokenType myType;
 
-    CFDtoken * myParent = NULL;
+    CFDtoken * myParent = nullptr;
     QLinkedList<CFDtoken *> childList;
     QByteArray myString;
     int myInt;

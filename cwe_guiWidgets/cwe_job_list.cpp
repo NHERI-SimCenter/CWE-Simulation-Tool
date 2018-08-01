@@ -52,7 +52,7 @@ CWE_job_list::~CWE_job_list()
     delete ui;
 }
 
-void CWE_job_list::customJobMenu(const QPoint &pos)
+void CWE_job_list::customJobMenu(const QPoint &)
 {
     //TODO
     /*

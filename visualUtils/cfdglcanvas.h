@@ -108,9 +108,9 @@ private:
     //QOpenGLVertexArrayObject myVertexArray;
     //QOpenGLBuffer myBuffer;
     /*
-    QOpenGLShaderProgram * myShaderProgram = NULL;
-    QOpenGLShader * myShader = NULL;
-    QOpenGLTexture * myTexture = NULL;
+    QOpenGLShaderProgram * myShaderProgram = nullptr;
+    QOpenGLShader * myShader = nullptr;
+    QOpenGLTexture * myTexture = nullptr;
     */
 };
 

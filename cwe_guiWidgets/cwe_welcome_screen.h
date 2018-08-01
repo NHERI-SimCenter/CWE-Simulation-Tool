@@ -48,7 +48,7 @@ class CWE_welcome_screen : public CWE_Super
     Q_OBJECT
 
 public:
-    explicit CWE_welcome_screen(QWidget *parent = 0);
+    explicit CWE_welcome_screen(QWidget *parent = nullptr);
     ~CWE_welcome_screen();
 
 private slots:

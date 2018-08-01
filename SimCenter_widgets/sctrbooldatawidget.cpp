@@ -44,8 +44,8 @@ SCtrBoolDataWidget::SCtrBoolDataWidget(QWidget *parent):
 
 SCtrBoolDataWidget::~SCtrBoolDataWidget()
 {
-    if (theCheckBox != NULL) theCheckBox->deleteLater();
-    if (label_varName != NULL) label_varName->deleteLater();
+    if (theCheckBox != nullptr) theCheckBox->deleteLater();
+    if (label_varName != nullptr) label_varName->deleteLater();
 }
 
 QString SCtrBoolDataWidget::shownValue()
