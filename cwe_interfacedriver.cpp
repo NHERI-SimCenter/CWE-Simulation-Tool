@@ -91,8 +91,16 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
         if (CFDanalysisType::jsonConfigIsEnabled(&rawConfig, debug))
         {
             CFDanalysisType * newTemplate = new CFDanalysisType(rawConfig);
-            templateList.append(newTemplate);
-            qCDebug(agaveAppLayer, "Added New Template: %s", qPrintable(caseConfigFile));
+            if (!newTemplate->validParse())
+            {
+                qCDebug(agaveAppLayer, "Template Parse Invalid: %s", qPrintable(caseConfigFile));
+                delete newTemplate;
+            }
+            else
+            {
+                templateList.append(newTemplate);
+                qCDebug(agaveAppLayer, "Added New Template: %s", qPrintable(caseConfigFile));
+            }
         }
     }
 }

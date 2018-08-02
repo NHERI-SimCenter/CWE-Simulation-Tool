@@ -76,30 +76,39 @@ struct PARAM_VARIABLE_TYPE {
     QString showCondition;
 };
 
+struct TEMPLATE_GROUP {
+    QString displayName;
+    QString internalName;
+    QList<PARAM_VARIABLE_TYPE> varList;
+    QString groupImage;
+};
+
+struct TEMPLATE_STAGE {
+    QString displayName;
+    QString internalName;
+    QString appName;
+    QString appInputFile;
+    QList<TEMPLATE_GROUP> groupList;
+    QList<RESULTS_STYLE> resultList;
+};
+
 class CFDanalysisType
 {
 public:
     CFDanalysisType(QJsonDocument rawJSON);
+    ~CFDanalysisType();
+    bool validParse();
 
     QString getInternalName();
     QString getDisplayName();
     QString getDescription();
-    QString getIconName();
-    QStringList getStageIds();
-
-    QStringList getStageGroups(QString stage);
-    QList<RESULTS_STYLE> getStageResults(QString stage);
-
-    QStringList getVarGroup(QString group);
-    PARAM_VARIABLE_TYPE getVariableInfo(QString name);
-
-    QString getStageApp(QString stageID);
-    QString getExtraInput(QString stageID);
+    QIcon * getIcon();
+    int getListOrderNum();
 
     QString translateStageId(QString stageId);
-    QString translateGroupId(QString groupId);
-
-    QIcon * getIcon();
+    TEMPLATE_STAGE getStageFromId(QString stageId);
+    TEMPLATE_GROUP getGroupFromIds(QString stageId, QString groupId);
+    QStringList getStageIds();
 
     static bool jsonConfigIsEnabled(QJsonDocument * aDocument, bool inDebugMode);
 
@@ -107,16 +116,15 @@ public:
     static QJsonObject getStageById(QJsonArray stageList, QString toFind);
 
 private:
-    QJsonDocument * getRawConfig();
-
+    QString displayName;
+    QString internalName;
+    QString myDescription;
     QIcon myIcon;
     int listPriority;
+    bool valid = false;
 
-
-    QJsonDocument myConfiguration;
-
-
-    QStringList cachedOrderedStageList;
+    QList<TEMPLATE_STAGE> stageList;
+    QMap<QString, PARAM_VARIABLE_TYPE *> myVariables;
 };
 
 #endif // CFDANALYSISTYPE_H

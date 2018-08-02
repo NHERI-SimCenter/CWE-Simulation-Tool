@@ -121,7 +121,7 @@ private:
     void createStageTabs();
     void createGroupTabs();
     void createParamWidgets();
-    void addVariable(QString varName, PARAM_VARIABLE_TYPE &theVariable, QString *nonDefaultValue = nullptr);
+    void addVariable(PARAM_VARIABLE_TYPE &theVariable, QString *nonDefaultValue = nullptr);
 
     void clearStageTabs();
     void clearGroupTabs();

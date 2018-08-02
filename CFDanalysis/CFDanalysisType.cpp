@@ -39,269 +39,214 @@
 
 CFDanalysisType::CFDanalysisType(QJsonDocument rawJSON)
 {
-    myConfiguration = rawJSON;
+    QJsonObject obj = rawJSON.object();
 
-    QJsonObject obj = myConfiguration.object();
-    QString theIcon = obj["icon"].toString();
-
-    //Find the template icon
-    QString theIconPath;
-    if (theIcon == "")
+    internalName = obj["internalName"].toString();
+    displayName = obj["displayName"].toString();
+    myDescription = obj["description"].toString();
+    if (!obj.contains("list_order"))
     {
-        theIconPath = ":/buttons/images/defaultCaseImage.png";
+        listPriority = std::numeric_limits<int>::max();
     }
     else
+    {
+        listPriority = obj["list_order"].toInt();
+    }
+
+    //Find the template icon
+    QString theIcon = obj["icon"].toString();
+    QString theIconPath = ":/buttons/images/defaultCaseImage.png";
+    if (!theIcon.isEmpty())
     {
         theIconPath = ":/buttons/images/" + theIcon;
     }
     myIcon = QIcon(theIconPath);
 
-    //Initialize the cached stage list
-    QStringList stageList = obj["stages"].toObject().keys();;
-
-    for (QJsonValue aStage : obj["sequence"].toArray())
+    QJsonArray rawStages = obj["stages"].toArray();
+    for (QJsonValue aStageVal : rawStages)
     {
-        QString stageID = aStage.toString();
-        if (stageID.isEmpty()) continue;
-        if (!stageList.contains(stageID))
+        QJsonObject aStage = aStageVal.toObject();
+
+        TEMPLATE_STAGE newStage;
+        newStage.displayName = aStage.value("displayName").toString();
+        newStage.internalName = aStage.value("internalName").toString();
+        newStage.appName = aStage.value("app").toString();
+        newStage.appInputFile = aStage.value("app_input").toString();
+
+        if (newStage.displayName.isEmpty() || newStage.internalName.isEmpty() || newStage.appName.isEmpty())
         {
-            qCDebug(agaveAppLayer, "Config Parse Error: Sequence list and stage list do not match");
-            continue;
+            qCDebug(agaveAppLayer, "Config Parse Error: %s stage is incomplete", qPrintable(newStage.internalName));
+            return;
         }
 
-        cachedOrderedStageList.append(stageID);
-    }
-
-    if (cachedOrderedStageList.length() != stageList.length())
-    {
-        qCWarning(agaveAppLayer, "Config Parse Error: Sequence list and stage list do not match");
-    }
-}
-
-QJsonDocument * CFDanalysisType::getRawConfig()
-{
-    return &myConfiguration;
-}
-
-QString CFDanalysisType::getInternalName()
-{
-    QJsonObject obj = myConfiguration.object();
-    return obj["internalName"].toString();
-}
-
-QString CFDanalysisType::getDisplayName()
-{
-    QJsonObject obj = myConfiguration.object();
-    return obj["displayName"].toString();
-}
-
-QString CFDanalysisType::getDescription()
-{
-    QJsonObject obj = myConfiguration.object();
-    return obj["description"].toString();
-}
-
-QString CFDanalysisType::getIconName()
-{
-    QJsonObject obj = myConfiguration.object();
-    return obj["icon"].toString();
-}
-
-QStringList CFDanalysisType::getStageGroups(QString stage)
-{
-    QStringList list;
-
-    QJsonObject obj = myConfiguration.object();
-    QJsonArray groups = obj["stages"].toObject().value(stage).toObject().value("groups").toArray();
-
-    foreach (QJsonValue item, groups)
-    {
-        list.append(item.toString());
-    }
-
-    return list;
-}
-
-QList<RESULTS_STYLE> CFDanalysisType::getStageResults(QString stage)
-{
-    QList<RESULTS_STYLE> list;
-
-    QJsonObject obj = myConfiguration.object();
-    QJsonArray results = obj["stages"].toObject().value(stage).toObject().value("results").toArray();
-
-    foreach (QJsonValue val, results)
-    {
-        QJsonObject item = val.toObject();
-
-        RESULTS_STYLE res;
-
-        if (item.contains("displayName")) { res.displayName = item.value("displayName").toString(); }
-        if (item.contains("type")) { res.type = item.value("type").toString(); }
-        if (item.contains("file")) { res.file = item.value("file").toString(); }
-        if (item.contains("values")) { res.values = item.value("values").toString(); }
-        res.stage = stage;
-
-        list.append(res);
-    }
-
-    return list;
-}
-
-QStringList CFDanalysisType::getVarGroup(QString group)
-{
-    QStringList list;
-
-    QJsonObject obj = myConfiguration.object();
-    QJsonArray vars = obj["groups"].toObject().value(group).toObject().value("vars").toArray();
-
-    foreach (QJsonValue val, vars)
-    {
-        QString str = val.toString();
-        if (!str.isEmpty())
+        QJsonArray rawGroups = aStage.value("groups").toArray();
+        foreach (QJsonValue aGroup, rawGroups)
         {
-            list.append( str);
+            QJsonObject rawGroup = aGroup.toObject();
+
+            TEMPLATE_GROUP newGroup;
+            newGroup.displayName = rawGroup.value("displayName").toString();
+            newGroup.internalName = rawGroup.value("internalName").toString();
+            newGroup.groupImage = rawGroup.value("image").toString();
+
+            QJsonArray rawVars = rawGroup.value("vars").toArray();
+
+            foreach (QJsonValue aVar, rawVars)
+            {
+                QJsonObject rawVar = aGroup.toObject();
+
+                PARAM_VARIABLE_TYPE newVar;
+                newVar.options.clear();
+
+                newVar.internalName = rawVar.value("internalName").toString();
+                newVar.displayName = rawVar.value("displayName").toString();
+
+                newVar.type = SimCenterDataType::unknown;
+                if (rawVar.contains("type"))
+                {
+                    QString typeName = rawVar.value("type").toString();
+
+                    if (typeName == "std")          { newVar.type = SimCenterDataType::floatingpoint; }
+                    else if (typeName == "file")    { newVar.type = SimCenterDataType::file; }
+                    else if (typeName == "choose")  { newVar.type = SimCenterDataType::selection; }
+                    else if (typeName == "bool")    { newVar.type = SimCenterDataType::boolean; }
+                }
+
+                if (newVar.type == SimCenterDataType::unknown)
+                {
+                    qCDebug(agaveAppLayer, "Config Parse Error: %s var is unknown type", qPrintable(newVar.internalName));
+                    return;
+                }
+
+                if (newVar.type == SimCenterDataType::boolean)
+                {
+                    if (rawVar.contains("default") && rawVar.value("default").toBool())
+                    {
+                        newVar.defaultValue = "true";
+                    }
+                    else
+                    {
+                        newVar.defaultValue = "false";
+                    }
+                }
+                else
+                {
+                    newVar.defaultValue = rawVar.value("default").toString();
+                }
+
+                if (rawVar.contains("options"))
+                {
+                    foreach (QString key, rawVar.value("options").toObject().keys())
+                    {
+                        newVar.options.insert(key, rawVar.value("options").toObject().value(key).toString());
+                    }
+                }
+
+                newVar.unit = rawVar.value("unit").toString();
+                newVar.precision = rawVar.value("precision").toString();
+                newVar.sign = rawVar.value("sign").toString();
+                newVar.hideCondition = rawVar.value("hideCondition").toString();
+                newVar.showCondition = rawVar.value("showCondition").toString();
+
+                //TODO: Validate new var
+
+                newGroup.varList.append(newVar);
+                myVariables.insert(newVar.internalName, &(newGroup.varList.back()));
+            }
+
+            //TODO: Validate new group
+
+            newStage.groupList.append(newGroup);
+        }
+
+        QJsonArray rawResults = aStage.value("results").toArray();
+        foreach (QJsonValue val, rawResults)
+        {
+            QJsonObject rawResult = val.toObject();
+
+            RESULTS_STYLE newResult;
+            newResult.displayName = rawResult.value("displayName").toString();
+            newResult.type = rawResult.value("type").toString();
+            newResult.file = rawResult.value("file").toString();
+            newResult.values = rawResult.value("values").toString();
+            newResult.stage = newStage.internalName;
+
+            //TODO: Validate new result
+
+            newStage.resultList.append(newResult);
+        }
+
+        stageList.append(newStage);
+    }
+}
+
+CFDanalysisType::~CFDanalysisType()
+{
+    for (PARAM_VARIABLE_TYPE * aVar : myVariables.values())
+    {
+        delete aVar;
+    }
+}
+
+bool CFDanalysisType::validParse() {return valid;}
+QString CFDanalysisType::getInternalName() {return internalName;}
+QString CFDanalysisType::getDisplayName() {return displayName;}
+QString CFDanalysisType::getDescription() {return myDescription;}
+QIcon * CFDanalysisType::getIcon() {return &myIcon;}
+int CFDanalysisType::getListOrderNum() {return listPriority;}
+
+QString CFDanalysisType::translateStageId(QString stageId)
+{
+    TEMPLATE_STAGE aStage = getStageFromId(stageId);
+    return aStage.displayName;
+}
+
+TEMPLATE_STAGE CFDanalysisType::getStageFromId(QString stageId)
+{
+    for (TEMPLATE_STAGE aStage : stageList)
+    {
+        if (aStage.internalName == stageId)
+        {
+            return aStage;
         }
     }
-
-    return list;
+    //TODO: Debug error message here
+    TEMPLATE_STAGE nil;
+    return nil;
 }
 
-PARAM_VARIABLE_TYPE CFDanalysisType::getVariableInfo(QString name)
+TEMPLATE_GROUP CFDanalysisType::getGroupFromIds(QString stageId, QString groupId)
 {
-    //TODO: Clean up this method
-    //TODO: Default should always exist and be valid
+    TEMPLATE_GROUP nil;
 
-    PARAM_VARIABLE_TYPE res;
-
-    res.internalName = "ERROR";
-    res.options.clear();
-
-    QJsonObject obj = myConfiguration.object();
-    QJsonObject vals = obj["vars"].toObject();
-
-    if (!vals.contains(name))
+    TEMPLATE_STAGE theStage = getStageFromId(stageId);
+    if (theStage.internalName.isEmpty())
     {
-        res.displayName   = "none";
-        res.type          = SimCenterDataType::unknown;
-        res.defaultValue  = QString("missing definition for variable '%1'").arg(name);
+        //TODO: Debug error message here
+        return nil;
     }
 
-    QJsonObject item = vals.value(name).toObject();
-
-    res.internalName = name;
-
-    if (item.contains("displayName")) { res.displayName = item.value("displayName").toString(); }
-
-    if (item.contains("options"))
+    for (TEMPLATE_GROUP aGroup : theStage.groupList)
     {
-        foreach (QString key, item["options"].toObject().keys())
+        if (aGroup.internalName == groupId)
         {
-            res.options.insert(key, item["options"].toObject().value(key).toString());
+            return aGroup;
         }
     }
-    if (item.contains("type"))
-    {
-        QString typeName = item.value("type").toString();
-
-        if (typeName == "std")
-        {
-            res.type = SimCenterDataType::floatingpoint;
-        }
-        else if (typeName == "file")
-        {
-            res.type = SimCenterDataType::file;
-        }
-        else if (typeName == "choose")
-        {
-            res.type = SimCenterDataType::selection;
-        }
-        else if (typeName == "bool")
-        {
-            res.type = SimCenterDataType::boolean;
-        }
-        else
-        {
-            res.type = SimCenterDataType::unknown;
-        }
-    }
-
-    if (res.type == SimCenterDataType::boolean)
-    {
-        if (item.contains("default") && item.value("default").toBool())
-        {
-            res.defaultValue = "true";
-        }
-        else
-        {
-            res.defaultValue = "false";
-        }
-    }
-    else
-    {
-        if (item.contains("default"))     { res.defaultValue = item.value("default").toString(); }
-    }
-
-    if (item.contains("unit"))          { res.unit = item.value("unit").toString(); }
-    if (item.contains("precision"))     { res.precision = item.value("precision").toString(); }
-    if (item.contains("sign"))          { res.sign = item.value("sign").toString(); }
-    if (item.contains("hideCondition")) { res.hideCondition = item.value("hideCondition").toString(); }
-    if (item.contains("showCondition")) { res.showCondition = item.value("showCondition").toString(); }
-
-    return res;
-}
-
-QString CFDanalysisType::getStageApp(QString stageID)
-{
-    QJsonObject obj = myConfiguration.object();
-    QString tmpStr = obj["stages"].toObject().value(stageID).toObject().value("app").toString();
-    if (tmpStr.isEmpty())
-    {
-        return "cwe-serial";
-    }
-    return tmpStr;
-}
-
-QString CFDanalysisType::getExtraInput(QString stageID)
-{
-    QJsonObject obj = myConfiguration.object();
-    QString tmpStr = obj["stages"].toObject().value(stageID).toObject().value("app_input").toString();
-    return tmpStr;
+    //TODO: Debug error message here
+    return nil;
 }
 
 QStringList CFDanalysisType::getStageIds()
 {
-    return cachedOrderedStageList;
-}
+    QStringList ret;
 
-QString CFDanalysisType::translateStageId(QString stageId)
-{
-    QJsonObject obj = myConfiguration.object();
-    QJsonObject stageList = obj["stages"].toObject();
-
-    QString aStage = stageList[stageId].toObject()["displayName"].toString();
-    if (aStage.isEmpty())
+    for (TEMPLATE_STAGE aStage : stageList)
     {
-        return "NULL";
+        ret.append(aStage.internalName);
     }
-    return aStage;
-}
 
-QString CFDanalysisType::translateGroupId(QString groupId)
-{
-    QJsonObject obj = myConfiguration.object();
-    QJsonObject stageList = obj["groups"].toObject();
-
-    QString aGroup = stageList[groupId].toObject()["displayName"].toString();
-    if (aGroup.isEmpty())
-    {
-        return "NULL";
-    }
-    return aGroup;
-}
-
-QIcon * CFDanalysisType::getIcon()
-{
-    return &myIcon;
+    return ret;
 }
 
 bool CFDanalysisType::jsonConfigIsEnabled(QJsonDocument * aDocument, bool inDebugMode)

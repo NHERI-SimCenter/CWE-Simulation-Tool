@@ -681,11 +681,11 @@ void CWE_Parameters::createGroupTabs()
 
     QHBoxLayout * tablayout = qobject_cast<QHBoxLayout *>(ui->groupsBar->layout());
 
-    QStringList groupList = theType->getStageGroups(selectedStage->getRefKey());
+    QList<TEMPLATE_GROUP> groupList = theType->getStageFromId(selectedStage->getRefKey()).groupList;
 
-    for (QString aGroup : groupList)
+    for (TEMPLATE_GROUP aGroup : groupList)
     {
-        CWE_GroupTab *tab = new CWE_GroupTab(aGroup, theType->translateGroupId(aGroup), this);
+        CWE_GroupTab *tab = new CWE_GroupTab(aGroup.internalName, aGroup.displayName, this);
 
         tablayout->addWidget(tab);
         groupTabList.append(tab);
@@ -726,26 +726,25 @@ void CWE_Parameters::createParamWidgets()
         loadingLabel = nullptr;
     }
 
-    QStringList groupVars = theType->getVarGroup(selectedGroup->getRefKey());
+    TEMPLATE_GROUP aGroup = theType->getGroupFromIds(selectedStage->getRefKey(), selectedGroup->getRefKey());
 
-    foreach (QString varName, groupVars)
+    foreach (PARAM_VARIABLE_TYPE theVariable, aGroup.varList)
     {
-        PARAM_VARIABLE_TYPE theVariable = theType->getVariableInfo(varName);
-        if (currentParams.contains(varName))
+        if (currentParams.contains(theVariable.internalName))
         {
-            QString currentValue = currentParams.value(varName);
-            addVariable(varName, theVariable, &currentValue);
+            QString currentValue = currentParams.value(theVariable.internalName);
+            addVariable(theVariable, &currentValue);
         }
         else
         {
-            addVariable(varName, theVariable);
+            addVariable(theVariable);
         }
     }
 
     resetButtonAndView();
 }
 
-void CWE_Parameters::addVariable(QString varName, PARAM_VARIABLE_TYPE &theVariable, QString * nonDefaultValue)
+void CWE_Parameters::addVariable(PARAM_VARIABLE_TYPE &theVariable, QString * nonDefaultValue)
 {
     SCtrMasterDataWidget *theVar = nullptr;
 
@@ -778,7 +777,7 @@ void CWE_Parameters::addVariable(QString varName, PARAM_VARIABLE_TYPE &theVariab
     }
     else {
         // add an error message
-        qCWarning(agaveAppLayer, "Variable %s of unknown type. Variable ignored.", qPrintable(varName));
+        qCWarning(agaveAppLayer, "Variable %s of unknown type. Variable ignored.", qPrintable(theVariable.internalName));
         return;
     }
     theVar->setDataType(theVariable);
