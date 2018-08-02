@@ -1,11 +1,11 @@
 {
     "displayName":"3D Motion Simulation",
-    "internalName":"motionSim",
+    "internalName":"motion_sim",
     "description":"This model computes \nthe air flow around a building\n using an uploaded 3D geometry,\nand simulates the resulting building motion.",
     "icon":"upload3D.png",
     "debugOnly":true,
     "disable":true,
-    "parent":"upload3D",
+    "parent":"upload3D.json",
     "stages":[
         "mesh",
         "sim",

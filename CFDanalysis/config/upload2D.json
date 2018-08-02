@@ -3,6 +3,7 @@
     "internalName":"upload2D",
     "description":"This model describes \nthe air flow around a building\n using a 2D horizontal slice.",
     "icon":"upload2D.png",
+    "list_order":1,
     "stages":[
         {
             "displayName":"Mesh",

@@ -82,8 +82,7 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
     foreach (QString caseConfigFile, caseTypeFiles)
     {
         QString confPath = ":/config/";
-        confPath = confPath.append(caseConfigFile);
-        QJsonDocument rawConfig = CFDanalysisType::getRawJSON(confPath);
+        QJsonDocument rawConfig = CFDanalysisType::getRawJSON(confPath, caseConfigFile);
         if (rawConfig.isEmpty())
         {
             qCDebug(agaveAppLayer, "Unreadable template config file skipped: %s", qPrintable(caseConfigFile));

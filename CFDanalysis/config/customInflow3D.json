@@ -1,11 +1,12 @@
 {
     "displayName":"3D Building - Custom Inflow",
-    "internalName":"motionSim",
+    "internalName":"custom_inflow",
     "description":"This model computes \nthe air flow around a building\n using an uploaded 3D geometry,\nusing customized inflows",
     "icon":"upload3D.png",
     "debugOnly":true,
-    "disable":true,
-    "parent":"upload3D",
+    "disable":false,
+    "list_order":3,
+    "parent":"upload3D.json",
     "stages":[
         {
             "displayName":"Custom Inflow",

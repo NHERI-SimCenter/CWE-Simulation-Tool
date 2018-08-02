@@ -324,9 +324,12 @@ bool CFDanalysisType::jsonConfigIsEnabled(QJsonDocument * aDocument, bool inDebu
     return true;
 }
 
-QJsonDocument CFDanalysisType::getRawJSON(QString configFileName)
+QJsonDocument CFDanalysisType::getRawJSON(QString configFolder, QString configFile)
 {
-    QJsonDocument empty;
+    QString configFileName = configFolder;
+    configFileName = configFileName.append("/");
+    configFileName = configFileName.append(configFile);
+
     QFile inFile(configFileName);
     inFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QByteArray val = inFile.readAll();
@@ -338,10 +341,50 @@ QJsonDocument CFDanalysisType::getRawJSON(QString configFileName)
     if (ret.isNull())
     {
         qCDebug(agaveAppLayer, "JSON Parse Error: %s", qPrintable(theError.errorString()));
-        return empty;
+        return QJsonDocument();
     }
 
-    //TODO: Perform loading of parent configs
+    QJsonObject theConfig = ret.object();
+    if (theConfig.contains("parent") && theConfig.value("parent").isString())
+    {
+        QJsonDocument parentConfig = getRawJSON(configFolder, theConfig.value("parent").toString());
+        QJsonArray trueStages;
+        QJsonArray stageList = theConfig.value("stages").toArray();
+        QJsonArray parentStages = parentConfig.object().value("stages").toArray();
+
+        for (QJsonValue arrayEntry: stageList)
+        {
+            if (arrayEntry.isString())
+            {
+                QString stageID = arrayEntry.toString();
+                QJsonObject stageToInsert = getStageById(parentStages, stageID);
+                if (!stageToInsert.isEmpty())
+                {
+                    trueStages.append(stageToInsert);
+                }
+            }
+            else
+            {
+                trueStages.append(arrayEntry);
+            }
+        }
+
+        theConfig.remove("stages");
+        theConfig.insert("stages", trueStages);
+        ret.setObject(theConfig);
+    }
 
     return ret;
+}
+
+QJsonObject CFDanalysisType::getStageById(QJsonArray stageList, QString toFind)
+{
+    for (QJsonValue aStage: stageList)
+    {
+        if (aStage.toObject().value("internalName").toString() == toFind)
+        {
+            return aStage.toObject();
+        }
+    }
+    return QJsonObject();
 }

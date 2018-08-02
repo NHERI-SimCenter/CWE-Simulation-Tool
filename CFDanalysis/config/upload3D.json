@@ -3,6 +3,7 @@
     "internalName":"upload3D",
     "description":"This model describes \nthe air flow around a building\n using an uploaded 3D geometry.",
     "icon":"upload3D.png",
+    "list_order":2,
     "stages":[
         {
             "displayName":"Mesh",

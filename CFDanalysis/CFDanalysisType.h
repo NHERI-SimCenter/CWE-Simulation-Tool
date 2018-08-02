@@ -103,14 +103,18 @@ public:
 
     static bool jsonConfigIsEnabled(QJsonDocument * aDocument, bool inDebugMode);
 
-    static QJsonDocument getRawJSON(QString configFileName);
+    static QJsonDocument getRawJSON(QString configFolder, QString configFile);
+    static QJsonObject getStageById(QJsonArray stageList, QString toFind);
 
 private:
     QJsonDocument * getRawConfig();
 
     QIcon myIcon;
+    int listPriority;
+
 
     QJsonDocument myConfiguration;
+
 
     QStringList cachedOrderedStageList;
 };
