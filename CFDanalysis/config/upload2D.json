@@ -114,30 +114,194 @@
                     "displayName":"Subdomains",
                     "internalName":"mesh_subdomains",
                     "vars":[
-                        "innerDomains",
-                        "inPadDom1",
-                        "outPadDom1",
-                        "lowYDom1",
-                        "highYDom1",
-                        "meshDensityDom1",
-                        "inPadDom2",
-                        "outPadDom2",
-                        "lowYDom2",
-                        "highYDom2",
-                        "meshDensityDom2",
-                        "inPadDom3",
-                        "outPadDom3",
-                        "lowYDom3",
-                        "highYDom3",
-                        "meshDensityDom3"
+                        {
+                            "displayName":"Number of Subdomains",
+                            "internalName":"innerDomains",
+                            "type":"choose",
+                            "default":"0",
+                            "options":{
+                                "0":"0",
+                                "1":"1",
+                                "2":"2",
+                                "3":"3"
+                            }
+                        },
+                        {
+                            "displayName":"Subdomain 1 Length (Inlet)",
+                            "internalName":"inPadDom1",
+                            "type":"std",
+                            "default":"2",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=1"
+                        },
+                        {
+                            "displayName":"Subdomain 1 Length (Outlet)",
+                            "internalName":"outPadDom1",
+                            "type":"std",
+                            "default":"4",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=1"
+                        },
+                        {
+                            "displayName":"Subdomain 1 Length (Lower)",
+                            "internalName":"lowYDom1",
+                            "type":"std",
+                            "default":"2",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=1"
+                        },
+                        {
+                            "displayName":"Subdomain 1 Length (Upper)",
+                            "internalName":"highYDom1",
+                            "type":"std",
+                            "default":"2",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=1"
+                        },
+                        {
+                            "displayName":"Grid Size (Edge of Subdomain 1)",
+                            "internalName":"meshDensityDom1",
+                            "type":"std",
+                            "default":"3",
+                            "unit":"m",
+                            "precision":"2",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=1"
+                        },
+                        {
+                            "displayName":"Subdomain 2 Length (Inlet)",
+                            "internalName":"inPadDom2",
+                            "type":"std",
+                            "default":"4",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=2"
+                        },
+                        {
+                            "displayName":"Subdomain 2 Length (Outlet)",
+                            "internalName":"outPadDom2",
+                            "type":"std",
+                            "default":"6",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=2"
+                        },
+                        {
+                            "displayName":"Subdomain 2 Length (Lower)",
+                            "internalName":"lowYDom2",
+                            "type":"std",
+                            "default":"4",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=2"
+                        },
+                        {
+                            "displayName":"Subdomain 2 Length (Upper)",
+                            "internalName":"highYDom2",
+                            "type":"std",
+                            "default":"4",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=2"
+                        },
+                        {
+                            "displayName":"Grid Size (Edge of Subdomain 2)",
+                            "internalName":"meshDensityDom2",
+                            "type":"std",
+                            "default":"3",
+                            "unit":"m",
+                            "precision":"2",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=2"
+                        },
+                        {
+                            "displayName":"Subdomain 3 Length (Inlet)",
+                            "internalName":"inPadDom3",
+                            "type":"std",
+                            "default":"6",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=3"
+                        },
+                        {
+                            "displayName":"Subdomain 3 Length (Outlet)",
+                            "internalName":"outPadDom3",
+                            "type":"std",
+                            "default":"8",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=3"
+                        },
+                        {
+                            "displayName":"Subdomain 3 Length (Lower)",
+                            "internalName":"lowYDom3",
+                            "type":"std",
+                            "default":"6",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=3"
+                        },
+                        {
+                            "displayName":"Subdomain 3 Length (Upper)",
+                            "internalName":"highYDom3",
+                            "type":"std",
+                            "default":"6",
+                            "unit":"times max size of object",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=3"
+                        },
+                        {
+                            "displayName":"Grid Size (Edge of Subdomain 3)",
+                            "internalName":"meshDensityDom3",
+                            "type":"std",
+                            "default":"3",
+                            "unit":"m",
+                            "precision":"1",
+                            "sign":"+",
+                            "showCondition":"$innerDomains>=3"
+                        }
                     ]
                 },
                 {
                     "displayName":"Boundaries",
                     "internalName":"boundaries",
                     "vars":[
-                        "lowYPlane",
-                        "highYPlane"
+                        {
+                            "displayName":"Boundary Condition (Bottom)",
+                            "internalName":"lowYPlane",
+                            "type":"choose",
+                            "default":"SYM_PLANE",
+                            "options":{
+                                "SYM_PLANE": "Symmetry Plane",
+                                "WALL": "Wall"
+                            }
+                        },
+                        {
+                            "displayName":"Boundary Condition (Top)",
+                            "internalName":"highYPlane",
+                            "type":"choose",
+                            "default":"SYM_PLANE",
+                            "options":{
+                                "SYM_PLANE": "Symmetry Plane",
+                                "WALL": "Wall"
+                            }
+                        }
                     ]
                 }
             ],
@@ -214,13 +378,62 @@
                     "displayName":"Advanced",
                     "internalName":"advanced",
                     "vars":[
-                        "turbModel",
-                        "useForceCoeffs",
-                        "useFieldUmean",
-                        "useFieldPmean",
-                        "pisoCorrectors",
-                        "pisoNonOrthCorrect",
-                        "turbintensity"
+                        {
+                            "displayName":"Turbulence Model",
+                            "internalName":"turbModel",
+                            "type":"choose",
+                            "default":"laminar",
+                            "options":{
+                                "laminar":"Laminar Flow model",
+                                "SpalartAllmaras":"S-A one equation model (RANS)",
+                                "kEpsilon":"k-epsilon model (RANS)",
+                                "Smagorinsky":"Smagorinsky SGS model (LES)",
+                                "kEqn":"One equation eddy-viscosity model (LES)"
+                            }
+                        },
+                        {
+                            "displayName":"Compute Force Coefficients?",
+                            "internalName":"useForceCoeffs",
+                            "type":"bool",
+                            "default": true
+                        },
+                        {
+                            "displayName":"Compute Mean Velocity Field?",
+                            "internalName":"useFieldUmean",
+                            "type":"bool",
+                            "default": false
+                        },
+                        {
+                            "displayName":"Compute Mean Pressure Field?",
+                            "internalName":"useFieldPmean",
+                            "type":"bool",
+                            "default": false
+                        },
+                        {
+                            "displayName":"Number of PISO Correctors",
+                            "internalName":"pisoCorrectors",
+                            "type":"std",
+                            "default":"2",
+                            "precision":"int",
+                            "sign":"+0"
+                        },
+                        {
+                            "displayName":"Number of non-orthogonal Correctors",
+                            "internalName":"pisoNonOrthCorrect",
+                            "type":"std",
+                            "default":"1",
+                            "precision":"int",
+                            "sign":"+0"
+                        },
+                        {
+                            "displayName":"Turbulence Intensity",
+                            "internalName":"turbintensity",
+                            "type":"std",
+                            "default":"0.1",
+                            "precision":"2",
+                            "sign":"+",
+                            "showCondition":"$turbModel!laminar"
+                        }
                     ]
                 }
             ],
@@ -264,224 +477,5 @@
                 }
             ]
         }
-    ],
-    "vars":{
-
-
-
-
-        "lowYPlane":{
-            "displayName":"Boundary Condition (Bottom)",
-            "type":"choose",
-            "default":"SYM_PLANE",
-            "options":{
-                "SYM_PLANE": "Symmetry Plane",
-                "WALL": "Wall"
-            }
-        },
-        "highYPlane":{
-            "displayName":"Boundary Condition (Top)",
-            "type":"choose",
-            "default":"SYM_PLANE",
-            "options":{
-                "SYM_PLANE": "Symmetry Plane",
-                "WALL": "Wall"
-            }
-        },
-        "useForceCoeffs":{
-            "displayName":"Compute Force Coefficients?",
-            "type":"bool",
-            "default": true
-        },
-        "useFieldUmean":{
-            "displayName":"Compute Mean Velocity Field?",
-            "type":"bool",
-            "default": false
-        },
-        "useFieldPmean":{
-            "displayName":"Compute Mean Pressure Field?",
-            "type":"bool",
-            "default": false
-        },
-        "turbModel":{
-            "displayName":"Turbulence Model",
-            "type":"choose",
-            "default":"laminar",
-            "options":{
-                "laminar":"Laminar Flow model",
-                "SpalartAllmaras":"S-A one equation model (RANS)",
-                "kEpsilon":"k-epsilon model (RANS)",
-                "Smagorinsky":"Smagorinsky SGS model (LES)",
-                "kEqn":"One equation eddy-viscosity model (LES)"
-            }
-        },
-        "turbintensity":{
-            "displayName":"Turbulence Intensity",
-            "type":"std",
-            "default":"0.1",
-            "precision":"2",
-            "sign":"+",
-            "showCondition":"$turbModel!laminar"
-        },
-        "pisoCorrectors":{
-            "displayName":"Number of PISO Correctors",
-            "type":"std",
-            "default":"2",
-            "precision":"int",
-            "sign":"+0"
-        },
-        "pisoNonOrthCorrect":{
-            "displayName":"Number of non-orthogonal Correctors",
-            "type":"std",
-            "default":"1",
-            "precision":"int",
-            "sign":"+0"
-        },
-        "innerDomains":{
-            "displayName":"Number of Subdomains",
-            "type":"choose",
-            "default":"0",
-            "options":{
-                "0":"0",
-                "1":"1",
-                "2":"2",
-                "3":"3"
-            }
-        },
-        "inPadDom1":{
-            "displayName":"Subdomain 1 Length (Inlet)",
-            "type":"std",
-            "default":"2",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=1"
-        },
-        "outPadDom1":{
-            "displayName":"Subdomain 1 Length (Outlet)",
-            "type":"std",
-            "default":"4",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=1"
-        },
-        "lowYDom1":{
-            "displayName":"Subdomain 1 Length (Lower)",
-            "type":"std",
-            "default":"2",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=1"
-        },
-        "highYDom1":{
-            "displayName":"Subdomain 1 Length (Upper)",
-            "type":"std",
-            "default":"2",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=1"
-        },
-        "meshDensityDom1":{
-            "displayName":"Grid Size (Edge of Subdomain 1)",
-            "type":"std",
-            "default":"3",
-            "unit":"m",
-            "precision":"2",
-            "sign":"+",
-            "showCondition":"$innerDomains>=1"
-        },
-        "inPadDom2":{
-            "displayName":"Subdomain 2 Length (Inlet)",
-            "type":"std",
-            "default":"4",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=2"
-        },
-        "outPadDom2":{
-            "displayName":"Subdomain 2 Length (Outlet)",
-            "type":"std",
-            "default":"6",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=2"
-        },
-        "lowYDom2":{
-            "displayName":"Subdomain 2 Length (Lower)",
-            "type":"std",
-            "default":"4",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=2"
-        },
-        "highYDom2":{
-            "displayName":"Subdomain 2 Length (Upper)",
-            "type":"std",
-            "default":"4",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=2"
-        },
-        "meshDensityDom2":{
-            "displayName":"Grid Size (Edge of Subdomain 2)",
-            "type":"std",
-            "default":"3",
-            "unit":"m",
-            "precision":"2",
-            "sign":"+",
-            "showCondition":"$innerDomains>=2"
-        },
-        "inPadDom3":{
-            "displayName":"Subdomain 3 Length (Inlet)",
-            "type":"std",
-            "default":"6",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=3"
-        },
-        "outPadDom3":{
-            "displayName":"Subdomain 3 Length (Outlet)",
-            "type":"std",
-            "default":"8",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=3"
-        },
-        "lowYDom3":{
-            "displayName":"Subdomain 3 Length (Lower)",
-            "type":"std",
-            "default":"6",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=3"
-        },
-        "highYDom3":{
-            "displayName":"Subdomain 3 Length (Upper)",
-            "type":"std",
-            "default":"6",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=3"
-        },
-        "meshDensityDom3":{
-            "displayName":"Grid Size (Edge of Subdomain 3)",
-            "type":"std",
-            "default":"3",
-            "unit":"m",
-            "precision":"1",
-            "sign":"+",
-            "showCondition":"$innerDomains>=3"
-        }
-    }
+    ]
 }

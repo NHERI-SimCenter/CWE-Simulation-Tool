@@ -168,6 +168,8 @@ void Create_Case_Popup::populateCaseTypes()
 
         idx++;
     }
+    layout->addItem(new QSpacerItem(1,1, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding),
+                    layout->rowCount(),0,1,layout->columnCount());
 
     QLayout *lyt = ui->scroll_NewCase->layout();
     if (lyt != nullptr) {delete lyt;}

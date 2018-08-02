@@ -83,18 +83,18 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
     {
         QString confPath = ":/config/";
         confPath = confPath.append(caseConfigFile);
-        CFDanalysisType * newTemplate = new CFDanalysisType(confPath);
-        if ((debug == false) && (newTemplate->isDebugOnly() == true))
+        QJsonDocument rawConfig = CFDanalysisType::getRawJSON(confPath);
+        if (rawConfig.isEmpty())
         {
-            delete newTemplate;
+            qCDebug(agaveAppLayer, "Unreadable template config file skipped: %s", qPrintable(caseConfigFile));
             continue;
         }
-        if (newTemplate->isDisabled())
+        if (CFDanalysisType::jsonConfigIsEnabled(&rawConfig, debug))
         {
-            delete newTemplate;
-            continue;
+            CFDanalysisType * newTemplate = new CFDanalysisType(rawConfig);
+            templateList.append(newTemplate);
+            qCDebug(agaveAppLayer, "Added New Template: %s", qPrintable(caseConfigFile));
         }
-        templateList.append(newTemplate);
     }
 }
 

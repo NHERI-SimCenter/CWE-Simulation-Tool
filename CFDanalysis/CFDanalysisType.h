@@ -79,7 +79,7 @@ struct PARAM_VARIABLE_TYPE {
 class CFDanalysisType
 {
 public:
-    CFDanalysisType(QString configFile);
+    CFDanalysisType(QJsonDocument rawJSON);
 
     QString getInternalName();
     QString getDisplayName();
@@ -101,8 +101,9 @@ public:
 
     QIcon * getIcon();
 
-    bool isDebugOnly();
-    bool isDisabled();
+    static bool jsonConfigIsEnabled(QJsonDocument * aDocument, bool inDebugMode);
+
+    static QJsonDocument getRawJSON(QString configFileName);
 
 private:
     QJsonDocument * getRawConfig();
@@ -112,7 +113,6 @@ private:
     QJsonDocument myConfiguration;
 
     QStringList cachedOrderedStageList;
-
 };
 
 #endif // CFDANALYSISTYPE_H

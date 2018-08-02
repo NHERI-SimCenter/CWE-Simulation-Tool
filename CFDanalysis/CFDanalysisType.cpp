@@ -37,14 +37,9 @@
 
 #include "../AgaveExplorer/ae_globals.h"
 
-CFDanalysisType::CFDanalysisType(QString configFile)
+CFDanalysisType::CFDanalysisType(QJsonDocument rawJSON)
 {
-    QFile inFile(configFile);
-    inFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray val = inFile.readAll();
-    inFile.close();
-
-    myConfiguration = QJsonDocument::fromJson(val);
+    myConfiguration = rawJSON;
 
     QJsonObject obj = myConfiguration.object();
     QString theIcon = obj["icon"].toString();
@@ -309,40 +304,44 @@ QIcon * CFDanalysisType::getIcon()
     return &myIcon;
 }
 
-bool CFDanalysisType::isDebugOnly()
+bool CFDanalysisType::jsonConfigIsEnabled(QJsonDocument * aDocument, bool inDebugMode)
 {
-    QJsonObject obj = myConfiguration.object();
-    if (!obj.contains("debugOnly"))
+    QJsonObject obj = aDocument->object();
+
+    if (!inDebugMode)
+    {
+        if (obj.contains("debugOnly") && obj["debugOnly"].isBool() && (obj["debugOnly"].toBool() == true))
+        {
+            return false;
+        }
+    }
+
+    if (obj.contains("disable") && obj["disable"].isBool() && (obj["disable"].toBool() == true))
     {
         return false;
     }
-    if (!obj["debugOnly"].isBool())
-    {
-        return false;
-    }
-    if (obj["debugOnly"].toBool() == true)
-    {
-        return true;
-    }
-    return false;
+
+    return true;
 }
 
-bool CFDanalysisType::isDisabled()
+QJsonDocument CFDanalysisType::getRawJSON(QString configFileName)
 {
-    QJsonObject obj = myConfiguration.object();
-    if (!obj.contains("disable"))
+    QJsonDocument empty;
+    QFile inFile(configFileName);
+    inFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray val = inFile.readAll();
+    inFile.close();
+
+    QJsonParseError theError;
+    QJsonDocument ret = QJsonDocument::fromJson(val, &theError);
+
+    if (ret.isNull())
     {
-        return false;
+        qCDebug(agaveAppLayer, "JSON Parse Error: %s", qPrintable(theError.errorString()));
+        return empty;
     }
-    if (!obj["disable"].isBool())
-    {
-        return false;
-    }
-    if (obj["disable"].toBool() == true)
-    {
-        return true;
-    }
-    return false;
+
+    //TODO: Perform loading of parent configs
+
+    return ret;
 }
-
-

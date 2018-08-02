@@ -5,7 +5,6 @@
     "icon":"placeholderIcon.png",
     "debugOnly":true,
     "disable":true,
-    "sequence":["mesh","sim"],
     "stages":{
         "mesh":{
             "displayName":"Mesh",
