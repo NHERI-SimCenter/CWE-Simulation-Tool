@@ -82,7 +82,7 @@ class SCtrMasterDataWidget : public QFrame
     Q_OBJECT
 
 public:
-    explicit SCtrMasterDataWidget(QWidget *parent = 0);
+    explicit SCtrMasterDataWidget(QWidget *parent = nullptr);
     ~SCtrMasterDataWidget();
     SimCenterViewState viewState();
     void setViewState(SimCenterViewState);

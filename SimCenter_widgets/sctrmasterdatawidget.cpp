@@ -75,8 +75,6 @@ void SCtrMasterDataWidget::setViewState(SimCenterViewState state)
         setComponetsEnabled(true);
         this->show();
         break;
-    default:
-        cwe_globals::displayFatalPopup("Invalid SimCenter View State in code.", "Fatal Error");
     }
 }
 

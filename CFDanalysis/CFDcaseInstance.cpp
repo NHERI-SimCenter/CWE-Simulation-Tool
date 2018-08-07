@@ -49,7 +49,7 @@
 #include "cwe_globals.h"
 
 CFDcaseInstance::CFDcaseInstance(const FileNodeRef &newCaseFolder):
-    QObject((QObject *) cwe_globals::get_CWE_Driver())
+    QObject(qobject_cast<QObject *>(cwe_globals::get_CWE_Driver()))
 {
     caseFolder = newCaseFolder;
     connectCaseSignals();
@@ -57,7 +57,7 @@ CFDcaseInstance::CFDcaseInstance(const FileNodeRef &newCaseFolder):
 }
 
 CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType):
-    QObject((QObject *) cwe_globals::get_CWE_Driver())
+    QObject(qobject_cast<QObject *>(cwe_globals::get_CWE_Driver()))
 {
     myType = caseType;
     connectCaseSignals();
@@ -65,7 +65,7 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType):
 }
 
 CFDcaseInstance::CFDcaseInstance():
-    QObject((QObject *) cwe_globals::get_CWE_Driver())
+    QObject(qobject_cast<QObject *>(cwe_globals::get_CWE_Driver()))
 {
     connectCaseSignals();
     computeInitState();
@@ -100,8 +100,6 @@ CaseState CFDcaseInstance::getCaseState()
     case InternalCaseState::STOPPING_JOB :
     case InternalCaseState::WAITING_FOLDER_DEL : return CaseState::OP_INVOKE;
     case InternalCaseState::RUNNING_JOB : return CaseState::RUNNING;
-    default:
-        return CaseState::ERROR;
     }
     return CaseState::ERROR;
 }
@@ -120,7 +118,7 @@ QString CFDcaseInstance::getCaseName()
 
 CFDanalysisType * CFDcaseInstance::getMyType()
 {
-    if (defunct) return NULL;
+    if (defunct) return nullptr;
     return myType;
 }
 
@@ -233,7 +231,7 @@ bool CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
         return false;
     }
 
-    varStore.setFileBuffer(NULL);
+    varStore.setFileBuffer(nullptr);
     emitNewState(InternalCaseState::PARAM_SAVE);
 
     return true;
@@ -243,7 +241,7 @@ bool CFDcaseInstance::startStageApp(QString stageID)
 {
     if (defunct) return false;
     if (!caseFolder.fileNodeExtant()) return false;
-    if (myType == NULL) return false;
+    if (myType == nullptr) return false;
     if (myState != InternalCaseState::READY) return false;
     if (storedStageStates.value(stageID, StageState::ERROR) != StageState::UNRUN) return false;
 
@@ -267,7 +265,7 @@ bool CFDcaseInstance::startStageApp(QString stageID)
     jobName = jobName.append(stageID);
     RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder.getFullPath(), jobName);
 
-    if (jobHandle == NULL)
+    if (jobHandle == nullptr)
     {
         return false;
     }
@@ -310,10 +308,10 @@ bool CFDcaseInstance::stopJob()
     if (caseFolder.isNil()) return false;
     if (myState != InternalCaseState::RUNNING_JOB) return false;
 
-    RemoteDataReply * jobHandle = NULL;
+    RemoteDataReply * jobHandle = nullptr;
     jobHandle = cwe_globals::get_connection()->stopJob(runningID);
 
-    if (jobHandle == NULL) return false;
+    if (jobHandle == nullptr) return false;
 
     QObject::connect(jobHandle, SIGNAL(haveStoppedJob(RequestState)),
                      this, SLOT(jobKilled(RequestState)));
@@ -328,7 +326,7 @@ bool CFDcaseInstance::downloadCase(QString destLocalFile)
     if (caseFolder.isNil()) return false;
     if ((myState != InternalCaseState::READY) &&
             (myState != InternalCaseState::READY_ERROR)) return false;
-    if (myType == NULL) return false;
+    if (myType == nullptr) return false;
     if (cwe_globals::get_file_handle()->operationIsPending()) return false;
 
     if (!cwe_globals::isValidLocalFolder(destLocalFile))
@@ -543,7 +541,7 @@ void CFDcaseInstance::computeInitState()
 
     if (caseFolder.isNil())
     {
-        if (myType == NULL)
+        if (myType == nullptr)
         {
             myState = InternalCaseState::EMPTY_CASE;
         }
@@ -589,7 +587,7 @@ void CFDcaseInstance::emitNewState(InternalCaseState newState)
 bool CFDcaseInstance::caseDataLoaded()
 {
     if (defunct) return false;
-    if (myType == NULL) return false;
+    if (myType == nullptr) return false;
     if (caseFolder.isNil()) return false;
 
     if (!caseFolder.folderContentsLoaded()) return false;
@@ -630,7 +628,7 @@ bool CFDcaseInstance::caseDataInvalid()
     if (varStore.isEmpty() && !triedParamFile)
     {
         triedParamFile = true;
-        varFile.setFileBuffer(NULL);
+        varFile.setFileBuffer(nullptr);
         cwe_globals::get_file_handle()->sendDownloadBuffReq(varFile);
         return false;
     }
@@ -658,7 +656,7 @@ bool CFDcaseInstance::caseDataInvalid()
 
 void CFDcaseInstance::computeCaseType()
 {
-    if (myType != NULL) return;
+    if (myType != nullptr) return;
 
     const FileNodeRef varFile = caseFolder.getChildWithName(caseParamFileName);
     if (varFile.isNil()) return;
@@ -722,7 +720,7 @@ bool CFDcaseInstance::recomputeStageStates()
     //Needs re-think and re-write
 
     if (defunct) return false;
-    if (myType == NULL) return false;
+    if (myType == nullptr) return false;
 
     QMap<QString, StageState> newStageStates;
 
@@ -1021,7 +1019,7 @@ void CFDcaseInstance::state_Running_jobList()
     if (myState != InternalCaseState::RUNNING_JOB) return;
 
     const RemoteJobData * aNode = cwe_globals::get_CWE_Job_Accountant()->getJobByID(runningID);
-    if (aNode == NULL) return;
+    if (aNode == nullptr) return;
 
     if (aNode->inTerminalState())
     {
@@ -1105,7 +1103,7 @@ void CFDcaseInstance::state_Param_Save_taskDone(RequestState invokeStatus)
     FileNodeRef paramNode = caseFolder.getChildWithName(caseParamFileName);
     if (!paramNode.isNil())
     {
-        paramNode.setFileBuffer(NULL);
+        paramNode.setFileBuffer(nullptr);
     }
 
     //This line is a stopgap measure against a race condition if one reads too quickly an uploaded file.
@@ -1140,7 +1138,7 @@ void CFDcaseInstance::computeIdleState()
         {
             caseFolder.enactFolderRefresh();
         }
-        else if (myType != NULL)
+        else if (myType != nullptr)
         {
             for (QString aStage : myType->getStageIds())
             {
@@ -1169,7 +1167,7 @@ void CFDcaseInstance::computeIdleState()
     }
 
     const RemoteJobData * myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFullPath());
-    if (myJob != NULL)
+    if (myJob != nullptr)
     {
         if (!myJob->inTerminalState())
         {

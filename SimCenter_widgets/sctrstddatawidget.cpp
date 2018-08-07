@@ -42,9 +42,9 @@ SCtrStdDataWidget::SCtrStdDataWidget(QWidget *parent):
 
 SCtrStdDataWidget::~SCtrStdDataWidget()
 {
-    if (theValue != NULL) theValue->deleteLater();
-    if (label_unit != NULL) label_unit->deleteLater();
-    if (label_varName != NULL) label_varName->deleteLater();
+    if (theValue != nullptr) theValue->deleteLater();
+    if (label_unit != nullptr) label_unit->deleteLater();
+    if (label_varName != nullptr) label_varName->deleteLater();
 }
 
 QString SCtrStdDataWidget::shownValue()

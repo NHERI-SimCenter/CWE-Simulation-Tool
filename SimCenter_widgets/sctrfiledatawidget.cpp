@@ -48,10 +48,10 @@ SCtrFileDataWidget::SCtrFileDataWidget(RemoteFileModel * aFileModel, QWidget *pa
 
 SCtrFileDataWidget::~SCtrFileDataWidget()
 {
-    if (myFileTree != NULL) myFileTree->deleteLater();
-    if (selectedFile != NULL) selectedFile->deleteLater();
-    if (explainText != NULL) explainText->deleteLater();
-    if (label_varName != NULL) label_varName->deleteLater();
+    if (myFileTree != nullptr) myFileTree->deleteLater();
+    if (selectedFile != nullptr) selectedFile->deleteLater();
+    if (explainText != nullptr) explainText->deleteLater();
+    if (label_varName != nullptr) label_varName->deleteLater();
 }
 
 QString SCtrFileDataWidget::shownValue()

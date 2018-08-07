@@ -46,7 +46,7 @@ class CWE_StageStatusTab : public CWE_ParamTab
     Q_OBJECT
 
 public:
-    explicit CWE_StageStatusTab(QString stageKey, QString stageName, QWidget *parent = 0);
+    explicit CWE_StageStatusTab(QString stageKey, QString stageName, QWidget *parent = nullptr);
     ~CWE_StageStatusTab();
 
     void setStatus(const QString str);

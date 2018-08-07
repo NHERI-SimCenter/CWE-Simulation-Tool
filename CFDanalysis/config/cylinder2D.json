@@ -1,14 +1,15 @@
 {
-    "name":"Circular Cylinder (2D)",
-    "internalName":"cylinder2D",
-    "description":"This model describes \nthe air flow around a circular\n cylinder using 2D simulation.",
+    "displayName":"Standard Shapes (2D/3D)",
+    "internalName":"stdShape",
+    "description":"This model describes \nthe air flow various standard shapes\n either using 2D simulation or a 3D extrusion.",
     "icon":"placeholderIcon.png",
     "debugOnly":true,
     "disable":true,
     "sequence":["mesh","sim"],
     "stages":{
         "mesh":{
-            "name":"Mesh",
+            "displayName":"Mesh",
+            "app":"cwe-serial",
             "groups":[
                 "Building Geometry",
                 "Mesh Density",
@@ -17,107 +18,293 @@
             ],
             "results":[
                 {
-                    "name":"Mesh View",
-                    "type":"GLmesh"
+                    "displayName":"Mesh View",
+                    "type":"GLmesh",
+                    "showCondition":"XXXX"
+                },
+                {
+                    "displayName":"Visualize 3D Mesh",
+                    "type":"GLmesh3D",
+                    "showCondition":"XXXX"
+                },
+                {
+                    "displayName":"Mesh Agave Log",
+                    "type":"text",
+                    "file":"logs/.agave.log"
+                },
+                {
+                    "displayName":"Mesh Error Log",
+                    "type":"text",
+                    "file":"logs/cwe-serial.err"
+                },
+                {
+                    "displayName":"Mesh Output Log",
+                    "type":"text",
+                    "file":"logs/cwe-serial.out"
                 }
             ]
         },
         "sim":{
-            "name":"Simulation",
+            "displayName":"Simulation",
+            "app":"cwe-parallel",
             "groups":[
                 "Simulation Control",
                 "Advanced"
             ],
             "results":[
                 {
-                    "name":"Final Flow Velocity Field",
+                    "displayName":"Final Flow Velocity Field",
                     "type":"GLdata",
                     "file":"U",
-                    "values":"magnitude"
+                    "values":"magnitude",
+                    "showCondition":"XXXX"
                 },
                 {
-                    "name":"Final Flow Pressure Field",
+                    "displayName":"Final Flow Pressure Field",
                     "type":"GLdata",
                     "file":"p",
-                    "values":"scalar"
+                    "values":"scalar",
+                    "showCondition":"XXXX"
                 },
                 {
-                    "name":"Force Coefficients",
+                    "displayName":"Force Coefficients",
                     "type":"text",
                     "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat"
+                },
+                {
+                    "displayName":"Sim Agave Log",
+                    "type":"text",
+                    "file":"logs/.agave.log"
+                },
+                {
+                    "displayName":"Sim Error Log",
+                    "type":"text",
+                    "file":"logs/cwe-parallel.err"
+                },
+                {
+                    "displayName":"Sim Output Log",
+                    "type":"text",
+                    "file":"logs/cwe-parallel.out"
+                },
+                {
+                    "displayName":"OpenFOAM Log",
+                    "type":"text",
+                    "file":"logs/sim.log"
                 }
             ]
         }
     },
-    "varGroups":{
-        "Building Geometry":[
-            "geoFile",
-            "slicePlane",
-            "sliceAngle"
-        ],
-        "Mesh Density":[
-            "inPad",
-            "outPad",
-            "topPad",
-            "bottomPad",
-            "meshDensity",
-            "meshDensityFar"
-        ],
-        "Subdomains":[
-            "innerDomains",
-            "inPadDom1",
-            "outPadDom1",
-            "topPadDom1",
-            "bottomPadDom1",
-            "meshDensityDom1",
-            "inPadDom2",
-            "outPadDom2",
-            "topPadDom2",
-            "bottomPadDom2",
-            "meshDensityDom2",
-            "inPadDom3",
-            "outPadDom3",
-            "topPadDom3",
-            "bottomPadDom3",
-            "meshDensityDom3"
-        ],
-        "Boundaries":[
-            "lowYPlane",
-            "highYPlane"
-        ],
-        "Simulation Control":[
-            "endTime",
-            "deltaT",
-            "velocity",
-            "nu"
-        ],
-        "Advanced":[
-            "turbModel",
-            "useForceCoeffs",
-            "useFieldUmean",
-            "useFieldPmean",
-            "pisoCorrectors",
-            "pisoNonOrthCorrect"
-        ]
+    "groups":{
+        "Building Geometry":{
+            "displayName":"Shape Geometry",
+            "vars":[
+                "shapeType",
+                "dimensions",
+                "itemD",
+                "itemXwidth",
+                "itemYwidth",
+                "mirrored"
+                ]
+        },
+        "Mesh Density":{
+            "displayName":"Mesh Density",
+            "vars":[
+                "boundR",
+                "boundMeshR",
+                "boundMeshC",
+                "boundNXf",
+                "boundNXb",
+                "boundNYt",
+                "boundNYb",
+                "boundRXf",
+                "boundRXb",
+                "boundMeshL",
+                "boundMeshN",
+                "boundRatio"
+
+                ]
+        },
+        "Boundaries":{
+            "displayName":"Boundaries",
+            "vars":[
+                "lowYPlane",
+                "highYPlane"
+            ]
+        },
+
+    cylinder
+        
+
+
+    rectangle
+
+
+boundNXf = '35'
+boundNXb = '35'
+boundNYt = '10'
+boundNYb = '10'
+	
+boundRXf = '2'
+boundRXb = '2'
+
+boundMeshL = '1.5'
+boundMeshN = '25'
+boundRatio = '1.5'
+
+triangle
+
+	
+boundNXf = '35'
+boundNXb = '35'
+boundNYt = '10'
+boundNYb = '10'
+
+boundRXf = '2'
+boundRXb = '2'
+
+boundMeshL = '1.5'
+boundMeshN = '25'
+boundRatio = '1.5'
+
+
+
+all
+minX = '10'
+minY = '10'
+maxX = '40'
+maxY = '10'
+		
+inletNum= '40'
+outletNum= '120'
+inletRatio= '5'
+outletRatio= '15'
+	
+lowYNum= '40'
+lowYratio= '5'
+highYNum= '40'
+highYratio= '5'
+	
+
+
+
+        "Simulation Control":{
+            "displayName":"Simulation Control",
+            "vars":[
+                "endTime",
+                "deltaT",
+                "velocity",
+                "nu"
+            ]
+        },
+        "Advanced":{
+            "displayName":"Advanced",
+            "vars":[
+                "turbModel",
+                "useForceCoeffs",
+                "useFieldUmean",
+                "useFieldPmean",
+                "pisoCorrectors",
+                "pisoNonOrthCorrect",
+                "turbintensity"
+            ]
+        }
     },
     "vars":{
-        "geoFile":{
-            "displayName":"Geometry File",
-            "type":"file"
+        "shapeType":{
+            "displayName":"Shape Type",
+            "type":"choose",
+            "default":"circle",
+            "options":{
+                "circle":"Circle",
+                "triangle":"Triangle",
+                "rectangle":"Rectangle"
+            }
         },
-        "slicePlane":{
-            "displayName":"Z-coord of 2D Slice Plane",
+        "dimensions":{
+            "displayName":"Shape Type",
+            "type":"choose",
+            "default":"2",
+            "options":{
+                "2":"2D Simulation",
+                "3":"3D Extrusion"
+            }
+        },
+        "itemD":{
+            "displayName":"Diameter of Circle",
             "type":"std",
             "default":"1.0",
             "unit":"m",
-            "precision":"5"
+            "precision":"2",
+            "sign":"+",
+            "showCondition":"$shapeType=circle"
         },
-        "sliceAngle":{
-            "displayName":"Rotation of 2D Slice",
+        "itemXwidth":{
+            "displayName":"Object Length (X)",
             "type":"std",
-            "default":"0",
-            "unit":"Degrees",
-            "precision":"2"
+            "default":"3.0",
+            "unit":"m",
+            "precision":"2",
+            "sign":"+",
+            "showCondition":"$shapeType!circle"
+        },
+        "itemYwidth":{
+            "displayName":"Object Length (Y)",
+            "type":"std",
+            "default":"1.0",
+            "unit":"m",
+            "precision":"2",
+            "sign":"+",
+            "showCondition":"$shapeType!circle"
+        },
+        "mirrored":{
+            "displayName":"Reverse Triangle Orientation",
+            "type":"bool",
+            "default": false
+        },
+        "boundR":{
+            "displayName":"Mesh Boundary Layer Radius",
+            "type":"std",
+            "default":"3.0",
+            "unit":"m",
+            "precision":"1",
+            "sign":"+",
+            "showCondition":"$shapeType=circle"
+        },
+        "boundR":{
+            "displayName":"Mesh Boundary Layer Radius",
+            "type":"std",
+            "default":"60",
+            "unit":"m",
+            "precision":"0",
+            "sign":"+",
+            "showCondition":"$shapeType=circle"
+        },
+
+
+
+	
+boundMeshR = '60'
+boundMeshC = '200'
+boundRatio = '50'
+
+
+        "lowYPlane":{
+            "displayName":"Boundary Condition (Bottom)",
+            "type":"choose",
+            "default":"SYM_PLANE",
+            "options":{
+                "SYM_PLANE": "Symmetry Plane",
+                "WALL": "Wall"
+            }
+        },
+        "highYPlane":{
+            "displayName":"Boundary Condition (Top)",
+            "type":"choose",
+            "default":"SYM_PLANE",
+            "options":{
+                "SYM_PLANE": "Symmetry Plane",
+                "WALL": "Wall"
+            }
         },
         "endTime":{
             "displayName":"Simulation Duration",
@@ -146,76 +333,10 @@
         "nu":{
             "displayName":"Kinematic Viscosity",
             "type":"std",
-            "default":"1.5e-05",
+            "default":"1.48e-05",
             "unit":"m^2/s",
             "precision":"9",
             "sign":"+"
-        },
-        "inPad":{
-            "displayName":"Domain Length (Inlet)",
-            "type":"std",
-            "default":"8",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "outPad":{
-            "displayName":"Domain Length (Outlet)",
-            "type":"std",
-            "default":"20",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "topPad":{
-            "displayName":"Domain Length (Top)",
-            "type":"std",
-            "default":"8",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "bottomPad":{
-            "displayName":"Domain Length (Bottom)",
-            "type":"std",
-            "default":"8",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "meshDensity":{
-            "displayName":"Grid Size (on the bluff body)",
-            "type":"std",
-            "default":"3",
-            "unit":"m",
-            "precision":"2",
-            "sign":"+"
-        },
-        "meshDensityFar":{
-            "displayName":"Grid Size (on the outer bound)",
-            "type":"std",
-            "default":"10",
-            "unit":"m",
-            "precision":"2",
-            "sign":"+"
-        },
-        "lowYPlane":{
-            "displayName":"Boundary Condition (Top)",
-            "type":"choose",
-            "default":"SYM_PLANE",
-            "options":{
-                "SYM_PLANE": "Symmetry Plane",
-                "WALL": "Wall"
-            }
-        },
-        "highYPlane":{
-            "displayName":"Boundary Condition (Bottom)",
-            "type":"choose",
-            "default":"SYM_PLANE",
-            "options":{
-                "SYM_PLANE": "Symmetry Plane",
-                "WALL": "Wall"
-            }
         },
         "useForceCoeffs":{
             "displayName":"Compute Force Coefficients?",
@@ -235,14 +356,22 @@
         "turbModel":{
             "displayName":"Turbulence Model",
             "type":"choose",
-            "default":"Laminar",
+            "default":"laminar",
             "options":{
-                "Laminar":"Laminar Flow model",
+                "laminar":"Laminar Flow model",
                 "SpalartAllmaras":"S-A one equation model (RANS)",
                 "kEpsilon":"k-epsilon model (RANS)",
-                "Smagorinsky":"Smagorinsky turbulence model (LES)",
-                "dynOneEqEddy":"Dynamic One Equation model (LES)"
+                "Smagorinsky":"Smagorinsky SGS model (LES)",
+                "kEqn":"One equation eddy-viscosity model (LES)"
             }
+        },
+        "turbintensity":{
+            "displayName":"Turbulence Intensity",
+            "type":"std",
+            "default":"0.1",
+            "precision":"2",
+            "sign":"+",
+            "showCondition":"$turbModel!laminar"
         },
         "pisoCorrectors":{
             "displayName":"Number of PISO Correctors",
@@ -257,133 +386,6 @@
             "default":"1",
             "precision":"int",
             "sign":"+0"
-        },
-        "innerDomains":{
-            "displayName":"Number of Subdomains",
-            "type":"std",
-            "default":"0",
-            "precision":"int",
-            "sign":"+0"
-        },
-        "inPadDom1":{
-            "displayName":"Subdomain 1 Length (Inlet)",
-            "type":"std",
-            "default":"2",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "outPadDom1":{
-            "displayName":"Subdomain 1 Length (Outlet)",
-            "type":"std",
-            "default":"4",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "topPadDom1":{
-            "displayName":"Subdomain 1 Length (Top)",
-            "type":"std",
-            "default":"2",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "bottomPadDom1":{
-            "displayName":"Subdomain 1 Length (Bottom)",
-            "type":"std",
-            "default":"2",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "meshDensityDom1":{
-            "displayName":"Grid Size (Edge of Subdomain 1)",
-            "type":"std",
-            "default":"3",
-            "unit":"m",
-            "precision":"2",
-            "sign":"+"
-        },
-        "inPadDom2":{
-            "displayName":"Subdomain 2 Length (Inlet)",
-            "type":"std",
-            "default":"4",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "outPadDom2":{
-            "displayName":"Subdomain 2 Length (Outlet)",
-            "type":"std",
-            "default":"6",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "topPadDom2":{
-            "displayName":"Subdomain 2 Length (Top)",
-            "type":"std",
-            "default":"4",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "bottomPadDom2":{
-            "displayName":"Subdomain 2 Length (Bottom)",
-            "type":"std",
-            "default":"4",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "meshDensityDom2":{
-            "displayName":"Grid Size (Edge of Subdomain 2)",
-            "type":"std",
-            "default":"3",
-            "unit":"m",
-            "precision":"2",
-            "sign":"+"
-        },
-        "inPadDom3":{
-            "displayName":"Subdomain 3 Length (Inlet)",
-            "type":"std",
-            "default":"6",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "outPadDom3":{
-            "displayName":"Subdomain 3 Length (Outlet)",
-            "type":"std",
-            "default":"8",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "topPadDom3":{
-            "displayName":"Subdomain 3 Length (Top)",
-            "type":"std",
-            "default":"6",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "bottomPadDom3":{
-            "displayName":"Subdomain 3 Length (Bottom)",
-            "type":"std",
-            "default":"6",
-            "unit":"times max size of object",
-            "precision":"1",
-            "sign":"+"
-        },
-        "meshDensityDom3":{
-            "displayName":"Grid Size (Edge of Subdomain 3)",
-            "type":"std",
-            "default":"3",
-            "unit":"m",
-            "precision":"1",
-            "sign":"+"
         }
     }
 }

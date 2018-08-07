@@ -54,7 +54,7 @@ class CWE_file_manager : public CWE_Super
     Q_OBJECT
 
 public:
-    explicit CWE_file_manager(QWidget *parent = 0);
+    explicit CWE_file_manager(QWidget *parent = nullptr);
     ~CWE_file_manager();
 
     virtual void linkMainWindow(CWE_MainWindow * theMainWin);

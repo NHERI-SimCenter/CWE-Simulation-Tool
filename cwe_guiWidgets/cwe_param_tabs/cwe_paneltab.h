@@ -46,7 +46,7 @@ class CWE_PanelTab : public CWE_ParamTab
     Q_OBJECT
 
 public:
-    explicit CWE_PanelTab(QWidget * panelWidget, QString panelKey, QString panelName, QWidget *parent = 0);
+    explicit CWE_PanelTab(QWidget * panelWidget, QString panelKey, QString panelName, QWidget *parent = nullptr);
     ~CWE_PanelTab();
 
     QWidget * getPanelWidget();

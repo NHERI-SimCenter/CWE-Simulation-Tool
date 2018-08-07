@@ -100,7 +100,7 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
 
 CWE_InterfaceDriver::~CWE_InterfaceDriver()
 {
-    if (mainWindow != NULL) delete mainWindow;
+    if (mainWindow != nullptr) delete mainWindow;
 }
 
 void CWE_InterfaceDriver::startup()
@@ -117,7 +117,7 @@ void CWE_InterfaceDriver::startup()
 
 void CWE_InterfaceDriver::closeAuthScreen()
 {
-    if (mainWindow == NULL)
+    if (mainWindow == nullptr)
     {
         cwe_globals::displayFatalPopup("Fatal Error: Main window not found");
     }
@@ -130,10 +130,10 @@ void CWE_InterfaceDriver::closeAuthScreen()
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
-    AgaveThread * tmpHandle = (AgaveThread *) theConnectThread;
+    AgaveThread * tmpHandle = qobject_cast<AgaveThread *>(theConnectThread);
     AgaveTaskReply * getAppList = tmpHandle->getAgaveAppList();
 
-    if (getAppList == NULL)
+    if (getAppList == nullptr)
     {
         cwe_globals::displayFatalPopup("Unable to get app list from DesignSafe");
         return;
@@ -141,12 +141,12 @@ void CWE_InterfaceDriver::closeAuthScreen()
     QObject::connect(getAppList, SIGNAL(haveAgaveAppList(RequestState,QVariantList)),
                      this, SLOT(checkAppList(RequestState,QVariantList)));
 
-    if (authWindow != NULL)
+    if (authWindow != nullptr)
     {
         QObject::disconnect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
         authWindow->hide();
         authWindow->deleteLater();
-        authWindow = NULL;
+        authWindow = nullptr;
     }
 
     if (!inDebugMode)
@@ -232,12 +232,12 @@ void CWE_InterfaceDriver::checkAppList(RequestState replyState, QVariantList app
 
     if (!registerOneAppByVersion(appList, "cwe-serial", {"stage"}, {"directory", "file_input"}, "directory"))
     {
-        cwe_globals::displayFatalPopup("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.", "Permission Error");
+        cwe_globals::displayFatalPopup("To use CWE, the SimCenter needs to register your DesignSafe username. The CWE program depends on several apps hosted on DesignSafe which are not listed as published. Please contact the SimCenter project, with your username, to be able to access these apps.", "Username Registration Needed");
         return;
     }
     if (!registerOneAppByVersion(appList, "cwe-parallel", {"stage"}, {"directory", "file_input"}, "directory"))
     {
-        cwe_globals::displayFatalPopup("The CWE program depends on several apps hosted on DesignSafe which are not public. Please contact the SimCenter project to be able to access these apps.", "Permission Error");
+        cwe_globals::displayFatalPopup("To use CWE, the SimCenter needs to register your DesignSafe username. The CWE program depends on several apps hosted on DesignSafe which are not listed as published. Please contact the SimCenter project, with your username, to be able to access these apps.", "Username Registration Needed");
         return;
     }
 
@@ -272,7 +272,7 @@ bool CWE_InterfaceDriver::registerOneAppByVersion(QVariantList appList, QString 
         return false;
     }
 
-    AgaveThread * tmpThread = (AgaveThread *)theConnectThread;
+    AgaveThread * tmpThread = qobject_cast<AgaveThread *>(theConnectThread);
     tmpThread->registerAgaveAppInfo(agaveAppName, idToUse, parameterList, inputList, workingDirParameter);
     return true;
 

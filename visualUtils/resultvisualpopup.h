@@ -81,8 +81,8 @@ private:
     CFDcaseInstance * myCase;
     RESULTS_STYLE resultObj;
 
-    QWidget * displayFrameTenant = NULL;
-    QHBoxLayout * resultFrameLayout = NULL;
+    QWidget * displayFrameTenant = nullptr;
+    QHBoxLayout * resultFrameLayout = nullptr;
 };
 
 #endif // RESULTVISUALPOPUP_H
