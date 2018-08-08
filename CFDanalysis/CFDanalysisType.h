@@ -40,6 +40,7 @@
 #include <QJsonArray>
 #include <QIcon>
 #include <QFile>
+#include <QMap>
 
 struct RESULTS_STYLE {
     QString displayName;
@@ -49,45 +50,80 @@ struct RESULTS_STYLE {
     QString stage;
 };
 
-struct VARIABLE_TYPE;
+
+enum class SimCenterDataType { integer,
+                               floatingpoint,
+                               boolean,
+                               string,
+                               selection,
+                               file,
+                               tensor2D,
+                               tensor3D,
+                               vector2D,
+                               vector3D,
+                               unknown};
+
+struct PARAM_VARIABLE_TYPE {
+    QString internalName;
+    QString displayName;
+    SimCenterDataType type;
+    QString defaultValue;
+    QString unit;
+    QString precision;
+    QString sign;
+    QMap<QString, QString> options;
+    QString hideCondition;
+    QString showCondition;
+};
+
+struct TEMPLATE_GROUP {
+    QString displayName;
+    QString internalName;
+    QList<PARAM_VARIABLE_TYPE> varList;
+    QString groupImage;
+};
+
+struct TEMPLATE_STAGE {
+    QString displayName;
+    QString internalName;
+    QString appName;
+    QString appInputFile;
+    QList<TEMPLATE_GROUP> groupList;
+    QList<RESULTS_STYLE> resultList;
+};
 
 class CFDanalysisType
 {
 public:
-    CFDanalysisType(QString configFile);
+    CFDanalysisType(QJsonDocument rawJSON);
+    bool validParse();
 
     QString getInternalName();
     QString getDisplayName();
     QString getDescription();
-    QString getIconName();
-    QStringList getStageIds();
-
-    QStringList getStageGroups(QString stage);
-    QList<RESULTS_STYLE> getStageResults(QString stage);
-
-    QStringList getVarGroup(QString group);
-    VARIABLE_TYPE getVariableInfo(QString name);
-
-    QString getStageApp(QString stageID);
-    QString getExtraInput(QString stageID);
+    QIcon * getIcon();
+    int getListOrderNum();
 
     QString translateStageId(QString stageId);
-    QString translateGroupId(QString groupId);
+    TEMPLATE_STAGE getStageFromId(QString stageId);
+    TEMPLATE_GROUP getGroupFromIds(QString stageId, QString groupId);
+    QStringList getStageIds();
 
-    QIcon * getIcon();
+    static bool jsonConfigIsEnabled(QJsonDocument * aDocument, bool inDebugMode);
 
-    bool isDebugOnly();
-    bool isDisabled();
+    static QJsonDocument getRawJSON(QString configFolder, QString configFile);
+    static QJsonObject getStageById(QJsonArray stageList, QString toFind);
 
 private:
-    QJsonDocument * getRawConfig();
-
+    QString displayName;
+    QString internalName;
+    QString myDescription;
     QIcon myIcon;
+    int listPriority;
+    bool valid = false;
 
-    QJsonDocument myConfiguration;
-
-    QStringList cachedOrderedStageList;
-
+    QList<TEMPLATE_STAGE> stageList;
+    QMap<QString, PARAM_VARIABLE_TYPE *> myVariables;
 };
 
 #endif // CFDANALYSISTYPE_H
