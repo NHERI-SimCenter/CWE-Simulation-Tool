@@ -96,7 +96,6 @@ class CFDanalysisType
 {
 public:
     CFDanalysisType(QJsonDocument rawJSON);
-    ~CFDanalysisType();
     bool validParse();
 
     QString getInternalName();

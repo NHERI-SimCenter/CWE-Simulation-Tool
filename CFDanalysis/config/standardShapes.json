@@ -97,7 +97,17 @@
         "Building Geometry":{
             "displayName":"Shape Geometry",
             "vars":[
-                "shapeType",
+                {
+                    "displayName":"Shape Type",
+                    "internalName":"shapeType",
+                    "type":"choose",
+                    "default":"circle",
+                    "options":{
+                        "circle":"Circle",
+                        "triangle":"Triangle",
+                        "rectangle":"Rectangle"
+                    }
+                },
                 "dimensions",
                 "itemD",
                 "itemXwidth",
@@ -209,16 +219,7 @@ highYratio= '5'
         }
     },
     "vars":{
-        "shapeType":{
-            "displayName":"Shape Type",
-            "type":"choose",
-            "default":"circle",
-            "options":{
-                "circle":"Circle",
-                "triangle":"Triangle",
-                "rectangle":"Rectangle"
-            }
-        },
+
         "dimensions":{
             "displayName":"Shape Type",
             "type":"choose",

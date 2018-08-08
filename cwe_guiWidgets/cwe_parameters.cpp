@@ -864,15 +864,15 @@ QString CWE_Parameters::getStateText(StageState theState)
 {
     switch (theState)
     {
-        case StageState::DOWNLOADING : return "Downloading . . .";
-        case StageState::ERROR : return "*** ERROR ***";
-        case StageState::FINISHED : return "Task Finished";
-        case StageState::FINISHED_PREREQ : return "Task Finished";
-        case StageState::LOADING : return "Loading Data ...";
-        case StageState::OFFLINE : return "Offline (Debug)";
-        case StageState::RUNNING : return "Task Running";
-        case StageState::UNREADY : return "Need Prev. \nStage";
-        case StageState::UNRUN : return "Not Yet Run";
+        case StageState::DOWNLOADING :      return "Downloading \nData . . .";
+        case StageState::ERROR :            return "*** ERROR ***";
+        case StageState::FINISHED :         return "Task Finished";
+        case StageState::FINISHED_PREREQ :  return "Task Finished";
+        case StageState::LOADING :          return "Loading \nData . . .";
+        case StageState::OFFLINE :          return "Offline (Debug)";
+        case StageState::RUNNING :          return "Task Running";
+        case StageState::UNREADY :          return "Need Prev. \nStage";
+        case StageState::UNRUN :            return "Not Yet Run";
     }
     return "*** TOTAL ERROR ***";
 }

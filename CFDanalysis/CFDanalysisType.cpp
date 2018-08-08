@@ -93,7 +93,7 @@ CFDanalysisType::CFDanalysisType(QJsonDocument rawJSON)
 
             foreach (QJsonValue aVar, rawVars)
             {
-                QJsonObject rawVar = aGroup.toObject();
+                QJsonObject rawVar = aVar.toObject();
 
                 PARAM_VARIABLE_TYPE newVar;
                 newVar.options.clear();
@@ -178,14 +178,7 @@ CFDanalysisType::CFDanalysisType(QJsonDocument rawJSON)
 
         stageList.append(newStage);
     }
-}
-
-CFDanalysisType::~CFDanalysisType()
-{
-    for (PARAM_VARIABLE_TYPE * aVar : myVariables.values())
-    {
-        delete aVar;
-    }
+    valid = true;
 }
 
 bool CFDanalysisType::validParse() {return valid;}
