@@ -78,7 +78,7 @@ void SCtrMasterDataWidget::setViewState(SimCenterViewState state)
     }
 }
 
-void SCtrMasterDataWidget::setDataType(VARIABLE_TYPE & newTypeData)
+void SCtrMasterDataWidget::setDataType(PARAM_VARIABLE_TYPE & newTypeData)
 {
     if (m_obj.type != SimCenterDataType::unknown)
     {
@@ -98,7 +98,7 @@ void SCtrMasterDataWidget::setDataType(VARIABLE_TYPE & newTypeData)
     }
 }
 
-VARIABLE_TYPE SCtrMasterDataWidget::getTypeInfo()
+PARAM_VARIABLE_TYPE SCtrMasterDataWidget::getTypeInfo()
 {
     return m_obj;
 }

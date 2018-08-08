@@ -48,34 +48,9 @@
 #include "../AgaveExplorer/remoteFileOps/filenoderef.h"
 #include "CFDanalysis/CFDanalysisType.h"
 
-enum class SimCenterDataType { integer,
-                               floatingpoint,
-                               boolean,
-                               string,
-                               selection,
-                               file,
-                               tensor2D,
-                               tensor3D,
-                               vector2D,
-                               vector3D,
-                               unknown};
-
 enum class SimCenterViewState  { visible,
                                  editable,
                                  hidden };
-
-struct VARIABLE_TYPE {
-    QString internalName;
-    QString displayName;
-    SimCenterDataType type;
-    QString defaultValue;
-    QString unit;
-    QString precision;
-    QString sign;
-    QMap<QString, QString> options;
-    QString hideCondition;
-    QString showCondition;
-};
 
 class SCtrMasterDataWidget : public QFrame
 {
@@ -87,8 +62,8 @@ public:
     SimCenterViewState viewState();
     void setViewState(SimCenterViewState);
 
-    void setDataType(VARIABLE_TYPE &);
-    VARIABLE_TYPE getTypeInfo();
+    void setDataType(PARAM_VARIABLE_TYPE &);
+    PARAM_VARIABLE_TYPE getTypeInfo();
 
     void setValue(QString newValue); //Sets both saved and shown value to newValue
     virtual QString shownValue() = 0; //Return string of raw value now shown in widget
@@ -113,7 +88,7 @@ private:
     virtual void setShownValue(QString newValue) = 0; //Put the new value into the displayed widget
     virtual bool shownValueIsValid(); //Return true if raw value now shown in widget is valid
 
-    VARIABLE_TYPE m_obj;
+    PARAM_VARIABLE_TYPE m_obj;
 
     bool doingManualUpdate = false;
     QString savedValue;

@@ -82,19 +82,26 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
     foreach (QString caseConfigFile, caseTypeFiles)
     {
         QString confPath = ":/config/";
-        confPath = confPath.append(caseConfigFile);
-        CFDanalysisType * newTemplate = new CFDanalysisType(confPath);
-        if ((debug == false) && (newTemplate->isDebugOnly() == true))
+        QJsonDocument rawConfig = CFDanalysisType::getRawJSON(confPath, caseConfigFile);
+        if (rawConfig.isEmpty())
         {
-            delete newTemplate;
+            qCDebug(agaveAppLayer, "Unreadable template config file skipped: %s", qPrintable(caseConfigFile));
             continue;
         }
-        if (newTemplate->isDisabled())
+        if (CFDanalysisType::jsonConfigIsEnabled(&rawConfig, debug))
         {
-            delete newTemplate;
-            continue;
+            CFDanalysisType * newTemplate = new CFDanalysisType(rawConfig);
+            if (!newTemplate->validParse())
+            {
+                qCDebug(agaveAppLayer, "Template Parse Invalid: %s", qPrintable(caseConfigFile));
+                delete newTemplate;
+            }
+            else
+            {
+                templateList.append(newTemplate);
+                qCDebug(agaveAppLayer, "Added New Template: %s", qPrintable(caseConfigFile));
+            }
         }
-        templateList.append(newTemplate);
     }
 }
 
@@ -214,7 +221,7 @@ QString CWE_InterfaceDriver::getBanner()
 
 QString CWE_InterfaceDriver::getVersion()
 {
-    return "Version: 1.0.0";
+    return "Version: 1.1.0";
 }
 
 QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()

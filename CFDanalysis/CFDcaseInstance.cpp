@@ -245,14 +245,15 @@ bool CFDcaseInstance::startStageApp(QString stageID)
     if (myState != InternalCaseState::READY) return false;
     if (storedStageStates.value(stageID, StageState::ERROR) != StageState::UNRUN) return false;
 
-    QString appName = myType->getStageApp(stageID);
+    TEMPLATE_STAGE theStage = myType->getStageFromId(stageID);
+    if (theStage.internalName.isEmpty()) return false;
+    //TODO: check for validity here
 
     QMultiMap<QString, QString> rawParams;
     rawParams.insert("stage",stageID);
-    QString extraInput = myType->getExtraInput(stageID);
-    if (!extraInput.isEmpty())
+    if (!theStage.appInputFile.isEmpty())
     {
-        QString addedInputVal = getCurrentParams().value(extraInput);
+        QString addedInputVal = getCurrentParams().value(theStage.appInputFile);
         if (!addedInputVal.isEmpty())
         {
             rawParams.insert("file_input", addedInputVal);
@@ -260,10 +261,10 @@ bool CFDcaseInstance::startStageApp(QString stageID)
     }
 
     RemoteDataThread * remoteConnect = cwe_globals::get_Driver()->getDataConnection();
-    QString jobName = appName;
+    QString jobName = theStage.appName;
     jobName = jobName.append("-");
     jobName = jobName.append(stageID);
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder.getFullPath(), jobName);
+    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(theStage.appName, rawParams, caseFolder.getFullPath(), jobName);
 
     if (jobHandle == nullptr)
     {
