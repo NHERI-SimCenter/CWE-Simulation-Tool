@@ -358,7 +358,7 @@ void CWE_MainWindow::setCurrentPanel(QWidget *newActivePanel)
 
 void CWE_MainWindow::on_actionAbout_CWE_triggered()
 {
-    DialogAbout *dlg = new DialogAbout();
+    DialogAbout *dlg = new DialogAbout(cwe_globals::get_Driver()->getVersion());
 
     //
     // adjust size of application window to the available display

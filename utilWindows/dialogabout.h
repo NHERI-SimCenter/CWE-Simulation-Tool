@@ -2,6 +2,8 @@
 #define DIALOGABOUT_H
 
 #include <QDialog>
+#include <QApplication>
+#include <QFile>
 
 namespace Ui {
 class DialogAbout;
@@ -12,7 +14,7 @@ class DialogAbout : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogAbout(QWidget *parent = nullptr);
+    explicit DialogAbout(QString versionText, QWidget *parent = nullptr);
     ~DialogAbout();
 
 private slots:
