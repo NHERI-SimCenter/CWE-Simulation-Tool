@@ -1,9 +1,7 @@
 #include "dialogabout.h"
 #include "ui_dialogabout.h"
-#include <QApplication>
-#include <QFile>
 
-DialogAbout::DialogAbout(QWidget *parent) :
+DialogAbout::DialogAbout(QString versionText, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogAbout)
 {
@@ -14,7 +12,9 @@ DialogAbout::DialogAbout(QWidget *parent) :
     {
         ui->aboutTextBrowser->setHtml(file.readAll());
     }
-
+    QString versionString = "About Version ";
+    versionString = versionString.append(versionText);
+    ui->label_about->setText(versionString);
 }
 
 DialogAbout::~DialogAbout()

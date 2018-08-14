@@ -78,6 +78,8 @@ private slots:
 private:
     bool registerOneAppByVersion(QVariantList appList, QString agaveAppName, QStringList parameterList, QStringList inputList, QString workingDirParameter);
 
+    QNetworkAccessManager pingManager;
+
     CWE_MainWindow * mainWindow;
     QList<CFDanalysisType *> templateList;
 

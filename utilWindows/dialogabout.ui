@@ -85,7 +85,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>About Version 0.9.x</string>
+      <string>About Version </string>
      </property>
     </widget>
    </item>
