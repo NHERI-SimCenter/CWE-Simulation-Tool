@@ -92,7 +92,7 @@
   <customwidget>
    <class>RemoteJobLister</class>
    <extends>QTableView</extends>
-   <header>../AgaveExplorer/remoteModelViews/remotejoblister.h</header>
+   <header>remoteModelViews/remotejoblister.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
