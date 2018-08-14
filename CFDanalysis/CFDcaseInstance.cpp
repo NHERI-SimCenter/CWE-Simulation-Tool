@@ -264,7 +264,10 @@ bool CFDcaseInstance::startStageApp(QString stageID)
     QString jobName = theStage.appName;
     jobName = jobName.append("-");
     jobName = jobName.append(stageID);
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(theStage.appName, rawParams, caseFolder.getFullPath(), jobName);
+    QString archiveDir = caseFolder.getFullPath();
+    archiveDir = archiveDir.append("/");
+    archiveDir = archiveDir.append(stageID);
+    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(theStage.appName, rawParams, caseFolder.getFullPath(), jobName, archiveDir);
 
     if (jobHandle == nullptr)
     {

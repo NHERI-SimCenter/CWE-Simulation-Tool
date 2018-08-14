@@ -62,17 +62,6 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
         return;
     }
 
-    AgaveThread * tmpHandle = new AgaveThread(this);
-    tmpHandle->start();
-    while (!tmpHandle->interfaceReady())
-    {
-        QThread::usleep(10);
-    }
-    tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
-    tmpHandle->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
-
-    theConnectThread = tmpHandle;
-
     /* populate with available cases */
     QDir confDir(":/config");
     QStringList filters;
@@ -112,6 +101,19 @@ CWE_InterfaceDriver::~CWE_InterfaceDriver()
 
 void CWE_InterfaceDriver::startup()
 {
+    AgaveThread * tmpHandle = new AgaveThread(this);
+    tmpHandle->start();
+    while (!tmpHandle->interfaceReady())
+    {
+        QThread::usleep(10);
+    }
+    tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
+    tmpHandle->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
+
+    tmpHandle->setAgaveConnectionParams("https://agave.designsafe-ci.org", "SimCenter_CWE_GUI", "designsafe.storage.default");
+
+    theConnectThread = tmpHandle;
+
     myJobHandle = new JobOperator(this);
     myFileHandle = new FileOperator(this);
     myJobAccountant = new CWEjobAccountant(this);
@@ -158,7 +160,8 @@ void CWE_InterfaceDriver::closeAuthScreen()
 
     if (!inDebugMode)
     {
-        tmpHandle->sendCounterPing("http://opensees.berkeley.edu/OpenSees/developer/cwe/use.php");
+        //This URL is a counter
+        pingManager.get(QNetworkRequest(QUrl("http://opensees.berkeley.edu/OpenSees/developer/cwe/use.php")));
     }
 }
 
