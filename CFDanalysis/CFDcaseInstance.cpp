@@ -36,14 +36,14 @@
 
 #include "CFDanalysisType.h"
 
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "remoteFiles/fileoperator.h"
+#include "remoteFiles/filetreenode.h"
 #include "../AgaveExplorer/remoteFileOps/joboperator.h"
 #include "../AgaveExplorer/remoteFileOps/joblistnode.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
-#include "../AgaveClientInterface/remotedatainterface.h"
-#include "../AgaveClientInterface/remotejobdata.h"
+#include "filemetadata.h"
+#include "remotedatainterface.h"
+#include "remotejobdata.h"
 
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
@@ -260,14 +260,13 @@ bool CFDcaseInstance::startStageApp(QString stageID)
         }
     }
 
-    RemoteDataThread * remoteConnect = cwe_globals::get_Driver()->getDataConnection();
     QString jobName = theStage.appName;
     jobName = jobName.append("-");
     jobName = jobName.append(stageID);
     QString archiveDir = caseFolder.getFullPath();
     archiveDir = archiveDir.append("/");
     archiveDir = archiveDir.append(stageID);
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(theStage.appName, rawParams, caseFolder.getFullPath(), jobName, archiveDir);
+    RemoteDataReply * jobHandle = cwe_globals::get_connection()->runRemoteJob(theStage.appName, rawParams, caseFolder.getFullPath(), jobName, archiveDir);
 
     if (jobHandle == nullptr)
     {

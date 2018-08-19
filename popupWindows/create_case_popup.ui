@@ -325,7 +325,7 @@
   <customwidget>
    <class>RemoteFileTree</class>
    <extends>QWidget</extends>
-   <header>../AgaveExplorer/remoteModelViews/remotefiletree.h</header>
+   <header>remoteFiles/remotefiletree.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

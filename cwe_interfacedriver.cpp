@@ -35,14 +35,14 @@
 
 #include "cwe_interfacedriver.h"
 
-#include "../AgaveClientInterface/agaveInterfaces/agavethread.h"
-#include "../AgaveClientInterface/agaveInterfaces/agavetaskreply.h"
-#include "../AgaveClientInterface/remotejobdata.h"
+#include "agaveInterfaces/agavehandler.h"
+#include "agaveInterfaces/agavetaskreply.h"
+#include "remotejobdata.h"
 
-#include "../AgaveExplorer/utilFuncs/authform.h"
+#include "utilFuncs/authform.h"
 
-#include "../AgaveExplorer/remoteFileOps/joboperator.h"
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
+#include "remoteFileOps/joboperator.h"
+#include "remoteFiles/fileoperator.h"
 
 #include "CFDanalysis/CFDcaseInstance.h"
 #include "CFDanalysis/CFDanalysisType.h"
@@ -51,7 +51,7 @@
 #include "mainWindow/cwe_mainwindow.h"
 #include "cwe_globals.h"
 
-CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent, debug)
+CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent)
 {
     qRegisterMetaType<CaseState>("CaseState");
 
@@ -101,46 +101,31 @@ CWE_InterfaceDriver::~CWE_InterfaceDriver()
 
 void CWE_InterfaceDriver::startup()
 {
-    AgaveThread * tmpHandle = new AgaveThread(this);
-    tmpHandle->start();
-    while (!tmpHandle->interfaceReady())
-    {
-        QThread::usleep(10);
-    }
-    tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
-    tmpHandle->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
+    createAndStartAgaveThread();
 
-    tmpHandle->setAgaveConnectionParams("https://agave.designsafe-ci.org", "SimCenter_CWE_GUI", "designsafe.storage.default");
+    myDataInterface->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
+    myDataInterface->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
 
-    theConnectThread = tmpHandle;
-
-    myJobHandle = new JobOperator(this);
-    myFileHandle = new FileOperator(this);
-    myJobAccountant = new CWEjobAccountant(this);
-    authWindow = new AuthForm(this);
+    authWindow = new AuthForm();
     authWindow->show();
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
-
-    mainWindow = new CWE_MainWindow();
 }
 
 void CWE_InterfaceDriver::closeAuthScreen()
 {
-    if (mainWindow == nullptr)
-    {
-        cwe_globals::displayFatalPopup("Fatal Error: Main window not found");
-    }
+    mainWindow = new CWE_MainWindow();
+
+    myJobAccountant = new CWEjobAccountant(this);
 
     myJobHandle->demandJobDataRefresh();
-    myFileHandle->resetFileData();
+    myFileHandle->resetFileData(myDataInterface, myDataInterface->getUserName());
 
     mainWindow->runSetupSteps();
     mainWindow->show();
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
-    AgaveThread * tmpHandle = qobject_cast<AgaveThread *>(theConnectThread);
-    AgaveTaskReply * getAppList = tmpHandle->getAgaveAppList();
+    AgaveTaskReply * getAppList = myDataInterface->getAgaveAppList();
 
     if (getAppList == nullptr)
     {
@@ -158,11 +143,12 @@ void CWE_InterfaceDriver::closeAuthScreen()
         authWindow = nullptr;
     }
 
-    if (!inDebugMode)
-    {
+    //TODO: Reinstate the following
+    //if (!inDebugMode)
+    //{
         //This URL is a counter
-        pingManager.get(QNetworkRequest(QUrl("http://opensees.berkeley.edu/OpenSees/developer/cwe/use.php")));
-    }
+    //    pingManager.get(QNetworkRequest(QUrl("http://opensees.berkeley.edu/OpenSees/developer/cwe/use.php")));
+    //}
 }
 
 void CWE_InterfaceDriver::startOffline()
@@ -282,8 +268,7 @@ bool CWE_InterfaceDriver::registerOneAppByVersion(QVariantList appList, QString 
         return false;
     }
 
-    AgaveThread * tmpThread = qobject_cast<AgaveThread *>(theConnectThread);
-    tmpThread->registerAgaveAppInfo(agaveAppName, idToUse, parameterList, inputList, workingDirParameter);
+    myDataInterface->registerAgaveAppInfo(agaveAppName, idToUse, parameterList, inputList, workingDirParameter);
     return true;
 
 }

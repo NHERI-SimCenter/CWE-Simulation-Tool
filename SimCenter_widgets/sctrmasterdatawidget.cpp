@@ -35,7 +35,7 @@
 #include "cwe_globals.h"
 
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
-#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+#include "remoteFiles/filenoderef.h"
 #include "CFDanalysis/CFDanalysisType.h"
 
 SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :

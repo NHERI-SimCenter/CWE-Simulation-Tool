@@ -37,7 +37,7 @@
 
 #include "cwe_super.h"
 
-#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+#include "remoteFiles/filenoderef.h"
 
 #include <QFileSystemModel>
 #include <QMenu>

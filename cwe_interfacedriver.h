@@ -80,7 +80,7 @@ private:
 
     QNetworkAccessManager pingManager;
 
-    CWE_MainWindow * mainWindow;
+    CWE_MainWindow * mainWindow = nullptr;
     QList<CFDanalysisType *> templateList;
 
     CWEjobAccountant * myJobAccountant = nullptr;
