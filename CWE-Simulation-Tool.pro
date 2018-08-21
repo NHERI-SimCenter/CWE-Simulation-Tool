@@ -54,11 +54,12 @@ win32 {
     }
 }
 
-include(../AgaveExplorer/AgaveExplorer.pri)
+include($$PWD/../AgaveExplorer/AgaveExplorer.pri)
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
-SOURCES += main.cpp \
+SOURCES += \
+    main.cpp \
     mainWindow/cwe_mainwindow.cpp \
     visualUtils/cfdglcanvas.cpp \
     visualUtils/cfdtoken.cpp \

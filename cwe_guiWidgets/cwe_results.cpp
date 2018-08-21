@@ -35,7 +35,7 @@
 #include "cwe_results.h"
 #include "ui_cwe_results.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
+#include "filemetadata.h"
 
 #include "remoteFiles/fileoperator.h"
 #include "remoteFiles/filetreenode.h"

@@ -92,7 +92,7 @@
   <customwidget>
    <class>RemoteJobLister</class>
    <extends>QTableView</extends>
-   <header>remoteModelViews/remotejoblister.h</header>
+   <header>remoteJobs/remotejoblister.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

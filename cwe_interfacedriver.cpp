@@ -41,7 +41,7 @@
 
 #include "utilFuncs/authform.h"
 
-#include "remoteFileOps/joboperator.h"
+#include "remoteJobs/joboperator.h"
 #include "remoteFiles/fileoperator.h"
 
 #include "CFDanalysis/CFDcaseInstance.h"

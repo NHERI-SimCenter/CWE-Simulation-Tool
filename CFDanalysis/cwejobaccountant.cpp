@@ -35,7 +35,7 @@
 #include "cwejobaccountant.h"
 
 #include "remoteFiles/fileoperator.h"
-#include "../AgaveExplorer/remoteFileOps/joboperator.h"
+#include "remoteJobs/joboperator.h"
 #include "remotejobdata.h"
 #include "cwe_globals.h"
 

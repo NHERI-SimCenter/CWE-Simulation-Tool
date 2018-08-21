@@ -36,7 +36,7 @@
 #ifndef VWTINTERFACEDRIVER_H
 #define VWTINTERFACEDRIVER_H
 
-#include "../AgaveExplorer/utilFuncs/agavesetupdriver.h"
+#include "utilFuncs/agavesetupdriver.h"
 
 #include <QWindow>
 #include <QDir>

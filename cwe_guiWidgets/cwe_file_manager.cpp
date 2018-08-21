@@ -35,8 +35,8 @@
 #include "cwe_file_manager.h"
 #include "ui_cwe_file_manager.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
-#include "../AgaveClientInterface/remotedatainterface.h"
+#include "filemetadata.h"
+#include "remotedatainterface.h"
 
 #include "remoteFiles/filetreenode.h"
 #include "remoteFiles/fileoperator.h"

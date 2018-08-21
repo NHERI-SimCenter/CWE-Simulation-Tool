@@ -38,8 +38,8 @@
 
 #include "remoteFiles/fileoperator.h"
 #include "remoteFiles/filetreenode.h"
-#include "../AgaveExplorer/remoteFileOps/joboperator.h"
-#include "../AgaveExplorer/remoteFileOps/joblistnode.h"
+#include "remoteJobs/joboperator.h"
+#include "remoteJobs/joblistnode.h"
 
 #include "filemetadata.h"
 #include "remotedatainterface.h"
