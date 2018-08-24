@@ -154,9 +154,6 @@ void CWE_InterfaceDriver::closeAuthScreen()
 void CWE_InterfaceDriver::startOffline()
 {
     offlineMode = true;
-    myJobHandle = new JobOperator(this);
-    myFileHandle = new FileOperator(this);
-    myJobAccountant = new CWEjobAccountant(this);
     mainWindow = new CWE_MainWindow();
 
     mainWindow->runSetupSteps();

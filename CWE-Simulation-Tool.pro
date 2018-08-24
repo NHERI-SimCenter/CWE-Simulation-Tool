@@ -33,6 +33,15 @@
 # Contributors:
 # Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
+NEEDED_REPO=AgaveExplorer
+
+NEEDED_PRI=$$PWD/../$$NEEDED_REPO/"$$NEEDED_REPO".pri
+!exists( $$NEEDED_PRI ) {
+    message("Needed Git repo $$NEEDED_REPO not found. This project requires $$NEEDED_REPO from https://github.com/NHERI-SimCenter.")
+}
+
+include($$NEEDED_PRI)
+
 QT += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -53,8 +62,6 @@ win32 {
     ICON = icons/NHERI-CWE-Icon.icns
     }
 }
-
-include($$PWD/../AgaveExplorer/AgaveExplorer.pri)
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
