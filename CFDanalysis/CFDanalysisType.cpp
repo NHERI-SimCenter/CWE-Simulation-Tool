@@ -35,7 +35,7 @@
 #include "CFDanalysisType.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 
-#include "../AgaveExplorer/ae_globals.h"
+#include "cwe_globals.h"
 
 CFDanalysisType::CFDanalysisType(QJsonDocument rawJSON)
 {

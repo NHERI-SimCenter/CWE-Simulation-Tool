@@ -35,10 +35,10 @@
 #include "cwe_results.h"
 #include "ui_cwe_results.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
+#include "filemetadata.h"
 
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "remoteFiles/fileoperator.h"
+#include "remoteFiles/filetreenode.h"
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 

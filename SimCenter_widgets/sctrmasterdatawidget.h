@@ -45,7 +45,7 @@
 #include <QBoxLayout>
 #include <QKeyValueIterator>
 
-#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+#include "remoteFiles/filenoderef.h"
 #include "CFDanalysis/CFDanalysisType.h"
 
 enum class SimCenterViewState  { visible,

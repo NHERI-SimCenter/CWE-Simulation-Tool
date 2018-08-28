@@ -35,7 +35,7 @@
 
 #include "resultfield2dwindow.h"
 
-#include "../cfdglcanvas.h"
+#include "visualUtils/cfdglcanvas.h"
 
 ResultField2dWindow::ResultField2dWindow(CFDcaseInstance * theCase, RESULTS_STYLE *resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}

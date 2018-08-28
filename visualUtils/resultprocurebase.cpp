@@ -37,10 +37,10 @@
 #include "cwe_globals.h"
 #include "decompresswrapper.h"
 
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
+#include "remoteFiles/filetreenode.h"
+#include "remoteFiles/fileoperator.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
+#include "filemetadata.h"
 
 ResultProcureBase::ResultProcureBase(QWidget *parent) : QWidget(parent) {}
 

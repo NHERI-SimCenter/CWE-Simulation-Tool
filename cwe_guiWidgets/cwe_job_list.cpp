@@ -38,7 +38,7 @@
 
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
-#include "../AgaveExplorer/remoteModelViews/remotefiletree.h"
+#include "remoteFiles/remotefiletree.h"
 
 CWE_job_list::CWE_job_list(QWidget *parent) :
     CWE_Super(parent),

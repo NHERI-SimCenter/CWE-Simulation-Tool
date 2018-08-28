@@ -36,7 +36,7 @@
 #ifndef CWE_GLOBALS_H
 #define CWE_GLOBALS_H
 
-#include "../AgaveExplorer/ae_globals.h"
+#include "ae_globals.h"
 #include "CFDanalysis/cwejobaccountant.h"
 
 class CWE_InterfaceDriver;

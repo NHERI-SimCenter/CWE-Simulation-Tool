@@ -41,7 +41,7 @@
 #include <QPushButton>
 #include <QScreen>
 
-#include "../AgaveExplorer/remoteModelViews/remotefilemodel.h"
+#include "remoteFiles/remotefilemodel.h"
 
 namespace Ui {
 class CWE_MainWindow;

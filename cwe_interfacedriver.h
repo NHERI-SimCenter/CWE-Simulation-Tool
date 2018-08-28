@@ -36,7 +36,7 @@
 #ifndef VWTINTERFACEDRIVER_H
 #define VWTINTERFACEDRIVER_H
 
-#include "../AgaveExplorer/utilFuncs/agavesetupdriver.h"
+#include "utilFuncs/agavesetupdriver.h"
 
 #include <QWindow>
 #include <QDir>
@@ -80,7 +80,7 @@ private:
 
     QNetworkAccessManager pingManager;
 
-    CWE_MainWindow * mainWindow;
+    CWE_MainWindow * mainWindow = nullptr;
     QList<CFDanalysisType *> templateList;
 
     CWEjobAccountant * myJobAccountant = nullptr;

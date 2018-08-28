@@ -35,7 +35,7 @@
 
 #include "resultmesh3dwindow.h"
 
-#include "../cfdglcanvas.h"
+#include "visualUtils/cfdglcanvas.h"
 
 ResultMesh3dWindow::ResultMesh3dWindow(CFDcaseInstance * theCase, RESULTS_STYLE *resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}

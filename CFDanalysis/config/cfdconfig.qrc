@@ -1,10 +1,12 @@
 <RCC>
     <qresource prefix="/config">
-        <file>upload2D.json</file>
+        <file>NXupload2D.json</file>
         <file>upload3D.json</file>
         <file>standardShapes.json</file>
         <file>customInflow3D.json</file>
         <file>motionSim3D.json</file>
         <file>emptyChannel3D.json</file>
+        <file>upload2D.json</file>
+        <file>NXupload3D.json</file>
     </qresource>
 </RCC>
