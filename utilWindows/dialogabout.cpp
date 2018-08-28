@@ -7,7 +7,7 @@ DialogAbout::DialogAbout(QString versionText, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QFile file(":/help/About/CWEabout.html");
+    QFile file(":/About/CWEabout.html");
     if (file.open(QFile::ReadOnly))
     {
         ui->aboutTextBrowser->setHtml(file.readAll());
