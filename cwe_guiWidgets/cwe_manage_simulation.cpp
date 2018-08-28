@@ -38,8 +38,8 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
 
-#include "../popupWindows/create_case_popup.h"
-#include "../popupWindows/duplicate_case_popup.h"
+#include "popupWindows/create_case_popup.h"
+#include "popupWindows/duplicate_case_popup.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 

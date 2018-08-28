@@ -245,13 +245,13 @@
   <customwidget>
    <class>HeaderWidget</class>
    <extends>QFrame</extends>
-   <header>SimCenterCommon/HeaderWidget.h</header>
+   <header>commonUI/HeaderWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>FooterWidget</class>
    <extends>QFrame</extends>
-   <header>SimCenterCommon/FooterWidget.h</header>
+   <header>commonUI/FooterWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

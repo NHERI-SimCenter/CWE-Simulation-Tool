@@ -35,7 +35,7 @@
 #include "duplicate_case_popup.h"
 #include "ui_duplicate_case_popup.h"
 
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "remoteFiles/filetreenode.h"
 
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"

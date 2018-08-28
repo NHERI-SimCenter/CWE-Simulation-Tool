@@ -42,7 +42,7 @@
 #include <QRadioButton>
 #include <QJsonObject>
 
-#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+#include "remoteFiles/filenoderef.h"
 
 class CFDanalysisType;
 

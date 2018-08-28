@@ -34,14 +34,16 @@
 #include "cwe_mainwindow.h"
 #include "ui_cwe_mainwindow.h"
 
+#include "remoteFiles/fileoperator.h"
+
 #include "CFDanalysis/CFDcaseInstance.h"
 #include "cwe_guiWidgets/cwe_state_label.h"
 
 #include "cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.h"
 
-#include "../AgaveExplorer/utilFuncs/copyrightdialog.h"
+#include "utilFuncs/copyrightdialog.h"
 #include "cwe_interfacedriver.h"
-#include "../AgaveClientInterface/remotedatainterface.h"
+#include "remotedatainterface.h"
 #include "cwe_globals.h"
 
 #include "utilWindows/dialogabout.h"
@@ -54,6 +56,9 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
 
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
+
+    QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
+                         &fileModel, SLOT(newFileData(FileNodeRef)), Qt::QueuedConnection);
 
     addWindowPanel(ui->tab_welcome_screen,"welcome","Welcome");
     addWindowPanel(ui->tab_help,"help","Help");

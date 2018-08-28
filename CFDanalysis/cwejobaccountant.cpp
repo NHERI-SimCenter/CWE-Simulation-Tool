@@ -34,9 +34,9 @@
 
 #include "cwejobaccountant.h"
 
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
-#include "../AgaveExplorer/remoteFileOps/joboperator.h"
-#include "../AgaveClientInterface/remotejobdata.h"
+#include "remoteFiles/fileoperator.h"
+#include "remoteJobs/joboperator.h"
+#include "remotejobdata.h"
 #include "cwe_globals.h"
 
 CWEjobAccountant::CWEjobAccountant(QObject *parent) : QObject(parent)

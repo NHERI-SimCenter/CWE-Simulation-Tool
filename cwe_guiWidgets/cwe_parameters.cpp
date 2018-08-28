@@ -35,9 +35,9 @@
 #include "cwe_parameters.h"
 #include "ui_cwe_parameters.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
+#include "filemetadata.h"
 
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "remoteFiles/filetreenode.h"
 
 #include "cwe_interfacedriver.h"
 

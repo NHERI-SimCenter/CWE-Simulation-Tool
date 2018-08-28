@@ -39,7 +39,7 @@
 #include <QWidget>
 #include <QMap>
 
-#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+#include "remoteFiles/filenoderef.h"
 
 //TODO: Need to deal with situation when bsae folder is removed
 

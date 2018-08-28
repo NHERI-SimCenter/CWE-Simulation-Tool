@@ -36,7 +36,7 @@
 #define CWE_SUPER_H
 
 #include <QFrame>
-#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+#include "remoteFiles/filenoderef.h"
 
 class CWE_MainWindow;
 
