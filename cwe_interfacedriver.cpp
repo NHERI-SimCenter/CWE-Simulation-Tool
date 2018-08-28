@@ -117,7 +117,7 @@ void CWE_InterfaceDriver::closeAuthScreen()
 
     myJobAccountant = new CWEjobAccountant(this);
 
-    myJobHandle->demandJobDataRefresh();
+    myJobHandle->resetJobData(myDataInterface);
     myFileHandle->resetFileData(myDataInterface, myDataInterface->getUserName());
 
     mainWindow->runSetupSteps();
