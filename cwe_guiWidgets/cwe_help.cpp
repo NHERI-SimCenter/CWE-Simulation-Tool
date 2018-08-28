@@ -46,7 +46,7 @@ CWE_help::CWE_help(QWidget *parent) :
     ui(new Ui::CWE_help)
 {
     ui->setupUi(this);
-    ui->helpBrowser->setSource(QUrl("qrc:///help/index.html"));
+    ui->helpBrowser->setSource(QUrl("qrc:///docs/help/index.html"));
     ui->helpBrowser->setOpenExternalLinks(true);
 }
 

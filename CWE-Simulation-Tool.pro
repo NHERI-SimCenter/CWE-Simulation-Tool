@@ -170,11 +170,11 @@ RESOURCES += \
 
 win32 { 
     "$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc".commands = IF NOT EXIST $$shell_path($$OUT_PWD)\release\resources $(MKDIR) $$shell_path($$OUT_PWD)\release\resources & rcc -binary $$shell_path($$PWD)\cwe_help.qrc -o $$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc
-    "$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc".depends = $$PWD\cwe_help.qrc $$PWD\help\* $$PWD\help\Images\*
+    "$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc".depends = $$PWD\cwe_help.qrc $$PWD\docs\help\* $$PWD\docs\help\Images\*
     release.depends += "$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc"
 
     "$$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc".commands = IF NOT EXIST $$shell_path($$OUT_PWD)\debug\resources $(MKDIR) $$shell_path($$OUT_PWD)\debug\resources & rcc -binary $$shell_path($$PWD)\cwe_help.qrc -o $$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc
-    "$$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc".depends = $$PWD\cwe_help.qrc $$PWD\help\* $$PWD\help\Images\*
+    "$$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc".depends = $$PWD\cwe_help.qrc $$PWD\docs\help\* $$PWD\docs\help\Images\*
     debug.depends += "$$shell_path($$OUT_PWD)\debug\resources\cwe_help.rcc"
 
     export(release.depends)
@@ -187,7 +187,7 @@ win32 {
 } else {
     mac {
         "$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc".commands = $(MKDIR) $$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources ; rcc -binary $$PWD/cwe_help.qrc -o $$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc
-        "$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc".depends = $$PWD/cwe_help.qrc $$PWD/help/* $$PWD/help/Images/*
+        "$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc".depends = $$PWD/cwe_help.qrc $$PWD/docs/help/* $$PWD/docs/help/Images/*
         first.depends += "$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc"
         export(first.depends)
         export("$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc".depends)
@@ -195,7 +195,7 @@ win32 {
         QMAKE_EXTRA_TARGETS += first "$$OUT_PWD/$$TARGET$$join(TEMPLATE,,".")/Contents/MacOS/resources/cwe_help.rcc"
     } else {
         "$$OUT_PWD/resources/cwe_help.rcc".commands = $(MKDIR) $$OUT_PWD/resources; rcc -binary $$PWD/cwe_help.qrc -o $$OUT_PWD/resources/cwe_help.rcc
-        "$$OUT_PWD/resources/cwe_help.rcc".depends = $$PWD/cwe_help.qrc $$PWD/help/* $$PWD/help/Images/*
+        "$$OUT_PWD/resources/cwe_help.rcc".depends = $$PWD/cwe_help.qrc $$PWD/docs/help/* $$PWD/docs/help/Images/*
         first.depends += "$$OUT_PWD/resources/cwe_help.rcc"
         export(first.depends)
         export("$$OUT_PWD/resources/cwe_help.rcc".depends)
