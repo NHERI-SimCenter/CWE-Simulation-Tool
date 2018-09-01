@@ -36,14 +36,14 @@
 
 #include "CFDanalysisType.h"
 
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
-#include "../AgaveExplorer/remoteFileOps/joboperator.h"
-#include "../AgaveExplorer/remoteFileOps/joblistnode.h"
+#include "remoteFiles/fileoperator.h"
+#include "remoteFiles/filetreenode.h"
+#include "remoteJobs/joboperator.h"
+#include "remoteJobs/joblistnode.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
-#include "../AgaveClientInterface/remotedatainterface.h"
-#include "../AgaveClientInterface/remotejobdata.h"
+#include "filemetadata.h"
+#include "remotedatainterface.h"
+#include "remotejobdata.h"
 
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
@@ -245,25 +245,28 @@ bool CFDcaseInstance::startStageApp(QString stageID)
     if (myState != InternalCaseState::READY) return false;
     if (storedStageStates.value(stageID, StageState::ERROR) != StageState::UNRUN) return false;
 
-    QString appName = myType->getStageApp(stageID);
+    TEMPLATE_STAGE theStage = myType->getStageFromId(stageID);
+    if (theStage.internalName.isEmpty()) return false;
+    //TODO: check for validity here
 
     QMultiMap<QString, QString> rawParams;
     rawParams.insert("stage",stageID);
-    QString extraInput = myType->getExtraInput(stageID);
-    if (!extraInput.isEmpty())
+    if (!theStage.appInputFile.isEmpty())
     {
-        QString addedInputVal = getCurrentParams().value(extraInput);
+        QString addedInputVal = getCurrentParams().value(theStage.appInputFile);
         if (!addedInputVal.isEmpty())
         {
             rawParams.insert("file_input", addedInputVal);
         }
     }
 
-    RemoteDataThread * remoteConnect = cwe_globals::get_Driver()->getDataConnection();
-    QString jobName = appName;
+    QString jobName = theStage.appName;
     jobName = jobName.append("-");
     jobName = jobName.append(stageID);
-    RemoteDataReply * jobHandle = remoteConnect->runRemoteJob(appName, rawParams, caseFolder.getFullPath(), jobName);
+    QString archiveDir = caseFolder.getFullPath();
+    archiveDir = archiveDir.append("/");
+    archiveDir = archiveDir.append(stageID);
+    RemoteDataReply * jobHandle = cwe_globals::get_connection()->runRemoteJob(theStage.appName, rawParams, caseFolder.getFullPath(), jobName, archiveDir);
 
     if (jobHandle == nullptr)
     {

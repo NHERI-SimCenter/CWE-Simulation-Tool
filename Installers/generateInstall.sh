@@ -12,6 +12,7 @@ GENERATOR_DIR=$(dirname "$0")
 QT_HOME=~/Qt/5.11.1/gcc_64/lib
 QT_PLUGINS=~/Qt/5.11.1/gcc_64/plugins
 QT_BIN_CREATE=~/Qt/Tools/QtInstallerFramework/3.0/bin/binarycreator
+INSTALL_EXEC_NAME=SetupSimCenterCWE_Linux_1_1_0
 
 #----- do not modify below here -------------------------
 
@@ -57,4 +58,4 @@ cp -R release/* installer/packages/nheri.simcenter.cfdclient/data/
 
 cd installer
 
-$QT_BIN_CREATE --offline-only -c config/linconfig.xml -p packages ../SetupSimCenterCWE_Linux_1_0_0
+$QT_BIN_CREATE --offline-only -c config/linconfig.xml -p packages ../$INSTALL_EXEC_NAME

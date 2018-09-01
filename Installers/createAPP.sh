@@ -11,7 +11,7 @@ GENERATOR_DIR=$(dirname "$0")
 #----- adjust user settings -----------------------------
 
 APPNAME=CWE-Simulation-Tool.app
-APPINSTALLER=SetupSimCenterCWE_Mac_1_0_0
+APPINSTALLER=SetupSimCenterCWE_Mac_1_1_0
 
 MACDEPLOY=${HOME}/Qt/5.11.1/clang_64/bin/macdeployqt
 

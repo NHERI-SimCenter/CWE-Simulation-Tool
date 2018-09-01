@@ -36,7 +36,7 @@
 #include "resultvisualpopup.h"
 #include "ui_resultvisualpopup.h"
 
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "remoteFiles/filetreenode.h"
 
 #include "CFDanalysis/CFDcaseInstance.h"
 #include "CFDanalysis/CFDanalysisType.h"

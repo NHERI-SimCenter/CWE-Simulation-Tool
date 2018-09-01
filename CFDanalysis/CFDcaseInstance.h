@@ -43,7 +43,7 @@
 #include <QList>
 #include <QThread>
 
-#include "../AgaveExplorer/remoteFileOps/filenoderef.h"
+#include "remoteFiles/filenoderef.h"
 
 class CFDanalysisType;
 class RemoteJobData;

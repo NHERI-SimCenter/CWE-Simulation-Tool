@@ -38,7 +38,7 @@
 
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
-#include "../AgaveExplorer/remoteModelViews/remotefiletree.h"
+#include "remoteFiles/remotefiletree.h"
 
 CWE_job_list::CWE_job_list(QWidget *parent) :
     CWE_Super(parent),
@@ -50,6 +50,18 @@ CWE_job_list::CWE_job_list(QWidget *parent) :
 CWE_job_list::~CWE_job_list()
 {
     delete ui;
+}
+
+void CWE_job_list::linkMainWindow(CWE_MainWindow *theMainWin)
+{
+    //TODO: Clean up init
+    CWE_Super::linkMainWindow(theMainWin);
+    if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
+    {
+        ui->tableView_jobs->setOperator(cwe_globals::get_job_handle());
+        //QObject::connect(ui->tableView_jobs, SIGNAL(customContextMenuRequested(QPoint)),
+        //                 this, SLOT(customFileMenu(QPoint)));
+    }
 }
 
 void CWE_job_list::customJobMenu(const QPoint &)

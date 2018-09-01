@@ -35,14 +35,14 @@
 
 #include "cwe_interfacedriver.h"
 
-#include "../AgaveClientInterface/agaveInterfaces/agavethread.h"
-#include "../AgaveClientInterface/agaveInterfaces/agavetaskreply.h"
-#include "../AgaveClientInterface/remotejobdata.h"
+#include "agaveInterfaces/agavehandler.h"
+#include "agaveInterfaces/agavetaskreply.h"
+#include "remotejobdata.h"
 
-#include "../AgaveExplorer/utilFuncs/authform.h"
+#include "utilFuncs/authform.h"
 
-#include "../AgaveExplorer/remoteFileOps/joboperator.h"
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
+#include "remoteJobs/joboperator.h"
+#include "remoteFiles/fileoperator.h"
 
 #include "CFDanalysis/CFDcaseInstance.h"
 #include "CFDanalysis/CFDanalysisType.h"
@@ -51,7 +51,7 @@
 #include "mainWindow/cwe_mainwindow.h"
 #include "cwe_globals.h"
 
-CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent, debug)
+CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent)
 {
     qRegisterMetaType<CaseState>("CaseState");
 
@@ -62,17 +62,6 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
         return;
     }
 
-    AgaveThread * tmpHandle = new AgaveThread(this);
-    tmpHandle->start();
-    while (!tmpHandle->interfaceReady())
-    {
-        QThread::usleep(10);
-    }
-    tmpHandle->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
-    tmpHandle->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
-
-    theConnectThread = tmpHandle;
-
     /* populate with available cases */
     QDir confDir(":/config");
     QStringList filters;
@@ -82,19 +71,26 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
     foreach (QString caseConfigFile, caseTypeFiles)
     {
         QString confPath = ":/config/";
-        confPath = confPath.append(caseConfigFile);
-        CFDanalysisType * newTemplate = new CFDanalysisType(confPath);
-        if ((debug == false) && (newTemplate->isDebugOnly() == true))
+        QJsonDocument rawConfig = CFDanalysisType::getRawJSON(confPath, caseConfigFile);
+        if (rawConfig.isEmpty())
         {
-            delete newTemplate;
+            qCDebug(agaveAppLayer, "Unreadable template config file skipped: %s", qPrintable(caseConfigFile));
             continue;
         }
-        if (newTemplate->isDisabled())
+        if (CFDanalysisType::jsonConfigIsEnabled(&rawConfig, debug))
         {
-            delete newTemplate;
-            continue;
+            CFDanalysisType * newTemplate = new CFDanalysisType(rawConfig);
+            if (!newTemplate->validParse())
+            {
+                qCDebug(agaveAppLayer, "Template Parse Invalid: %s", qPrintable(caseConfigFile));
+                delete newTemplate;
+            }
+            else
+            {
+                templateList.append(newTemplate);
+                qCDebug(agaveAppLayer, "Added New Template: %s", qPrintable(caseConfigFile));
+            }
         }
-        templateList.append(newTemplate);
     }
 }
 
@@ -105,33 +101,31 @@ CWE_InterfaceDriver::~CWE_InterfaceDriver()
 
 void CWE_InterfaceDriver::startup()
 {
-    myJobHandle = new JobOperator(this);
-    myFileHandle = new FileOperator(this);
-    myJobAccountant = new CWEjobAccountant(this);
-    authWindow = new AuthForm(this);
+    createAndStartAgaveThread();
+
+    myDataInterface->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
+    myDataInterface->registerAgaveAppInfo("extract", "extract-0.1u1",{"inputFile"},{},"");
+
+    authWindow = new AuthForm();
     authWindow->show();
     QObject::connect(authWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
-
-    mainWindow = new CWE_MainWindow();
 }
 
 void CWE_InterfaceDriver::closeAuthScreen()
 {
-    if (mainWindow == nullptr)
-    {
-        cwe_globals::displayFatalPopup("Fatal Error: Main window not found");
-    }
+    mainWindow = new CWE_MainWindow();
 
-    myJobHandle->demandJobDataRefresh();
-    myFileHandle->resetFileData();
+    myJobAccountant = new CWEjobAccountant(this);
+
+    myJobHandle->resetJobData(myDataInterface);
+    myFileHandle->resetFileData(myDataInterface, myDataInterface->getUserName());
 
     mainWindow->runSetupSteps();
     mainWindow->show();
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
-    AgaveThread * tmpHandle = qobject_cast<AgaveThread *>(theConnectThread);
-    AgaveTaskReply * getAppList = tmpHandle->getAgaveAppList();
+    AgaveTaskReply * getAppList = myDataInterface->getAgaveAppList();
 
     if (getAppList == nullptr)
     {
@@ -149,18 +143,17 @@ void CWE_InterfaceDriver::closeAuthScreen()
         authWindow = nullptr;
     }
 
-    if (!inDebugMode)
-    {
-        tmpHandle->sendCounterPing("http://opensees.berkeley.edu/OpenSees/developer/cwe/use.php");
-    }
+    //TODO: Reinstate the following
+    //if (!inDebugMode)
+    //{
+        //This URL is a counter
+    //    pingManager.get(QNetworkRequest(QUrl("http://opensees.berkeley.edu/OpenSees/developer/cwe/use.php")));
+    //}
 }
 
 void CWE_InterfaceDriver::startOffline()
 {
     offlineMode = true;
-    myJobHandle = new JobOperator(this);
-    myFileHandle = new FileOperator(this);
-    myJobAccountant = new CWEjobAccountant(this);
     mainWindow = new CWE_MainWindow();
 
     mainWindow->runSetupSteps();
@@ -214,7 +207,7 @@ QString CWE_InterfaceDriver::getBanner()
 
 QString CWE_InterfaceDriver::getVersion()
 {
-    return "Version: 1.0.0";
+    return "Version: 1.1.0";
 }
 
 QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()
@@ -272,8 +265,7 @@ bool CWE_InterfaceDriver::registerOneAppByVersion(QVariantList appList, QString 
         return false;
     }
 
-    AgaveThread * tmpThread = qobject_cast<AgaveThread *>(theConnectThread);
-    tmpThread->registerAgaveAppInfo(agaveAppName, idToUse, parameterList, inputList, workingDirParameter);
+    myDataInterface->registerAgaveAppInfo(agaveAppName, idToUse, parameterList, inputList, workingDirParameter);
     return true;
 
 }

@@ -35,10 +35,10 @@
 #include "cwe_results.h"
 #include "ui_cwe_results.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
+#include "filemetadata.h"
 
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "remoteFiles/fileoperator.h"
+#include "remoteFiles/filetreenode.h"
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
@@ -201,7 +201,7 @@ RESULTS_STYLE CWE_Results::getResultObjectFromName(QString name)
             continue;
         }
 
-        QList<RESULTS_STYLE> resultList = currentCase->getMyType()->getStageResults(itr.key());
+        QList<RESULTS_STYLE> resultList = currentCase->getMyType()->getStageFromId(itr.key()).resultList;
 
         for (RESULTS_STYLE aResult : resultList)
         {
@@ -302,7 +302,7 @@ void CWE_Results::populateResultsScreen()
             continue;
         }
 
-        QList<RESULTS_STYLE> resultList = currentCase->getMyType()->getStageResults(itr.key());
+        QList<RESULTS_STYLE> resultList = currentCase->getMyType()->getStageFromId(itr.key()).resultList;
 
         for (RESULTS_STYLE aResult : resultList)
         {

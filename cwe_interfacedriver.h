@@ -36,7 +36,7 @@
 #ifndef VWTINTERFACEDRIVER_H
 #define VWTINTERFACEDRIVER_H
 
-#include "../AgaveExplorer/utilFuncs/agavesetupdriver.h"
+#include "utilFuncs/agavesetupdriver.h"
 
 #include <QWindow>
 #include <QDir>
@@ -78,7 +78,9 @@ private slots:
 private:
     bool registerOneAppByVersion(QVariantList appList, QString agaveAppName, QStringList parameterList, QStringList inputList, QString workingDirParameter);
 
-    CWE_MainWindow * mainWindow;
+    QNetworkAccessManager pingManager;
+
+    CWE_MainWindow * mainWindow = nullptr;
     QList<CFDanalysisType *> templateList;
 
     CWEjobAccountant * myJobAccountant = nullptr;

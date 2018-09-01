@@ -35,7 +35,7 @@
 #include "create_case_popup.h"
 #include "ui_create_case_popup.h"
 
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
+#include "remoteFiles/filetreenode.h"
 
 #include "CFDanalysis/CFDanalysisType.h"
 #include "CFDanalysis/CFDcaseInstance.h"
@@ -146,14 +146,14 @@ void Create_Case_Popup::populateCaseTypes()
         buttonIcon->setMaximumSize(150, 100);
         QLabel *labelDescription = new QLabel(ui->scroll_NewCase);
         if (theDescription == "") {
-            theDescription = "some\ndescription\nof this\ncase.";
+            theDescription = "ERROR: Template description is missing.";
         }
         labelDescription->setText(theDescription);
 
         int cnt = layout->rowCount();
-        layout->addWidget(buttonIcon,cnt+1,1,1,1);
-        layout->addWidget(labelDescription,cnt+1,2,1,1);
-        layout->addWidget(radioBtn,cnt,1,1,2);
+        layout->addWidget(buttonIcon,cnt+1,0,1,1);
+        layout->addWidget(labelDescription,cnt+1,1,1,1);
+        layout->addWidget(radioBtn,cnt,0,1,2);
 
         CASE_TYPE_DATA list;
         list.radioBtn = radioBtn;
@@ -168,6 +168,8 @@ void Create_Case_Popup::populateCaseTypes()
 
         idx++;
     }
+    layout->addItem(new QSpacerItem(1,1, QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding),
+                    layout->rowCount(),0,1,layout->columnCount());
 
     QLayout *lyt = ui->scroll_NewCase->layout();
     if (lyt != nullptr) {delete lyt;}

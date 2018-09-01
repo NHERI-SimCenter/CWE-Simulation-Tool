@@ -51,6 +51,8 @@ public:
     explicit CWE_job_list(QWidget *parent = nullptr);
     ~CWE_job_list();
 
+    virtual void linkMainWindow(CWE_MainWindow * theMainWin);
+
 private slots:
     void customJobMenu(const QPoint &pos);
 

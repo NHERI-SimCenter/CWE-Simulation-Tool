@@ -35,12 +35,12 @@
 #include "cwe_file_manager.h"
 #include "ui_cwe_file_manager.h"
 
-#include "../AgaveClientInterface/filemetadata.h"
-#include "../AgaveClientInterface/remotedatainterface.h"
+#include "filemetadata.h"
+#include "remotedatainterface.h"
 
-#include "../AgaveExplorer/remoteFileOps/filetreenode.h"
-#include "../AgaveExplorer/remoteFileOps/fileoperator.h"
-#include "../AgaveExplorer/utilFuncs/singlelinedialog.h"
+#include "remoteFiles/filetreenode.h"
+#include "remoteFiles/fileoperator.h"
+#include "utilFuncs/singlelinedialog.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
@@ -110,13 +110,20 @@ void CWE_file_manager::on_pb_upload_clicked()
     QModelIndex localSelectIndex = ui->localTreeView->currentIndex();
     QFileInfo fileData = localFileModel->fileInfo(localSelectIndex);
 
-    if (!fileData.isFile())
+    if (fileData.isDir())
     {
-        cwe_globals::displayPopup("Please select exactly 1 local file to upload.");
+        cwe_globals::get_file_handle()->enactRecursiveUpload(targetFile, fileData.absoluteFilePath());
+    }
+    else if (fileData.isFile())
+    {
+        cwe_globals::get_file_handle()->sendUploadReq(targetFile, fileData.absoluteFilePath());
+    }
+    else
+    {
+        cwe_globals::displayPopup("Please select one file or folder for upload.");
         return;
     }
 
-    cwe_globals::get_file_handle()->sendUploadReq(targetFile, fileData.absoluteFilePath());
     expectingOp = true;
 
     if (!cwe_globals::get_file_handle()->operationIsPending())

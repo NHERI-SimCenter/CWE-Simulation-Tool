@@ -38,11 +38,11 @@
 #include <QSslSocket>
 #include <QtGlobal>
 
-#include "../AgaveClientInterface/remotedatainterface.h"
+#include "remotedatainterface.h"
 
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
-#include "../AgaveExplorer/utilFuncs/fixforssl.h"
+#include "utilFuncs/fixforssl.h"
 
 int main(int argc, char *argv[])
 {
@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
             debugLoggingEnabled = true;
         }
     }
+    CWE_InterfaceDriver::setDebugLogging(debugLoggingEnabled);
 
     if (runOffline) qCDebug(agaveAppLayer, "NOTE: Running CWE client offline.");
     if (debugLoggingEnabled) qCDebug(agaveAppLayer, "NOTE: Debugging text output is enabled.");

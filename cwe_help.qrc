@@ -1,48 +1,48 @@
 <RCC>
-    <qresource prefix="/">
-        <file>images/Overview/CWEFlow1.png</file>
-        <file>images/Overview/CWEFlow2.png</file>
-        <file>images/Overview/CWEFlow3.png</file>
-        <file>images/Overview/CWEFlow4.png</file>
-        <file>images/Overview/CWEFlow5.png</file>
-        <file>help/about_developers.html</file>
-        <file>help/about_simcenter.html</file>
-        <file>help/license.html</file>
-        <file>help/index.html</file>
-        <file>help/tut_case.html</file>
-        <file>help/tut_geo.html</file>
-        <file>help/tut_mesh.html</file>
-        <file>help/tut_jobs.html</file>
-        <file>help/tut_result.html</file>
-        <file>help/tut_sim.html</file>
-        <file>help/help_default.html</file>
-        <file>help/cfd_intro.html</file>
-        <file>help/tut_login.html</file>
-        <file>help/Images/AnalysisDoneScreen.png</file>
-        <file>help/Images/CreateCaseScreen.png</file>
-        <file>help/Images/CreateNewCase.png</file>
-        <file>help/Images/DownloadEntireCase.png</file>
-        <file>help/Images/DuplicateCase.png</file>
-        <file>help/Images/LoginScreen.png</file>
-        <file>help/Images/ParameterTabScreen.png</file>
-        <file>help/Images/RemoteFiles.png</file>
-        <file>help/Images/RemoteJobs.png</file>
-        <file>help/Images/ResultsScreen.png</file>
-        <file>help/Images/RunButton.png</file>
-        <file>help/Images/RunningScreen.png</file>
-        <file>help/Images/SaveAllParameters.png</file>
-        <file>help/Images/SelectTemplateScreen.png</file>
-        <file>help/Images/ShowMeshScreen.png</file>
-        <file>help/Images/SimulationCases.png</file>
-        <file>help/Images/ViewParameters.png</file>
-        <file>help/Images/ViewResults.png</file>
-        <file>help/workflow_app.html</file>
-        <file>help/workflow_clone_case.html</file>
-        <file>help/workflow_continue.html</file>
-        <file>help/workflow_new_case.html</file>
-        <file>help/About/Peter-Sempolinski.png</file>
-        <file>help/About/McKenna-Frank.png</file>
-        <file>help/About/Mackenzie-Helnwein-Peter.png</file>
-        <file>help/About/CWEabout.html</file>
+    <qresource prefix="/help/">
+        <file alias="Images/Overview/CWEFlow1.png">docs/help/Images/Overview/CWEFlow1.png</file>
+        <file alias="Images/Overview/CWEFlow2.png">docs/help/Images/Overview/CWEFlow2.png</file>
+        <file alias="Images/Overview/CWEFlow3.png">docs/help/Images/Overview/CWEFlow3.png</file>
+        <file alias="Images/Overview/CWEFlow4.png">docs/help/Images/Overview/CWEFlow4.png</file>
+        <file alias="Images/Overview/CWEFlow5.png">docs/help/Images/Overview/CWEFlow5.png</file>
+        <file alias="about_developers.html">docs/help/about_developers.html</file>
+        <file alias="about_simcenter.html">docs/help/about_simcenter.html</file>
+        <file alias="license.html">docs/help/license.html</file>
+        <file alias="index.html">docs/help/index.html</file>
+        <file alias="tut_case.html">docs/help/tut_case.html</file>
+        <file alias="tut_geo.html">docs/help/tut_geo.html</file>
+        <file alias="tut_mesh.html">docs/help/tut_mesh.html</file>
+        <file alias="tut_jobs.html">docs/help/tut_jobs.html</file>
+        <file alias="tut_result.html">docs/help/tut_result.html</file>
+        <file alias="tut_sim.html">docs/help/tut_sim.html</file>
+        <file alias="help_default.html">docs/help/help_default.html</file>
+        <file alias="cfd_intro.html">docs/help/cfd_intro.html</file>
+        <file alias="tut_login.html">docs/help/tut_login.html</file>
+        <file alias="Images/AnalysisDoneScreen.png">docs/help/Images/AnalysisDoneScreen.png</file>
+        <file alias="Images/CreateCaseScreen.png">docs/help/Images/CreateCaseScreen.png</file>
+        <file alias="Images/CreateNewCase.png">docs/help/Images/CreateNewCase.png</file>
+        <file alias="Images/DownloadEntireCase.png">docs/help/Images/DownloadEntireCase.png</file>
+        <file alias="Images/DuplicateCase.png">docs/help/Images/DuplicateCase.png</file>
+        <file alias="Images/LoginScreen.png">docs/help/Images/LoginScreen.png</file>
+        <file alias="Images/ParameterTabScreen.png">docs/help/Images/ParameterTabScreen.png</file>
+        <file alias="Images/RemoteFiles.png">docs/help/Images/RemoteFiles.png</file>
+        <file alias="Images/RemoteJobs.png">docs/help/Images/RemoteJobs.png</file>
+        <file alias="Images/ResultsScreen.png">docs/help/Images/ResultsScreen.png</file>
+        <file alias="Images/RunButton.png">docs/help/Images/RunButton.png</file>
+        <file alias="Images/RunningScreen.png">docs/help/Images/RunningScreen.png</file>
+        <file alias="Images/SaveAllParameters.png">docs/help/Images/SaveAllParameters.png</file>
+        <file alias="Images/SelectTemplateScreen.png">docs/help/Images/SelectTemplateScreen.png</file>
+        <file alias="Images/ShowMeshScreen.png">docs/help/Images/ShowMeshScreen.png</file>
+        <file alias="Images/SimulationCases.png">docs/help/Images/SimulationCases.png</file>
+        <file alias="Images/ViewParameters.png">docs/help/Images/ViewParameters.png</file>
+        <file alias="Images/ViewResults.png">docs/help/Images/ViewResults.png</file>
+        <file alias="workflow_app.html">docs/help/workflow_app.html</file>
+        <file alias="workflow_clone_case.html">docs/help/workflow_clone_case.html</file>
+        <file alias="workflow_continue.html">docs/help/workflow_continue.html</file>
+        <file alias="workflow_new_case.html">docs/help/workflow_new_case.html</file>
+        <file alias="About/Peter-Sempolinski.png">docs/help/About/Peter-Sempolinski.png</file>
+        <file alias="About/McKenna-Frank.png">docs/help/About/McKenna-Frank.png</file>
+        <file alias="About/Mackenzie-Helnwein-Peter.png">docs/help/About/Mackenzie-Helnwein-Peter.png</file>
+        <file alias="About/CWEabout.html">docs/help/About/CWEabout.html</file>
     </qresource>
 </RCC>
