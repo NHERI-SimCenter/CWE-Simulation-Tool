@@ -165,8 +165,8 @@ FORMS    += \
     cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.ui
 
 RESOURCES += \
-    cwe_resources.qrc \
-    CFDanalysis/config/cfdconfig.qrc
+    CFDanalysis/config/cfdconfig.qrc \
+    cwe_resources.qrc
 
 win32 { 
     "$$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc".commands = IF NOT EXIST $$shell_path($$OUT_PWD)\release\resources $(MKDIR) $$shell_path($$OUT_PWD)\release\resources & rcc -binary $$shell_path($$PWD)\cwe_help.qrc -o $$shell_path($$OUT_PWD)\release\resources\cwe_help.rcc
