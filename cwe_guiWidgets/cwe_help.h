@@ -53,6 +53,9 @@ public:
 public slots:
     void setPageSource(const QUrl &url);
 
+private slots:
+    void on_searchText_editingFinished();
+
 private:
     Ui::CWE_help *ui;
 };

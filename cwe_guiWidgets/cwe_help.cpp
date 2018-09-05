@@ -59,3 +59,39 @@ void CWE_help::setPageSource(const QUrl &url)
 {
     ui->helpBrowser->setSource(url);
 }
+
+void CWE_help::on_searchText_editingFinished()
+{
+    QString searchString = ui->searchText->text();
+
+    //
+    // get a list of available html files
+    //
+    QStringList fileList;
+
+    //
+    // create results document as a string
+    //
+    QString searchResults;
+
+    searchResults += "<h1>Search results for: " + searchString + "</h1>";
+
+    //
+    // search file by file for search string
+    //
+    foreach (QString fileName, fileList)
+    {
+        // open help file
+
+        // look for search string in file contents
+
+        // add entry to search result file
+
+    }
+
+    //
+    // display search results
+    //
+    ui->helpBrowser->setHtml(searchResults);
+
+}
