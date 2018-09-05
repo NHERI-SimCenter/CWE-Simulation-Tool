@@ -38,6 +38,10 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QUrl>
+#include <QDir>
+#include <QString>
+
+#include <QDebug>
 
 #include <QtGlobal>
 
@@ -64,17 +68,44 @@ void CWE_help::on_searchText_editingFinished()
 {
     QString searchString = ui->searchText->text();
 
+    qDebug() << "QString: " << searchString;
+    qDebug() << "Utf8:    " << searchString.toUtf8();
+
     //
     // get a list of available html files
     //
-    QStringList fileList;
+    QDir helpDir(":/help");
+    QStringList filters;
+    filters << "*.html" << "*.HTML" << "*.htm" << "*.HTM";
+    QStringList fileList =  helpDir.entryList(filters, QDir::Files);
 
     //
     // create results document as a string
     //
     QString searchResults;
 
+    searchResults += "<!DOCTYPE html>\
+                        <html>\
+                        <head>\
+                            <style>\
+                                xmp  {\
+                                    font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;\
+                                    margin-bottom: 10px;\
+                                    overflow: auto;\
+                                    width: auto;\
+                                    padding: 5px;\
+                                    padding-bottom: 20px!ie7;\
+                                    max-height: 600px;\
+                                    background-color: #cccccc;\
+                                      }\
+                            </style>\
+                        </head>\
+                        <body>";
+
     searchResults += "<h1>Search results for: " + searchString + "</h1>";
+    searchResults += "<ol>";
+
+    QByteArray searchPattern = searchString.toLower().toUtf8();
 
     //
     // search file by file for search string
@@ -82,12 +113,45 @@ void CWE_help::on_searchText_editingFinished()
     foreach (QString fileName, fileList)
     {
         // open help file
+        QFile theFile(helpDir.absoluteFilePath(fileName));
 
-        // look for search string in file contents
+        if ( theFile.open(QIODevice::ReadOnly) )
+        {
+            QByteArray theContents = theFile.readAll().toLower();
 
-        // add entry to search result file
+            // look for search string in file contents
+            if (theContents.contains(searchPattern) )
+            {
+                int idx = 0;
 
+                while (theContents.indexOf(searchPattern, idx) > 0)
+                {
+                    idx = theContents.indexOf(searchPattern, idx);
+                    int start = idx - 20;
+                    if (start < 0) {start = 0;}
+                    int length = searchString.length() + 20 + 20;
+
+                    QString textSample = theContents.mid(start, length);
+
+                    // add entry to search result file
+                    searchResults += "<li>" ;
+                    searchResults += "<a href=\"" + helpDir.relativeFilePath(fileName) + "\">" + helpDir.relativeFilePath(fileName) + "</a>\n";
+                    searchResults += "<blockquote><xmp> [...] ";
+                    searchResults += textSample.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;");
+                    searchResults += " [...] </xmp></blockquote>\n";
+                    searchResults += "</li>";
+
+                    idx += searchString.length();
+                }
+            }
+
+            theFile.close();
+        }
     }
+
+    searchResults += "</ol>";
+
+    searchResults += "</body></html>";
 
     //
     // display search results
