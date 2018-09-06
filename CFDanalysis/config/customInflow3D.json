@@ -1,50 +1,61 @@
 {
-    "displayName":"3D Building - Custom Inflow",
-    "internalName":"custom_inflow",
+    "displayName":"3D Building - Custom Turbulent Inflow",
+    "internalName":"customInflow",
     "description":"This model computes \nthe air flow around a building\n using an uploaded 3D geometry,\nusing customized inflows",
     "icon":"upload3D.png",
     "debugOnly":true,
-    "disable":true,
     "list_order":3,
     "parent":"upload3D.json",
     "stages":[
         {
-            "displayName":"Custom Inflow",
-            "internalName":"inflow",
-            "app":"cwe-serial",
-            "app_input":"geoFile",
+            "internalName":"mesh",
             "groups":[
+                "geometry",
                 {
-                    "displayName":"Inflow Pre-Process",
-                    "internalName":"post_process",
+                    "displayName":"Inflow Conditions",
+                    "internalName":"inflow",
                     "vars":[
                         {
-                            "displayName":"Select Inflow Params Folder",
-                            "internalName":"swakChoose",
-                            "type":"file"
+                            "displayName":"Select Inflow Type",
+                            "internalName":"inflowChoose",
+                            "type":"choose",
+                            "default":"turbulentDFInlet",
+                            "options":{
+                                "turbulentDFInlet": "DF",
+                                "turbulentSEMInlet": "SEM"
+                            }
+                        },
+                        {
+                            "displayName":"Select Inflow Shape",
+                            "internalName":"dfShape",
+                            "type":"choose",
+                            "default":"turbulentDFInlet",
+                            "options":{
+                                "turbulentDFInlet": "DF",
+                                "turbulentSEMInlet": "SEM"
+                            }
                         }
                     ]
-                }
-            ],
-            "results":[
-                {
-                    "displayName":"Inflow Agave Log",
-                    "type":"text",
-                    "file":"logs/.agave.log"
                 },
-                {
-                    "displayName":"Inflow Error Log",
-                    "type":"text",
-                    "file":"logs/cwe-serial.err"
-                },
-                {
-                    "displayName":"Inflow Output Log",
-                    "type":"text",
-                    "file":"logs/cwe-serial.out"
-                }
+                "mesh_density",
+                "mesh_subdomains",
+                "boundaries"
             ]
         },
-        "mesh",
-        "sim"
+        {
+            "internalName":"sim",
+            "groups":[
+                {
+                    "internalName":"simulation_control",
+                    "vars":[
+                        {
+                            "internalName":"velocity",
+                            "type":"void",
+                        }
+                    ]
+                },
+                "advanced"
+            ]
+        }
     ]
 }
