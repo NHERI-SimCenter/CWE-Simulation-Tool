@@ -43,7 +43,7 @@ CWE_welcome_screen::CWE_welcome_screen(QWidget *parent) :
     ui(new Ui::CWE_welcome_screen)
 {
     ui->setupUi(this);
-    QFile frontMatter(":/help/FrontMatter.html");
+    QFile frontMatter(":/docs/help/FrontMatter.html");
 
     if (frontMatter.open(QFile::ReadOnly))
     {
