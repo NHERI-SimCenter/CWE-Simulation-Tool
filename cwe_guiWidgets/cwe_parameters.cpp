@@ -771,7 +771,7 @@ void CWE_Parameters::addVariable(PARAM_VARIABLE_TYPE &theVariable, QString * non
         layout->addWidget(theVar);
     }
     else if (theVariable.type == SimCenterDataType::file) {
-        theVar = new SCtrFileDataWidget(theMainWindow->getFileModel(), this);
+        theVar = new SCtrFileDataWidget(this);
         theVar->setStyleSheet("QLineEdit {background-color: #f8f8f8}");
         layout->addWidget(theVar);
     }
