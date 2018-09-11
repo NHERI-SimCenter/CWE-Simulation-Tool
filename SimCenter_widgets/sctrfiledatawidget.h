@@ -46,7 +46,7 @@ class SCtrFileDataWidget: public SCtrMasterDataWidget
 {
     Q_OBJECT
 public:
-    SCtrFileDataWidget(RemoteFileModel *aFileModel, QWidget *parent);
+    SCtrFileDataWidget(QWidget *parent);
     ~SCtrFileDataWidget();
 
     virtual QString shownValue();
@@ -59,8 +59,6 @@ private:
     virtual void setComponetsEnabled(bool newSetting);
 
     virtual void setShownValue(QString newValue);
-
-    RemoteFileModel * theFileModel = nullptr;
 
     RemoteFileTree * myFileTree = nullptr;
     QLabel * selectedFile = nullptr;

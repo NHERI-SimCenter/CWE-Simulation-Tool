@@ -57,9 +57,6 @@ CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     //Set Header text
     ui->header->setHeadingText("SimCenter CWE Workbench");
 
-    QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
-                         &fileModel, SLOT(newFileData(FileNodeRef)), Qt::QueuedConnection);
-
     addWindowPanel(ui->tab_welcome_screen,"welcome","Welcome");
     addWindowPanel(ui->tab_help,"help","Help");
     ui->panelTabsLayout->addItem(new QSpacerItem(150, 0));
@@ -214,11 +211,6 @@ void CWE_MainWindow::switchToParameterTab()
 void CWE_MainWindow::switchToFilesTab()
 {
     setCurrentPanel(ui->tab_files);
-}
-
-RemoteFileModel * CWE_MainWindow::getFileModel()
-{
-    return &fileModel;
 }
 
 void CWE_MainWindow::changeParamsAndResultsEnabled(bool setting)
