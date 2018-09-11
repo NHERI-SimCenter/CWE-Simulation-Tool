@@ -1,6 +1,6 @@
 ![missing CWE logo][logo]
 
-[logo]: https://nheri-simcenter.github.io/CWE-Simulation-Tool/icons/NHERI-CWE-Icon.png "CWE Logo"
+[logo]: https://nheri-simcenter.github.io/CWE-Simulation-Tool/docs/NHERI-CWE-Icon.png "CWE Logo"
 
 # CWE Simulation Tool
 
