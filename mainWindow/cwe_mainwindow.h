@@ -73,8 +73,6 @@ public:
     void switchToFilesTab();
     void switchToHelpTab(const QUrl &url);
 
-    RemoteFileModel * getFileModel();
-
     CFDcaseInstance * getCurrentCase();
     void setCurrentCase();
     void setCurrentCase(CFDcaseInstance * newCase);
@@ -113,8 +111,6 @@ private:
     CFDcaseInstance * currentCase = nullptr;
 
     QMap<QWidget *, CWE_PanelTab *> listOfPanelTabs;
-
-    RemoteFileModel fileModel;
     cwe_state_label        *stateLabel = nullptr;
 };
 

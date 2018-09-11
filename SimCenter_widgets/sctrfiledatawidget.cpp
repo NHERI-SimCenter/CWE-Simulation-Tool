@@ -34,17 +34,17 @@
 
 #include "sctrfiledatawidget.h"
 
+#include "cwe_globals.h"
+
 #include "remoteFiles/remotefiletree.h"
 #include "remoteFiles/filetreenode.h"
 #include "filemetadata.h"
 #include "cwe_interfacedriver.h"
 #include "mainWindow/cwe_mainwindow.h"
 
-SCtrFileDataWidget::SCtrFileDataWidget(RemoteFileModel * aFileModel, QWidget *parent):
+SCtrFileDataWidget::SCtrFileDataWidget(QWidget *parent):
     SCtrMasterDataWidget(parent)
-{
-    theFileModel = aFileModel;
-}
+{}
 
 SCtrFileDataWidget::~SCtrFileDataWidget()
 {
@@ -85,7 +85,7 @@ void SCtrFileDataWidget::initUI()
     label_varName = new QLabel(getTypeInfo().displayName, this);
 
     myFileTree = new RemoteFileTree(this);
-    myFileTree->setModelLink(theFileModel);
+    myFileTree->setModelLink(cwe_globals::get_file_handle());
     myFileTree->setEditTriggers(QTreeView::NoEditTriggers);
     QObject::connect(myFileTree, SIGNAL(newFileSelected(FileNodeRef)),
                      this, SLOT(newFileSelected(FileNodeRef)));
