@@ -47,7 +47,7 @@ CWEjobAccountant::CWEjobAccountant(QObject *parent) : QObject(parent)
                      Qt::QueuedConnection);
 }
 
-const RemoteJobData * CWEjobAccountant::getJobByID(QString IDstr)
+RemoteJobData CWEjobAccountant::getJobByID(QString IDstr)
 {
     if (detailedRunningJobs.contains(IDstr))
     {
@@ -61,35 +61,35 @@ const RemoteJobData * CWEjobAccountant::getJobByID(QString IDstr)
     {
         return terminatedJobs.value(IDstr);
     }
-    return nullptr;
+    return RemoteJobData::nil();
 }
 
-const RemoteJobData * CWEjobAccountant::getJobByFolder(QString folderName)
+RemoteJobData CWEjobAccountant::getJobByFolder(QString folderName)
 {
-    const RemoteJobData * retJob = nullptr;
+    RemoteJobData retJob;
 
-    for (const RemoteJobData * aJob : detailedRunningJobs)
+    for (RemoteJobData aJob : detailedRunningJobs)
     {
-        if (!aJob->detailsLoaded()) continue;
+        if (!aJob.detailsLoaded()) continue;
 
-        if (cwe_globals::folderNamesMatch(folderName, aJob->getInputs().value("directory")))
+        if (cwe_globals::folderNamesMatch(folderName, aJob.getInputs().value("directory")))
         {
-            if ((retJob == nullptr) || (aJob->getTimeCreated() > retJob->getTimeCreated()))
+            if ((!retJob.isValidEntry()) || (aJob.getTimeCreated() > retJob.getTimeCreated()))
             {
                 retJob = aJob;
             }
         }
     }
 
-    if (retJob != nullptr) return retJob;
+    if (retJob.isValidEntry()) return retJob;
 
-    for (const RemoteJobData * aJob : terminatedJobs)
+    for (RemoteJobData aJob : terminatedJobs)
     {
-        if (!aJob->detailsLoaded()) continue;
+        if (!aJob.detailsLoaded()) continue;
 
-        if (cwe_globals::folderNamesMatch(folderName, aJob->getInputs().value("directory")))
+        if (cwe_globals::folderNamesMatch(folderName, aJob.getInputs().value("directory")))
         {
-            if ((retJob == nullptr) || (aJob->getTimeCreated() > retJob->getTimeCreated()))
+            if ((!retJob.isValidEntry()) || (aJob.getTimeCreated() > retJob.getTimeCreated()))
             {
                 retJob = aJob;
             }
@@ -105,43 +105,43 @@ bool CWEjobAccountant::allRunningDetailsLoaded()
 
 void CWEjobAccountant::reloadJobLists()
 {
-    QMap<QString, const RemoteJobData *> prevRunningJobs = detailedRunningJobs;
+    QMap<QString, RemoteJobData> prevRunningJobs = detailedRunningJobs;
 
     detailedRunningJobs.clear();
     undetailedRunningJobs.clear();
     terminatedJobs.clear();
-    QMap<QString, const RemoteJobData *> fullJobList = cwe_globals::get_job_handle()->getJobsList();
+    QMap<QString, RemoteJobData> fullJobList = cwe_globals::get_job_handle()->getJobsList();
 
-    for (const RemoteJobData * aJob : fullJobList)
+    for (RemoteJobData aJob : fullJobList)
     {
-        QString theApp = aJob->getApp();
+        QString theApp = aJob.getApp();
         if (!theApp.startsWith("cwe-serial") && !theApp.startsWith("cwe-parallel"))
         {
             continue;
         }
 
-        if (aJob->inTerminalState() || (aJob->getState().isEmpty()))
+        if (aJob.inTerminalState() || (aJob.getState().isEmpty()))
         {
-            terminatedJobs.insert(aJob->getID(),aJob);
+            terminatedJobs.insert(aJob.getID(),aJob);
             continue;
         }
-        if (aJob->detailsLoaded())
+        if (aJob.detailsLoaded())
         {
-            detailedRunningJobs.insert(aJob->getID(),aJob);
+            detailedRunningJobs.insert(aJob.getID(),aJob);
         }
         else
         {
-            cwe_globals::get_job_handle()->requestJobDetails(aJob);
-            undetailedRunningJobs.insert(aJob->getID(),aJob);
+            cwe_globals::get_job_handle()->requestJobDetails(&aJob);
+            undetailedRunningJobs.insert(aJob.getID(),aJob);
         }
     }
 
-    for (const RemoteJobData * anOldJob : prevRunningJobs)
+    for (RemoteJobData anOldJob : prevRunningJobs)
     {
-        if (!anOldJob->detailsLoaded()) continue;
-        if (detailedRunningJobs.contains(anOldJob->getID())) continue;
+        if (!anOldJob.detailsLoaded()) continue;
+        if (detailedRunningJobs.contains(anOldJob.getID())) continue;
 
-        QString folderName = anOldJob->getInputs().value("directory");
+        QString folderName = anOldJob.getInputs().value("directory");
         if (folderName.isEmpty()) continue;
         FileNodeRef folderToRefresh = cwe_globals::get_file_handle()->speculateFileWithName(folderName,true);
         if (folderToRefresh.isNil()) continue;

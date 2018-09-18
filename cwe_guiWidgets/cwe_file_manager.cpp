@@ -80,13 +80,13 @@ void CWE_file_manager::linkMainWindow(CWE_MainWindow *theMainWin)
     CWE_Super::linkMainWindow(theMainWin);
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        ui->remoteTreeView->setModelLink(theMainWindow->getFileModel());
+        ui->remoteTreeView->setModelLink(cwe_globals::get_file_handle());
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
         QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState,QString)),
-                         this, SLOT(remoteOpDone(RequestState,QString)));
+                         this, SLOT(remoteOpDone(RequestState,QString)), Qt::QueuedConnection);
         QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpStarted()),
-                         this, SLOT(remoteOpStarted()));
+                         this, SLOT(remoteOpStarted()), Qt::QueuedConnection);
         setControlsEnabled(true);
     }
 }

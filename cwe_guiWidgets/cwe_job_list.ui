@@ -96,24 +96,7 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>tableView_jobs</sender>
-   <signal>customContextMenuRequested(QPoint)</signal>
-   <receiver>CWE_job_list</receiver>
-   <slot>customJobMenu(QPoint)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>199</x>
-     <y>149</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>199</x>
-     <y>149</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>customJobMenu(QPoint)</slot>
  </slots>
