@@ -32,13 +32,16 @@
 
 // Contributors:
 // Peter Mackenzie-Helnwein, UW Seattle
+// Peter Sempolinski, University of Notre Dame
 
 #include "cwe_job_list.h"
 #include "ui_cwe_job_list.h"
 
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
-#include "remoteFiles/remotefiletree.h"
+#include "remoteJobs/joboperator.h"
+#include "remotejobdata.h"
+#include "remotedatainterface.h"
 
 CWE_job_list::CWE_job_list(QWidget *parent) :
     CWE_Super(parent),
@@ -59,44 +62,62 @@ void CWE_job_list::linkMainWindow(CWE_MainWindow *theMainWin)
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
         ui->tableView_jobs->setOperator(cwe_globals::get_job_handle());
-        //QObject::connect(ui->tableView_jobs, SIGNAL(customContextMenuRequested(QPoint)),
-        //                 this, SLOT(customFileMenu(QPoint)));
+        QObject::connect(ui->tableView_jobs, SIGNAL(customContextMenuRequested(QPoint)),
+                         this, SLOT(customJobMenu(QPoint)));
+        QObject::connect(cwe_globals::get_job_handle(), SIGNAL(jobOpDone(RequestState, QString)),
+                         this, SLOT(jobOpDone(RequestState, QString)), Qt::QueuedConnection);
     }
 }
 
-void CWE_job_list::customJobMenu(const QPoint &)
+void CWE_job_list::customJobMenu(const QPoint &pos)
 {
-    //TODO
-    /*
     QModelIndex targetIndex = ui->tableView_jobs->indexAt(pos);
-    ui->tableView_jobs->
-
     QMenu jobMenu;
 
-    targetNode = ui->remoteTreeView->getSelectedFile();
+    ui->tableView_jobs->jobEntryTouched(targetIndex);
+    RemoteJobData theJob = ui->tableView_jobs->getSelectedJob();
 
     //If we did not click anything, we should return
-    if (targetNode.isNil()) return;
-    if (targetNode.isRootNode()) return;
+    if (!theJob.isValidEntry()) return;
 
-    if (targetNode.getFileType() == FileType::INVALID) return;
-
-    fileMenu.addAction("Copy To . . .",this, SLOT(copyMenuItem()));
-    fileMenu.addAction("Move To . . .",this, SLOT(moveMenuItem()));
-    //We don't let the user delete the username folder
-
-    if (targetNode.getFileType() == FileType::FILE)
+    if (cwe_globals::get_job_handle()->currentlyPerformingJobOperation())
     {
-        fileMenu.addAction("Download Buffer (DEBUG)",this, SLOT(downloadBufferItem()));
+        jobMenu.addAction("Performing Job Operation . . .");
+        jobMenu.exec(QCursor::pos());
+        return;
     }
 
-    if ((targetNode.getFileType() == FileType::DIR) || (targetNode.getFileType() == FileType::FILE))
+    if (cwe_globals::get_job_handle()->currentlyPerformingJobOperation())
     {
-        fileMenu.addSeparator();
-        fileMenu.addAction("Refresh Data",this, SLOT(refreshMenuItem()));
-        fileMenu.addSeparator();
+        jobMenu.addAction("Refreshing File List . . .");
+        jobMenu.exec(QCursor::pos());
+        return;
     }
 
-    fileMenu.exec(QCursor::pos());
-    */
+    targetJob = theJob;
+
+    jobMenu.addAction("Delete Job Entry",this, SLOT(deleteJobItem()));
+    jobMenu.exec(QCursor::pos());
+}
+
+void CWE_job_list::deleteJobItem()
+{
+    if (cwe_globals::get_job_handle()->currentlyPerformingJobOperation()) return;
+    cwe_globals::get_job_handle()->deleteJobDataEntry(&targetJob);
+    expectingOp = cwe_globals::get_job_handle()->currentlyPerformingJobOperation();
+}
+
+void CWE_job_list::jobOpDone(RequestState opState, QString err_msg)
+{
+    if (!expectingOp) return;
+    expectingOp = false;
+
+    if (opState != RequestState::GOOD)
+    {
+        cwe_globals::displayPopup(err_msg,"Job Operation");
+    }
+    else
+    {
+        cwe_globals::displayPopup("Job Operation Complete","Job Operation");
+    }
 }
