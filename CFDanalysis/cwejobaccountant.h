@@ -38,15 +38,15 @@
 #include <QObject>
 #include <QMap>
 
-class RemoteJobData;
+#include "remotejobdata.h"
 
 class CWEjobAccountant : public QObject
 {
     Q_OBJECT
 public:
     explicit CWEjobAccountant(QObject *parent = nullptr);
-    const RemoteJobData * getJobByID(QString IDstr);
-    const RemoteJobData * getJobByFolder(QString folderName);
+    RemoteJobData getJobByID(QString IDstr);
+    RemoteJobData getJobByFolder(QString folderName);
     bool allRunningDetailsLoaded();
 
 signals:
@@ -56,9 +56,9 @@ public slots:
     void reloadJobLists();
 
 private:
-    QMap<QString, const RemoteJobData *> detailedRunningJobs;
-    QMap<QString, const RemoteJobData *> undetailedRunningJobs;
-    QMap<QString, const RemoteJobData *> terminatedJobs;
+    QMap<QString, RemoteJobData> detailedRunningJobs;
+    QMap<QString, RemoteJobData> undetailedRunningJobs;
+    QMap<QString, RemoteJobData> terminatedJobs;
 
 };
 

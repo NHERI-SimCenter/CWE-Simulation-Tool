@@ -4,9 +4,11 @@
 
 # CWE Simulation Tool
 
-## Copyright and Copyleft
+## Copyright and License
 
 Please make note of the COPYING file for the copyright and licensing information. 
+
+## Release Notes
 
 If you attempt to recompile this, particularly when using QT creator, take note that most platforms do not have the old SSL implementations, for many very good reasons, but QT may expect some of them and complain. Do NOT compile old and dangerous SSL versions. Rather, supress this error message using build environment variables. QT_LOGGING_RULES should be set to: qt.network.ssl.warning=false
 

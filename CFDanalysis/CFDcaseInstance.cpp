@@ -1021,14 +1021,14 @@ void CFDcaseInstance::state_Running_jobList()
 {
     if (myState != InternalCaseState::RUNNING_JOB) return;
 
-    const RemoteJobData * aNode = cwe_globals::get_CWE_Job_Accountant()->getJobByID(runningID);
-    if (aNode == nullptr) return;
+    RemoteJobData aJob = cwe_globals::get_CWE_Job_Accountant()->getJobByID(runningID);
+    if (!aJob.isValidEntry()) return;
 
-    if (aNode->inTerminalState())
+    if (aJob.inTerminalState())
     {
         caseFolder.enactFolderRefresh(true);
         computeIdleState();
-        if (aNode->getState() == "FINISHED")
+        if (aJob.getState() == "FINISHED")
         {
             cwe_globals::displayPopup("Job finished for current case", "Job Complete");
         }
@@ -1169,13 +1169,13 @@ void CFDcaseInstance::computeIdleState()
         return;
     }
 
-    const RemoteJobData * myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFullPath());
-    if (myJob != nullptr)
+    RemoteJobData myJob = cwe_globals::get_CWE_Job_Accountant()->getJobByFolder(caseFolder.getFullPath());
+    if (myJob.isValidEntry())
     {
-        if (!myJob->inTerminalState())
+        if (!myJob.inTerminalState())
         {
-            runningID = myJob->getID();
-            runningStage = myJob->getParams().value("stage");
+            runningID = myJob.getID();
+            runningStage = myJob.getParams().value("stage");
             computeParamList();
             emitNewState(InternalCaseState::RUNNING_JOB);
             return;
