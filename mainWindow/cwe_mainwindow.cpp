@@ -99,8 +99,11 @@ void CWE_MainWindow::runSetupSteps()
     stateLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     ui->header->appendWidget(stateLabel);
 
-    QLabel * username = new QLabel(cwe_globals::get_connection()->getUserName());
-    ui->header->appendWidget(username);
+    if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
+    {
+        QLabel * username = new QLabel(cwe_globals::get_connection()->getUserName());
+        ui->header->appendWidget(username);
+    }
 
     QPushButton * logoutButton = new QPushButton("Logout");
     logoutButton->setObjectName("logoutButton");
