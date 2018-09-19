@@ -38,6 +38,7 @@
 
 #include "remoteFiles/fileoperator.h"
 #include "remoteFiles/filetreenode.h"
+#include "remoteFiles/filerecursiveoperator.h"
 #include "remoteJobs/joboperator.h"
 #include "remoteJobs/joblistnode.h"
 
@@ -351,7 +352,7 @@ bool CFDcaseInstance::downloadCase(QString destLocalFile)
 
     if (lastCompleteNode.isNil()) return false;
 
-    cwe_globals::get_file_handle()->enactRecursiveDownload(lastCompleteNode, destLocalFile);
+    cwe_globals::get_file_handle()->getRecursiveOp()->enactRecursiveDownload(lastCompleteNode, destLocalFile);
     if (!cwe_globals::get_file_handle()->operationIsPending()) return false;
 
     emitNewState(InternalCaseState::DOWNLOAD);

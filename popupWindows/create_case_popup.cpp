@@ -54,7 +54,7 @@ Create_Case_Popup::Create_Case_Popup(CWE_MainWindow *controlWindow, QWidget *par
 
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        ui->primary_remoteFileTree->setModelLink(cwe_globals::get_file_handle());
+        ui->primary_remoteFileTree->linkToFileOperator(cwe_globals::get_file_handle());
     }
 }
 

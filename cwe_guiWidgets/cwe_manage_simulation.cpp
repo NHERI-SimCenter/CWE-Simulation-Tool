@@ -68,7 +68,7 @@ CWE_manage_simulation::~CWE_manage_simulation()
 void CWE_manage_simulation::linkMainWindow(CWE_MainWindow *theMainWin)
 {
     CWE_Super::linkMainWindow(theMainWin);
-    ui->treeView->setModelLink(cwe_globals::get_file_handle());
+    ui->treeView->linkToFileOperator(cwe_globals::get_file_handle());
     QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
                      this, SLOT(newCaseGiven()));
 }

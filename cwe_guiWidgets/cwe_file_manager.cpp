@@ -40,6 +40,7 @@
 
 #include "remoteFiles/filetreenode.h"
 #include "remoteFiles/fileoperator.h"
+#include "remoteFiles/filerecursiveoperator.h"
 #include "utilFuncs/singlelinedialog.h"
 
 #include "mainWindow/cwe_mainwindow.h"
@@ -80,7 +81,7 @@ void CWE_file_manager::linkMainWindow(CWE_MainWindow *theMainWin)
     CWE_Super::linkMainWindow(theMainWin);
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        ui->remoteTreeView->setModelLink(cwe_globals::get_file_handle());
+        ui->remoteTreeView->linkToFileOperator(cwe_globals::get_file_handle());
         QObject::connect(ui->remoteTreeView, SIGNAL(customContextMenuRequested(QPoint)),
                          this, SLOT(customFileMenu(QPoint)));
         QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpDone(RequestState,QString)),
@@ -112,7 +113,7 @@ void CWE_file_manager::on_pb_upload_clicked()
 
     if (fileData.isDir())
     {
-        cwe_globals::get_file_handle()->enactRecursiveUpload(targetFile, fileData.absoluteFilePath());
+        cwe_globals::get_file_handle()->getRecursiveOp()->enactRecursiveUpload(targetFile, fileData.absoluteFilePath());
     }
     else if (fileData.isFile())
     {
@@ -179,7 +180,7 @@ void CWE_file_manager::on_pb_download_clicked()
     }
     else if (targetFile.getFileType() == FileType::DIR)
     {
-        cwe_globals::get_file_handle()->enactRecursiveDownload(targetFile, localPath);
+        cwe_globals::get_file_handle()->getRecursiveOp()->enactRecursiveDownload(targetFile, localPath);
     }
 
     if (!cwe_globals::get_file_handle()->operationIsPending())
