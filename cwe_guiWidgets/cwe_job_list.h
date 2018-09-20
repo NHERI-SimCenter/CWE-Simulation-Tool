@@ -36,8 +36,12 @@
 #define CWE_LANDING_H
 
 #include "cwe_super.h"
+#include "remotejobdata.h"
 
 #include <QStandardItemModel>
+#include <QMenu>
+
+enum class RequestState;
 
 namespace Ui {
 class CWE_job_list;
@@ -55,10 +59,16 @@ public:
 
 private slots:
     void customJobMenu(const QPoint &pos);
+    void deleteJobItem();
+
+    void jobOpDone(RequestState opState, QString err_msg);
 
 private:
     Ui::CWE_job_list    *ui;
     QStandardItemModel *model;
+
+    RemoteJobData targetJob;
+    bool expectingOp = false;
 };
 
 #endif // CWE_LANDING_H
