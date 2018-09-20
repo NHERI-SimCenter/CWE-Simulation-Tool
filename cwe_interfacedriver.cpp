@@ -121,7 +121,7 @@ void CWE_InterfaceDriver::closeAuthScreen()
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
-    AgaveTaskReply * getAppList = myDataInterface->getAgaveAppList();
+    RemoteDataReply * getAppList = myDataInterface->getAgaveAppList();
 
     if (getAppList == nullptr)
     {

@@ -41,7 +41,7 @@
 #include <QPushButton>
 #include <QScreen>
 
-#include "remoteFiles/remotefilemodel.h"
+#include "remoteFiles/filenoderef.h"
 
 namespace Ui {
 class CWE_MainWindow;
