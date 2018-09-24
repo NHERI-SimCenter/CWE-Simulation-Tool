@@ -541,6 +541,11 @@
                     "displayName":"OpenFOAM Log",
                     "type":"text",
                     "file":"logs/sim.log"
+                },
+                {
+                    "displayName":"VTK Visualization Files",
+                    "type":"download",
+                    "file":"VTK.zip"
                 }
             ]
         }

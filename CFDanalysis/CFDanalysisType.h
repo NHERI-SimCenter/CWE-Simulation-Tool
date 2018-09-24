@@ -42,7 +42,7 @@
 #include <QFile>
 #include <QMap>
 
-struct RESULTS_STYLE {
+struct RESULT_ENTRY {
     QString displayName;
     QString type;
     QString file;
@@ -89,7 +89,7 @@ struct TEMPLATE_STAGE {
     QString appName;
     QString appInputFile;
     QList<TEMPLATE_GROUP> groupList;
-    QList<RESULTS_STYLE> resultList;
+    QList<RESULT_ENTRY> resultList;
 };
 
 class CFDanalysisType

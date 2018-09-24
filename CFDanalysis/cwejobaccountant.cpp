@@ -43,6 +43,9 @@ CWEjobAccountant::CWEjobAccountant(QObject *parent) : QObject(parent)
 {
     cwe_globals::set_CWE_Job_Accountant(this);
     QObject::connect(cwe_globals::get_job_handle(), SIGNAL(newJobData()),
+                     this, SLOT(reloadJobListsInterlock()),
+                     Qt::QueuedConnection);
+    QObject::connect(this, SIGNAL(reloadJobListsInterlockSignal()),
                      this, SLOT(reloadJobLists()),
                      Qt::QueuedConnection);
 }
@@ -103,8 +106,16 @@ bool CWEjobAccountant::allRunningDetailsLoaded()
     return undetailedRunningJobs.empty();
 }
 
+void CWEjobAccountant::reloadJobListsInterlock()
+{
+    if (interlockHasJobListChange) return;
+    interlockHasJobListChange = true;
+    emit reloadJobListsInterlockSignal();
+}
+
 void CWEjobAccountant::reloadJobLists()
 {
+    interlockHasJobListChange = false;
     QMap<QString, RemoteJobData> prevRunningJobs = detailedRunningJobs;
 
     detailedRunningJobs.clear();

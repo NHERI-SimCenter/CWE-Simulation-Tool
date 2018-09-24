@@ -45,7 +45,7 @@
 enum class CaseState;
 class ResultProcureBase;
 class CWE_MainWindow;
-struct RESULTS_STYLE;
+struct RESULT_ENTRY;
 
 namespace Ui {
 class CWE_Results;
@@ -70,7 +70,7 @@ private slots:
     void newCaseState(CaseState newState);
 
 private:
-    RESULTS_STYLE getResultObjectFromName(QString name);
+    RESULT_ENTRY getResultObjectFromName(QString name);
     void populateResultsScreen();
     void performSingleFileDownload(QString filePathToDownload, QString stage);
     void addResult(QString name, bool showeye, bool download, QString type);

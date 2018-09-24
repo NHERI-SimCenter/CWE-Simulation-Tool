@@ -128,7 +128,7 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
     CFDcaseInstance * currentCase = theMainWindow->getCurrentCase();
     if (currentCase == nullptr) return;
 
-    if (!(theItem->column() == showCol) && !(theItem->column() == downloadCol))
+    if ((theItem->column() != showCol) && (theItem->column() != downloadCol))
     {
         return;
     }
@@ -139,7 +139,7 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
         return;
     }
 
-    RESULTS_STYLE resultObject = getResultObjectFromName(resultName);
+    RESULT_ENTRY resultObject = getResultObjectFromName(resultName);
 
     if (resultObject.type == "text")
     {
@@ -174,11 +174,17 @@ void CWE_Results::resultViewClicked(QModelIndex modelID)
         ResultMesh3dWindow * resultPopup = new ResultMesh3dWindow(currentCase, &resultObject, nullptr);
         resultPopup->initializeView();
     }
+    else if (resultObject.type == "GLmesh3D")
+    {
+        if (theItem->column() != downloadCol) return;
+
+        performSingleFileDownload(resultObject.file, resultObject.stage);
+    }
 }
 
-RESULTS_STYLE CWE_Results::getResultObjectFromName(QString name)
+RESULT_ENTRY CWE_Results::getResultObjectFromName(QString name)
 {
-    RESULTS_STYLE ret;
+    RESULT_ENTRY ret;
     ret.type = "null";
 
     if (!viewIsValid) return ret;
@@ -201,9 +207,9 @@ RESULTS_STYLE CWE_Results::getResultObjectFromName(QString name)
             continue;
         }
 
-        QList<RESULTS_STYLE> resultList = currentCase->getMyType()->getStageFromId(itr.key()).resultList;
+        QList<RESULT_ENTRY> resultList = currentCase->getMyType()->getStageFromId(itr.key()).resultList;
 
-        for (RESULTS_STYLE aResult : resultList)
+        for (RESULT_ENTRY aResult : resultList)
         {
             if (aResult.displayName  == name)
             {
@@ -217,15 +223,8 @@ RESULTS_STYLE CWE_Results::getResultObjectFromName(QString name)
 
 void CWE_Results::newCaseState(CaseState newState)
 {
-    if (!viewIsValid)
-    {
-        populateResultsScreen();
-    }
-
-    if (!viewIsValid)
-    {
-        return;
-    }
+    if (!viewIsValid) populateResultsScreen();
+    if (!viewIsValid) return;
 
     switch (newState)
     {
@@ -236,7 +235,6 @@ void CWE_Results::newCaseState(CaseState newState)
         resetViewInfo();
         ui->downloadEntireCaseButton->setDisabled(true);
         return; //These states should be handled elsewhere
-        break;
     case CaseState::DOWNLOAD:
     case CaseState::LOADING:
     case CaseState::EXTERN_OP:
@@ -245,20 +243,17 @@ void CWE_Results::newCaseState(CaseState newState)
         ui->downloadEntireCaseButton->setDisabled(true);
         resetViewInfo();
         return;
-        break;
     case CaseState::RUNNING:
         ui->downloadEntireCaseButton->setDisabled(true);
         resetViewInfo();
         populateResultsScreen();
         return;
-        break;
     case CaseState::READY:
     case CaseState::READY_ERROR:
         ui->downloadEntireCaseButton->setEnabled(true);
         resetViewInfo();
         populateResultsScreen();
         return;
-        break;
     }
 }
 
@@ -302,9 +297,9 @@ void CWE_Results::populateResultsScreen()
             continue;
         }
 
-        QList<RESULTS_STYLE> resultList = currentCase->getMyType()->getStageFromId(itr.key()).resultList;
+        QList<RESULT_ENTRY> resultList = currentCase->getMyType()->getStageFromId(itr.key()).resultList;
 
-        for (RESULTS_STYLE aResult : resultList)
+        for (RESULT_ENTRY aResult : resultList)
         {
             if (aResult.type == "text")
             {
@@ -321,6 +316,10 @@ void CWE_Results::populateResultsScreen()
             else if (aResult.type == "GLmesh3D")
             {
                 addResult(aResult.displayName,true,false,"3D Mesh Image");
+            }
+            else if (aResult.type == "download")
+            {
+                addResult(aResult.displayName,false,true,"Data Download");
             }
             else
             {

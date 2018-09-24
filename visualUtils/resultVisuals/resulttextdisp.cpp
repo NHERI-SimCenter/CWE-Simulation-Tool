@@ -37,7 +37,7 @@
 
 #include "visualUtils/cfdglcanvas.h"
 
-ResultTextDisplay::ResultTextDisplay(CFDcaseInstance * theCase, RESULTS_STYLE * resultDesc, QWidget *parent):
+ResultTextDisplay::ResultTextDisplay(CFDcaseInstance * theCase, RESULT_ENTRY * resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}
 
 ResultTextDisplay::~ResultTextDisplay(){}

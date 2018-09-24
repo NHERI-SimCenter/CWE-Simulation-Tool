@@ -38,12 +38,12 @@
 
 #include "visualUtils/resultvisualpopup.h"
 
-struct RESULTS_STYLE;
+struct RESULT_ENTRY;
 
 class ResultField2dWindow : public ResultVisualPopup
 {
 public:
-    ResultField2dWindow(CFDcaseInstance * theCase, RESULTS_STYLE * resultDesc, QWidget *parent = nullptr);
+    ResultField2dWindow(CFDcaseInstance * theCase, RESULT_ENTRY * resultDesc, QWidget *parent = nullptr);
     ~ResultField2dWindow();
 
     virtual void initializeView();

@@ -164,7 +164,7 @@ CFDanalysisType::CFDanalysisType(QJsonDocument rawJSON)
         {
             QJsonObject rawResult = val.toObject();
 
-            RESULTS_STYLE newResult;
+            RESULT_ENTRY newResult;
             newResult.displayName = rawResult.value("displayName").toString();
             newResult.type = rawResult.value("type").toString();
             newResult.file = rawResult.value("file").toString();

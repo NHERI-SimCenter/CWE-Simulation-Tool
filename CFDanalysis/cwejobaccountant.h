@@ -51,8 +51,10 @@ public:
 
 signals:
     void haveNewJobInfo();
+    void reloadJobListsInterlockSignal();
 
 public slots:
+    void reloadJobListsInterlock();
     void reloadJobLists();
 
 private:
@@ -60,6 +62,7 @@ private:
     QMap<QString, RemoteJobData> undetailedRunningJobs;
     QMap<QString, RemoteJobData> terminatedJobs;
 
+    bool interlockHasJobListChange = false;
 };
 
 #endif // CWEJOBACCOUNTANT_H

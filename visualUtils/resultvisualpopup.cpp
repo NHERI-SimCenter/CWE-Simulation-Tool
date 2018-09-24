@@ -42,7 +42,7 @@
 #include "CFDanalysis/CFDanalysisType.h"
 #include "cwe_globals.h"
 
-ResultVisualPopup::ResultVisualPopup(CFDcaseInstance *theCase, RESULTS_STYLE * resultDesc, QWidget *parent) :
+ResultVisualPopup::ResultVisualPopup(CFDcaseInstance *theCase, RESULT_ENTRY * resultDesc, QWidget *parent) :
     ResultProcureBase(parent),
     ui(new Ui::ResultVisualPopup)
 {
@@ -111,7 +111,7 @@ void ResultVisualPopup::underlyingDataChanged(QString )
     //Note: This is deliberately blank. This result popup is static once the image displays.
 }
 
-RESULTS_STYLE ResultVisualPopup::getResultObj()
+RESULT_ENTRY ResultVisualPopup::getResultObj()
 {
     return resultObj;
 }

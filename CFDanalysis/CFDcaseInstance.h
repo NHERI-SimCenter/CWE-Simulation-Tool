@@ -102,9 +102,11 @@ public:
 
 signals:
     void haveNewState(CaseState newState);
+    void underlyingFilesInterlockSignal();
 
 private slots:
-    void underlyingFilesUpdated(FileNodeRef changedFile);
+    void underlyingFilesInterlock(const FileNodeRef changedNode);
+    void underlyingFilesUpdated();
     void jobListUpdated();
     void fileTaskDone(RequestState invokeStatus);
     void fileTaskStarted();
@@ -146,6 +148,7 @@ private:
     void computeIdleState();
 
     bool defunct = false;
+    bool interlockHasFileChange = false;
     QMap<QString, StageState> storedStageStates;
     QMap<QString, QString> storedParamList;
     QMap<QString, QString> prospectiveNewParamList;

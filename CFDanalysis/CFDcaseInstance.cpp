@@ -359,8 +359,9 @@ bool CFDcaseInstance::downloadCase(QString destLocalFile)
     return true;
 }
 
-void CFDcaseInstance::underlyingFilesUpdated(const FileNodeRef changedNode)
+void CFDcaseInstance::underlyingFilesInterlock(const FileNodeRef changedNode)
 {
+    if (interlockHasFileChange) return;
     if (defunct) return;
     if (caseFolder.isNil()) return;
 
@@ -371,6 +372,15 @@ void CFDcaseInstance::underlyingFilesUpdated(const FileNodeRef changedNode)
     }
 
     if (!caseFolder.isAncestorOf(changedNode)) return;
+
+    interlockHasFileChange = true;
+    emit underlyingFilesInterlockSignal();
+}
+
+void CFDcaseInstance::underlyingFilesUpdated()
+{
+    if (defunct) return;
+    interlockHasFileChange = false;
 
     InternalCaseState activeState = myState;
 
@@ -916,7 +926,10 @@ void CFDcaseInstance::connectCaseSignals()
                      this, SLOT(fileTaskDone(RequestState)),
                      Qt::QueuedConnection);
     QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
-                     this, SLOT(underlyingFilesUpdated(FileNodeRef)),
+                     this, SLOT(underlyingFilesInterlock(FileNodeRef)),
+                     Qt::QueuedConnection);
+    QObject::connect(this, SIGNAL(underlyingFilesInterlockSignal()),
+                     this, SLOT(underlyingFilesUpdated()),
                      Qt::QueuedConnection);
     QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpStarted()),
                      this, SLOT(fileTaskStarted()),
