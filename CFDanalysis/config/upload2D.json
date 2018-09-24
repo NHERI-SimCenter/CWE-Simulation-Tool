@@ -389,7 +389,8 @@
                                 "SpalartAllmaras":"S-A one equation model (RANS)",
                                 "kEpsilon":"k-epsilon model (RANS)",
                                 "Smagorinsky":"Smagorinsky SGS model (LES)",
-                                "kEqn":"One equation eddy-viscosity model (LES)"
+                                "kEqn":"One equation eddy-viscosity model (LES)",
+                                "SpalartAllmarasDDES": "Spalart Allmaras DDES model"
                             }
                         },
                         {

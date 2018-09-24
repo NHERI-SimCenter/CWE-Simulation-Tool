@@ -472,7 +472,8 @@
                                 "SpalartAllmaras":"S-A one equation model (RANS)",
                                 "kEpsilon":"k-epsilon model (RANS)",
                                 "Smagorinsky":"Smagorinsky turbulence model (LES)",
-                                "dynOneEqEddy":"Dynamic One Equation model (LES)"
+                                "dynOneEqEddy":"Dynamic One Equation model (LES)",
+                                "SpalartAllmarasDDES": "Spalart Allmaras DDES model"
                             }
                         },
                         {
