@@ -35,7 +35,7 @@
 
 #include "resultmesh2dwindow.h"
 
-#include "visualUtils/cfdglcanvas.h"
+#include "visualUtils/cfdglcanvas2D.h"
 
 ResultMesh2dWindow::ResultMesh2dWindow(CFDcaseInstance * theCase, RESULT_ENTRY *resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}
@@ -58,15 +58,13 @@ void ResultMesh2dWindow::allFilesLoaded()
     QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
     CFDglCanvas * myCanvas;
-    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas2D());
 
-    myCanvas->loadMeshData2D(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
+    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
-    if (!myCanvas->haveMeshData())
+    if (!myCanvas->displayAvailData())
     {
         changeDisplayFrameTenant(new QLabel("Error: Data for 2D mesh result is unreadable. Please reset and try again."));
         return;
     }
-
-    myCanvas->setDisplayState(CFDDisplayState::MESH);
 }

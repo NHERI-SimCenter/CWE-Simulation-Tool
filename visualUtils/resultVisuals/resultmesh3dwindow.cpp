@@ -57,6 +57,8 @@ void ResultMesh3dWindow::allFilesLoaded()
     QObject::disconnect(this);
     QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
+    //TODO: Redo for 3D
+    /*
     CFDglCanvas * myCanvas;
     changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
 
@@ -69,4 +71,5 @@ void ResultMesh3dWindow::allFilesLoaded()
     }
 
     myCanvas->setDisplayState(CFDDisplayState::MESH3D);
+    */
 }

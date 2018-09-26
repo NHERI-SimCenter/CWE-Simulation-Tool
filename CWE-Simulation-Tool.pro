@@ -104,7 +104,8 @@ SOURCES += \
     cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.cpp \
     cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.cpp \
     cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.cpp \
-    visualUtils/resultVisuals/resultmesh3dwindow.cpp
+    visualUtils/resultVisuals/resultmesh3dwindow.cpp \
+    visualUtils/cfdglcanvas2D.cpp
 
 HEADERS  += \
     CFDanalysis/CFDanalysisType.h \
@@ -144,7 +145,8 @@ HEADERS  += \
     cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.h \
     cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.h \
     cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.h \
-    visualUtils/resultVisuals/resultmesh3dwindow.h
+    visualUtils/resultVisuals/resultmesh3dwindow.h \
+    visualUtils/cfdglcanvas2D.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
