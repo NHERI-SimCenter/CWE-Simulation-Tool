@@ -1,26 +1,61 @@
 <h1>Step 3: Create a Mesh</h1>
 
 <p>Once the case is created, you can generate the mesh.
-First, select the folder containing the case in the 'Simulation Cases' tab.</p>
 
-<p>Click 'View Parameters/Details' to go to the parameters screen.</p>
+<dl>
+   <dt>
+       Start from the 'Simulation Cases' screen:
+       <center>
+	  <img src="./Images/CaseTabScreenB.png" alt="the Simulation Cases Screen" width="800">
+       </center>
+  </dt>
+  <dt><img src="./Images/Tag1.png" height=24></dt>
+    <dd>
+	Select the folder containing the case in the 'Simulation Cases' tab.</p>
+    </dd>
+  <dt><img src="./Images/Tag2.png" height=24></dt>
+    <dd>
+	Click 'View Parameters/Details' to go to the parameters screen.
+       <center>
+	  <img src="./Images/ParameterTabScreen.png" alt="the Parameters Screen" width="800">
+       </center>
+    </dd>
+  <dt><img src="./Images/Tag3.png" height=24></dt>
+    <dd>
+	Parameters are grouped by task on the left side of the parameter screen.
 
-   <center>
-      <img src="./Images/ParameterTabScreen.png" alt="the Parameters Screen" width="800">
-   </center>
+	Every case template initiates tabs for 'Mesh Parameters' and 'Simulation Parameters'.
 
-<p>On the left side of the there screen are tabs for 'Mesh Parameters' and 'Simulation Parameters'.
-The mesh needs to be generated before the simulation is run. There are paramers for each process.[1]</p>
-
-<p style="color: red;">For your first case, we suggest using a simple geometry that is provided by the CWE tool,
-by selecting it next to 'Select Geometry File'. Later, you can upload your own geometries for simulation.[2]</p>
-
-<p>Users can set mesh density, subdomains and bundaries[3] for mesh generation. CWE prevides default settings for both Mesh Parameters and Simulation Parameters. Users can make changes to better fit their simulations.</p>
-
-<p>At any time, you can click 'save all parameters'[4] to save your changes.
-Click 'run' to begin generating your mesh [5]. Under the 'remote jobs' tab,
-you will be able to view the list of agave jobs in progress and monitor the
-eventual completion of your mesh.</p>
+	<p>
+	<b>Note:</b> The mesh needs to be generated before the simulation can be run. 
+	</p>
+   </dd>
+  <dt><img src="./Images/Tag4.png" height=24></dt>
+    <dd>
+	<span style="color: red;">For your first case, we suggest using a simple geometry that is provided by the CWE tool,
+	by selecting it next to 'Select Geometry File'. Later, you can upload your own geometries for simulation.
+    </dd>
+  <dt><img src="./Images/Tag5.png" height=24></dt>
+    <dd>
+	Users can set mesh density, subdomains and bundaries for mesh generation.
+	CWE prevides default settings for both Mesh Parameters and Simulation Parameters.
+	Users can make changes to better fit their simulations.</p>
+    </dd>
+  <dt><img src="./Images/Tag6.png" height=24></dt>
+    <dd>
+	At any time, you can click 'save all parameters' to save your changes.
+    </dd>
+  <dt><img src="./Images/Tag7.png" height=24></dt>
+    <dd>
+	Click 'run' to begin generating your mesh. 
+	
+	<p>
+	<b>Note:</b> Under the 'remote jobs' tab,
+	you will be able to view the list of agave jobs in progress and monitor the
+	eventual completion of your mesh.
+	</p>
+    </dd>
+</dl>
 
 <p>
 Continue to <a href="./tut_sim.html">Step 4: Run Simulation</a>.
