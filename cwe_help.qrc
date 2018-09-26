@@ -14,6 +14,7 @@
 	<file alias="Images/DuplicateCase.png">docs/help/Images/DuplicateCase.png</file>
 	<file alias="Images/DuplicateCaseScreen.png">docs/help/Images/DuplicateCaseScreen.png</file>
 	<file alias="Images/LoginScreen.png">docs/help/Images/LoginScreen.png</file>
+	<file alias="Images/MonitorRemoteJobsScreen.png">docs/help/Images/MonitorRemoteJobsScreen.png</file>
 	<file alias="Images/Overview/CWEFlow1.png">docs/help/Images/Overview/CWEFlow1.png</file>
 	<file alias="Images/Overview/CWEFlow2.png">docs/help/Images/Overview/CWEFlow2.png</file>
 	<file alias="Images/Overview/CWEFlow3.png">docs/help/Images/Overview/CWEFlow3.png</file>
