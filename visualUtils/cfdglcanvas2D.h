@@ -66,11 +66,13 @@ private:
     double highz;
     double lowz;
 
-    int zoomTicks;
-    int lastXmousePos;
-    int lastYmousePos;
-    float panXdist;
-    float panYdist;
+    int zoomTicks = 0;
+    int lastXmousePos = 0;
+    int lastYmousePos = 0;
+    float panXdist = 0.0;
+    float panYdist = 0.0;
+    double distByPixelX = 0.0;
+    double distByPixelY = 0.0;
 };
 
 #endif // CFDGLCANVAS2D_H

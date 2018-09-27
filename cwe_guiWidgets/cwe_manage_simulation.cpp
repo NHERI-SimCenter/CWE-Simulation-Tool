@@ -99,8 +99,16 @@ void CWE_manage_simulation::newCaseGiven()
 
     if (newCase != nullptr)
     {
-        ui->treeView->selectRowByFile(newCase->getCaseFolder());
-        ui->label_caseName->setText(newCase->getCaseName());
+        if (!newCase->getCaseFolder().isNil())
+        {
+            ui->treeView->selectRowByFile(newCase->getCaseFolder());
+            ui->label_caseName->setText(newCase->getCaseName());
+        }
+        else
+        {
+            ui->treeView->clearSelection();
+            ui->label_caseName->setText("N/A");
+        }
 
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
                          this, SLOT(newCaseState(CaseState)));
@@ -109,11 +117,13 @@ void CWE_manage_simulation::newCaseGiven()
     else
     {
         ui->treeView->clearSelection();
+        ui->label_caseName->setText("N/A");
     }
 }
 
 void CWE_manage_simulation::newCaseState(CaseState newState)
 {
+    //TODO: Possible race condition if states change quickly
     if (newState == CaseState::DOWNLOAD)
     {
         //TODO: This should be visible but unclickable
@@ -136,6 +146,7 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         if (newState == CaseState::DEFUNCT)
         {
             ui->treeView->clearSelection();
+            ui->label_caseName->setText("N/A");
         }
         if (newState != CaseState::LOADING)
         {
@@ -153,6 +164,12 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
             (newState == CaseState::EXTERN_OP) ||
             (newState == CaseState::PARAM_SAVE))
     {
+        if (ui->treeView->getSelectedFile().isNil())
+        {
+            ui->treeView->selectRowByFile(theMainWindow->getCurrentCase()->getCaseFolder());
+            ui->label_caseName->setText(theMainWindow->getCurrentCase()->getCaseName());
+        }
+
         ui->pb_duplicateCase->setEnabled(newState == CaseState::READY);
         ui->pb_viewParameters->setEnabled(true);
         ui->pb_viewResults->setEnabled((newState == CaseState::READY) || (newState == CaseState::READY_ERROR));

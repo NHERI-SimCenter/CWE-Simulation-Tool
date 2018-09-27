@@ -139,7 +139,7 @@ void CWE_InterfaceDriver::closeAuthScreen()
         authWindow = nullptr;
     }
 
-    //TODO: Reinstate the following
+    //TODO: Reinstate the following, pending privacy policy resolution
     //if (!inDebugMode)
     //{
         //This URL is a counter

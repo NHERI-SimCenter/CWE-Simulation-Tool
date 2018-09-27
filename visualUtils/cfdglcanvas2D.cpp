@@ -68,37 +68,13 @@ void CFDglCanvas2D::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton)
     {
-        double scaleFactor = 1.0 / qPow(2.0, (static_cast<double>(zoomTicks))/ ZOOMFACTOR2D);
-
-        double objWidth = modelBounds2D.right() - modelBounds2D.left();
-        double objHeight = modelBounds2D.top() - modelBounds2D.bottom();
-        double wRatio = objWidth / myDisplayWidth;
-        double hRatio = objHeight / myDisplayHeight;
-
-        double xPerPixel;
-        double yPerPixel;
-
-        if (wRatio > hRatio)
-        {
-            double correctionFactor = hRatio / wRatio;
-
-            xPerPixel = scaleFactor * objWidth / myDisplayWidth;
-            yPerPixel = correctionFactor * scaleFactor * objHeight / myDisplayHeight;
-        }
-        else
-        {
-            double correctionFactor =  wRatio / hRatio;
-
-            xPerPixel = correctionFactor * scaleFactor * objWidth / myDisplayWidth;
-            yPerPixel = scaleFactor * objHeight / myDisplayHeight;
-        }
-
         int deltaX = event->x() - lastXmousePos;
         int deltaY = event->y() - lastYmousePos;
 
-        panXdist += deltaX * xPerPixel;
-        panYdist += deltaY * yPerPixel;
+        panXdist += deltaX * distByPixelX;
+        panYdist -= deltaY * distByPixelY;
         recomputeViewModelMat();
+        this->update();
     }
 
     lastXmousePos = event->x();
@@ -226,6 +202,9 @@ void CFDglCanvas2D::recomputePerspecMat()
                       -static_cast<float>(scaleFactor * correctionFactor * objHeight/2),
                       static_cast<float>(scaleFactor * correctionFactor * objHeight/2),
                       -1.0f,1.0f);
+
+        distByPixelX = scaleFactor * objWidth / myDisplayWidth;
+        distByPixelY = scaleFactor * correctionFactor * objHeight / myDisplayHeight;
     }
     else
     {
@@ -236,6 +215,9 @@ void CFDglCanvas2D::recomputePerspecMat()
                       -static_cast<float>(scaleFactor * objHeight/2),
                       static_cast<float>(scaleFactor * objHeight/2),
                       -1.0f,1.0f);
+
+        distByPixelX = scaleFactor * correctionFactor * objWidth / myDisplayWidth;
+        distByPixelY = scaleFactor * objHeight / myDisplayHeight;
     }
 }
 
@@ -246,6 +228,4 @@ void CFDglCanvas2D::recomputeViewModelMat()
     viewModelMat.translate(panXdist, panYdist);
     viewModelMat.translate(static_cast<float>(-modelBounds2D.center().x()),
                            static_cast<float>(-modelBounds2D.center().y()));
-
-    this->update();
 }
