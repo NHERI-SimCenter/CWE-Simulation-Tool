@@ -36,7 +36,7 @@
 
 #include "remoteFiles/fileoperator.h"
 
-#include "CFDanalysis/CFDcaseInstance.h"
+#include "CFDanalysis/cwecaseinstance.h"
 #include "cwe_guiWidgets/cwe_state_label.h"
 
 #include "cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.h"
@@ -129,9 +129,10 @@ void CWE_MainWindow::newCaseState(CaseState newState)
     QObject * theSender = sender();
     if (theSender != nullptr)
     {
-        CFDcaseInstance * theCase = qobject_cast<CFDcaseInstance *>(theSender);
+        CWEcaseInstance * theCase = qobject_cast<CWEcaseInstance *>(theSender);
         if (theCase != currentCase) return;
     }
+    stateLabel->setNewState(newState);
 
     if ((newState == CaseState::DEFUNCT) ||
             (newState == CaseState::ERROR) ||
@@ -241,7 +242,7 @@ void CWE_MainWindow::changeTabEnabled(QWidget * thePanel, bool newSetting)
     listOfPanelTabs.value(thePanel)->setTabEnabled(newSetting);
 }
 
-CFDcaseInstance * CWE_MainWindow::getCurrentCase()
+CWEcaseInstance * CWE_MainWindow::getCurrentCase()
 {
     return currentCase;
 }
@@ -252,17 +253,15 @@ void CWE_MainWindow::setCurrentCase()
 
     deactivateCurrentCase();
     currentCase = nullptr;
-    stateLabel->setCurrentCase(currentCase);
+    stateLabel->setNewState(CaseState::DEFUNCT);
     emit haveNewCase();
 }
 
-void CWE_MainWindow::setCurrentCase(CFDcaseInstance * newCase)
+void CWE_MainWindow::setCurrentCase(CWEcaseInstance * newCase)
 {
     if (newCase == currentCase) return;
 
     changeParamsAndResultsEnabled(false);
-    stateLabel->setCurrentCase(newCase);
-
     deactivateCurrentCase();
     currentCase = newCase;
     if (currentCase == nullptr) return;
@@ -277,7 +276,7 @@ void CWE_MainWindow::setCurrentCase(CFDcaseInstance * newCase)
 
 void CWE_MainWindow::setCurrentCase(const FileNodeRef &caseNode)
 {
-    CFDcaseInstance * newCase = getCaseFromFolder(caseNode);
+    CWEcaseInstance * newCase = getCaseFromFolder(caseNode);
     if (newCase == nullptr)
     {
         setCurrentCase();
@@ -286,9 +285,9 @@ void CWE_MainWindow::setCurrentCase(const FileNodeRef &caseNode)
     setCurrentCase(newCase);
 }
 
-void CWE_MainWindow::setCurrentCase(CFDanalysisType * newCaseType)
+void CWE_MainWindow::setCurrentCase(CWEanalysisType * newCaseType)
 {
-    CFDcaseInstance * newCase = getCaseFromType(newCaseType);
+    CWEcaseInstance * newCase = getCaseFromType(newCaseType);
     if (newCase == nullptr)
     {
         setCurrentCase();
@@ -297,7 +296,7 @@ void CWE_MainWindow::setCurrentCase(CFDanalysisType * newCaseType)
     setCurrentCase(newCase);
 }
 
-CFDcaseInstance * CWE_MainWindow::getCaseFromFolder(const FileNodeRef &caseNode)
+CWEcaseInstance * CWE_MainWindow::getCaseFromFolder(const FileNodeRef &caseNode)
 {
     if ((currentCase != nullptr) && (currentCase->getCaseFolder().getFullPath() == caseNode.getFullPath()))
     {
@@ -309,20 +308,20 @@ CFDcaseInstance * CWE_MainWindow::getCaseFromFolder(const FileNodeRef &caseNode)
         return nullptr;
     }
 
-    CFDcaseInstance * newCase = new CFDcaseInstance(caseNode);
+    CWEcaseInstance * newCase = new CWEcaseInstance(caseNode);
     return newCase;
 }
 
-CFDcaseInstance * CWE_MainWindow::getCaseFromType(CFDanalysisType * caseType)
+CWEcaseInstance * CWE_MainWindow::getCaseFromType(CWEanalysisType * caseType)
 {
-    CFDcaseInstance * ret;
+    CWEcaseInstance * ret;
     if (caseType == nullptr)
     {
-        ret = new CFDcaseInstance();
+        ret = new CWEcaseInstance();
     }
     else
     {
-        ret = new CFDcaseInstance(caseType);
+        ret = new CWEcaseInstance(caseType);
     }
     return ret;
 }

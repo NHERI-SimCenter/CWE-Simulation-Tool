@@ -37,8 +37,8 @@
 
 #include "remoteFiles/filetreenode.h"
 
-#include "CFDanalysis/CFDanalysisType.h"
-#include "CFDanalysis/CFDcaseInstance.h"
+#include "CFDanalysis/cweanalysistype.h"
+#include "CFDanalysis/cwecaseinstance.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 
@@ -87,7 +87,7 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
     }
 
     /* OK, something has been selected */
-    CFDcaseInstance * newCase;
+    CWEcaseInstance * newCase;
 
     QString newCaseName = ui->lineEdit_newCaseName->text();
 
@@ -104,7 +104,7 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
         return;
     }
 
-    CFDcaseInstance * tempCase = myMainWindow->getCaseFromFolder(clonedFolder);
+    CWEcaseInstance * tempCase = myMainWindow->getCaseFromFolder(clonedFolder);
     if (tempCase == nullptr)
     {
         cwe_globals::displayPopup("Folder to duplicated is invalid.", "ERROR");
@@ -133,7 +133,7 @@ void Duplicate_Case_Popup::button_create_copy_clicked()
         cwe_globals::displayPopup("Unable to duplicate case. Please check that the case does not have an active job.");
         return;
     }
-    newCase = new CFDcaseInstance();
+    newCase = new CWEcaseInstance();
     if (!newCase->duplicateCase(newCaseName, selectedFile, clonedFolder))
     {
         cwe_globals::displayPopup("Unable to contact design safe. Please wait and try again.", "Network Issue");

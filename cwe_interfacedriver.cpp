@@ -44,8 +44,8 @@
 #include "remoteJobs/joboperator.h"
 #include "remoteFiles/fileoperator.h"
 
-#include "CFDanalysis/CFDcaseInstance.h"
-#include "CFDanalysis/CFDanalysisType.h"
+#include "CFDanalysis/cwecaseinstance.h"
+#include "CFDanalysis/cweanalysistype.h"
 #include "CFDanalysis/cwejobaccountant.h"
 
 #include "mainWindow/cwe_mainwindow.h"
@@ -71,15 +71,15 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
     foreach (QString caseConfigFile, caseTypeFiles)
     {
         QString confPath = ":/config/";
-        QJsonDocument rawConfig = CFDanalysisType::getRawJSON(confPath, caseConfigFile);
+        QJsonDocument rawConfig = CWEanalysisType::getRawJSON(confPath, caseConfigFile);
         if (rawConfig.isEmpty())
         {
             qCDebug(agaveAppLayer, "Unreadable template config file skipped: %s", qPrintable(caseConfigFile));
             continue;
         }
-        if (CFDanalysisType::jsonConfigIsEnabled(&rawConfig, debug))
+        if (CWEanalysisType::jsonConfigIsEnabled(&rawConfig, debug))
         {
-            CFDanalysisType * newTemplate = new CFDanalysisType(rawConfig);
+            CWEanalysisType * newTemplate = new CWEanalysisType(rawConfig);
             if (!newTemplate->validParse())
             {
                 qCDebug(agaveAppLayer, "Template Parse Invalid: %s", qPrintable(caseConfigFile));
@@ -206,7 +206,7 @@ QString CWE_InterfaceDriver::getVersion()
     return "Version: 1.1.0";
 }
 
-QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()
+QList<CWEanalysisType *> * CWE_InterfaceDriver::getTemplateList()
 {
     return &templateList;
 }

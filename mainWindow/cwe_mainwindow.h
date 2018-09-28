@@ -51,8 +51,8 @@ class CWE_ParamTab;
 class CWE_PanelTab;
 class cwe_state_label;
 class CWE_InterfaceDriver;
-class CFDcaseInstance;
-class CFDanalysisType;
+class CWEcaseInstance;
+class CWEanalysisType;
 class CWE_Super;
 enum class CaseState;
 
@@ -73,18 +73,17 @@ public:
     void switchToFilesTab();
     void switchToHelpTab(const QUrl &url);
 
-    CFDcaseInstance * getCurrentCase();
+    CWEcaseInstance * getCurrentCase();
     void setCurrentCase();
-    void setCurrentCase(CFDcaseInstance * newCase);
+    void setCurrentCase(CWEcaseInstance * newCase);
     void setCurrentCase(const FileNodeRef &caseNode);
-    void setCurrentCase(CFDanalysisType * newCaseType);
+    void setCurrentCase(CWEanalysisType * newCaseType);
 
-    CFDcaseInstance * getCaseFromType(CFDanalysisType *caseType);
-    CFDcaseInstance * getCaseFromFolder(const FileNodeRef &caseNode);
+    CWEcaseInstance * getCaseFromType(CWEanalysisType *caseType);
+    CWEcaseInstance * getCaseFromFolder(const FileNodeRef &caseNode);
 
 signals:
     void haveNewCase();
-    void newTabSelected(CWE_Super * newTab);
 
 private slots:
     void newCaseState(CaseState newState);
@@ -108,7 +107,7 @@ private:
 
     Ui::CWE_MainWindow *ui;
 
-    CFDcaseInstance * currentCase = nullptr;
+    CWEcaseInstance * currentCase = nullptr;
 
     QMap<QWidget *, CWE_PanelTab *> listOfPanelTabs;
     cwe_state_label        *stateLabel = nullptr;

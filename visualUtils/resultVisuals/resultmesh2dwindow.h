@@ -47,7 +47,7 @@ class ResultMesh2dWindow : public ResultVisualPopup
 {
     Q_OBJECT
 public:
-    ResultMesh2dWindow(CFDcaseInstance * theCase, RESULT_ENTRY * resultDesc, QWidget *parent = nullptr);
+    ResultMesh2dWindow(CWEcaseInstance * theCase, RESULT_ENTRY * resultDesc, QWidget *parent = nullptr);
     ~ResultMesh2dWindow();
 
     virtual void initializeView();

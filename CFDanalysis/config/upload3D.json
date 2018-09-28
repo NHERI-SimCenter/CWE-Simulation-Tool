@@ -544,6 +544,11 @@
                     "file":"logs/sim.log"
                 },
                 {
+                    "displayName":"Force Coefficients",
+                    "type":"text",
+                    "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat"
+                },
+                {
                     "displayName":"VTK Visualization Files",
                     "type":"download",
                     "file":"VTK.zip"

@@ -35,29 +35,11 @@
 
 #include "cwe_state_label.h"
 
-#include "CFDanalysis/CFDcaseInstance.h"
+#include "CFDanalysis/cwecaseinstance.h"
 
 cwe_state_label::cwe_state_label(QWidget *parent) : QLabel(parent)
 {
     this->setText("No Case Selected");
-}
-
-void cwe_state_label::setCurrentCase(CFDcaseInstance * newCase)
-{
-    if (currentCase != nullptr)
-    {
-        QObject::disconnect(currentCase, nullptr, this, nullptr);
-    }
-    currentCase = newCase;
-    if (currentCase == nullptr)
-    {
-        this->setText("No Case Selected");
-        return;
-    }
-    QObject::connect(currentCase, SIGNAL(haveNewState(CaseState)),
-                    this, SLOT(setNewState(CaseState)));
-    CaseState currentState = currentCase->getCaseState();
-    setNewState(currentState);
 }
 
 void cwe_state_label::setNewState(CaseState newState)

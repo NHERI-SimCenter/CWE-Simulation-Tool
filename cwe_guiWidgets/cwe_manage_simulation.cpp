@@ -35,8 +35,8 @@
 #include "cwe_manage_simulation.h"
 #include "ui_cwe_manage_simulation.h"
 
-#include "CFDanalysis/CFDanalysisType.h"
-#include "CFDanalysis/CFDcaseInstance.h"
+#include "CFDanalysis/cweanalysistype.h"
+#include "CFDanalysis/cwecaseinstance.h"
 
 #include "popupWindows/create_case_popup.h"
 #include "popupWindows/duplicate_case_popup.h"
@@ -53,7 +53,7 @@ CWE_manage_simulation::CWE_manage_simulation(QWidget *parent) :
     ui->setupUi(this);
 
     QObject::connect(ui->treeView, SIGNAL(newFileSelected(FileNodeRef)),
-                             this, SLOT(newFileSelected(FileNodeRef)));
+                             this, SLOT(newFileSelected(FileNodeRef)), Qt::QueuedConnection);
 
     clearSelectView();
 
@@ -70,7 +70,7 @@ void CWE_manage_simulation::linkMainWindow(CWE_MainWindow *theMainWin)
     CWE_Super::linkMainWindow(theMainWin);
     ui->treeView->linkToFileOperator(cwe_globals::get_file_handle());
     QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
-                     this, SLOT(newCaseGiven()));
+                     this, SLOT(newCaseGiven()), Qt::QueuedConnection);
 }
 
 void CWE_manage_simulation::newFileSelected(FileNodeRef newFile)
@@ -86,9 +86,7 @@ void CWE_manage_simulation::newFileSelected(FileNodeRef newFile)
 
 void CWE_manage_simulation::newCaseGiven()
 {
-    CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
-
-    ui->label_caseStatus->setCurrentCase(newCase);    
+    CWEcaseInstance * newCase = theMainWindow->getCurrentCase();
 
     ui->treeView->setEnabled(true);
     clearSelectView();
@@ -111,18 +109,21 @@ void CWE_manage_simulation::newCaseGiven()
         }
 
         QObject::connect(newCase, SIGNAL(haveNewState(CaseState)),
-                         this, SLOT(newCaseState(CaseState)));
+                         this, SLOT(newCaseState(CaseState)), Qt::QueuedConnection);
         newCaseState(newCase->getCaseState());
     }
     else
     {
         ui->treeView->clearSelection();
         ui->label_caseName->setText("N/A");
+        ui->label_caseStatus->setNewState(CaseState::DEFUNCT);
     }
 }
 
 void CWE_manage_simulation::newCaseState(CaseState newState)
 {
+    ui->label_caseStatus->setNewState(newState);
+
     //TODO: Possible race condition if states change quickly
     if (newState == CaseState::DOWNLOAD)
     {
@@ -174,9 +175,9 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         ui->pb_viewParameters->setEnabled(true);
         ui->pb_viewResults->setEnabled((newState == CaseState::READY) || (newState == CaseState::READY_ERROR));
 
-        CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+        CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
 
-        CFDanalysisType * theType = theCase->getMyType();
+        CWEanalysisType * theType = theCase->getMyType();
         if (theType == nullptr)
         {
             cwe_globals::displayFatalPopup("Type/stage mismatch for case.");

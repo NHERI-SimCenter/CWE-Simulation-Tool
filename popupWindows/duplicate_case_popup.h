@@ -44,7 +44,7 @@
 
 #include "remoteFiles/filenoderef.h"
 
-class CFDanalysisType;
+class CWEanalysisType;
 
 namespace Ui {
 class Duplicate_Case_Popup;

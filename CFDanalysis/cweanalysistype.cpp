@@ -32,12 +32,12 @@
 // Contributors:
 // Renamed, modifed by Peter Sempolinski
 
-#include "CFDanalysisType.h"
+#include "cweanalysistype.h"
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 
 #include "cwe_globals.h"
 
-CFDanalysisType::CFDanalysisType(QJsonDocument rawJSON)
+CWEanalysisType::CWEanalysisType(QJsonDocument rawJSON)
 {
     QJsonObject obj = rawJSON.object();
 
@@ -181,20 +181,20 @@ CFDanalysisType::CFDanalysisType(QJsonDocument rawJSON)
     valid = true;
 }
 
-bool CFDanalysisType::validParse() {return valid;}
-QString CFDanalysisType::getInternalName() {return internalName;}
-QString CFDanalysisType::getDisplayName() {return displayName;}
-QString CFDanalysisType::getDescription() {return myDescription;}
-QIcon * CFDanalysisType::getIcon() {return &myIcon;}
-int CFDanalysisType::getListOrderNum() {return listPriority;}
+bool CWEanalysisType::validParse() {return valid;}
+QString CWEanalysisType::getInternalName() {return internalName;}
+QString CWEanalysisType::getDisplayName() {return displayName;}
+QString CWEanalysisType::getDescription() {return myDescription;}
+QIcon * CWEanalysisType::getIcon() {return &myIcon;}
+int CWEanalysisType::getListOrderNum() {return listPriority;}
 
-QString CFDanalysisType::translateStageId(QString stageId)
+QString CWEanalysisType::translateStageId(QString stageId)
 {
     TEMPLATE_STAGE aStage = getStageFromId(stageId);
     return aStage.displayName;
 }
 
-TEMPLATE_STAGE CFDanalysisType::getStageFromId(QString stageId)
+TEMPLATE_STAGE CWEanalysisType::getStageFromId(QString stageId)
 {
     for (TEMPLATE_STAGE aStage : stageList)
     {
@@ -208,7 +208,7 @@ TEMPLATE_STAGE CFDanalysisType::getStageFromId(QString stageId)
     return nil;
 }
 
-TEMPLATE_GROUP CFDanalysisType::getGroupFromIds(QString stageId, QString groupId)
+TEMPLATE_GROUP CWEanalysisType::getGroupFromIds(QString stageId, QString groupId)
 {
     TEMPLATE_GROUP nil;
 
@@ -230,7 +230,7 @@ TEMPLATE_GROUP CFDanalysisType::getGroupFromIds(QString stageId, QString groupId
     return nil;
 }
 
-QStringList CFDanalysisType::getStageIds()
+QStringList CWEanalysisType::getStageIds()
 {
     QStringList ret;
 
@@ -242,7 +242,7 @@ QStringList CFDanalysisType::getStageIds()
     return ret;
 }
 
-bool CFDanalysisType::jsonConfigIsEnabled(QJsonDocument * aDocument, bool inDebugMode)
+bool CWEanalysisType::jsonConfigIsEnabled(QJsonDocument * aDocument, bool inDebugMode)
 {
     QJsonObject obj = aDocument->object();
 
@@ -262,7 +262,7 @@ bool CFDanalysisType::jsonConfigIsEnabled(QJsonDocument * aDocument, bool inDebu
     return true;
 }
 
-QJsonDocument CFDanalysisType::getRawJSON(QString configFolder, QString configFile)
+QJsonDocument CWEanalysisType::getRawJSON(QString configFolder, QString configFile)
 {
     QString configFileName = configFolder;
     configFileName = configFileName.append("/");
@@ -315,7 +315,7 @@ QJsonDocument CFDanalysisType::getRawJSON(QString configFolder, QString configFi
     return ret;
 }
 
-QJsonObject CFDanalysisType::getStageById(QJsonArray stageList, QString toFind)
+QJsonObject CWEanalysisType::getStageById(QJsonArray stageList, QString toFind)
 {
     for (QJsonValue aStage: stageList)
     {

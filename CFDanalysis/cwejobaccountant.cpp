@@ -150,7 +150,7 @@ void CWEjobAccountant::reloadJobLists()
     for (RemoteJobData anOldJob : prevRunningJobs)
     {
         if (!anOldJob.detailsLoaded()) continue;
-        if (detailedRunningJobs.contains(anOldJob.getID())) continue;
+        if (!terminatedJobs.contains(anOldJob.getID())) continue;
 
         QString folderName = anOldJob.getInputs().value("directory");
         if (folderName.isEmpty()) continue;

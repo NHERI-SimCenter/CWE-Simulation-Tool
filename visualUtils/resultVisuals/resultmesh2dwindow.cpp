@@ -37,7 +37,7 @@
 
 #include "visualUtils/cfdglcanvas2D.h"
 
-ResultMesh2dWindow::ResultMesh2dWindow(CFDcaseInstance * theCase, RESULT_ENTRY *resultDesc, QWidget *parent):
+ResultMesh2dWindow::ResultMesh2dWindow(CWEcaseInstance * theCase, RESULT_ENTRY *resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}
 
 ResultMesh2dWindow::~ResultMesh2dWindow(){}

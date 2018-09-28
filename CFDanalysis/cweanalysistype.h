@@ -92,10 +92,10 @@ struct TEMPLATE_STAGE {
     QList<RESULT_ENTRY> resultList;
 };
 
-class CFDanalysisType
+class CWEanalysisType
 {
 public:
-    CFDanalysisType(QJsonDocument rawJSON);
+    CWEanalysisType(QJsonDocument rawJSON);
     bool validParse();
 
     QString getInternalName();

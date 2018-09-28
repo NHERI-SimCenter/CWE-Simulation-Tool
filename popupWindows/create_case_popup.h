@@ -41,12 +41,12 @@
 #include <QRadioButton>
 #include <QJsonObject>
 
-class CFDanalysisType;
+class CWEanalysisType;
 
 struct CASE_TYPE_DATA {
     QRadioButton         *radioBtn;
     QPushButton          *pbtn;
-    CFDanalysisType      *templateData;
+    CWEanalysisType      *templateData;
 };
 
 namespace Ui {
@@ -71,7 +71,7 @@ private:
     void populateCaseTypes();
     void create_new_case_from_template(QString filename);
 
-    CFDanalysisType * selectedTemplate = nullptr;
+    CWEanalysisType * selectedTemplate = nullptr;
 
     QVector<CASE_TYPE_DATA> caseTypeDataList;
 };
