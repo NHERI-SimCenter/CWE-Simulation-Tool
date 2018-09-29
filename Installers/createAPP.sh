@@ -13,7 +13,7 @@ GENERATOR_DIR=$(dirname "$0")
 APPNAME=CWE-Simulation-Tool.app
 APPINSTALLER=SetupSimCenterCWE_Mac_1_1_0
 
-MACDEPLOY=${HOME}/Qt/5.11.1/clang_64/bin/macdeployqt
+MACDEPLOY=${HOME}/Qt/5.11.2/clang_64/bin/macdeployqt
 
 QTINSTALLER=${HOME}/Qt/Tools/QtInstallerFramework/3.0/bin/binarycreator
 QTINSTALLEROPTIONS="--offline-only --ignore-translations -c config/macconfig.xml -p packages"

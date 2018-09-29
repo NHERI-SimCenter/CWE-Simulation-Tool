@@ -106,7 +106,8 @@ SOURCES += \
     visualUtils/cfdglcanvas2D.cpp \
     CFDanalysis/cweresultinstance.cpp \
     CFDanalysis/cweanalysistype.cpp \
-    CFDanalysis/cwecaseinstance.cpp
+    CFDanalysis/cwecaseinstance.cpp \
+    visualUtils/cfdglcanvas3D.cpp
 
 HEADERS  += \
     visualUtils/cfdglcanvas.h \
@@ -148,7 +149,8 @@ HEADERS  += \
     visualUtils/cfdglcanvas2D.h \
     CFDanalysis/cweresultinstance.h \
     CFDanalysis/cweanalysistype.h \
-    CFDanalysis/cwecaseinstance.h
+    CFDanalysis/cwecaseinstance.h \
+    visualUtils/cfdglcanvas3D.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \

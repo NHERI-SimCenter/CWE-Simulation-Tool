@@ -10,7 +10,7 @@ SET GENERATOR_DIR=%~dp0
 
 rem ----- adjust user settings -----------------------------
 
-SET QT_WIN_DEPLOY=D:\QT\5.11.1\msvc2017_64\bin\windeployqt
+SET QT_WIN_DEPLOY=D:\QT\5.11.2\msvc2017_64\bin\windeployqt
 SET QT_BIN_CREATE=D:\QT\Tools\QtInstallerFramework\3.0\bin\binarycreator.exe
 SET EXEC_NAME=SetupSimCenterCWE_Win_1_1_0.exe
 

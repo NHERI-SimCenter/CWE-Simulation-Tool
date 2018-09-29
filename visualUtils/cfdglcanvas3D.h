@@ -33,43 +33,35 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CFDGLCANVAS2D_H
-#define CFDGLCANVAS2D_H
+#ifndef CFDGLCANVAS3D_H
+#define CFDGLCANVAS3D_H
 
 #include "cfdglcanvas.h"
 
-class CFDglCanvas2D : public CFDglCanvas
+class CFDglCanvas3D : public CFDglCanvas
 {
 public:
-    CFDglCanvas2D(QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
-    ~CFDglCanvas2D();
+    CFDglCanvas3D(QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    ~CFDglCanvas3D();
 
     bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
 
 protected:
-    virtual void mousePressEvent(QMouseEvent *event);
-    virtual void mouseReleaseEvent(QMouseEvent *event);
-    virtual void mouseMoveEvent(QMouseEvent *event);
-    virtual void wheelEvent(QWheelEvent *event);
+    //virtual void mousePressEvent(QMouseEvent *event);
+    //virtual void mouseReleaseEvent(QMouseEvent *event);
+    //virtual void mouseMoveEvent(QMouseEvent *event);
+    //virtual void wheelEvent(QWheelEvent *event);
 
     virtual void paintGL();
 
 private:
-    constexpr static const double ZOOMFACTOR2D = 650.0;
-
     virtual void recomputePerspecMat();
     virtual void recomputeViewModelMat();
 
     QMatrix4x4 projMat;
     QMatrix4x4 viewModelMat;
 
-    int zoomTicks = 0;
-    int lastXmousePos = 0;
-    int lastYmousePos = 0;
-    float panXdist = 0.0;
-    float panYdist = 0.0;
-    double distByPixelX = 0.0;
-    double distByPixelY = 0.0;
+    double centerz;
 };
 
-#endif // CFDGLCANVAS2D_H
+#endif // CFDGLCANVAS3D_H
