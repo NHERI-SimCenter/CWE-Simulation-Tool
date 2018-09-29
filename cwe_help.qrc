@@ -5,6 +5,8 @@
 	<file alias="About/McKenna-Frank.png">docs/help/About/McKenna-Frank.png</file>
 	<file alias="About/Peter-Sempolinski.png">docs/help/About/Peter-Sempolinski.png</file>
 	<file alias="Images/AnalysisDoneScreen.png">docs/help/Images/AnalysisDoneScreen.png</file>
+	<file alias="Images/CaseTabScreenB.png">docs/help/Images/CaseTabScreenB.png</file>
+	<file alias="Images/CaseTabScreenC.png">docs/help/Images/CaseTabScreenC.png</file>
 	<file alias="Images/CreateCaseScreen.png">docs/help/Images/CreateCaseScreen.png</file>
 	<file alias="Images/CreateNewCase.png">docs/help/Images/CreateNewCase.png</file>
 	<file alias="Images/CreateNewSimulationButton.png">docs/help/Images/CreateNewSimulationButton.png</file>
@@ -12,12 +14,14 @@
 	<file alias="Images/DuplicateCase.png">docs/help/Images/DuplicateCase.png</file>
 	<file alias="Images/DuplicateCaseScreen.png">docs/help/Images/DuplicateCaseScreen.png</file>
 	<file alias="Images/LoginScreen.png">docs/help/Images/LoginScreen.png</file>
+	<file alias="Images/MonitorRemoteJobsScreen.png">docs/help/Images/MonitorRemoteJobsScreen.png</file>
 	<file alias="Images/Overview/CWEFlow1.png">docs/help/Images/Overview/CWEFlow1.png</file>
 	<file alias="Images/Overview/CWEFlow2.png">docs/help/Images/Overview/CWEFlow2.png</file>
 	<file alias="Images/Overview/CWEFlow3.png">docs/help/Images/Overview/CWEFlow3.png</file>
 	<file alias="Images/Overview/CWEFlow4.png">docs/help/Images/Overview/CWEFlow4.png</file>
 	<file alias="Images/Overview/CWEFlow5.png">docs/help/Images/Overview/CWEFlow5.png</file>
 	<file alias="Images/ParameterTabScreen.png">docs/help/Images/ParameterTabScreen.png</file>
+	<file alias="Images/ParameterTabScreenB.png">docs/help/Images/ParameterTabScreenB.png</file>
 	<file alias="Images/ParametersTab.png">docs/help/Images/ParametersTab.png</file>
 	<file alias="Images/RemoteFiles.png">docs/help/Images/RemoteFiles.png</file>
 	<file alias="Images/RemoteFilesTab.png">docs/help/Images/RemoteFilesTab.png</file>
