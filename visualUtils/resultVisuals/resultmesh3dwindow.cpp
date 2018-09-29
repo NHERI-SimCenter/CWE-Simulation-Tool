@@ -35,9 +35,9 @@
 
 #include "resultmesh3dwindow.h"
 
-#include "visualUtils/cfdglcanvas.h"
+#include "visualUtils/cfdglcanvas3D.h"
 
-ResultMesh3dWindow::ResultMesh3dWindow(CFDcaseInstance * theCase, RESULTS_STYLE *resultDesc, QWidget *parent):
+ResultMesh3dWindow::ResultMesh3dWindow(CWEcaseInstance * theCase, RESULT_ENTRY *resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}
 
 ResultMesh3dWindow::~ResultMesh3dWindow(){}
@@ -57,16 +57,15 @@ void ResultMesh3dWindow::allFilesLoaded()
     QObject::disconnect(this);
     QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
+    //TODO: Redo for 3D
     CFDglCanvas * myCanvas;
-    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas3D());
 
-    myCanvas->loadMeshData3D(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
+    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
-    if (!myCanvas->haveMeshData())
+    if (!myCanvas->displayAvailData())
     {
         changeDisplayFrameTenant(new QLabel("Error: Data for 3D mesh result is unreadable. Please reset and try again."));
         return;
     }
-
-    myCanvas->setDisplayState(CFDDisplayState::MESH3D);
 }

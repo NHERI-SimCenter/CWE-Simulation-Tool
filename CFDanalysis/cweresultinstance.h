@@ -31,65 +31,49 @@
 ***********************************************************************************/
 
 // Contributors:
+// Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef CWE_RESULTS_H
-#define CWE_RESULTS_H
+#ifndef CWERESULTINSTANCE_H
+#define CWERESULTINSTANCE_H
 
-#include "cwe_super.h"
+#include <QObject>
+#include <QStandardItem>
+#include <QFileDialog>
 
-#include <QStandardItemModel>
-#include <QJsonObject>
-#include <QJsonArray>
-
-enum class CaseState;
-enum class ResultInstanceState;
-class ResultProcureBase;
-class CWE_MainWindow;
-class cweResultInstance;
-class CWEcaseInstance;
-struct RESULT_ENTRY;
-
-namespace Ui {
+#include "CFDanalysis/cweanalysistype.h"
 class CWE_Results;
-}
+class FileNodeRef;
 
-class CWE_Results : public CWE_Super
+enum class ResultInstanceState {UNLOADED, NIL, LOADED};
+
+class cweResultInstance : public QObject
 {
     Q_OBJECT
-
-    friend class cweResultInstance;
-
 public:
-    explicit CWE_Results(QWidget *parent = nullptr);
-    ~CWE_Results();
+    explicit cweResultInstance(QString stageName, RESULT_ENTRY resultData, CWE_Results *parent);
 
-    virtual void linkMainWindow(CWE_MainWindow *theMainWin);
-    void resetViewInfo();
+    void enactShowOp();
+    void enactDownloadOp();
 
-protected:
-    void changeVisibleState(cweResultInstance *toChange, ResultInstanceState newState);
-    FileNodeRef getCaseFolder();
-    CWEcaseInstance * getCurrentCase();
+    QList<QStandardItem *> getItemList();
+    ResultInstanceState getState();
 
 private slots:
-    void on_downloadEntireCaseButton_clicked();
-    void resultViewClicked(QModelIndex);
-
-    void newCaseGiven();
-    void newCaseState(CaseState newState);
+    void recomputeResultState();
 
 private:
-    void populateResultDirectory();
+    void setInternalParams(bool show, bool download, QString type);
+    void changeMyState(ResultInstanceState newState);
+    bool baseFolderContainsNumber();
 
-    Ui::CWE_Results    *ui;
-    QStandardItemModel *resultListModel;
-    QList<cweResultInstance *> resultDirectory;
-    QList<cweResultInstance *> resultCorrespondenceList;
+    CWE_Results * myParent;
+    bool showEye = false;
+    bool downloadable = false;
+    QString typeString = "Unknown";
 
-    int showCol = 1;
-    int downloadCol = 2;
-
-    bool loadingRow = false;
+    ResultInstanceState myState = ResultInstanceState::UNLOADED;
+    QString myStage;
+    RESULT_ENTRY myResultData;
 };
 
-#endif // CWE_RESULTS_H
+#endif // CWERESULTINSTANCE_H

@@ -38,18 +38,11 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include <QMouseEvent>
 
 #include <QMatrix4x4>
 
-#include <math.h>
-
-enum class CFDDisplayState
-{
-    TEST_BOX,
-    MESH,
-    MESH3D,
-    FIELD
-};
+#include <QtMath>
 
 class CFDglCanvas : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -57,61 +50,39 @@ public:
     CFDglCanvas(QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~CFDglCanvas();
 
-    bool loadMeshData2D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
-    bool loadMeshData3D(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
+    virtual bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile) = 0;
     bool loadFieldData(QByteArray * rawDataFile, QString valueType);
-    bool haveMeshData();
-    QString getDisplayError();
 
-    void setDisplayState(CFDDisplayState newState);
+    bool displayAvailData();
+    QString getDisplayError();
 
 protected:
     virtual void initializeGL();
     virtual void resizeGL(int w, int h);
-    virtual void paintGL();
-
-private:
-    bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
-
-    CFDDisplayState myState = CFDDisplayState::TEST_BOX;
-    int myWidth;
-    int myHeight;
-
-    //Note: this should probably be static const
-    double PRECISION = 0.000000001;
-
-    void recomputeProjectionMat(int w, int h);
-    void clearMeshData();
 
     bool isAllZ0(QList<int> aFace);
+    bool loadRawMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
+    void clearAllData();
 
-    QString currentDisplayError;
-
-    QMatrix4x4 projectionMat;
-
-    //Current Mesh Data:
-    bool haveValidMeshData = false;
     QList<QList<double>> pointList;
     QList<QList<int>> faceList;
     QList<int> ownerList;
-
     QList<double> dataList;
 
-    QRectF displayBounds2D;
-    double highz;
-    double lowz;
+    bool readyToDisplay = false;
+    QString currentDisplayError;
 
+    QRectF modelBounds2D;
+    int myDisplayWidth;
+    int myDisplayHeight;
     double lowDataVal;
     double highDataVal;
-    double dataSpan;
 
-    //QOpenGLVertexArrayObject myVertexArray;
-    //QOpenGLBuffer myBuffer;
-    /*
-    QOpenGLShaderProgram * myShaderProgram = nullptr;
-    QOpenGLShader * myShader = nullptr;
-    QOpenGLTexture * myTexture = nullptr;
-    */
+    constexpr static const double PRECISION = 0.000000001;
+
+private:
+    virtual void recomputePerspecMat() = 0;
+    virtual void recomputeViewModelMat() = 0;
 };
 
 #endif // CFDGLCANVAS_H

@@ -85,7 +85,7 @@ void SCtrFileDataWidget::initUI()
     label_varName = new QLabel(getTypeInfo().displayName, this);
 
     myFileTree = new RemoteFileTree(this);
-    myFileTree->setModelLink(cwe_globals::get_file_handle());
+    myFileTree->linkToFileOperator(cwe_globals::get_file_handle());
     myFileTree->setEditTriggers(QTreeView::NoEditTriggers);
     QObject::connect(myFileTree, SIGNAL(newFileSelected(FileNodeRef)),
                      this, SLOT(newFileSelected(FileNodeRef)));

@@ -44,8 +44,8 @@
 #include <QResource>
 
 class CWE_MainWindow;
-class CFDanalysisType;
-class CFDcaseInstance;
+class CWEanalysisType;
+class CWEcaseInstance;
 class RemoteJobData;
 class FileNodeRef;
 class CWEjobAccountant;
@@ -68,7 +68,7 @@ public:
     virtual QString getBanner();
     virtual QString getVersion();
 
-    QList<CFDanalysisType *> * getTemplateList();
+    QList<CWEanalysisType *> * getTemplateList();
 
     bool inOfflineMode();
 
@@ -81,7 +81,7 @@ private:
     QNetworkAccessManager pingManager;
 
     CWE_MainWindow * mainWindow = nullptr;
-    QList<CFDanalysisType *> templateList;
+    QList<CWEanalysisType *> templateList;
 
     CWEjobAccountant * myJobAccountant = nullptr;
 

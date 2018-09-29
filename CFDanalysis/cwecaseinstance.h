@@ -45,7 +45,8 @@
 
 #include "remoteFiles/filenoderef.h"
 
-class CFDanalysisType;
+class cweResultInstance;
+class CWEanalysisType;
 class RemoteJobData;
 class JobListNode;
 enum class RequestState;
@@ -70,14 +71,14 @@ enum class InternalCaseState {OFFLINE, INVALID, ERROR, DEFUNCT,
                              STARTING_JOB, STOPPING_JOB, RUNNING_JOB,
                              DOWNLOAD};
 
-class CFDcaseInstance : public QObject
+class CWEcaseInstance : public QObject
 {
     Q_OBJECT
 
 public:
-    CFDcaseInstance(const FileNodeRef &newCaseFolder);
-    CFDcaseInstance(CFDanalysisType * caseType); //For new cases
-    CFDcaseInstance(); // For duplications
+    CWEcaseInstance(const FileNodeRef &newCaseFolder);
+    CWEcaseInstance(CWEanalysisType * caseType); //For new cases
+    CWEcaseInstance(); // For duplications
 
     bool isDefunct();
     CaseState getCaseState();
@@ -86,7 +87,7 @@ public:
 
     //Note: For these, it can always answer "I don't know"
     //But that should only happen in the LOADING/ERROR state
-    CFDanalysisType * getMyType();
+    CWEanalysisType * getMyType();
     QMap<QString, QString> getCurrentParams();
     QMap<QString, StageState> getStageStates();
 
@@ -102,9 +103,11 @@ public:
 
 signals:
     void haveNewState(CaseState newState);
+    void underlyingFilesInterlockSignal();
 
 private slots:
-    void underlyingFilesUpdated(FileNodeRef changedFile);
+    void underlyingFilesInterlock(const FileNodeRef changedNode);
+    void underlyingFilesUpdated();
     void jobListUpdated();
     void fileTaskDone(RequestState invokeStatus);
     void fileTaskStarted();
@@ -146,6 +149,7 @@ private:
     void computeIdleState();
 
     bool defunct = false;
+    bool interlockHasFileChange = false;
     QMap<QString, StageState> storedStageStates;
     QMap<QString, QString> storedParamList;
     QMap<QString, QString> prospectiveNewParamList;
@@ -154,7 +158,7 @@ private:
     InternalCaseState myState = InternalCaseState::ERROR;
 
     FileNodeRef caseFolder;
-    CFDanalysisType * myType = nullptr;
+    CWEanalysisType * myType = nullptr;
 
     QString expectedNewCaseFolder;
     QString downloadDest;

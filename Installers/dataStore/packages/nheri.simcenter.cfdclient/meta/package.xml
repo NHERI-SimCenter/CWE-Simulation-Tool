@@ -3,7 +3,7 @@
       <DisplayName>SimCenter CWE Client Program</DisplayName>
       <Description>Install CWE Client.</Description>
       <Version>1.1.0</Version>
-      <ReleaseDate>2018-08-03</ReleaseDate>
+      <ReleaseDate>2018-09-29</ReleaseDate>
       <Licenses>
           <License name="BSD and LGPL" file="license.txt" />
       </Licenses>
