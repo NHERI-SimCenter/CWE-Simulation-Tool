@@ -71,10 +71,7 @@ int main(int argc, char *argv[])
 
     if (!runOffline)
     {
-        if (!FixForSSL::performSSLcheck())
-        {
-            return mainRunLoop.exec();
-        }
+        if (!CWE_InterfaceDriver::sslCheckOkay()) return -1;
     }
 
     CWE_InterfaceDriver programDriver(nullptr, debugLoggingEnabled || runOffline);
