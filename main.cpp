@@ -37,12 +37,12 @@
 #include <QFile>
 #include <QSslSocket>
 #include <QtGlobal>
+#include <QStringList>
 
 #include "remotedatainterface.h"
 
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
-#include "utilFuncs/fixforssl.h"
 
 int main(int argc, char *argv[])
 {
@@ -50,41 +50,9 @@ int main(int argc, char *argv[])
 
     mainRunLoop.setWindowIcon(QIcon(":/icons/NHERI-CWE-Icon.icns"));
 
-    bool debugLoggingEnabled = false;
-    bool runOffline = false;
-    for (int i = 0; i < argc; i++)
-    {
-        if (strcmp(argv[i],"enableDebugLogging") == 0)
-        {
-            debugLoggingEnabled = true;
-        }
-        if (strcmp(argv[i],"offlineMode") == 0)
-        {
-            runOffline = true;
-            debugLoggingEnabled = true;
-        }
-    }
-    CWE_InterfaceDriver::setDebugLogging(debugLoggingEnabled);
-
-    if (runOffline) qCDebug(agaveAppLayer, "NOTE: Running CWE client offline.");
-    if (debugLoggingEnabled) qCDebug(agaveAppLayer, "NOTE: Debugging text output is enabled.");
-
-    if (!runOffline)
-    {
-        if (!CWE_InterfaceDriver::sslCheckOkay()) return -1;
-    }
-
-    CWE_InterfaceDriver programDriver(nullptr, debugLoggingEnabled || runOffline);
+    CWE_InterfaceDriver programDriver(argc, argv, nullptr);
     programDriver.loadStyleFiles();
-
-    if (runOffline)
-    {
-        programDriver.startOffline();
-    }
-    else
-    {
-        programDriver.startup();
-    }
+    programDriver.startup();
 
     return mainRunLoop.exec();
 }

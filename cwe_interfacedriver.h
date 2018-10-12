@@ -56,12 +56,10 @@ class CWE_InterfaceDriver : public AgaveSetupDriver
     Q_OBJECT
 
 public:
-    explicit CWE_InterfaceDriver(QObject *parent = nullptr, bool debug = false);
+    explicit CWE_InterfaceDriver(int argc, char *argv[], QObject *parent = nullptr);
     ~CWE_InterfaceDriver();
     virtual void startup();
     virtual void closeAuthScreen();
-
-    virtual void startOffline();
 
     virtual void loadStyleFiles();
 
@@ -84,8 +82,7 @@ private:
     QList<CWEanalysisType *> templateList;
 
     CWEjobAccountant * myJobAccountant = nullptr;
-
-    bool offlineMode = false;
+    bool useAlternateApps = false;
 };
 
 #endif // VWTINTERFACEDRIVER_H

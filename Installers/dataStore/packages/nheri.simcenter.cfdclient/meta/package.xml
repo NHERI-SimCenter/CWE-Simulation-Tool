@@ -2,8 +2,8 @@
   <Package>
       <DisplayName>SimCenter CWE Client Program</DisplayName>
       <Description>Install CWE Client.</Description>
-      <Version>1.1.0</Version>
-      <ReleaseDate>2018-09-29</ReleaseDate>
+      <Version>1.1.1</Version>
+      <ReleaseDate>2018-10-12</ReleaseDate>
       <Licenses>
           <License name="BSD and LGPL" file="license.txt" />
       </Licenses>
