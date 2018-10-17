@@ -4,6 +4,7 @@
     "description":"This model computes \nthe air flow around a building\n using an uploaded 3D geometry,\nusing customized inflows",
     "icon":"upload3D.png",
     "debugOnly":true,
+    "disable":true,
     "list_order":3,
     "parent":"upload3D.json",
     "stages":[
@@ -51,86 +52,22 @@
                     "internalName":"inflow",
                     "vars":[
                         {
-                            "displayName":"Select Inflow Type",
-                            "internalName":"inflowChoose",
-                            "type":"choose",
-                            "default":"turbulentDFInlet",
-                            "options":{
-                                "turbulentDFInlet": "DF",
-                                "turbulentSEMInlet": "SEM"
-                            }
-                        },
-                        {
-                            "displayName":"Select Inflow Shape",
-                            "internalName":"dfShape",
-                            "type":"choose",
-                            "default":"exponential",
-                            "options":{
-                                "exponential": "Exponential",
-                                "gaussian": "Gaussian"
-                            },
-                            "showCondition":"$inflowChoose=turbulentDFInlet"
-                        },
-                        {
-                            "displayName":"Select Inflow Shape",
-                            "internalName":"semShape",
-                            "type":"choose",
-                            "default":"gaussian",
-                            "options":{
-                                "gaussian": "Gaussian",
-                                "tent": "Tent",
-                                "step": "Step"
-                            },
-                            "showCondition":"$inflowChoose=turbulentSEMInlet"
-                        },
-                        {
-                            "displayName":"Inflow Type",
-                            "internalName":"flowType",
-                            "type":"choose",
-                            "default":"uniform",
-                            "options":{
-                                "uniform": "Uniform"
-                            }
-                        },
-                        {
-                            "displayName":"Inflow Velocity",
+                            "displayName":"Mean Inflow Velocity",
                             "internalName":"velocity",
                             "type":"std",
                             "default":"1",
                             "unit":"m/s",
                             "precision":"6",
-                            "sign":"+",
-                            "showCondition":"$flowType=uniform"
+                            "sign":"+"
                         },
                         {
-                            "displayName":"Turbulence Length (X)",
-                            "internalName":"turbLenX",
-                            "type":"std",
-                            "default":"0.1",
-                            "unit":"m",
-                            "precision":"1",
-                            "sign":"+",
-                            "showCondition":"$flowType=uniform"
-                        },
-                        {
-                            "displayName":"Turbulence Length (Y)",
-                            "internalName":"turbLenY",
-                            "type":"std",
-                            "default":"0.1",
-                            "unit":"m",
-                            "precision":"1",
-                            "sign":"+",
-                            "showCondition":"$flowType=uniform"
-                        },
-                        {
-                            "displayName":"Turbulence Length (Z)",
-                            "internalName":"turbLenZ",
-                            "type":"std",
-                            "default":"0.1",
-                            "unit":"m",
-                            "precision":"1",
-                            "sign":"+",
-                            "showCondition":"$flowType=uniform"
+                            "displayName":"Select Landscape Type",
+                            "internalName":"inflowChoose",
+                            "type":"choose",
+                            "default":"TODO",
+                            "options":{
+                                "Actual OF option text":"Human Text"
+                            }
                         }
                     ]
                 },
@@ -148,7 +85,8 @@
                                 "SpalartAllmaras":"S-A one equation model (RANS)",
                                 "kEpsilon":"k-epsilon model (RANS)",
                                 "Smagorinsky":"Smagorinsky turbulence model (LES)",
-                                "dynOneEqEddy":"Dynamic One Equation model (LES)"
+                                "dynOneEqEddy":"Dynamic One Equation model (LES)",
+                                "SpalartAllmarasDDES": "Spalart Allmaras DDES model"
                             }
                         },
                         {
@@ -217,6 +155,11 @@
                     "displayName":"OpenFOAM Log",
                     "type":"text",
                     "file":"logs/sim.log"
+                },
+                {
+                    "displayName":"VTK Visualization Files",
+                    "type":"download",
+                    "file":"VTK.zip"
                 }
             ]
         }

@@ -38,11 +38,11 @@
 
 #include "remoteFiles/filetreenode.h"
 
-#include "CFDanalysis/CFDcaseInstance.h"
-#include "CFDanalysis/CFDanalysisType.h"
+#include "CFDanalysis/cwecaseinstance.h"
+#include "CFDanalysis/cweanalysistype.h"
 #include "cwe_globals.h"
 
-ResultVisualPopup::ResultVisualPopup(CFDcaseInstance *theCase, RESULTS_STYLE * resultDesc, QWidget *parent) :
+ResultVisualPopup::ResultVisualPopup(CWEcaseInstance *theCase, RESULT_ENTRY * resultDesc, QWidget *parent) :
     ResultProcureBase(parent),
     ui(new Ui::ResultVisualPopup)
 {
@@ -111,7 +111,7 @@ void ResultVisualPopup::underlyingDataChanged(QString )
     //Note: This is deliberately blank. This result popup is static once the image displays.
 }
 
-RESULTS_STYLE ResultVisualPopup::getResultObj()
+RESULT_ENTRY ResultVisualPopup::getResultObj()
 {
     return resultObj;
 }

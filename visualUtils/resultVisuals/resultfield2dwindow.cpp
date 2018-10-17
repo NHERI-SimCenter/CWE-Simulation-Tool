@@ -35,9 +35,9 @@
 
 #include "resultfield2dwindow.h"
 
-#include "visualUtils/cfdglcanvas.h"
+#include "visualUtils/cfdglcanvas2D.h"
 
-ResultField2dWindow::ResultField2dWindow(CFDcaseInstance * theCase, RESULTS_STYLE *resultDesc, QWidget *parent):
+ResultField2dWindow::ResultField2dWindow(CWEcaseInstance * theCase, RESULT_ENTRY *resultDesc, QWidget *parent):
     ResultVisualPopup(theCase, resultDesc, parent) {}
 
 ResultField2dWindow::~ResultField2dWindow(){}
@@ -63,16 +63,21 @@ void ResultField2dWindow::allFilesLoaded()
     QMap<QString, QByteArray *> fileBuffers = getFileBuffers();
 
     CFDglCanvas * myCanvas;
-    changeDisplayFrameTenant(myCanvas = new CFDglCanvas());
+    changeDisplayFrameTenant(myCanvas = new CFDglCanvas2D());
 
-    myCanvas->loadMeshData2D(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
+    myCanvas->loadMeshData(fileBuffers["points"], fileBuffers["faces"], fileBuffers["owner"]);
 
-    if (!myCanvas->haveMeshData())
+    if (!myCanvas->getDisplayError().isEmpty())
     {
         changeDisplayFrameTenant(new QLabel("Error: Data for 2D mesh is unreadable. Please reset and try again."));
         return;
     }
 
     myCanvas->loadFieldData(fileBuffers["data"], getResultObj().values);
-    myCanvas->setDisplayState(CFDDisplayState::FIELD);
+
+    if (!myCanvas->displayAvailData())
+    {
+        changeDisplayFrameTenant(new QLabel("Error: Data for 2D field visual is unreadable. Please reset and try again."));
+        return;
+    }
 }

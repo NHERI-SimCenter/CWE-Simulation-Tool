@@ -32,12 +32,14 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#include "CFDcaseInstance.h"
+#include "cwecaseinstance.h"
 
-#include "CFDanalysisType.h"
+#include "cweanalysistype.h"
+#include "cweresultinstance.h"
 
 #include "remoteFiles/fileoperator.h"
 #include "remoteFiles/filetreenode.h"
+#include "remoteFiles/filerecursiveoperator.h"
 #include "remoteJobs/joboperator.h"
 #include "remoteJobs/joblistnode.h"
 
@@ -48,7 +50,7 @@
 #include "cwe_interfacedriver.h"
 #include "cwe_globals.h"
 
-CFDcaseInstance::CFDcaseInstance(const FileNodeRef &newCaseFolder):
+CWEcaseInstance::CWEcaseInstance(const FileNodeRef &newCaseFolder):
     QObject(qobject_cast<QObject *>(cwe_globals::get_CWE_Driver()))
 {
     caseFolder = newCaseFolder;
@@ -56,7 +58,7 @@ CFDcaseInstance::CFDcaseInstance(const FileNodeRef &newCaseFolder):
     computeInitState();
 }
 
-CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType):
+CWEcaseInstance::CWEcaseInstance(CWEanalysisType * caseType):
     QObject(qobject_cast<QObject *>(cwe_globals::get_CWE_Driver()))
 {
     myType = caseType;
@@ -64,19 +66,19 @@ CFDcaseInstance::CFDcaseInstance(CFDanalysisType * caseType):
     computeInitState();
 }
 
-CFDcaseInstance::CFDcaseInstance():
+CWEcaseInstance::CWEcaseInstance():
     QObject(qobject_cast<QObject *>(cwe_globals::get_CWE_Driver()))
 {
     connectCaseSignals();
     computeInitState();
 }
 
-bool CFDcaseInstance::isDefunct()
+bool CWEcaseInstance::isDefunct()
 {
     return defunct;
 }
 
-CaseState CFDcaseInstance::getCaseState()
+CaseState CWEcaseInstance::getCaseState()
 {
     if (defunct) return CaseState::DEFUNCT;
     switch (myState)
@@ -104,39 +106,39 @@ CaseState CFDcaseInstance::getCaseState()
     return CaseState::ERROR;
 }
 
-const FileNodeRef CFDcaseInstance::getCaseFolder()
+const FileNodeRef CWEcaseInstance::getCaseFolder()
 {
     return caseFolder;
 }
 
-QString CFDcaseInstance::getCaseName()
+QString CWEcaseInstance::getCaseName()
 {
     QString ret;
     if (caseFolder.isNil()) return ret;
     return caseFolder.getFileName();
 }
 
-CFDanalysisType * CFDcaseInstance::getMyType()
+CWEanalysisType * CWEcaseInstance::getMyType()
 {
     if (defunct) return nullptr;
     return myType;
 }
 
-QMap<QString, QString> CFDcaseInstance::getCurrentParams()
+QMap<QString, QString> CWEcaseInstance::getCurrentParams()
 {
     QMap<QString, QString> ret;
     if (defunct) return ret;
     return storedParamList;
 }
 
-QMap<QString, StageState> CFDcaseInstance::getStageStates()
+QMap<QString, StageState> CWEcaseInstance::getStageStates()
 {
     QMap<QString, StageState> ret;
     if (defunct) return ret;
     return storedStageStates;
 }
 
-bool CFDcaseInstance::createCase(QString newName, const FileNodeRef &containingFolder)
+bool CWEcaseInstance::createCase(QString newName, const FileNodeRef &containingFolder)
 {
     if (defunct) return false;
 
@@ -162,7 +164,7 @@ bool CFDcaseInstance::createCase(QString newName, const FileNodeRef &containingF
     return true;
 }
 
-bool CFDcaseInstance::duplicateCase(QString newName, const FileNodeRef &containingFolder, const FileNodeRef &oldCase)
+bool CWEcaseInstance::duplicateCase(QString newName, const FileNodeRef &containingFolder, const FileNodeRef &oldCase)
 {
     if (defunct) return false;
 
@@ -188,7 +190,7 @@ bool CFDcaseInstance::duplicateCase(QString newName, const FileNodeRef &containi
     return true;
 }
 
-bool CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
+bool CWEcaseInstance::changeParameters(QMap<QString, QString> paramList)
 {
     if (defunct) return false;
 
@@ -237,7 +239,7 @@ bool CFDcaseInstance::changeParameters(QMap<QString, QString> paramList)
     return true;
 }
 
-bool CFDcaseInstance::startStageApp(QString stageID)
+bool CWEcaseInstance::startStageApp(QString stageID)
 {
     if (defunct) return false;
     if (!caseFolder.fileNodeExtant()) return false;
@@ -280,7 +282,7 @@ bool CFDcaseInstance::startStageApp(QString stageID)
     return true;
 }
 
-bool CFDcaseInstance::rollBack(QString stageToDelete)
+bool CWEcaseInstance::rollBack(QString stageToDelete)
 {
     if (defunct) return false;
     if (!caseFolder.fileNodeExtant()) return false;
@@ -305,7 +307,7 @@ bool CFDcaseInstance::rollBack(QString stageToDelete)
     return true;
 }
 
-bool CFDcaseInstance::stopJob()
+bool CWEcaseInstance::stopJob()
 {
     if (defunct) return false;
     if (caseFolder.isNil()) return false;
@@ -323,7 +325,7 @@ bool CFDcaseInstance::stopJob()
     return true;
 }
 
-bool CFDcaseInstance::downloadCase(QString destLocalFile)
+bool CWEcaseInstance::downloadCase(QString destLocalFile)
 {
     if (defunct) return false;
     if (caseFolder.isNil()) return false;
@@ -351,15 +353,16 @@ bool CFDcaseInstance::downloadCase(QString destLocalFile)
 
     if (lastCompleteNode.isNil()) return false;
 
-    cwe_globals::get_file_handle()->enactRecursiveDownload(lastCompleteNode, destLocalFile);
+    cwe_globals::get_file_handle()->getRecursiveOp()->enactRecursiveDownload(lastCompleteNode, destLocalFile);
     if (!cwe_globals::get_file_handle()->operationIsPending()) return false;
 
     emitNewState(InternalCaseState::DOWNLOAD);
     return true;
 }
 
-void CFDcaseInstance::underlyingFilesUpdated(const FileNodeRef changedNode)
+void CWEcaseInstance::underlyingFilesInterlock(const FileNodeRef changedNode)
 {
+    if (interlockHasFileChange) return;
     if (defunct) return;
     if (caseFolder.isNil()) return;
 
@@ -370,6 +373,15 @@ void CFDcaseInstance::underlyingFilesUpdated(const FileNodeRef changedNode)
     }
 
     if (!caseFolder.isAncestorOf(changedNode)) return;
+
+    interlockHasFileChange = true;
+    emit underlyingFilesInterlockSignal();
+}
+
+void CWEcaseInstance::underlyingFilesUpdated()
+{
+    if (defunct) return;
+    interlockHasFileChange = false;
 
     InternalCaseState activeState = myState;
 
@@ -387,7 +399,7 @@ void CFDcaseInstance::underlyingFilesUpdated(const FileNodeRef changedNode)
     }
 }
 
-void CFDcaseInstance::jobListUpdated()
+void CWEcaseInstance::jobListUpdated()
 {
     if (defunct) return;
 
@@ -410,7 +422,7 @@ void CFDcaseInstance::jobListUpdated()
     }
 }
 
-void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
+void CWEcaseInstance::fileTaskDone(RequestState invokeStatus)
 {
     if (defunct) return;
 
@@ -457,7 +469,7 @@ void CFDcaseInstance::fileTaskDone(RequestState invokeStatus)
     }
 }
 
-void CFDcaseInstance::fileTaskStarted()
+void CWEcaseInstance::fileTaskStarted()
 {
     if (defunct) return;
 
@@ -474,7 +486,7 @@ void CFDcaseInstance::fileTaskStarted()
     }
 }
 
-void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument jobData)
+void CWEcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument jobData)
 {
     if (defunct) return;
 
@@ -505,7 +517,7 @@ void CFDcaseInstance::jobInvoked(RequestState invokeStatus, QJsonDocument jobDat
     }
 }
 
-void CFDcaseInstance::jobKilled(RequestState invokeStatus)
+void CWEcaseInstance::jobKilled(RequestState invokeStatus)
 {
     if (defunct) return;
 
@@ -534,7 +546,7 @@ void CFDcaseInstance::jobKilled(RequestState invokeStatus)
     }
 }
 
-void CFDcaseInstance::computeInitState()
+void CWEcaseInstance::computeInitState()
 {
     if (cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
@@ -560,7 +572,7 @@ void CFDcaseInstance::computeInitState()
     computeIdleState();
 }
 
-void CFDcaseInstance::emitNewState(InternalCaseState newState)
+void CWEcaseInstance::emitNewState(InternalCaseState newState)
 {
     if (defunct) return;
     if (newState == InternalCaseState::DEFUNCT)
@@ -587,7 +599,7 @@ void CFDcaseInstance::emitNewState(InternalCaseState newState)
     }
 }
 
-bool CFDcaseInstance::caseDataLoaded()
+bool CWEcaseInstance::caseDataLoaded()
 {
     if (defunct) return false;
     if (myType == nullptr) return false;
@@ -612,7 +624,7 @@ bool CFDcaseInstance::caseDataLoaded()
     return true;
 }
 
-bool CFDcaseInstance::caseDataInvalid()
+bool CWEcaseInstance::caseDataInvalid()
 {
     //This is for when we have loaded the remote info and we know this current folder is NOT a CWE case
     if (defunct) return false;
@@ -645,7 +657,7 @@ bool CFDcaseInstance::caseDataInvalid()
 
     triedParamFile = false;
 
-    QList<CFDanalysisType *> * templates = cwe_globals::get_CWE_Driver()->getTemplateList();
+    QList<CWEanalysisType *> * templates = cwe_globals::get_CWE_Driver()->getTemplateList();
     for (auto itr = templates->cbegin(); itr != templates->cend(); itr++)
     {
         if (templateName == (*itr)->getInternalName())
@@ -657,7 +669,7 @@ bool CFDcaseInstance::caseDataInvalid()
     return true;
 }
 
-void CFDcaseInstance::computeCaseType()
+void CWEcaseInstance::computeCaseType()
 {
     if (myType != nullptr) return;
 
@@ -674,7 +686,7 @@ void CFDcaseInstance::computeCaseType()
         return;
     }
 
-    for (CFDanalysisType * aTemplate : *(cwe_globals::get_CWE_Driver()->getTemplateList()))
+    for (CWEanalysisType * aTemplate : *(cwe_globals::get_CWE_Driver()->getTemplateList()))
     {
         if (templateName == aTemplate->getInternalName())
         {
@@ -684,7 +696,7 @@ void CFDcaseInstance::computeCaseType()
     }
 }
 
-bool CFDcaseInstance::stageStatesEqual(QMap<QString, StageState> *list1, QMap<QString, StageState> *list2)
+bool CWEcaseInstance::stageStatesEqual(QMap<QString, StageState> *list1, QMap<QString, StageState> *list2)
 {
     if (list1->size() != list2->size())
     {
@@ -705,7 +717,7 @@ bool CFDcaseInstance::stageStatesEqual(QMap<QString, StageState> *list1, QMap<QS
     return true;
 }
 
-bool CFDcaseInstance::updateStageStatesIfNew(QMap<QString, StageState> * newStageStates)
+bool CWEcaseInstance::updateStageStatesIfNew(QMap<QString, StageState> * newStageStates)
 {
     if (stageStatesEqual(newStageStates, &storedStageStates))
     {
@@ -715,7 +727,7 @@ bool CFDcaseInstance::updateStageStatesIfNew(QMap<QString, StageState> * newStag
     return true;
 }
 
-bool CFDcaseInstance::recomputeStageStates()
+bool CWEcaseInstance::recomputeStageStates()
 {
     //Return true if stage states have changed
 
@@ -856,7 +868,7 @@ bool CFDcaseInstance::recomputeStageStates()
     return updateStageStatesIfNew(&newStageStates);
 }
 
-void CFDcaseInstance::computeParamList()
+void CWEcaseInstance::computeParamList()
 {
     if (defunct) return;
     if (!caseDataLoaded()) return;
@@ -882,7 +894,7 @@ void CFDcaseInstance::computeParamList()
     }
 }
 
-QByteArray CFDcaseInstance::produceJSONparams(QMap<QString, QString> paramList)
+QByteArray CWEcaseInstance::produceJSONparams(QMap<QString, QString> paramList)
 {
     QJsonDocument ret;
     QJsonObject mainObject;
@@ -906,7 +918,7 @@ QByteArray CFDcaseInstance::produceJSONparams(QMap<QString, QString> paramList)
     return ret.toJson();
 }
 
-void CFDcaseInstance::connectCaseSignals()
+void CWEcaseInstance::connectCaseSignals()
 {
     QObject::connect(cwe_globals::get_CWE_Job_Accountant(), SIGNAL(haveNewJobInfo()),
                      this, SLOT(jobListUpdated()),
@@ -915,14 +927,17 @@ void CFDcaseInstance::connectCaseSignals()
                      this, SLOT(fileTaskDone(RequestState)),
                      Qt::QueuedConnection);
     QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileSystemChange(FileNodeRef)),
-                     this, SLOT(underlyingFilesUpdated(FileNodeRef)),
+                     this, SLOT(underlyingFilesInterlock(FileNodeRef)),
+                     Qt::QueuedConnection);
+    QObject::connect(this, SIGNAL(underlyingFilesInterlockSignal()),
+                     this, SLOT(underlyingFilesUpdated()),
                      Qt::QueuedConnection);
     QObject::connect(cwe_globals::get_file_handle(), SIGNAL(fileOpStarted()),
                      this, SLOT(fileTaskStarted()),
                      Qt::QueuedConnection);
 }
 
-void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
+void CWEcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
 {
     if (myState != InternalCaseState::COPYING_FOLDER) return;
 
@@ -944,21 +959,21 @@ void CFDcaseInstance::state_CopyingFolder_taskDone(RequestState invokeStatus)
     computeIdleState();
 }
 
-void CFDcaseInstance::state_DataLoad_fileChange_jobList()
+void CWEcaseInstance::state_DataLoad_fileChange_jobList()
 {
     if (myState != InternalCaseState::RE_DATA_LOAD) return;
 
     computeIdleState();
 }
 
-void CFDcaseInstance::state_ExternOp_taskDone()
+void CWEcaseInstance::state_ExternOp_taskDone()
 {
     if (myState != InternalCaseState::EXTERN_FILE_OP) return;
 
     computeIdleState();
 }
 
-void CFDcaseInstance::state_InitParam_taskDone(RequestState invokeStatus)
+void CWEcaseInstance::state_InitParam_taskDone(RequestState invokeStatus)
 {
     if (myState != InternalCaseState::INIT_PARAM_UPLOAD) return;
 
@@ -975,7 +990,7 @@ void CFDcaseInstance::state_InitParam_taskDone(RequestState invokeStatus)
     computeIdleState();
 }
 
-void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
+void CWEcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
 {
     if (myState != InternalCaseState::MAKING_FOLDER) return;
 
@@ -1009,7 +1024,7 @@ void CFDcaseInstance::state_MakingFolder_taskDone(RequestState invokeStatus)
     emitNewState(InternalCaseState::INIT_PARAM_UPLOAD);
 }
 
-void CFDcaseInstance::state_Ready_fileChange_jobList()
+void CWEcaseInstance::state_Ready_fileChange_jobList()
 {
     if ((myState != InternalCaseState::READY) &&
             (myState != InternalCaseState::READY_ERROR)) return;
@@ -1017,7 +1032,7 @@ void CFDcaseInstance::state_Ready_fileChange_jobList()
     computeIdleState();
 }
 
-void CFDcaseInstance::state_Running_jobList()
+void CWEcaseInstance::state_Running_jobList()
 {
     if (myState != InternalCaseState::RUNNING_JOB) return;
 
@@ -1035,7 +1050,7 @@ void CFDcaseInstance::state_Running_jobList()
     }
 }
 
-void CFDcaseInstance::state_StartingJob_jobInvoked(QString jobID)
+void CWEcaseInstance::state_StartingJob_jobInvoked(QString jobID)
 {
     if (myState != InternalCaseState::STARTING_JOB) return;
 
@@ -1052,7 +1067,7 @@ void CFDcaseInstance::state_StartingJob_jobInvoked(QString jobID)
     emitNewState(InternalCaseState::RUNNING_JOB);
 }
 
-void CFDcaseInstance::state_StoppingJob_jobKilled()
+void CWEcaseInstance::state_StoppingJob_jobKilled()
 {
     if (myState != InternalCaseState::STOPPING_JOB) return;
 
@@ -1060,7 +1075,7 @@ void CFDcaseInstance::state_StoppingJob_jobKilled()
     computeIdleState();
 }
 
-void CFDcaseInstance::state_WaitingFolderDel_taskDone(RequestState invokeStatus)
+void CWEcaseInstance::state_WaitingFolderDel_taskDone(RequestState invokeStatus)
 {
     if (myState != InternalCaseState::WAITING_FOLDER_DEL) return;
     if (invokeStatus != RequestState::GOOD)
@@ -1074,7 +1089,7 @@ void CFDcaseInstance::state_WaitingFolderDel_taskDone(RequestState invokeStatus)
     computeIdleState();
 }
 
-void CFDcaseInstance::state_Download_recursiveOpDone(RequestState invokeStatus)
+void CWEcaseInstance::state_Download_recursiveOpDone(RequestState invokeStatus)
 {
     if (myState != InternalCaseState::DOWNLOAD) return;
 
@@ -1090,7 +1105,7 @@ void CFDcaseInstance::state_Download_recursiveOpDone(RequestState invokeStatus)
     computeIdleState();
 }
 
-void CFDcaseInstance::state_Param_Save_taskDone(RequestState invokeStatus)
+void CWEcaseInstance::state_Param_Save_taskDone(RequestState invokeStatus)
 {
     if (myState != InternalCaseState::PARAM_SAVE) return;
 
@@ -1115,7 +1130,7 @@ void CFDcaseInstance::state_Param_Save_taskDone(RequestState invokeStatus)
     computeIdleState();
 }
 
-void CFDcaseInstance::computeIdleState()
+void CWEcaseInstance::computeIdleState()
 {
     if (defunct) return;
     if (caseDataInvalid())

@@ -44,14 +44,14 @@
 #include "remoteJobs/joboperator.h"
 #include "remoteFiles/fileoperator.h"
 
-#include "CFDanalysis/CFDcaseInstance.h"
-#include "CFDanalysis/CFDanalysisType.h"
+#include "CFDanalysis/cwecaseinstance.h"
+#include "CFDanalysis/cweanalysistype.h"
 #include "CFDanalysis/cwejobaccountant.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 #include "cwe_globals.h"
 
-CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSetupDriver(parent)
+CWE_InterfaceDriver::CWE_InterfaceDriver(int argc, char *argv[], QObject *parent) : AgaveSetupDriver(argc, argv, parent)
 {
     qRegisterMetaType<CaseState>("CaseState");
 
@@ -71,15 +71,15 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
     foreach (QString caseConfigFile, caseTypeFiles)
     {
         QString confPath = ":/config/";
-        QJsonDocument rawConfig = CFDanalysisType::getRawJSON(confPath, caseConfigFile);
+        QJsonDocument rawConfig = CWEanalysisType::getRawJSON(confPath, caseConfigFile);
         if (rawConfig.isEmpty())
         {
             qCDebug(agaveAppLayer, "Unreadable template config file skipped: %s", qPrintable(caseConfigFile));
             continue;
         }
-        if (CFDanalysisType::jsonConfigIsEnabled(&rawConfig, debug))
+        if (CWEanalysisType::jsonConfigIsEnabled(&rawConfig, debugLoggingEnabled))
         {
-            CFDanalysisType * newTemplate = new CFDanalysisType(rawConfig);
+            CWEanalysisType * newTemplate = new CWEanalysisType(rawConfig);
             if (!newTemplate->validParse())
             {
                 qCDebug(agaveAppLayer, "Template Parse Invalid: %s", qPrintable(caseConfigFile));
@@ -92,6 +92,13 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(QObject *parent, bool debug) : AgaveSet
             }
         }
     }
+    for (int i = 0; i < argc; i++)
+    {
+        if (strcmp(argv[i],"useAlternateApps") == 0)
+        {
+            useAlternateApps = true;
+        }
+    }
 }
 
 CWE_InterfaceDriver::~CWE_InterfaceDriver()
@@ -101,6 +108,17 @@ CWE_InterfaceDriver::~CWE_InterfaceDriver()
 
 void CWE_InterfaceDriver::startup()
 {
+    if (offlineMode)
+    {
+        mainWindow = new CWE_MainWindow();
+
+        mainWindow->runSetupSteps();
+        mainWindow->show();
+
+        QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
+        return;
+    }
+
     createAndStartAgaveThread();
 
     myDataInterface->registerAgaveAppInfo("compress", "compress-0.1u1",{"directory", "compression_type"},{},"directory");
@@ -121,15 +139,23 @@ void CWE_InterfaceDriver::closeAuthScreen()
 
     QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 
-    AgaveTaskReply * getAppList = myDataInterface->getAgaveAppList();
-
-    if (getAppList == nullptr)
+    if (useAlternateApps)
     {
-        cwe_globals::displayFatalPopup("Unable to get app list from DesignSafe");
-        return;
+        myDataInterface->registerAgaveAppInfo("cwe-serial", "cwe-serial-0.2.0", {"stage"}, {"directory", "file_input"}, "directory");
+        myDataInterface->registerAgaveAppInfo("cwe-parallel", "cwe-parallel-0.2.0", {"stage"}, {"directory", "file_input"}, "directory");
     }
-    QObject::connect(getAppList, SIGNAL(haveAgaveAppList(RequestState,QVariantList)),
-                     this, SLOT(checkAppList(RequestState,QVariantList)));
+    else
+    {
+        RemoteDataReply * getAppList = myDataInterface->getAgaveAppList();
+
+        if (getAppList == nullptr)
+        {
+            cwe_globals::displayFatalPopup("Unable to get app list from DesignSafe");
+            return;
+        }
+        QObject::connect(getAppList, SIGNAL(haveAgaveAppList(RequestState,QVariantList)),
+                         this, SLOT(checkAppList(RequestState,QVariantList)));
+    }
 
     if (authWindow != nullptr)
     {
@@ -139,23 +165,12 @@ void CWE_InterfaceDriver::closeAuthScreen()
         authWindow = nullptr;
     }
 
-    //TODO: Reinstate the following
+    //TODO: Reinstate the following, pending privacy policy resolution
     //if (!inDebugMode)
     //{
         //This URL is a counter
     //    pingManager.get(QNetworkRequest(QUrl("http://opensees.berkeley.edu/OpenSees/developer/cwe/use.php")));
     //}
-}
-
-void CWE_InterfaceDriver::startOffline()
-{
-    offlineMode = true;
-    mainWindow = new CWE_MainWindow();
-
-    mainWindow->runSetupSteps();
-    mainWindow->show();
-
-    QObject::connect(mainWindow->windowHandle(),SIGNAL(visibleChanged(bool)),this, SLOT(subWindowHidden(bool)));
 }
 
 void CWE_InterfaceDriver::loadStyleFiles()
@@ -203,10 +218,10 @@ QString CWE_InterfaceDriver::getBanner()
 
 QString CWE_InterfaceDriver::getVersion()
 {
-    return "Version: 1.1.0";
+    return "Version: 1.1.1";
 }
 
-QList<CFDanalysisType *> * CWE_InterfaceDriver::getTemplateList()
+QList<CWEanalysisType *> * CWE_InterfaceDriver::getTemplateList()
 {
     return &templateList;
 }
@@ -233,7 +248,7 @@ void CWE_InterfaceDriver::checkAppList(RequestState replyState, QVariantList app
 }
 
 bool CWE_InterfaceDriver::registerOneAppByVersion(QVariantList appList, QString agaveAppName, QStringList parameterList, QStringList inputList, QString workingDirParameter)
-{
+{   
     QString idToUse;
     QString versionToUse;
 

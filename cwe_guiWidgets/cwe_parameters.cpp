@@ -41,8 +41,8 @@
 
 #include "cwe_interfacedriver.h"
 
-#include "CFDanalysis/CFDanalysisType.h"
-#include "CFDanalysis/CFDcaseInstance.h"
+#include "CFDanalysis/cweanalysistype.h"
+#include "CFDanalysis/cwecaseinstance.h"
 
 #include "cwe_param_tabs/cwe_stagestatustab.h"
 #include "cwe_param_tabs/cwe_grouptab.h"
@@ -91,9 +91,7 @@ void CWE_Parameters::linkMainWindow(CWE_MainWindow *theMainWin)
 {
     CWE_Super::linkMainWindow(theMainWin);
     QObject::connect(theMainWindow, SIGNAL(haveNewCase()),
-                     this, SLOT(newCaseGiven()));
-    QObject::connect(theMainWindow, SIGNAL(newTabSelected(CWE_Super*)),
-                     this, SLOT(newCaseGiven()));
+                     this, SLOT(newCaseGiven()), Qt::QueuedConnection);
 }
 
 bool CWE_Parameters::allowClickAway()
@@ -113,7 +111,7 @@ bool CWE_Parameters::allowClickAway()
 
 void CWE_Parameters::newCaseGiven()
 {
-    CFDcaseInstance * newCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * newCase = theMainWindow->getCurrentCase();
 
     clearStageTabs();
 
@@ -132,7 +130,7 @@ void CWE_Parameters::newCaseGiven()
 
 void CWE_Parameters::setHeaderLabels()
 {
-    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == nullptr)
     {
         ui->label_theName->setText("N/A");
@@ -141,7 +139,7 @@ void CWE_Parameters::setHeaderLabels()
         return;
     }
 
-    CFDanalysisType * theType = theCase->getMyType();
+    CWEanalysisType * theType = theCase->getMyType();
 
     if (theCase->getCaseName().isEmpty())
     {
@@ -175,9 +173,9 @@ void CWE_Parameters::newCaseState(CaseState)
 {
     setHeaderLabels();
 
-    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == nullptr) return;
-    CFDanalysisType * theType = theCase->getMyType();
+    CWEanalysisType * theType = theCase->getMyType();
     if (theType == nullptr) return;
 
     if (loadingLabel != nullptr)
@@ -505,7 +503,7 @@ QString CWE_Parameters::getVarValByName(QString varName)
         }
     }
 
-    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == nullptr) return QString();
     return theCase->getCurrentParams().value(varName);
 }
@@ -541,7 +539,7 @@ bool CWE_Parameters::panelSwitchPermitted()
 
 void CWE_Parameters::save_all_button_clicked()
 {
-    CFDcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * linkedCFDCase = theMainWindow->getCurrentCase();
     if (linkedCFDCase == nullptr) return;
     if (selectedStage == nullptr) return;
     if (!paramsChanged()) return;
@@ -574,7 +572,7 @@ void CWE_Parameters::save_all_button_clicked()
 
 void CWE_Parameters::run_button_clicked()
 {
-    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == nullptr) return;
     if (selectedStage == nullptr) return;
     if (paramsChanged()) return;
@@ -588,7 +586,7 @@ void CWE_Parameters::run_button_clicked()
 
 void CWE_Parameters::cancel_button_clicked()
 {
-    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == nullptr) return;
     if (selectedStage == nullptr) return;
     if (paramsChanged()) return;
@@ -602,7 +600,7 @@ void CWE_Parameters::cancel_button_clicked()
 
 void CWE_Parameters::results_button_clicked()
 {
-    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == nullptr) return;
 
     theMainWindow->switchToResultsTab();
@@ -610,7 +608,7 @@ void CWE_Parameters::results_button_clicked()
 
 void CWE_Parameters::rollback_button_clicked()
 {
-    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == nullptr) return;
     if (selectedStage == nullptr) return;
     if (paramsChanged()) return;
@@ -624,9 +622,9 @@ void CWE_Parameters::rollback_button_clicked()
 
 void CWE_Parameters::createStageTabs()
 {
-    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == nullptr) return;
-    CFDanalysisType * theType = theCase->getMyType();
+    CWEanalysisType * theType = theCase->getMyType();
     if (theType == nullptr) return;
 
     if ((selectedStage != nullptr) || !stageTabList.isEmpty() || !ui->tabsBar->layout()->isEmpty())
@@ -668,9 +666,9 @@ void CWE_Parameters::createStageTabs()
 
 void CWE_Parameters::createGroupTabs()
 {
-    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == nullptr) return;
-    CFDanalysisType * theType = theCase->getMyType();
+    CWEanalysisType * theType = theCase->getMyType();
     if (theType == nullptr) return;
     if (selectedStage == nullptr) return;
 
@@ -706,9 +704,9 @@ void CWE_Parameters::createGroupTabs()
 
 void CWE_Parameters::createParamWidgets()
 {
-    CFDcaseInstance * theCase = theMainWindow->getCurrentCase();
+    CWEcaseInstance * theCase = theMainWindow->getCurrentCase();
     if (theCase == nullptr) return;
-    CFDanalysisType * theType = theCase->getMyType();
+    CWEanalysisType * theType = theCase->getMyType();
     if (theType == nullptr) return;
     if (selectedStage == nullptr) return;
     if (selectedGroup == nullptr) return;

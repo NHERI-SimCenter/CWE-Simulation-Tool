@@ -33,56 +33,43 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef VWTINTERFACEDRIVER_H
-#define VWTINTERFACEDRIVER_H
+#ifndef CFDGLCANVAS2D_H
+#define CFDGLCANVAS2D_H
 
-#include "utilFuncs/agavesetupdriver.h"
+#include "cfdglcanvas.h"
 
-#include <QWindow>
-#include <QDir>
-#include <QVariant>
-#include <QResource>
-
-class CWE_MainWindow;
-class CWEanalysisType;
-class CWEcaseInstance;
-class RemoteJobData;
-class FileNodeRef;
-class CWEjobAccountant;
-enum class CaseState;
-
-class CWE_InterfaceDriver : public AgaveSetupDriver
+class CFDglCanvas2D : public CFDglCanvas
 {
-    Q_OBJECT
-
 public:
-    explicit CWE_InterfaceDriver(int argc, char *argv[], QObject *parent = nullptr);
-    ~CWE_InterfaceDriver();
-    virtual void startup();
-    virtual void closeAuthScreen();
+    CFDglCanvas2D(QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    ~CFDglCanvas2D();
 
-    virtual void loadStyleFiles();
+    bool loadMeshData(QByteArray * rawPointFile, QByteArray * rawFaceFile, QByteArray * rawOwnerFile);
 
-    virtual QString getBanner();
-    virtual QString getVersion();
+protected:
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void wheelEvent(QWheelEvent *event);
 
-    QList<CWEanalysisType *> * getTemplateList();
-
-    bool inOfflineMode();
-
-private slots:
-    void checkAppList(RequestState replyState, QVariantList appList);
+    virtual void paintGL();
 
 private:
-    bool registerOneAppByVersion(QVariantList appList, QString agaveAppName, QStringList parameterList, QStringList inputList, QString workingDirParameter);
+    constexpr static const double ZOOMFACTOR2D = 650.0;
 
-    QNetworkAccessManager pingManager;
+    virtual void recomputePerspecMat();
+    virtual void recomputeViewModelMat();
 
-    CWE_MainWindow * mainWindow = nullptr;
-    QList<CWEanalysisType *> templateList;
+    QMatrix4x4 projMat;
+    QMatrix4x4 viewModelMat;
 
-    CWEjobAccountant * myJobAccountant = nullptr;
-    bool useAlternateApps = false;
+    int zoomTicks = 0;
+    int lastXmousePos = 0;
+    int lastYmousePos = 0;
+    float panXdist = 0.0;
+    float panYdist = 0.0;
+    double distByPixelX = 0.0;
+    double distByPixelY = 0.0;
 };
 
-#endif // VWTINTERFACEDRIVER_H
+#endif // CFDGLCANVAS2D_H

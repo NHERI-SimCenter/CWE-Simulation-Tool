@@ -41,11 +41,11 @@
 #include <QLabel>
 #include <QHBoxLayout>
 
-#include "CFDanalysis/CFDanalysisType.h"
+#include "CFDanalysis/cweanalysistype.h"
 
 #include "resultprocurebase.h"
 
-class CFDcaseInstance;
+class CWEcaseInstance;
 
 namespace Ui {
 class ResultVisualPopup;
@@ -55,7 +55,7 @@ class ResultVisualPopup : public ResultProcureBase
 {
     Q_OBJECT
 public:
-    explicit ResultVisualPopup(CFDcaseInstance * theCase, RESULTS_STYLE *resultDesc, QWidget *parent = nullptr);
+    explicit ResultVisualPopup(CWEcaseInstance * theCase, RESULT_ENTRY *resultDesc, QWidget *parent = nullptr);
     ~ResultVisualPopup();
 
     virtual void initializeView() = 0;
@@ -67,7 +67,7 @@ protected:
     virtual void initialFailure();
     virtual void underlyingDataChanged(QString fileID);
 
-    RESULTS_STYLE getResultObj();
+    RESULT_ENTRY getResultObj();
 
 protected slots:
     virtual void baseFolderRemoved();
@@ -78,8 +78,8 @@ private slots:
 private:
     Ui::ResultVisualPopup *ui;
 
-    CFDcaseInstance * myCase;
-    RESULTS_STYLE resultObj;
+    CWEcaseInstance * myCase;
+    RESULT_ENTRY resultObj;
 
     QWidget * displayFrameTenant = nullptr;
     QHBoxLayout * resultFrameLayout = nullptr;

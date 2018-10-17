@@ -39,20 +39,17 @@
 #include <QLabel>
 
 enum class CaseState;
-class CFDcaseInstance;
+class CWEcaseInstance;
 
 class cwe_state_label : public QLabel
 {
     Q_OBJECT
 public:
     cwe_state_label(QWidget *parent);
-    void setCurrentCase(CFDcaseInstance * newCase);
-
-public slots:
     void setNewState(CaseState newState);
 
 private:
-    CFDcaseInstance * currentCase = nullptr;
+    CWEcaseInstance * currentCase = nullptr;
 };
 
 #endif // CWE_STATE_LABEL_H

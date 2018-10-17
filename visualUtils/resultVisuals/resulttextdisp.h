@@ -43,7 +43,7 @@
 class ResultTextDisplay : public ResultVisualPopup
 {
 public:
-    ResultTextDisplay(CFDcaseInstance * theCase, RESULTS_STYLE * resultDesc, QWidget *parent = nullptr);
+    ResultTextDisplay(CWEcaseInstance * theCase, RESULT_ENTRY * resultDesc, QWidget *parent = nullptr);
     ~ResultTextDisplay();
 
     virtual void initializeView();

@@ -1,7 +1,7 @@
 /*********************************************************************************
 **
-** Copyright (c) 2017 The University of Notre Dame
-** Copyright (c) 2017 The Regents of the University of California
+** Copyright (c) 2018 The University of Notre Dame
+** Copyright (c) 2018 The Regents of the University of California
 **
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
@@ -33,56 +33,47 @@
 // Contributors:
 // Written by Peter Sempolinski, for the Natural Hazard Modeling Laboratory, director: Ahsan Kareem, at Notre Dame
 
-#ifndef VWTINTERFACEDRIVER_H
-#define VWTINTERFACEDRIVER_H
+#ifndef CWERESULTINSTANCE_H
+#define CWERESULTINSTANCE_H
 
-#include "utilFuncs/agavesetupdriver.h"
+#include <QObject>
+#include <QStandardItem>
+#include <QFileDialog>
 
-#include <QWindow>
-#include <QDir>
-#include <QVariant>
-#include <QResource>
-
-class CWE_MainWindow;
-class CWEanalysisType;
-class CWEcaseInstance;
-class RemoteJobData;
+#include "CFDanalysis/cweanalysistype.h"
+class CWE_Results;
 class FileNodeRef;
-class CWEjobAccountant;
-enum class CaseState;
 
-class CWE_InterfaceDriver : public AgaveSetupDriver
+enum class ResultInstanceState {UNLOADED, NIL, LOADED};
+
+class cweResultInstance : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit CWE_InterfaceDriver(int argc, char *argv[], QObject *parent = nullptr);
-    ~CWE_InterfaceDriver();
-    virtual void startup();
-    virtual void closeAuthScreen();
+    explicit cweResultInstance(QString stageName, RESULT_ENTRY resultData, CWE_Results *parent);
 
-    virtual void loadStyleFiles();
+    void enactShowOp();
+    void enactDownloadOp();
 
-    virtual QString getBanner();
-    virtual QString getVersion();
-
-    QList<CWEanalysisType *> * getTemplateList();
-
-    bool inOfflineMode();
+    QList<QStandardItem *> getItemList();
+    ResultInstanceState getState();
 
 private slots:
-    void checkAppList(RequestState replyState, QVariantList appList);
+    void recomputeResultState();
 
 private:
-    bool registerOneAppByVersion(QVariantList appList, QString agaveAppName, QStringList parameterList, QStringList inputList, QString workingDirParameter);
+    void setInternalParams(bool show, bool download, QString type);
+    void changeMyState(ResultInstanceState newState);
+    bool baseFolderContainsNumber();
 
-    QNetworkAccessManager pingManager;
+    CWE_Results * myParent;
+    bool showEye = false;
+    bool downloadable = false;
+    QString typeString = "Unknown";
 
-    CWE_MainWindow * mainWindow = nullptr;
-    QList<CWEanalysisType *> templateList;
-
-    CWEjobAccountant * myJobAccountant = nullptr;
-    bool useAlternateApps = false;
+    ResultInstanceState myState = ResultInstanceState::UNLOADED;
+    QString myStage;
+    RESULT_ENTRY myResultData;
 };
 
-#endif // VWTINTERFACEDRIVER_H
+#endif // CWERESULTINSTANCE_H
