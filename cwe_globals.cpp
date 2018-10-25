@@ -54,7 +54,6 @@ void cwe_globals::set_CWE_Job_Accountant(CWEjobAccountant * theAccountant)
     if (theJobAccountant != nullptr)
     {
         displayFatalPopup("Job Accountant object has multiple definitions. Please note the circumstances of this error and report it to the developers.", "Internal Error");
-        return;
     }
     theJobAccountant = theAccountant;
 }

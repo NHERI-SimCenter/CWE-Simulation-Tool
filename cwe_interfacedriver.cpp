@@ -59,7 +59,6 @@ CWE_InterfaceDriver::CWE_InterfaceDriver(int argc, char *argv[], QObject *parent
     if (!QResource::registerResource(QCoreApplication::applicationDirPath().append("/resources/cwe_help.rcc")))
     {
         cwe_globals::displayFatalPopup("Error: Unable to locate help files, your install may be corrupted. Please reinstall the client program", "Install Error");
-        return;
     }
 
     /* populate with available cases */
@@ -151,7 +150,6 @@ void CWE_InterfaceDriver::closeAuthScreen()
         if (getAppList == nullptr)
         {
             cwe_globals::displayFatalPopup("Unable to get app list from DesignSafe");
-            return;
         }
         QObject::connect(getAppList, SIGNAL(haveAgaveAppList(RequestState,QVariantList)),
                          this, SLOT(checkAppList(RequestState,QVariantList)));
@@ -193,13 +191,11 @@ void CWE_InterfaceDriver::loadStyleFiles()
     if (!mainStyleFile.open(QFile::ReadOnly))
     {
         cwe_globals::displayFatalPopup("Unable to open main style file. Install may be corrupted.");
-        return;
     }
 
     if (!appendedStyle.open(QFile::ReadOnly))
     {
         cwe_globals::displayFatalPopup("Unable to open platform style file. Install may be corrupted.");
-        return;
     }
 
     fullStyleSheet = fullStyleSheet.append(mainStyleFile.readAll());
@@ -218,7 +214,7 @@ QString CWE_InterfaceDriver::getBanner()
 
 QString CWE_InterfaceDriver::getVersion()
 {
-    return "Version: 1.1.1";
+    return "Version: 1.1.2";
 }
 
 QList<CWEanalysisType *> * CWE_InterfaceDriver::getTemplateList()
@@ -231,20 +227,16 @@ void CWE_InterfaceDriver::checkAppList(RequestState replyState, QVariantList app
     if (replyState != RequestState::GOOD)
     {
         cwe_globals::displayFatalPopup("Unable to connect to Agave to get app info.");
-        return;
     }
 
     if (!registerOneAppByVersion(appList, "cwe-serial", {"stage"}, {"directory", "file_input"}, "directory"))
     {
         cwe_globals::displayFatalPopup("To use CWE, the SimCenter needs to register your DesignSafe username. The CWE program depends on several apps hosted on DesignSafe which are not listed as published. Please contact the SimCenter project, with your username, to be able to access these apps.", "Username Registration Needed");
-        return;
     }
     if (!registerOneAppByVersion(appList, "cwe-parallel", {"stage"}, {"directory", "file_input"}, "directory"))
     {
         cwe_globals::displayFatalPopup("To use CWE, the SimCenter needs to register your DesignSafe username. The CWE program depends on several apps hosted on DesignSafe which are not listed as published. Please contact the SimCenter project, with your username, to be able to access these apps.", "Username Registration Needed");
-        return;
     }
-
 }
 
 bool CWE_InterfaceDriver::registerOneAppByVersion(QVariantList appList, QString agaveAppName, QStringList parameterList, QStringList inputList, QString workingDirParameter)

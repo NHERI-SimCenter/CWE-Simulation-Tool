@@ -54,7 +54,6 @@ ResultVisualPopup::ResultVisualPopup(CWEcaseInstance *theCase, RESULT_ENTRY * re
     if (myCase == nullptr)
     {
         cwe_globals::displayFatalPopup("Internal error: Empty case passed to result display");
-        return;
     }
 
     resultObj = *resultDesc;

@@ -1,0 +1,20 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classCWE__ParamTab.html" title="CWE_ParamTab" alt="" coords="141,81,263,108"/>
+<area shape="rect" id="node6" href="$classCWE__Super.html" title="CWE_Super" alt="" coords="155,309,249,336"/>
+<area shape="rect" id="node14" href="$classSCtrMasterDataWidget.html" title="SCtrMasterDataWidget" alt="" coords="123,588,281,615"/>
+<area shape="rect" id="node3" href="$classCWE__GroupTab.html" title="CWE_GroupTab" alt="" coords="357,5,475,32"/>
+<area shape="rect" id="node4" href="$classCWE__PanelTab.html" title="CWE_PanelTab" alt="" coords="358,56,474,83"/>
+<area shape="rect" id="node5" href="$classCWE__StageStatusTab.html" title="CWE_StageStatusTab" alt="" coords="339,107,493,133"/>
+<area shape="rect" id="node7" href="$classCWE__file__manager.html" title="CWE_file_manager" alt="" coords="349,157,483,184"/>
+<area shape="rect" id="node8" href="$classCWE__help.html" title="CWE_help" alt="" coords="373,208,459,235"/>
+<area shape="rect" id="node9" href="$classCWE__job__list.html" title="CWE_job_list" alt="" coords="365,259,467,285"/>
+<area shape="rect" id="node10" href="$classCWE__manage__simulation.html" title="CWE_manage_simulation" alt="" coords="329,309,503,336"/>
+<area shape="rect" id="node11" href="$classCWE__Parameters.html" title="CWE_Parameters" alt="" coords="352,360,480,387"/>
+<area shape="rect" id="node12" href="$classCWE__Results.html" title="CWE_Results" alt="" coords="363,411,469,437"/>
+<area shape="rect" id="node13" href="$classCWE__welcome__screen.html" title="CWE_welcome_screen" alt="" coords="337,461,495,488"/>
+<area shape="rect" id="node15" href="$classSCtrBoolDataWidget.html" title="SCtrBoolDataWidget" alt="" coords="344,512,488,539"/>
+<area shape="rect" id="node16" href="$classSCtrChoiceDataWidget.html" title="SCtrChoiceDataWidget" alt="" coords="337,563,495,589"/>
+<area shape="rect" id="node17" href="$classSCtrFileDataWidget.html" title="SCtrFileDataWidget" alt="" coords="347,613,485,640"/>
+<area shape="rect" id="node18" href="$classSCtrStdDataWidget.html" title="SCtrStdDataWidget" alt="" coords="347,664,485,691"/>
+<area shape="rect" id="node19" href="$classSCtrTextDataWidget.html" title="SCtrTextDataWidget" alt="" coords="344,715,488,741"/>
+</map>
