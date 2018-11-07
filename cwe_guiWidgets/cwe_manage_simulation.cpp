@@ -181,7 +181,6 @@ void CWE_manage_simulation::newCaseState(CaseState newState)
         if (theType == nullptr)
         {
             cwe_globals::displayFatalPopup("Type/stage mismatch for case.");
-            return;
         }
         ui->label_CaseTypeIcon->setPixmap(theType->getIcon()->pixmap(150,100));
 

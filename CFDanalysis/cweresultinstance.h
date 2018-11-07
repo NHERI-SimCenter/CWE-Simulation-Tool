@@ -58,7 +58,7 @@ public:
     QList<QStandardItem *> getItemList();
     ResultInstanceState getState();
 
-private slots:
+public slots:
     void recomputeResultState();
 
 private:

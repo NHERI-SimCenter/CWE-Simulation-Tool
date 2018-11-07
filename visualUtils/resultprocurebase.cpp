@@ -110,7 +110,6 @@ void ResultProcureBase::computeFileBuffers()
         if (!theFile.fileNodeExtant())
         {
             cwe_globals::displayFatalPopup("Internal Error: result file not loaded after load");
-            return;
         }
         QByteArray * rawBuffer = nullptr;
 
@@ -128,7 +127,6 @@ void ResultProcureBase::computeFileBuffers()
         if (rawBuffer == nullptr)
         {
             cwe_globals::displayFatalPopup("Internal Error: result buffer not loaded after load");
-            return;
         }
         myBufferList[fileID] = rawBuffer;
     }

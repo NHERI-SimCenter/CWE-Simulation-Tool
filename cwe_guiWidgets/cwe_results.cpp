@@ -252,4 +252,9 @@ void CWE_Results::populateResultDirectory()
             resultDirectory.append(new cweResultInstance(aStage, aResult, this));
         }
     }
+
+    for (cweResultInstance * aResult : resultDirectory)
+    {
+        aResult->recomputeResultState();
+    }
 }
