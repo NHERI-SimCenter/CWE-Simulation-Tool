@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
   <Installer>
       <Name>CWE Client Program</Name>
-      <Version>1.1.0</Version>
+      <Version>1.1.2</Version>
       <Title>CWE Client Program Linux Installer</Title>
       <Publisher>NHERI SimCenter</Publisher>
       <TargetDir>@HomeDir@/SimCenterCWE</TargetDir>

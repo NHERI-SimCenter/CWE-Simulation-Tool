@@ -38,14 +38,16 @@
 #include "cwe_super.h"
 
 #include <QStandardItemModel>
-#include <QFileDialog>
 #include <QJsonObject>
 #include <QJsonArray>
 
 enum class CaseState;
+enum class ResultInstanceState;
 class ResultProcureBase;
 class CWE_MainWindow;
-struct RESULTS_STYLE;
+class cweResultInstance;
+class CWEcaseInstance;
+struct RESULT_ENTRY;
 
 namespace Ui {
 class CWE_Results;
@@ -55,12 +57,19 @@ class CWE_Results : public CWE_Super
 {
     Q_OBJECT
 
+    friend class cweResultInstance;
+
 public:
     explicit CWE_Results(QWidget *parent = nullptr);
     ~CWE_Results();
 
     virtual void linkMainWindow(CWE_MainWindow *theMainWin);
     void resetViewInfo();
+
+protected:
+    void changeVisibleState(cweResultInstance *toChange, ResultInstanceState newState);
+    FileNodeRef getCaseFolder();
+    CWEcaseInstance * getCurrentCase();
 
 private slots:
     void on_downloadEntireCaseButton_clicked();
@@ -70,17 +79,17 @@ private slots:
     void newCaseState(CaseState newState);
 
 private:
-    RESULTS_STYLE getResultObjectFromName(QString name);
-    void populateResultsScreen();
-    void performSingleFileDownload(QString filePathToDownload, QString stage);
-    void addResult(QString name, bool showeye, bool download, QString type);
+    void populateResultDirectory();
 
     Ui::CWE_Results    *ui;
     QStandardItemModel *resultListModel;
+    QList<cweResultInstance *> resultDirectory;
+    QList<cweResultInstance *> resultCorrespondenceList;
 
-    bool viewIsValid = false;
-    int showCol;
-    int downloadCol;
+    int showCol = 1;
+    int downloadCol = 2;
+
+    bool loadingRow = false;
 };
 
 #endif // CWE_RESULTS_H

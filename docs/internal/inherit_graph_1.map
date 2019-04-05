@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node2" href="$classCWE__InterfaceDriver.html" title="CWE_InterfaceDriver" alt="" coords="181,5,328,32"/>
+<area shape="rect" id="node2" href="$classCFDglCanvas.html" title="CFDglCanvas" alt="" coords="191,31,296,57"/>
+<area shape="rect" id="node3" href="$classCFDglCanvas2D.html" title="CFDglCanvas2D" alt="" coords="344,5,467,32"/>
+<area shape="rect" id="node4" href="$classCFDglCanvas3D.html" title="CFDglCanvas3D" alt="" coords="344,56,467,83"/>
 </map>

@@ -78,8 +78,6 @@ SOURCES += \
     cwe_guiWidgets/cwe_results.cpp \
     cwe_guiWidgets/cwe_parameters.cpp \
     cwe_guiWidgets/cwe_state_label.cpp \
-    CFDanalysis/CFDanalysisType.cpp \
-    CFDanalysis/CFDcaseInstance.cpp \
     SimCenter_widgets/sctrmasterdatawidget.cpp \
     SimCenter_widgets/sctrstddatawidget.cpp \
     SimCenter_widgets/sctrbooldatawidget.cpp \
@@ -104,11 +102,14 @@ SOURCES += \
     cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.cpp \
     cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.cpp \
     cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.cpp \
-    visualUtils/resultVisuals/resultmesh3dwindow.cpp
+    visualUtils/resultVisuals/resultmesh3dwindow.cpp \
+    visualUtils/cfdglcanvas2D.cpp \
+    CFDanalysis/cweresultinstance.cpp \
+    CFDanalysis/cweanalysistype.cpp \
+    CFDanalysis/cwecaseinstance.cpp \
+    visualUtils/cfdglcanvas3D.cpp
 
 HEADERS  += \
-    CFDanalysis/CFDanalysisType.h \
-    CFDanalysis/CFDcaseInstance.h \
     visualUtils/cfdglcanvas.h \
     visualUtils/cfdtoken.h \
     visualUtils/decompresswrapper.h \
@@ -144,7 +145,12 @@ HEADERS  += \
     cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.h \
     cwe_guiWidgets/cwe_param_tabs/cwe_paramtab.h \
     cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.h \
-    visualUtils/resultVisuals/resultmesh3dwindow.h
+    visualUtils/resultVisuals/resultmesh3dwindow.h \
+    visualUtils/cfdglcanvas2D.h \
+    CFDanalysis/cweresultinstance.h \
+    CFDanalysis/cweanalysistype.h \
+    CFDanalysis/cwecaseinstance.h \
+    visualUtils/cfdglcanvas3D.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \

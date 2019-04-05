@@ -63,7 +63,7 @@ void CWE_job_list::linkMainWindow(CWE_MainWindow *theMainWin)
     {
         ui->tableView_jobs->setOperator(cwe_globals::get_job_handle());
         QObject::connect(ui->tableView_jobs, SIGNAL(customContextMenuRequested(QPoint)),
-                         this, SLOT(customJobMenu(QPoint)));
+                         this, SLOT(customJobMenu(QPoint)), Qt::QueuedConnection);
         QObject::connect(cwe_globals::get_job_handle(), SIGNAL(jobOpDone(RequestState, QString)),
                          this, SLOT(jobOpDone(RequestState, QString)), Qt::QueuedConnection);
     }

@@ -472,7 +472,8 @@
                                 "SpalartAllmaras":"S-A one equation model (RANS)",
                                 "kEpsilon":"k-epsilon model (RANS)",
                                 "Smagorinsky":"Smagorinsky turbulence model (LES)",
-                                "dynOneEqEddy":"Dynamic One Equation model (LES)"
+                                "dynOneEqEddy":"Dynamic One Equation model (LES)",
+                                "SpalartAllmarasDDES": "Spalart Allmaras DDES model"
                             }
                         },
                         {
@@ -541,6 +542,16 @@
                     "displayName":"OpenFOAM Log",
                     "type":"text",
                     "file":"logs/sim.log"
+                },
+                {
+                    "displayName":"Force Coefficients",
+                    "type":"text",
+                    "file":"postProcessing/forceCoeffs/0/forceCoeffs.dat"
+                },
+                {
+                    "displayName":"VTK Visualization Files",
+                    "type":"download",
+                    "file":"VTK.zip"
                 }
             ]
         }

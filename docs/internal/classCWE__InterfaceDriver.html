@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>CFD Wind Enginnering Client Program: CWE_InterfaceDriver Class Reference</title>
+<title>SimCenter CWE Client Program: CWE_InterfaceDriver Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,10 +23,10 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">CFD Wind Enginnering Client Program
-   &#160;<span id="projectnumber">1.1.0</span>
+   <div id="projectname">SimCenter CWE Client Program
+   &#160;<span id="projectnumber">1.1.2</span>
    </div>
-   <div id="projectbrief">Client Program for running CFD simulations for Wind Engineering.</div>
+   <div id="projectbrief">This repo contains a Qt-UI program which communicates with the SimCenter Agave Server to run CFD simulations.</div>
   </td>
  </tr>
  </tbody>
@@ -40,8 +40,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -90,35 +90,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">CWE_InterfaceDriver Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="dynheader">
-Inheritance diagram for CWE_InterfaceDriver:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCWE__InterfaceDriver__inherit__graph.png" border="0" usemap="#CWE__InterfaceDriver_inherit__map" alt="Inheritance graph"/></div>
-<map name="CWE__InterfaceDriver_inherit__map" id="CWE__InterfaceDriver_inherit__map">
-</map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
-<div class="dynheader">
-Collaboration diagram for CWE_InterfaceDriver:</div>
-<div class="dyncontent">
-<div class="center"><img src="classCWE__InterfaceDriver__coll__graph.png" border="0" usemap="#CWE__InterfaceDriver_coll__map" alt="Collaboration graph"/></div>
-<map name="CWE__InterfaceDriver_coll__map" id="CWE__InterfaceDriver_coll__map">
-</map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afced3c4a0732436d8411d3ceff1c95b5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afced3c4a0732436d8411d3ceff1c95b5"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>CWE_InterfaceDriver</b> (QObject *parent=nullptr, bool debug=false)</td></tr>
-<tr class="separator:afced3c4a0732436d8411d3ceff1c95b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a222ed5d8a62634e38c760546d7b1754e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a222ed5d8a62634e38c760546d7b1754e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>CWE_InterfaceDriver</b> (int argc, char *argv[], QObject *parent=nullptr)</td></tr>
+<tr class="separator:a222ed5d8a62634e38c760546d7b1754e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae26d7b44071147ce7b62775550a4df3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aae26d7b44071147ce7b62775550a4df3"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>startup</b> ()</td></tr>
 <tr class="separator:aae26d7b44071147ce7b62775550a4df3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3fd79da6786637d0fe3b51e59896ecc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab3fd79da6786637d0fe3b51e59896ecc"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>closeAuthScreen</b> ()</td></tr>
 <tr class="separator:ab3fd79da6786637d0fe3b51e59896ecc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a077e1c35191cb0baeb07e071040d2a78"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a077e1c35191cb0baeb07e071040d2a78"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>startOffline</b> ()</td></tr>
-<tr class="separator:a077e1c35191cb0baeb07e071040d2a78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98ba1ef45ec6d33a77fe1827082b8291"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a98ba1ef45ec6d33a77fe1827082b8291"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>loadStyleFiles</b> ()</td></tr>
 <tr class="separator:a98ba1ef45ec6d33a77fe1827082b8291"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -128,17 +111,13 @@ virtual QString&#160;</td><td class="memItemRight" valign="bottom"><b>getBanner<
 <tr class="memitem:af22273386c44651286d09f8bbaa0a3eb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af22273386c44651286d09f8bbaa0a3eb"></a>
 virtual QString&#160;</td><td class="memItemRight" valign="bottom"><b>getVersion</b> ()</td></tr>
 <tr class="separator:af22273386c44651286d09f8bbaa0a3eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79d4038f509d106c5ad83cf03bb5ce9d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a79d4038f509d106c5ad83cf03bb5ce9d"></a>
-QList&lt; CFDanalysisType * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>getTemplateList</b> ()</td></tr>
-<tr class="separator:a79d4038f509d106c5ad83cf03bb5ce9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1b722e7b02549311da2d527d19576d5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae1b722e7b02549311da2d527d19576d5"></a>
+QList&lt; <a class="el" href="classCWEanalysisType.html">CWEanalysisType</a> * &gt; *&#160;</td><td class="memItemRight" valign="bottom"><b>getTemplateList</b> ()</td></tr>
+<tr class="separator:ae1b722e7b02549311da2d527d19576d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ccfe59c3302379b6c652a7fe0ea93bc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ccfe59c3302379b6c652a7fe0ea93bc"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>inOfflineMode</b> ()</td></tr>
 <tr class="separator:a0ccfe59c3302379b6c652a7fe0ea93bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following files:<ul>
-<li><a class="el" href="cwe__interfacedriver_8h_source.html">cwe_interfacedriver.h</a></li>
-<li>cwe_interfacedriver.cpp</li>
-</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

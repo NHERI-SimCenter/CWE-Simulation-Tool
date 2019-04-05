@@ -37,8 +37,8 @@
 
 #include "remoteFiles/filetreenode.h"
 
-#include "CFDanalysis/CFDanalysisType.h"
-#include "CFDanalysis/CFDcaseInstance.h"
+#include "CFDanalysis/cweanalysistype.h"
+#include "CFDanalysis/cwecaseinstance.h"
 
 #include "mainWindow/cwe_mainwindow.h"
 #include "cwe_interfacedriver.h"
@@ -54,7 +54,7 @@ Create_Case_Popup::Create_Case_Popup(CWE_MainWindow *controlWindow, QWidget *par
 
     if (!cwe_globals::get_CWE_Driver()->inOfflineMode())
     {
-        ui->primary_remoteFileTree->setModelLink(cwe_globals::get_file_handle());
+        ui->primary_remoteFileTree->linkToFileOperator(cwe_globals::get_file_handle());
     }
 }
 
@@ -86,7 +86,7 @@ void Create_Case_Popup::button_create_copy_clicked()
     }
 
     /* OK, something has been selected */
-    CFDcaseInstance * newCase;
+    CWEcaseInstance * newCase;
 
     QString newCaseName = ui->lineEdit_newCaseName->text();
 
@@ -126,12 +126,12 @@ void Create_Case_Popup::button_create_copy_clicked()
 
 void Create_Case_Popup::populateCaseTypes()
 {
-    QList<CFDanalysisType *> * templateList = cwe_globals::get_CWE_Driver()->getTemplateList();
+    QList<CWEanalysisType *> * templateList = cwe_globals::get_CWE_Driver()->getTemplateList();
     QGridLayout *layout = new QGridLayout();
 
     int idx = 0;
 
-    foreach (CFDanalysisType * caseType, *templateList) {
+    foreach (CWEanalysisType * caseType, *templateList) {
         /* get analysis type and name info from JSON */
         QString theName = caseType->getDisplayName();
         QString theDescription = caseType->getDescription();

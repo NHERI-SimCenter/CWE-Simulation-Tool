@@ -36,7 +36,7 @@
 
 #include "SimCenter_widgets/sctrmasterdatawidget.h"
 #include "remoteFiles/filenoderef.h"
-#include "CFDanalysis/CFDanalysisType.h"
+#include "CFDanalysis/cweanalysistype.h"
 
 SCtrMasterDataWidget::SCtrMasterDataWidget(QWidget *parent) :
     QFrame(parent)
@@ -83,7 +83,6 @@ void SCtrMasterDataWidget::setDataType(PARAM_VARIABLE_TYPE & newTypeData)
     if (m_obj.type != SimCenterDataType::unknown)
     {
         cwe_globals::displayFatalPopup("Parameter widget initialized twice.", "Internal Error");
-        return;
     }
 
     m_obj = newTypeData;
