@@ -47,6 +47,7 @@
 #include "cwe_globals.h"
 
 #include "utilWindows/dialogabout.h"
+#include "popupWindows/dialoginflowparameters.h"
 
 CWE_MainWindow::CWE_MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -367,6 +368,13 @@ void CWE_MainWindow::on_actionAbout_CWE_triggered()
     int width  = static_cast<int>(0.50*rec.width());
     dlg->resize(width, height);
 
+    dlg->exec();
+    delete dlg;
+}
+
+void CWE_MainWindow::on_actionInflow_parameters_triggered()
+{
+    DialogInflowParameters *dlg = new DialogInflowParameters();
     dlg->exec();
     delete dlg;
 }

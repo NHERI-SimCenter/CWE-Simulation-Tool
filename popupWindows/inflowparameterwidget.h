@@ -22,6 +22,14 @@ private slots:
     void on_PHI31_valueChanged(double arg1);
     void on_PHI32_valueChanged(double arg1);
 
+    void setDefaultParameters();
+
+    void on_selectUniform_clicked(bool checked);
+
+    void on_selectExponential_clicked(bool checked);
+
+    void on_resetButton_clicked();
+
 private:
     Ui::InflowParameterWidget *ui;
 };

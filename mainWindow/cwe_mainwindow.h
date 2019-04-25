@@ -95,6 +95,8 @@ private slots:
 
     void on_actionAbout_CWE_triggered();
 
+    void on_actionInflow_parameters_triggered();
+
 private:
     void addWindowPanel(QWidget * thePanel, QString panelName, QString tabText);
     void deactivateCurrentCase();

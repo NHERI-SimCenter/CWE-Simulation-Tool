@@ -147,7 +147,7 @@
      <x>0</x>
      <y>0</y>
      <width>1037</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -162,8 +162,15 @@
     </property>
     <addaction name="actionCopyright_and_License"/>
    </widget>
+   <widget class="QMenu" name="menuTesting">
+    <property name="title">
+     <string>Testing</string>
+    </property>
+    <addaction name="actionInflow_parameters"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuTesting"/>
   </widget>
   <action name="actionCreate_New_Simulation">
    <property name="text">
@@ -238,6 +245,11 @@
   <action name="actionCopyright_and_License">
    <property name="text">
     <string>Copyright and License</string>
+   </property>
+  </action>
+  <action name="actionInflow_parameters">
+   <property name="text">
+    <string>Inflow parameters</string>
    </property>
   </action>
  </widget>

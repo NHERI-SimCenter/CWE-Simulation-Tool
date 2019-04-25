@@ -3,16 +3,52 @@
 
 #include "math.h"
 
+#include <QDebug>
+
 InflowParameterWidget::InflowParameterWidget(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::InflowParameterWidget)
 {
     ui->setupUi(this);
+    setDefaultParameters();
 }
 
 InflowParameterWidget::~InflowParameterWidget()
 {
     delete ui;
+}
+
+void InflowParameterWidget::setDefaultParameters()
+{
+    if ( ui->selectUniform->isChecked() ) {
+
+    }
+    else if ( ui->selectExponential->isChecked() ) {
+
+    }
+    else {
+        // we should not get here unless there is an issue with the UI
+        qWarning() << "no model type selected.  Please report issue to SimCenter developers";
+    }
+
+    ui->PHI11->setValue(0.1);
+    ui->PHI21->setValue(0.0);
+    ui->PHI31->setValue(0.0);
+    ui->PHI22->setValue(0.1);
+    ui->PHI32->setValue(0.0);
+    ui->PHI33->setValue(0.1);
+
+    ui->z01->setValue(0.0);
+    ui->z02->setValue(0.0);
+    ui->z03->setValue(0.0);
+
+    ui->zVector1->setValue(0.0);
+    ui->zVector1->setValue(0.0);
+    ui->zVector1->setValue(1.0);
+
+    ui->alpha1->setValue(0.1);
+    ui->alpha2->setValue(0.1);
+    ui->alpha3->setValue(0.1);
 }
 
 void InflowParameterWidget::on_btnNormalize_clicked()
@@ -44,4 +80,40 @@ void InflowParameterWidget::on_PHI31_valueChanged(double arg1)
 void InflowParameterWidget::on_PHI32_valueChanged(double arg1)
 {
     ui->PHI23->setValue(arg1);
+}
+
+void InflowParameterWidget::on_selectUniform_clicked(bool checked)
+{
+    // adjust UI for uniform distribution
+    if ( checked ) {
+
+        // deactivate alpha parameters
+
+        ui->alpha1->setEnabled(false);
+        ui->alpha2->setEnabled(false);
+        ui->alpha2->setEnabled(false);
+
+        //ui->alphaParameterGroup->hide();
+    }
+}
+
+void InflowParameterWidget::on_selectExponential_clicked(bool checked)
+{
+    // adjust UI for exponential distribution
+    if ( checked ) {
+
+        // activate alpha parameters
+
+        ui->alpha1->setEnabled(true);
+        ui->alpha2->setEnabled(true);
+        ui->alpha2->setEnabled(true);
+
+        //ui->alphaParameterGroup->show();
+    }
+}
+
+void InflowParameterWidget::on_resetButton_clicked()
+{
+    // set UI to default parameter values
+    setDefaultParameters();
 }
