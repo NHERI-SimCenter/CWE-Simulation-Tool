@@ -91,7 +91,7 @@ void InflowParameterWidget::on_selectUniform_clicked(bool checked)
 
         ui->alpha1->setEnabled(false);
         ui->alpha2->setEnabled(false);
-        ui->alpha2->setEnabled(false);
+        ui->alpha3->setEnabled(false);
 
         //ui->alphaParameterGroup->hide();
     }
@@ -106,7 +106,7 @@ void InflowParameterWidget::on_selectExponential_clicked(bool checked)
 
         ui->alpha1->setEnabled(true);
         ui->alpha2->setEnabled(true);
-        ui->alpha2->setEnabled(true);
+        ui->alpha3->setEnabled(true);
 
         //ui->alphaParameterGroup->show();
     }
