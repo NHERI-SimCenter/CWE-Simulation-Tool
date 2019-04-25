@@ -107,7 +107,8 @@ SOURCES += \
     CFDanalysis/cweresultinstance.cpp \
     CFDanalysis/cweanalysistype.cpp \
     CFDanalysis/cwecaseinstance.cpp \
-    visualUtils/cfdglcanvas3D.cpp
+    visualUtils/cfdglcanvas3D.cpp \
+    popupWindows/inflowparameterwidget.cpp
 
 HEADERS  += \
     visualUtils/cfdglcanvas.h \
@@ -150,7 +151,8 @@ HEADERS  += \
     CFDanalysis/cweresultinstance.h \
     CFDanalysis/cweanalysistype.h \
     CFDanalysis/cwecaseinstance.h \
-    visualUtils/cfdglcanvas3D.h
+    visualUtils/cfdglcanvas3D.h \
+    popupWindows/inflowparameterwidget.h
 
 FORMS    += \
     mainWindow/cwe_mainwindow.ui \
@@ -168,7 +170,8 @@ FORMS    += \
     utilWindows/dialogabout.ui \
     cwe_guiWidgets/cwe_param_tabs/cwe_stagestatustab.ui \
     cwe_guiWidgets/cwe_param_tabs/cwe_grouptab.ui \
-    cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.ui
+    cwe_guiWidgets/cwe_param_tabs/cwe_paneltab.ui \
+    popupWindows/inflowparameterwidget.ui
 
 RESOURCES += \
     CFDanalysis/config/cfdconfig.qrc \

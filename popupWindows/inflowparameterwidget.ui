@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>InflowParameterWidget</class>
+ <widget class="QFrame" name="InflowParameterWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>640</width>
+    <height>422</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Frame</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="headerLabel">
+     <property name="text">
+      <string>Turbulent Inflow Model Paraemeters</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QGroupBox" name="alphaParameterGroup">
+     <property name="title">
+      <string>power law: alpha coefficients</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QDoubleSpinBox" name="alpha1"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="alpha2"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QDoubleSpinBox" name="alpha3"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="phiTensorGroup">
+     <property name="title">
+      <string>Coefficient tensor PHI</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item row="5" column="2">
+       <widget class="QDoubleSpinBox" name="PHI33"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QDoubleSpinBox" name="PHI21"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QDoubleSpinBox" name="PHI31"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QDoubleSpinBox" name="PHI32"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QDoubleSpinBox" name="PHI11"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="PHI12">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QDoubleSpinBox" name="PHI13">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QDoubleSpinBox" name="PHI23">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="PHI22"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QGroupBox" name="referencePointGroup">
+     <property name="title">
+      <string>reference point</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QDoubleSpinBox" name="z01"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="z02"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QDoubleSpinBox" name="z03"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QGroupBox" name="zVectorGroup">
+     <property name="title">
+      <string>z-vector</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item row="1" column="2">
+       <widget class="QDoubleSpinBox" name="zVector3"/>
+      </item>
+      <item row="2" column="0" colspan="3">
+       <widget class="QPushButton" name="btnNormalize">
+        <property name="text">
+         <string>normalize</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QDoubleSpinBox" name="zVector1"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="zVector2"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
