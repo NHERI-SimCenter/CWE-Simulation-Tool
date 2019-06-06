@@ -20,6 +20,8 @@ InflowParameterWidget::~InflowParameterWidget()
 
 void InflowParameterWidget::setDefaultParameters()
 {
+    ui->selectUniform->setChecked(true);
+
     if ( ui->selectUniform->isChecked() ) {
 
     }
@@ -93,6 +95,22 @@ void InflowParameterWidget::on_selectUniform_clicked(bool checked)
         ui->alpha2->setEnabled(false);
         ui->alpha3->setEnabled(false);
 
+        // deactivate reference point
+
+        //ui->zVectorGroup->setEnabled(false);
+
+        //ui->z01->setEnabled(false);
+        //ui->z02->setEnabled(false);
+        //ui->z03->setEnabled(false);
+
+        // deactivate reference direction (n-vector)
+
+        ui->referencePointGroup->setEnabled(false);
+
+        //ui->zVector1->setEnabled(false);
+        //ui->zVector2->setEnabled(false);
+        //ui->zVector3->setEnabled(false);
+
         //ui->alphaParameterGroup->hide();
     }
 }
@@ -107,6 +125,22 @@ void InflowParameterWidget::on_selectExponential_clicked(bool checked)
         ui->alpha1->setEnabled(true);
         ui->alpha2->setEnabled(true);
         ui->alpha3->setEnabled(true);
+
+        // activate reference point
+
+        //ui->zVectorGroup->setEnabled(true);
+
+        //ui->z01->setEnabled(true);
+        //ui->z02->setEnabled(true);
+        //ui->z03->setEnabled(true);
+
+        // activate reference direction (n-vector)
+
+        ui->referencePointGroup->setEnabled(true);
+
+        //ui->zVector1->setEnabled(true);
+        //ui->zVector2->setEnabled(true);
+        //ui->zVector3->setEnabled(true);
 
         //ui->alphaParameterGroup->show();
     }
