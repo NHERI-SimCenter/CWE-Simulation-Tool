@@ -38,3 +38,5 @@ CMakeLists.txt.user
 
 images/.DS_Store
 .DS_Store
+
+Agave/utils/gmsh
