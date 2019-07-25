@@ -26,6 +26,11 @@ That is, CFDClientProgram and AgaveClientInterface should be subfolders of the s
 - Online version of embedded tool help: [https://nheri-simcenter.github.io/CWE-Simulation-Tool/docs/help/index.html](https://nheri-simcenter.github.io/CWE-Simulation-Tool/docs/help/index.html)
 - source documentation: [https://nheri-simcenter.github.io/CWE-Simulation-Tool/docs/internal/index.html](https://nheri-simcenter.github.io/CWE-Simulation-Tool/docs/internal/index.html)
 
+Please visit the [CWE Research Tool webpage](https://simcenter.designsafe-ci.org/research-tools/cwe-application/)
+for more resources related to this tool. Additionally, this page
+provides more information on the NHERI SimCenter, including other SimCenter
+applications, FAQ, and how to collaborate.
+
 ## Source
 
 [https://github.com/NHERI-SimCenter/CWE-Simulation-Tool](https://github.com/NHERI-SimCenter/CWE-Simulation-Tool)
